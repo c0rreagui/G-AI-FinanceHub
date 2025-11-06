@@ -1,0 +1,33 @@
+:root {
+  --background-oklch: 0.14 0.025 264;
+  --foreground-oklch: 0.98 0.002 264;
+  --card-oklch: 0.18 0.030 268;
+  --card-foreground-oklch: 0.96 0.008 264;
+  --popover-oklch: 0.14 0.025 264;
+  --popover-foreground-oklch: 0.98 0.002 264;
+  --primary-oklch: 0.68 0.24 270;
+  --primary-foreground-oklch: 0.98 0.002 264;
+  --secondary-oklch: 0.22 0.035 268;
+  --secondary-foreground-oklch: 0.96 0.008 264;
+  --muted-oklch: 0.22 0.035 268;
+  --muted-foreground-oklch: 0.65 0.015 266;
+  --accent-oklch: 0.68 0.24 270;
+  --accent-foreground-oklch: 0.98 0.002 264;
+  --destructive-oklch: 0.55 0.22 25;
+  --destructive-foreground-oklch: 0.98 0.002 264;
+  --border-oklch: 0.22 0.035 268;
+  --input-oklch: 0.22 0.035 268;
+  --ring-oklch: 0.68 0.24 270;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: oklch(var(--background-oklch));
+    color: oklch(var(--foreground-oklch));
+    font-family: 'Inter', sans-serif;
+  }
+}
