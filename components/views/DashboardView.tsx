@@ -1,174 +1,144 @@
 import React from 'react';
 import { PageHeader } from '../layout/PageHeader';
-import { BarChart as BarChartIcon, Wallet, ArrowUpRight, ArrowDownLeft } from '../Icons';
+import { BarChart, ArrowDownLeft, ArrowUpRight, Wallet, Target, PlusCircle } from '../Icons';
 import { useDashboardData } from '../../hooks/useDashboardData';
-import { formatCurrencyBRL } from '../../utils/formatters';
-import { Goal, TransactionType, Debt } from '../../types';
-import { ResponsiveContainer, BarChart, XAxis, YAxis, Tooltip, Bar, PieChart, Pie, Cell, Legend, CartesianGrid } from 'recharts';
+import { formatCurrencyBRL, formatDate } from '../../utils/formatters';
+import { LoadingSpinner } from '../LoadingSpinner';
+import { Transaction, TransactionType } from '../../types';
+import { Button } from '../ui/Button';
+import { useDialog } from '../../hooks/useDialog';
 import { ProgressBar } from '../ui/ProgressBar';
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 
-// Mock data for the monthly balance chart to make it more interesting
-const monthlyBalanceData = [
-  { month: 'Jul', receitas: 6500, despesas: 4200 },
-  { month: 'Ago', receitas: 7000, despesas: 5000 },
-  { month: 'Set', receitas: 7200, despesas: 4800 },
-  { month: 'Out', receitas: 8000, despesas: 5124.80 },
-];
+const SummaryCard: React.FC<{ title: string; amount: number; icon: React.ElementType; color: string; }> = ({ title, amount, icon: Icon, color }) => (
+    <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6">
+        <div className="flex items-center gap-4">
+            <Icon className={`w-8 h-8 ${color}`} />
+            <p className="text-gray-300">{title}</p>
+        </div>
+        <p className="text-3xl font-bold text-white mt-4">{formatCurrencyBRL(amount)}</p>
+    </div>
+);
 
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
+const TransactionItem: React.FC<{ transaction: Transaction }> = ({ transaction }) => {
+    const isExpense = transaction.type === TransactionType.DESPESA;
     return (
-      <div className="p-2 bg-gray-800 border border-gray-700 rounded-md shadow-lg text-sm">
-        <p className="label font-bold text-white">{`${label}`}</p>
-        {payload.map((pld: any, index: number) => (
-           <p key={index} style={{ color: pld.color }}>
-             {`${pld.name}: ${formatCurrencyBRL(pld.value)}`}
-           </p>
-        ))}
-      </div>
+        <li className="flex items-center justify-between py-3">
+            <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{backgroundColor: `${transaction.category.color}20`}}>
+                    <transaction.category.icon className="w-5 h-5" style={{color: transaction.category.color}} />
+                </div>
+                <div>
+                    <p className="font-semibold text-white">{transaction.description}</p>
+                    <p className="text-sm text-gray-400">{formatDate(transaction.date, 'dayMonth')}</p>
+                </div>
+            </div>
+            <p className={`font-semibold ${isExpense ? 'text-red-400' : 'text-green-400'}`}>
+                {isExpense ? '' : '+'} {formatCurrencyBRL(transaction.amount)}
+            </p>
+        </li>
     );
-  }
-  return null;
 };
 
-
-const GoalItem: React.FC<{ goal: Goal }> = ({ goal }) => {
-    const progress = (goal.currentAmount / goal.targetAmount) * 100;
-    return (
-        <div>
-            <div className="flex justify-between items-baseline mb-1">
-                <span className="text-sm font-medium text-white">{goal.name}</span>
-                <span className="text-xs text-gray-400">{formatCurrencyBRL(goal.currentAmount)} / {formatCurrencyBRL(goal.targetAmount)}</span>
-            </div>
-            <ProgressBar percentage={progress} />
-        </div>
-    );
-}
-
-const DebtItem: React.FC<{ debt: Debt }> = ({ debt }) => {
-    const progress = (debt.paidAmount / debt.totalAmount) * 100;
-    return (
-        <div>
-            <div className="flex justify-between items-baseline mb-1">
-                <span className="text-sm font-medium text-white">{debt.name}</span>
-                <span className="text-xs text-gray-400">{formatCurrencyBRL(debt.paidAmount)} / {formatCurrencyBRL(debt.totalAmount)}</span>
-            </div>
-            <ProgressBar percentage={progress} color="red"/>
-        </div>
-    );
-}
-
-
 export const DashboardView: React.FC = () => {
-    const { summary, transactions, goals, debts } = useDashboardData();
+    const { summary, transactions, goals, loading, categories } = useDashboardData();
+    const { openDialog } = useDialog();
+
+    if (loading) {
+        return (
+            <div className="flex-grow flex items-center justify-center">
+                <LoadingSpinner />
+            </div>
+        );
+    }
+
+    const expensesByCategory = transactions
+        .filter(t => t.type === TransactionType.DESPESA)
+        .reduce((acc, t) => {
+            const categoryName = t.category.name;
+            const amount = Math.abs(t.amount);
+            if (!acc[categoryName]) {
+                acc[categoryName] = { name: categoryName, value: 0, color: t.category.color };
+            }
+            acc[categoryName].value += amount;
+            return acc;
+        }, {} as { [key: string]: { name: string; value: number; color: string } });
     
-    const expenseByCategory = transactions
-      .filter(t => t.type === TransactionType.DESPESA)
-      .reduce((acc, t) => {
-        const categoryName = t.category.name;
-        if (!acc[categoryName]) {
-          acc[categoryName] = { name: categoryName, value: 0, color: t.category.color };
-        }
-        acc[categoryName].value += Math.abs(t.amount);
-        return acc;
-      }, {} as any);
-    
-    const pieChartData = Object.values(expenseByCategory);
+    const pieChartData = Object.values(expensesByCategory);
+    const firstGoal = goals.find(g => g.status === 'Em Andamento');
 
     return (
         <>
-            <PageHeader 
-                icon={BarChartIcon} 
-                title="Dashboard" 
-                breadcrumbs={['FinanceHub', 'Dashboard']} 
+            <PageHeader
+                icon={BarChart}
+                title="Dashboard"
+                breadcrumbs={['FinanceHub', 'Dashboard']}
+                actions={<Button onClick={() => openDialog('add-transaction')}><PlusCircle className="w-4 h-4 mr-2"/> Nova Transação</Button>}
             />
-             <div className="mt-6 flex-grow grid grid-cols-1 lg:grid-cols-3 gap-6 overflow-y-auto pr-2">
-                {/* Coluna Principal */}
-                <div className="lg:col-span-2 flex flex-col gap-6">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                       <div className="bg-white/5 border border-white/10 p-5 rounded-xl flex items-center gap-4">
-                           <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center">
-                               <Wallet className="w-6 h-6 text-blue-400" />
-                           </div>
-                           <div>
-                             <h3 className="text-sm font-medium text-gray-400">Saldo Total</h3>
-                             <p className="text-2xl font-semibold text-white mt-1">{formatCurrencyBRL(summary.totalBalance)}</p>
-                           </div>
-                       </div>
-                       <div className="bg-white/5 border border-white/10 p-5 rounded-xl flex items-center gap-4">
-                           <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center">
-                               <ArrowUpRight className="w-6 h-6 text-green-400" />
-                           </div>
-                           <div>
-                             <h3 className="text-sm font-medium text-gray-400">Receitas do Mês</h3>
-                             <p className="text-2xl font-semibold text-green-400 mt-1">{formatCurrencyBRL(summary.monthlyIncome)}</p>
-                           </div>
-                       </div>
-                       <div className="bg-white/5 border border-white/10 p-5 rounded-xl flex items-center gap-4">
-                           <div className="w-12 h-12 bg-red-500/10 rounded-lg flex items-center justify-center">
-                               <ArrowDownLeft className="w-6 h-6 text-red-400" />
-                           </div>
-                           <div>
-                             <h3 className="text-sm font-medium text-gray-400">Despesas do Mês</h3>
-                             <p className="text-2xl font-semibold text-red-400 mt-1">{formatCurrencyBRL(Math.abs(summary.monthlyExpenses))}</p>
-                           </div>
-                       </div>
-                    </div>
-                    
-                    <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6 flex-grow flex flex-col">
-                        <h2 className="text-lg font-semibold text-white mb-4">Balanço Mensal</h2>
-                        <div className="flex-grow">
-                           <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={monthlyBalanceData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" />
-                                    <XAxis dataKey="month" tick={{ fill: '#9ca3af' }} fontSize={12} />
-                                    <YAxis tickFormatter={(value) => `R$${value/1000}k`} tick={{ fill: '#9ca3af' }} fontSize={12} />
-                                    <Tooltip content={<CustomTooltip />} cursor={{fill: 'rgba(255,255,255,0.05)'}}/>
-                                    <Legend wrapperStyle={{fontSize: "14px"}}/>
-                                    <Bar dataKey="receitas" fill="#22c55e" name="Receitas" radius={[4, 4, 0, 0]} />
-                                    <Bar dataKey="despesas" fill="#ef4444" name="Despesas" radius={[4, 4, 0, 0]} />
-                                 </BarChart>
-                           </ResponsiveContainer>
-                        </div>
-                    </div>
+
+            <div className="mt-6 flex-grow overflow-y-auto pr-2">
+                {/* Summary Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <SummaryCard title="Saldo Atual" amount={summary.totalBalance} icon={Wallet} color="text-blue-400" />
+                    <SummaryCard title="Receitas do Mês" amount={summary.monthlyIncome} icon={ArrowUpRight} color="text-green-400" />
+                    <SummaryCard title="Despesas do Mês" amount={Math.abs(summary.monthlyExpenses)} icon={ArrowDownLeft} color="text-red-400" />
                 </div>
 
-                {/* Coluna Direita */}
-                <div className="lg:col-span-1 flex flex-col gap-6">
-                    <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6">
-                        <h2 className="text-lg font-semibold text-white mb-4">Despesas por Categoria</h2>
-                        <ResponsiveContainer width="100%" height={200}>
-                            <PieChart>
-                                <Pie data={pieChartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} labelLine={false} label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
-                                    const radius = innerRadius + (outerRadius - innerRadius) * 1.2;
-                                    const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
-                                    const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
-                                    return (
-                                        <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" fontSize={12}>
-                                        {`${(percent * 100).toFixed(0)}%`}
-                                        </text>
-                                    );
-                                }}>
-                                    {pieChartData.map((entry: any, index: number) => <Cell key={`cell-${index}`} fill={entry.color} />)}
-                                </Pie>
-                                <Tooltip content={<CustomTooltip />} />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    </div>
-                    <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6">
-                        <h2 className="text-lg font-semibold text-white mb-4">Metas</h2>
-                        <div className="space-y-4">
-                            {goals.filter(g => g.status === 'Em Andamento').map(goal => <GoalItem key={goal.id} goal={goal} />)}
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mt-6">
+                    {/* Recent Transactions & Goal */}
+                    <div className="lg:col-span-3 space-y-6">
+                        <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6">
+                            <h2 className="text-xl font-semibold text-white mb-4">Transações Recentes</h2>
+                            <ul className="divide-y divide-white/10">
+                                {transactions.slice(0, 5).map(t => <TransactionItem key={t.id} transaction={t} />)}
+                            </ul>
+                        </div>
+                        <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6">
+                            <h2 className="text-xl font-semibold text-white mb-4">Progresso da Meta</h2>
+                            {firstGoal ? (
+                                <div>
+                                    <div className="flex justify-between items-center">
+                                        <p className="font-semibold text-white">{firstGoal.name}</p>
+                                        <Target className="w-6 h-6 text-indigo-400" />
+                                    </div>
+                                    <p className="text-sm text-gray-400 mt-2">
+                                        {formatCurrencyBRL(firstGoal.currentAmount)} de {formatCurrencyBRL(firstGoal.targetAmount)}
+                                    </p>
+                                    <ProgressBar percentage={(firstGoal.currentAmount / firstGoal.targetAmount) * 100} color="indigo" />
+                                </div>
+                            ) : (
+                                <p className="text-gray-400">Nenhuma meta em andamento.</p>
+                            )}
                         </div>
                     </div>
-                     <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6">
-                        <h2 className="text-lg font-semibold text-white mb-4">Dívidas Ativas</h2>
-                        <div className="space-y-4">
-                            {debts.filter(d => d.status === 'Ativa').map(debt => <DebtItem key={debt.id} debt={debt} />)}
+                    
+                    {/* Expenses Chart */}
+                    <div className="lg:col-span-2 bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6 flex flex-col">
+                        <h2 className="text-xl font-semibold text-white mb-4">Distribuição de Despesas</h2>
+                        <div className="flex-grow w-full h-80">
+                             <ResponsiveContainer>
+                                <PieChart>
+                                    <Pie data={pieChartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} fill="#8884d8">
+                                        {pieChartData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={entry.color} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip
+                                        formatter={(value: number) => [formatCurrencyBRL(value), 'Valor']}
+                                        contentStyle={{
+                                            backgroundColor: 'rgba(20, 20, 30, 0.8)',
+                                            borderColor: 'rgba(255, 255, 255, 0.2)',
+                                            borderRadius: '1rem'
+                                        }}
+                                        cursor={{ fill: 'rgba(139, 92, 246, 0.1)'}}
+                                    />
+                                    <Legend iconSize={10} />
+                                </PieChart>
+                            </ResponsiveContainer>
                         </div>
                     </div>
                 </div>
-             </div>
+            </div>
         </>
     );
 };

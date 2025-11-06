@@ -8,6 +8,7 @@ import { Button } from '../ui/Button';
 import { Goal, GoalStatus } from '../../types';
 import { Badge } from '../ui/Badge';
 import { useDialog } from '../../hooks/useDialog';
+import { LoadingSpinner } from '../LoadingSpinner';
 
 const GoalCard: React.FC<{ goal: Goal }> = ({ goal }) => {
     const progress = Math.min((goal.currentAmount / goal.targetAmount) * 100, 100);
@@ -42,7 +43,7 @@ const GoalCard: React.FC<{ goal: Goal }> = ({ goal }) => {
 };
 
 export const GoalsView: React.FC = () => {
-    const { goals } = useDashboardData();
+    const { goals, loading } = useDashboardData();
     const { openDialog } = useDialog();
 
     return (
@@ -53,13 +54,26 @@ export const GoalsView: React.FC = () => {
                 breadcrumbs={['FinanceHub', 'Metas']}
                 actions={<Button onClick={() => openDialog('add-goal')}><PlusCircle className="w-4 h-4 mr-2"/> Nova Meta</Button>}
             />
-            <div className="mt-6 flex-grow overflow-y-auto pr-2">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {goals.map(goal => (
-                        <GoalCard key={goal.id} goal={goal} />
-                    ))}
+            {loading ? (
+                 <div className="flex-grow flex items-center justify-center">
+                    <LoadingSpinner />
                 </div>
-            </div>
+            ) : (
+                <div className="mt-6 flex-grow overflow-y-auto pr-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {goals.length > 0 ? (
+                            goals.map(goal => (
+                                <GoalCard key={goal.id} goal={goal} />
+                            ))
+                        ) : (
+                             <div className="col-span-full text-center text-gray-400 py-8">
+                                <p>Nenhuma meta encontrada.</p>
+                                <p className="text-sm mt-2">Clique em "Nova Meta" para começar a planejar seu futuro!</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
         </>
     );
 };

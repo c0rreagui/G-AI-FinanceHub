@@ -38,8 +38,10 @@ export interface Transaction {
   amount: number;
   date: string;
   type: TransactionType;
-  category: Category;
+  category_id?: string; // Foreign key from DB - made optional for mock data
+  category: Category; // Joined data in the app
   installment?: Installment;
+  cardName?: string; // Optional credit card name
 }
 
 export interface CreditCard {
@@ -108,7 +110,8 @@ export interface ScheduledTransaction {
     description: string;
     amount: number;
     type: TransactionType;
-    category: Category;
+    category_id?: string; // Foreign key from DB - made optional for mock data
+    category: Category; // Joined data in the app
     startDate: string;
     frequency: ScheduledTransactionFrequency;
     nextDueDate: string;
@@ -136,6 +139,7 @@ export interface Achievement {
     description: string;
     unlocked: boolean;
     dateUnlocked?: string;
+    icon: React.ElementType;
 }
 
 // Colaboração

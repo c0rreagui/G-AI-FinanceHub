@@ -4,6 +4,7 @@ import { Lightbulb, Utensils, ShoppingCart, ArrowUpRight, Wallet } from '../Icon
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { formatCurrencyBRL } from '../../utils/formatters';
 import { TransactionType } from '../../types';
+import { LoadingSpinner } from '../LoadingSpinner';
 
 const InsightCard: React.FC<{ icon: React.ElementType, title: string, children: React.ReactNode, color: string }> = ({ icon: Icon, title, children, color }) => (
     <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6">
@@ -22,7 +23,22 @@ const InsightCard: React.FC<{ icon: React.ElementType, title: string, children: 
 );
 
 export const InsightsView: React.FC = () => {
-    const { transactions, goals } = useDashboardData();
+    const { transactions, goals, loading } = useDashboardData();
+
+    if (loading) {
+        return (
+             <>
+                <PageHeader 
+                    icon={Lightbulb} 
+                    title="Insights & Análises" 
+                    breadcrumbs={['FinanceHub', 'Insights']} 
+                />
+                <div className="flex-grow flex items-center justify-center">
+                    <LoadingSpinner />
+                </div>
+            </>
+        );
+    }
 
     // Simple logic for insights based on mock data
     const foodExpenses = transactions.filter(t => t.category.id === 'cat1' && t.type === TransactionType.DESPESA).reduce((sum, t) => sum + Math.abs(t.amount), 0);

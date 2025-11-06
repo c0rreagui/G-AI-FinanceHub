@@ -16,7 +16,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ icon: Icon, title, bread
             <h1 className="text-2xl font-bold leading-7 text-white">{title}</h1>
         </div>
         <p className="mt-2 text-sm text-gray-400">
-          {breadcrumbs.join(' / ')}
+          {breadcrumbs.join(' › ')}
         </p>
       </div>
       {actions && <div>{actions}</div>}

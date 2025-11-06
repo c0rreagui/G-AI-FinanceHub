@@ -6,7 +6,7 @@ import { UserRank } from '../../types';
 
 const getRankColor = (rank: UserRank): 'yellow' | 'gray' | 'blue' | 'green' | 'red' => {
     switch (rank) {
-        case UserRank.BRONZE: return 'yellow';
+        case UserRank.BRONZE: return 'red';
         case UserRank.PRATA: return 'gray';
         case UserRank.OURO: return 'yellow';
         case UserRank.PLATINA: return 'blue';
@@ -16,7 +16,29 @@ const getRankColor = (rank: UserRank): 'yellow' | 'gray' | 'blue' | 'green' | 'r
 }
 
 export const UserProfileCard: React.FC = () => {
-    const { userLevel } = useDashboardData();
+    const { userLevel, loading } = useDashboardData();
+
+    if (loading || !userLevel) {
+        return (
+            <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6 animate-pulse">
+                <div className="flex items-center justify-between">
+                    <div className="h-6 bg-gray-700 rounded w-3/4"></div>
+                    <div className="h-5 bg-gray-700 rounded w-16"></div>
+                </div>
+                <div className="mt-4">
+                    <div className="h-8 bg-gray-700 rounded w-1/4"></div>
+                    <div className="mt-2">
+                        <div className="flex justify-between text-sm text-gray-300 mb-1">
+                            <div className="h-4 bg-gray-700 rounded w-1/5"></div>
+                            <div className="h-4 bg-gray-700 rounded w-1/4"></div>
+                        </div>
+                        <div className="w-full bg-gray-700 rounded-full h-2"></div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+    
     const progress = (userLevel.xp / userLevel.xpToNextLevel) * 100;
 
     return (

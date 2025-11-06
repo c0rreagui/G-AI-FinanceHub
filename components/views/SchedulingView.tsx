@@ -6,6 +6,7 @@ import { ScheduledTransaction, TransactionType } from '../../types';
 import { formatCurrencyBRL, formatDate } from '../../utils/formatters';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
+import { LoadingSpinner } from '../LoadingSpinner';
 
 const ScheduledTransactionCard: React.FC<{ item: ScheduledTransaction }> = ({ item }) => {
     const isExpense = item.type === TransactionType.DESPESA;
@@ -32,7 +33,7 @@ const ScheduledTransactionCard: React.FC<{ item: ScheduledTransaction }> = ({ it
 }
 
 export const SchedulingView: React.FC = () => {
-    const { scheduledTransactions } = useDashboardData();
+    const { scheduledTransactions, loading } = useDashboardData();
 
     return (
         <>
@@ -42,13 +43,26 @@ export const SchedulingView: React.FC = () => {
                 breadcrumbs={['FinanceHub', 'Agendamentos']}
                 actions={<Button><PlusCircle className="w-4 h-4 mr-2"/> Novo Agendamento</Button>}
             />
-            <div className="mt-6 flex-grow overflow-y-auto pr-2">
-                <div className="space-y-4">
-                    {scheduledTransactions.map(item => (
-                        <ScheduledTransactionCard key={item.id} item={item} />
-                    ))}
+            {loading ? (
+                <div className="flex-grow flex items-center justify-center">
+                    <LoadingSpinner />
                 </div>
-            </div>
+            ) : (
+                <div className="mt-6 flex-grow overflow-y-auto pr-2">
+                    {scheduledTransactions.length > 0 ? (
+                        <div className="space-y-4">
+                            {scheduledTransactions.map(item => (
+                                <ScheduledTransactionCard key={item.id} item={item} />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center text-gray-400 py-8">
+                            <p>Nenhum agendamento encontrado.</p>
+                            <p className="text-sm mt-2">Adicione transações recorrentes para gerenciá-las aqui.</p>
+                        </div>
+                    )}
+                </div>
+            )}
         </>
     );
 };

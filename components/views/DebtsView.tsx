@@ -8,6 +8,7 @@ import { Button } from '../ui/Button';
 import { Debt, DebtStatus } from '../../types';
 import { Badge } from '../ui/Badge';
 import { useDialog } from '../../hooks/useDialog';
+import { LoadingSpinner } from '../LoadingSpinner';
 
 const DebtCard: React.FC<{ debt: Debt }> = ({ debt }) => {
     const progress = Math.min((debt.paidAmount / debt.totalAmount) * 100, 100);
@@ -45,7 +46,7 @@ const DebtCard: React.FC<{ debt: Debt }> = ({ debt }) => {
 
 
 export const DebtsView: React.FC = () => {
-    const { debts } = useDashboardData();
+    const { debts, loading } = useDashboardData();
     const { openDialog } = useDialog();
 
     return (
@@ -56,13 +57,26 @@ export const DebtsView: React.FC = () => {
                 breadcrumbs={['FinanceHub', 'Dívidas']}
                 actions={<Button onClick={() => openDialog('add-debt')}><PlusCircle className="w-4 h-4 mr-2"/> Adicionar Dívida</Button>}
             />
-             <div className="mt-6 flex-grow overflow-y-auto pr-2">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {debts.map(debt => (
-                        <DebtCard key={debt.id} debt={debt} />
-                    ))}
+             {loading ? (
+                <div className="flex-grow flex items-center justify-center">
+                    <LoadingSpinner />
                 </div>
-            </div>
+             ) : (
+                <div className="mt-6 flex-grow overflow-y-auto pr-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {debts.length > 0 ? (
+                            debts.map(debt => (
+                                <DebtCard key={debt.id} debt={debt} />
+                            ))
+                        ) : (
+                             <div className="col-span-full text-center text-gray-400 py-8">
+                                <p>Nenhuma dívida encontrada.</p>
+                                <p className="text-sm mt-2">Parece que você está livre de dívidas. Parabéns!</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+             )}
         </>
     );
 };
