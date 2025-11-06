@@ -96,6 +96,7 @@ const initialState: AppState = {
 };
 
 const calculateSummary = (transactions: Transaction[]): Summary => {
+    if (!transactions) return { totalBalance: 0, monthlyIncome: 0, monthlyExpenses: 0 };
     const monthlyIncome = transactions.filter(t => t.type === TransactionType.RECEITA).reduce((sum, t) => sum + t.amount, 0);
     const monthlyExpenses = transactions.filter(t => t.type === TransactionType.DESPESA).reduce((sum, t) => sum + t.amount, 0);
     const totalBalance = 25340.50; // TODO: Fetch real balance
@@ -190,7 +191,6 @@ export const DashboardDataProvider: React.FC<{ children: ReactNode }> = ({ child
                     transactions: hydratedTransactions,
                     goals: goalsRes.data as Goal[],
                     debts: debtsRes.data as Debt[],
-                    // TODO: Adicionar fetch para os outros mocks
                     creditCards: mockCreditCards,
                     invoices: mockInvoices,
                     scheduledTransactions: mockScheduledTransactions,
@@ -211,15 +211,40 @@ export const DashboardDataProvider: React.FC<{ children: ReactNode }> = ({ child
     }, []);
 
     const addGoal = async (goalData: Omit<Goal, 'id' | 'currentAmount' | 'status'>) => {
-        //... (lógica de addGoal)
+        const newGoalData = { ...goalData, currentAmount: 0, status: GoalStatus.EM_ANDAMENTO };
+        const { data, error } = await supabase.from('goals').insert([newGoalData]).select();
+        
+        if (error || !data) {
+            console.error('Falha ao adicionar meta:', error);
+        } else {
+             dispatch({ type: 'ADD_GOAL_SUCCESS', payload: data[0] as Goal });
+        }
     };
 
     const addDebt = async (debtData: Omit<Debt, 'id' | 'paidAmount' | 'status'>) => {
-        //... (lógica de addDebt)
+        const newDebtData = { ...debtData, paidAmount: 0, status: DebtStatus.ATIVA, category: debtData.category || 'Outros' };
+        const { data, error } = await supabase.from('debts').insert([newDebtData]).select();
+        
+        if (error || !data) {
+            console.error('Falha ao adicionar dívida:', error);
+        } else {
+            dispatch({ type: 'ADD_DEBT_SUCCESS', payload: data[0] as Debt });
+        }
     };
 
     const addTransaction = async (transactionData: Omit<Transaction, 'id'>) => {
-        //... (lógica de addTransaction)
+        const { category, ...restOfData } = transactionData;
+        const dataToInsert = { ...restOfData, category_id: category.id };
+
+        const { data, error } = await supabase.from('transactions').insert([dataToInsert]).select();
+
+        if (error || !data) {
+            console.error('Falha ao adicionar transação:', error);
+            // Poderia despachar uma ação de erro aqui para notificar o usuário
+        } else {
+            const newTransaction: Transaction = { ...data[0], category };
+            dispatch({ type: 'ADD_TRANSACTION_SUCCESS', payload: newTransaction });
+        }
     };
 
     const value = { ...state, categories, addGoal, addDebt, addTransaction };
