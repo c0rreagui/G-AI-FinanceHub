@@ -22,7 +22,15 @@ export const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({ message 
         }`}
       >
         {message.imageUrl && <img src={message.imageUrl} alt="Envio do usuário" className="rounded-lg mb-2 max-w-xs" />}
-        {message.isTyping && !message.text ? <div className="inline-block"><LoadingSpinner/></div> : message.text}
+        
+        {message.isTyping && !message.text ? (
+          <div className="flex justify-center items-center p-2">
+            <LoadingSpinner />
+          </div>
+        ) : (
+          message.text
+        )}
+
         {message.isTyping && message.text && <div className="inline-block w-1 h-4 bg-white animate-pulse ml-1"></div>}
         
         {message.grounding && message.grounding.length > 0 && (
