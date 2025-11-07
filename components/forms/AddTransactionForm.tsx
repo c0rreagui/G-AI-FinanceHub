@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { useDashboardData } from '../../hooks/useDashboardData';
-import { TransactionType, Transaction } from '../../types';
+// FIX: Import `Account` and `Category` types to resolve type errors.
+import { TransactionType, Transaction, Account, Category } from '../../types';
 import { TypeToggle } from '../ui/TypeToggle';
 import { ExtractedTransaction } from '../../services/transactionExtractor';
 import { CategoryPicker } from '../ui/CategoryPicker';
@@ -69,11 +70,12 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
   };
   
   const filteredCategories = Object.values(categories)
-    .filter(cat => {
+    // FIX: Explicitly type `cat` as `Category` to resolve type errors and correct filtering logic.
+    .filter((cat: Category) => {
         if (type === TransactionType.RECEITA) {
             return ['cat13', 'cat14'].includes(cat.id);
         }
-        return !['cat13'].includes(cat.id);
+        return !['cat13', 'cat14'].includes(cat.id);
     });
 
   return (
@@ -130,7 +132,8 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                 className="mt-1 block w-full bg-black/20 border border-white/20 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 required
               >
-                  {accounts.map(acc => (
+                  {/* FIX: Explicitly type `acc` as `Account` to resolve property access errors. */}
+                  {accounts.map((acc: Account) => (
                       <option key={acc.id} value={acc.id}>{acc.name}</option>
                   ))}
               </select>

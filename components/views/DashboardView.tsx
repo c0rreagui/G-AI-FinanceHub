@@ -120,7 +120,8 @@ export const DashboardView: React.FC = () => {
                              <ResponsiveContainer>
                                 <PieChart>
                                     <Pie data={pieChartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} fill="#8884d8">
-                                        {pieChartData.map((entry, index) => (
+                                        {/* FIX: Explicitly type `entry` as `any` to resolve TypeScript inference error. */}
+                                        {pieChartData.map((entry: any, index) => (
                                             <Cell key={`cell-${index}`} fill={entry.color} />
                                         ))}
                                     </Pie>

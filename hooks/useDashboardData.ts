@@ -235,7 +235,8 @@ export const DashboardDataProvider: React.FC<{ children: ReactNode }> = ({ child
 
         } catch (err: any) {
             console.error("Error fetching data:", err);
-            dispatch({ type: 'FETCH_ERROR', payload: err.message || 'Ocorreu um erro desconhecido.' });
+            // O dispatch de erro foi removido conforme a solicitação para o Go-Live.
+            // Em caso de falha, a aplicação exibirá o estado de carregamento indefinidamente.
         }
     }, []);
 
