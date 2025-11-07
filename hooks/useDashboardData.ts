@@ -61,6 +61,13 @@ const iconMap: { [key: string]: React.ElementType } = {
   'default': Wallet,
 };
 
+const defaultCategory: Category = {
+    id: 'default',
+    name: 'Desconhecida',
+    icon: Wallet,
+    color: '#94a3b8', // slate-400
+};
+
 interface DashboardDataContextType {
   summary: Summary;
   transactions: Transaction[];
@@ -134,28 +141,52 @@ export const DashboardDataProvider: React.FC<{ children: ReactNode }> = ({
         if (res.error) throw res.error;
       }
 
-      // Process Categories
+      // Process Categories into a map for easy lookup
       const fetchedCategories = categoriesRes.data?.reduce((acc, cat) => {
         acc[cat.id] = { ...cat, icon: iconMap[cat.id] || iconMap['default'] };
         return acc;
       }, {} as Record<string, Category>) || {};
       setCategories(fetchedCategories);
 
-      // Process Transactions
-      const fetchedTransactions = transactionsRes.data?.map((tx: any) => ({
-        ...tx,
-        category: fetchedCategories[tx.category_id],
-      })) as Transaction[] || [];
+      // Process Transactions, using joined category data first
+      const fetchedTransactions = transactionsRes.data?.map((tx: any) => {
+        let category: Category;
+        // Prioritize using the joined category data from `select('*, categories(*)')`
+        if (tx.categories && typeof tx.categories === 'object' && tx.categories.id) {
+            category = {
+                ...tx.categories,
+                icon: iconMap[tx.categories.id] || iconMap['default'],
+            };
+        } else {
+            // Fallback to manual lookup for robustness
+            category = fetchedCategories[tx.category_id] || defaultCategory;
+        }
+        return {
+          ...tx,
+          category: category,
+        };
+      }) as Transaction[] || [];
       setTransactions(fetchedTransactions);
 
-      // Process Scheduled Transactions
-       const fetchedScheduledTransactions = scheduledTransactionsRes.data?.map((stx: any) => ({
-          ...stx,
-          nextDueDate: stx.next_due_date,
-          startDate: stx.start_date,
-          frequency: stx.frequency,
-          category: fetchedCategories[stx.category_id]
-        })) as ScheduledTransaction[] || [];
+      // Process Scheduled Transactions, using joined data
+       const fetchedScheduledTransactions = scheduledTransactionsRes.data?.map((stx: any) => {
+          let category: Category;
+          if (stx.categories && typeof stx.categories === 'object' && stx.categories.id) {
+              category = {
+                  ...stx.categories,
+                  icon: iconMap[stx.categories.id] || iconMap['default'],
+              };
+          } else {
+              category = fetchedCategories[stx.category_id] || defaultCategory;
+          }
+          return {
+            ...stx,
+            nextDueDate: stx.next_due_date,
+            startDate: stx.start_date,
+            frequency: stx.frequency,
+            category: category
+          };
+        }) as ScheduledTransaction[] || [];
       setScheduledTransactions(fetchedScheduledTransactions);
       
       // Set other states
@@ -181,9 +212,29 @@ export const DashboardDataProvider: React.FC<{ children: ReactNode }> = ({
         dateUnlocked: a.date_unlocked,
       })) as Achievement[] || []);
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error fetching data:", err);
-      setError(err.message || 'An unknown error occurred.');
+      let errorMessage = "Ocorreu um erro desconhecido ao buscar os dados.";
+
+      if (err instanceof Error) {
+          // Standard JavaScript error (e.g., network error)
+          errorMessage = err.message;
+      } else if (err && typeof err === 'object' && 'message' in err) {
+          // Duck-typed error object (like from Supabase)
+          errorMessage = String((err as { message: unknown }).message);
+      } else if (typeof err === 'string') {
+          // Just a string was thrown
+          errorMessage = err;
+      } else {
+          // Something else, try to serialize it safely
+          try {
+              errorMessage = `Ocorreu um erro inesperado: ${JSON.stringify(err, null, 2)}`;
+          } catch {
+              errorMessage = "Ocorreu um erro não serializável ao buscar os dados.";
+          }
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

@@ -99,7 +99,7 @@ export const BookOpen: React.FC<IconProps> = (props) => (
   <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6-2.292m0 0v14.25" /></Icon>
 );
 export const Gift: React.FC<IconProps> = (props) => (
-  <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M12.75 3.03v.568c0 .334.148.65.405.864l1.068.89c.442.369.535 1.01.216 1.49l-.51.766a2.25 2.25 0 01-1.161.886l-.143.048a1.109 1.109 0 00-.57 1.664c.369.555.169 1.307-.427 1.605L9 13.125l.423 1.059a.956.956 0 01-1.632.524l-.052-.082a2.25 2.25 0 00-3.292 0l-.052.082a.956.956 0 01-1.632-.524l.423-1.059L3 13.125c-.6-.298-.797-1.05-.427-1.605a1.109 1.109 0 00-.57-1.664l-.143-.048a2.25 2.25 0 01-1.161.886l-.51-.766c-.32-.48-.04-1.121.216-1.49l1.068-.89a1.125 1.125 0 00.405-.864v-.568a1.125 1.125 0 011.125-1.125h3.375a1.125 1.125 0 011.125 1.125z" /></Icon>
+  <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M12.75 3.03v.568c0 .334.148.65.405.864l1.068.89c.442.369.535 1.01.216 1.49l-.51.766a2.25 2.25 0 01-1.161.886l-.143.048a1.109 1.109 0 00-.57 1.664c.369.555.169 1.307-.427 1.605L9 13.125l.423 1.059a.956.956 0 01-1.632.524l-.052-.082a2.25 2.25 0 00-3.292 0l-.052.082a.956.956 0 01-1.632-.524l.423-1.059L3 13.125c-.6-.298-.797-1.05-.427-1.605a1.109 1.109 0 00-.57-1.664l-.143-.048a2.25 2.25 0 01-1.161-.886l-.51-.766c-.32-.48-.04-1.121.216-1.49l1.068-.89a1.125 1.125 0 00.405-.864v-.568a1.125 1.125 0 011.125-1.125h3.375a1.125 1.125 0 011.125 1.125z" /></Icon>
 );
 export const Plane: React.FC<IconProps> = (props) => (
   <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></Icon>
@@ -112,6 +112,14 @@ export const Gamepad: React.FC<IconProps> = (props) => (
 );
 export const Film: React.FC<IconProps> = (props) => (
   <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M6 3v18M18 3v18M3 6h18M3 18h18M6.75 3h10.5M6.75 21h10.5" /></Icon>
+);
+export const XCircleIcon: React.FC<IconProps> = (props) => (
+    <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></Icon>
+);
+export const SignalIcon: React.FC<IconProps> = (props) => (
+  <Icon {...props}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.136 11.886a9 9 0 0113.728 0M2 8.732a12.75 12.75 0 0119.5 0" />
+  </Icon>
 );
 export const XIcon: React.FC<IconProps> = (props) => (
     <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></Icon>

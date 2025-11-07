@@ -7,6 +7,7 @@ import { getChatResponseStream, connectToLive, encode, decode, decodeAudioData }
 import { useGeolocation } from '../hooks/useGeolocation';
 import { LiveServerMessage, LiveSession, Blob as GenAiBlob } from '@google/genai';
 import { PageHeader } from './layout/PageHeader';
+import { LiveStatusIndicator } from './ui/LiveStatusIndicator';
 
 export const AIHub: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -16,6 +17,7 @@ export const AIHub: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [image, setImage] = useState<{ url: string; data: string; mimeType: string } | null>(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [liveStatus, setLiveStatus] = useState<'idle' | 'connecting' | 'connected' | 'error' | 'closing'>('idle');
   
   const [useSearch, setUseSearch] = useState(false);
   const [useMaps, setUseMaps] = useState(false);
@@ -108,44 +110,39 @@ export const AIHub: React.FC = () => {
 
   const toggleRecording = useCallback(async () => {
     if (isRecording) {
-      setIsRecording(false);
-      // Clean up resources
-      if (mediaStream.current) {
-        mediaStream.current.getTracks().forEach(track => track.stop());
-        mediaStream.current = null;
-      }
-      if (scriptProcessor.current) {
-        scriptProcessor.current.disconnect();
-        scriptProcessor.current = null;
-      }
-      if (inputAudioContext.current && inputAudioContext.current.state !== 'closed') {
-        await inputAudioContext.current.close();
-      }
-      if (outputAudioContext.current && outputAudioContext.current.state !== 'closed') {
-        await outputAudioContext.current.close();
-      }
+      setLiveStatus('closing');
       if (sessionPromise.current) {
-        const session = await sessionPromise.current;
-        session.close();
-        sessionPromise.current = null;
+        try {
+          const session = await sessionPromise.current;
+          session.close();
+        } catch (e) {
+          console.error("Error closing session:", e);
+          setIsRecording(false);
+          setLiveStatus('error');
+        }
+      } else {
+        setIsRecording(false);
+        setLiveStatus('idle');
       }
       return;
     }
 
     setIsRecording(true);
-    
+    setLiveStatus('connecting');
+
     try {
-      // Setup audio contexts
       inputAudioContext.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
       outputAudioContext.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
       nextAudioStartTime.current = 0;
-      
+
       sessionPromise.current = connectToLive({
         onopen: async () => {
+          setLiveStatus('connected');
+          setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "Chat de voz iniciado. Estou ouvindo..." }]);
           mediaStream.current = await navigator.mediaDevices.getUserMedia({ audio: true });
           const source = inputAudioContext.current!.createMediaStreamSource(mediaStream.current);
           scriptProcessor.current = inputAudioContext.current!.createScriptProcessor(4096, 1, 1);
-          
+
           scriptProcessor.current.onaudioprocess = (audioProcessingEvent) => {
             const inputData = audioProcessingEvent.inputBuffer.getChannelData(0);
             const l = inputData.length;
@@ -154,8 +151,8 @@ export const AIHub: React.FC = () => {
               int16[i] = inputData[i] * 32768;
             }
             const pcmBlob: GenAiBlob = {
-                data: encode(new Uint8Array(int16.buffer)),
-                mimeType: 'audio/pcm;rate=16000',
+              data: encode(new Uint8Array(int16.buffer)),
+              mimeType: 'audio/pcm;rate=16000',
             };
             if (sessionPromise.current) {
               sessionPromise.current.then((session) => {
@@ -169,82 +166,104 @@ export const AIHub: React.FC = () => {
         onmessage: async (message: LiveServerMessage) => {
           const base64Audio = message.serverContent?.modelTurn?.parts[0]?.inlineData?.data;
           if (base64Audio) {
-              const ctx = outputAudioContext.current!;
-              nextAudioStartTime.current = Math.max(nextAudioStartTime.current, ctx.currentTime);
-              const audioBuffer = await decodeAudioData(decode(base64Audio), ctx, 24000, 1);
-              const sourceNode = ctx.createBufferSource();
-              sourceNode.buffer = audioBuffer;
-              sourceNode.connect(ctx.destination);
-              sourceNode.addEventListener('ended', () => audioSources.current.delete(sourceNode));
-              sourceNode.start(nextAudioStartTime.current);
-              nextAudioStartTime.current += audioBuffer.duration;
-              audioSources.current.add(sourceNode);
+            const ctx = outputAudioContext.current!;
+            nextAudioStartTime.current = Math.max(nextAudioStartTime.current, ctx.currentTime);
+            const audioBuffer = await decodeAudioData(decode(base64Audio), ctx, 24000, 1);
+            const sourceNode = ctx.createBufferSource();
+            sourceNode.buffer = audioBuffer;
+            sourceNode.connect(ctx.destination);
+            sourceNode.addEventListener('ended', () => audioSources.current.delete(sourceNode));
+            sourceNode.start(nextAudioStartTime.current);
+            nextAudioStartTime.current += audioBuffer.duration;
+            audioSources.current.add(sourceNode);
           }
 
           if (message.serverContent?.interrupted) {
-              for (const source of audioSources.current.values()) {
-                  source.stop();
-              }
-              audioSources.current.clear();
-              nextAudioStartTime.current = 0;
-          }
-          
-          const inputTranscription = message.serverContent?.inputTranscription?.text;
-          const outputTranscription = message.serverContent?.outputTranscription?.text;
-          
-          if (inputTranscription) {
-              setMessages(prev => {
-                  const last = prev[prev.length - 1];
-                  if (last?.role === ChatRole.USER && last.isTyping) {
-                      const newMessages = [...prev];
-                      newMessages[newMessages.length - 1].text += inputTranscription;
-                      return newMessages;
-                  }
-                  return [...prev, { role: ChatRole.USER, text: inputTranscription, isTyping: true }];
-              });
-          }
-          
-          if(outputTranscription){
-               setMessages(prev => {
-                  const last = prev[prev.length - 1];
-                  if (last?.role === ChatRole.MODEL && last.isTyping) {
-                      const newMessages = [...prev];
-                      newMessages[newMessages.length - 1].text += outputTranscription;
-                      return newMessages;
-                  }
-                  const lastUserMsg = prev[prev.length - 1];
-                  if(lastUserMsg?.role === ChatRole.USER && lastUserMsg.isTyping) {
-                    const newMessages = [...prev];
-                    newMessages[newMessages.length-1].isTyping = false;
-                    return [...newMessages, { role: ChatRole.MODEL, text: outputTranscription, isTyping: true }];
-                  }
-                  return [...prev, { role: ChatRole.MODEL, text: outputTranscription, isTyping: true }];
-              });
+            for (const source of audioSources.current.values()) {
+              source.stop();
+            }
+            audioSources.current.clear();
+            nextAudioStartTime.current = 0;
           }
 
-          if(message.serverContent?.turnComplete) {
-             setMessages(prev => prev.map(m => ({...m, isTyping: false})));
+          const inputTranscription = message.serverContent?.inputTranscription?.text;
+          const outputTranscription = message.serverContent?.outputTranscription?.text;
+
+          if (inputTranscription) {
+            setMessages(prev => {
+              const last = prev[prev.length - 1];
+              if (last?.role === ChatRole.USER && last.isTyping) {
+                const newMessages = [...prev];
+                newMessages[newMessages.length - 1].text += inputTranscription;
+                return newMessages;
+              }
+              return [...prev, { role: ChatRole.USER, text: inputTranscription, isTyping: true }];
+            });
+          }
+
+          if (outputTranscription) {
+            setMessages(prev => {
+              const last = prev[prev.length - 1];
+              if (last?.role === ChatRole.MODEL && last.isTyping) {
+                const newMessages = [...prev];
+                newMessages[newMessages.length - 1].text += outputTranscription;
+                return newMessages;
+              }
+              const lastUserMsg = prev[prev.length - 1];
+              if (lastUserMsg?.role === ChatRole.USER && lastUserMsg.isTyping) {
+                const newMessages = [...prev];
+                newMessages[newMessages.length - 1].isTyping = false;
+                return [...newMessages, { role: ChatRole.MODEL, text: outputTranscription, isTyping: true }];
+              }
+              return [...prev, { role: ChatRole.MODEL, text: outputTranscription, isTyping: true }];
+            });
+          }
+
+          if (message.serverContent?.turnComplete) {
+            setMessages(prev => prev.map(m => ({ ...m, isTyping: false })));
           }
         },
         onerror: (e: ErrorEvent) => {
           console.error("Live session error:", e);
-          setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "Erro no chat de voz. Por favor, tente novamente." }]);
-          setIsRecording(false);
+          setLiveStatus('error');
+          setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "Erro na conexão de voz. Verifique as permissões do microfone e tente novamente." }]);
         },
         onclose: (e: CloseEvent) => {
           console.log("Live session closed.");
-          setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "Chat de voz encerrado." }]);
+          
+          if (liveStatus === 'closing') {
+             setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "Chat de voz encerrado." }]);
+          }
+
+          if (mediaStream.current) {
+            mediaStream.current.getTracks().forEach(track => track.stop());
+            mediaStream.current = null;
+          }
+          if (scriptProcessor.current) {
+            scriptProcessor.current.disconnect();
+            scriptProcessor.current = null;
+          }
+          if (inputAudioContext.current && inputAudioContext.current.state !== 'closed') {
+            inputAudioContext.current.close();
+          }
+          if (outputAudioContext.current && outputAudioContext.current.state !== 'closed') {
+            outputAudioContext.current.close();
+          }
+          sessionPromise.current = null;
+          audioSources.current.clear();
+          nextAudioStartTime.current = 0;
+          setLiveStatus('idle');
           setIsRecording(false);
         },
       });
-      setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "Chat de voz iniciado. Estou ouvindo..." }]);
-    } catch(error) {
-        const errorMessage = error instanceof Error ? error.message : "Erro ao iniciar o chat de voz.";
-        console.error("Live session setup error:", error);
-        setMessages(prev => [...prev, { role: ChatRole.MODEL, text: errorMessage }]);
-        setIsRecording(false); // Reset state on setup failure
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Erro ao iniciar o chat de voz.";
+      console.error("Live session setup error:", error);
+      setLiveStatus('error');
+      setMessages(prev => [...prev, { role: ChatRole.MODEL, text: errorMessage }]);
+      setIsRecording(false);
     }
-  }, [isRecording]);
+  }, [isRecording, liveStatus]);
   
   return (
     <>
@@ -264,6 +283,9 @@ export const AIHub: React.FC = () => {
               <button onClick={() => setImage(null)} className="ml-2 text-gray-400 hover:text-white">&times;</button>
             </div>
           )}
+          
+          <LiveStatusIndicator status={isRecording ? liveStatus : 'idle'} />
+
           <div className="flex items-center bg-black/20 rounded-xl p-2">
             <label htmlFor="file-upload" className="cursor-pointer p-2 rounded-full hover:bg-white/10 transition-colors">
               <PaperclipIcon />
@@ -282,7 +304,18 @@ export const AIHub: React.FC = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && !isLoading && handleSend()}
-              placeholder={isRecording ? "Ouvindo..." : "Converse com o assistente IA..."}
+              placeholder={
+                isRecording
+                  ? (
+                      {
+                        connecting: 'Conectando...',
+                        connected: 'Ouvindo... (Chat de voz ativo)',
+                        closing: 'Encerrando...',
+                        error: 'Erro de conexão',
+                      }[liveStatus] || 'Ouvindo...'
+                    )
+                  : 'Converse com o assistente IA...'
+              }
               disabled={isLoading || isRecording}
               className="flex-1 bg-transparent px-4 py-2 text-white placeholder-gray-500 focus:outline-none disabled:opacity-50"
             />

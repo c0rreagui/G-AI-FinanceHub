@@ -11,6 +11,8 @@ interface ErrorModalProps {
 export const ErrorModal: React.FC<ErrorModalProps> = ({ isOpen, onClose, error }) => {
   if (!isOpen || !error) return null;
 
+  const isFetchError = error?.includes('TypeError: Failed to fetch');
+
   return (
     <div 
         className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm"
@@ -33,7 +35,18 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({ isOpen, onClose, error }
                 </button>
             </div>
             <div className="mt-4">
-                 <p className="mb-4 text-red-100">Não foi possível carregar os dados. Verifique sua conexão com a internet ou as credenciais do Supabase.</p>
+                {isFetchError && (
+                    <div className="bg-yellow-900/50 border border-yellow-500/30 p-3 rounded-md mb-4 text-yellow-200 text-sm">
+                        <p className="font-bold">Dica para Desenvolvedores:</p>
+                        <p>O erro "Failed to fetch" geralmente ocorre por problemas de CORS (Cross-Origin Resource Sharing) quando a aplicação web tenta se comunicar com a API do Supabase.</p>
+                        <p className="mt-2">
+                            <strong>Ação Recomendada:</strong> Verifique se o domínio desta aplicação está adicionado à lista de URLs permitidas nas configurações de CORS do seu projeto Supabase.
+                            <br />
+                            Você pode fazer isso em: <code className="text-xs bg-black/30 px-1 py-0.5 rounded">Project Settings &gt; API &gt; CORS configuration</code> no seu painel do Supabase. Adicionar a URL de origem ou `*` (para desenvolvimento) deve resolver o problema.
+                        </p>
+                    </div>
+                )}
+                 <p className="mb-4 text-red-100">Não foi possível carregar os dados. Verifique sua conexão com a internet ou as credenciais do Supabase. Veja os detalhes técnicos abaixo.</p>
                 <pre className="bg-black/30 p-4 rounded-md text-xs whitespace-pre-wrap font-mono text-red-100">
                     <code>{error}</code>
                 </pre>
