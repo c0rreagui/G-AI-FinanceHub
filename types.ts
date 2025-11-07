@@ -39,9 +39,17 @@ export interface Transaction {
   date: string;
   type: TransactionType;
   category_id?: string; // Foreign key from DB - made optional for mock data
+  account_id?: string; // Foreign key from DB
   category: Category; // Joined data in the app
   installment?: Installment;
   cardName?: string; // Optional credit card name
+}
+
+export interface Account {
+    id: string;
+    name: string;
+    type: 'Carteira' | 'Conta Corrente' | 'Poupança';
+    balance: number;
 }
 
 export interface CreditCard {

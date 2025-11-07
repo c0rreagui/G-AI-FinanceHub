@@ -22,6 +22,7 @@ const SummaryCard: React.FC<{ title: string; amount: number; icon: React.Element
 
 const TransactionItem: React.FC<{ transaction: Transaction }> = ({ transaction }) => {
     const isExpense = transaction.type === TransactionType.DESPESA;
+    const amount = isExpense ? -Math.abs(transaction.amount) : transaction.amount;
     return (
         <li className="flex items-center justify-between py-3">
             <div className="flex items-center gap-4">
@@ -34,14 +35,14 @@ const TransactionItem: React.FC<{ transaction: Transaction }> = ({ transaction }
                 </div>
             </div>
             <p className={`font-semibold ${isExpense ? 'text-red-400' : 'text-green-400'}`}>
-                {isExpense ? '' : '+'} {formatCurrencyBRL(transaction.amount)}
+                {isExpense ? '' : '+'} {formatCurrencyBRL(amount)}
             </p>
         </li>
     );
 };
 
 export const DashboardView: React.FC = () => {
-    const { summary, transactions, goals, loading, categories } = useDashboardData();
+    const { summary, transactions, goals, loading } = useDashboardData();
     const { openDialog } = useDialog();
 
     if (loading) {

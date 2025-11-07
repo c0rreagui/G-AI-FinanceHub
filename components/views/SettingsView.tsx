@@ -5,6 +5,7 @@ import { UserProfileCard } from '../ui/UserProfileCard';
 import { AchievementsList } from '../ui/AchievementsList';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { LoadingSpinner } from '../LoadingSpinner';
+import { ApiKeySettings } from '../ui/ApiKeySettings';
 
 export const SettingsView: React.FC = () => {
     const { loading } = useDashboardData();
@@ -23,6 +24,7 @@ export const SettingsView: React.FC = () => {
             ) : (
                 <div className="mt-6 flex-grow overflow-y-auto pr-2">
                     <UserProfileCard />
+                    <ApiKeySettings />
                     <AchievementsList />
                 </div>
             )}

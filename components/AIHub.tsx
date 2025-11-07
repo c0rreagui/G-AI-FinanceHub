@@ -99,7 +99,8 @@ export const AIHub: React.FC = () => {
 
     } catch (error) {
       console.error("Error generating content:", error);
-      setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "Desculpe, encontrei um erro. Por favor, tente novamente." }]);
+      const errorMessage = error instanceof Error ? error.message : "Desculpe, encontrei um erro. Por favor, tente novamente.";
+      setMessages(prev => [...prev, { role: ChatRole.MODEL, text: errorMessage }]);
     } finally {
       setIsLoading(false);
     }
@@ -132,111 +133,117 @@ export const AIHub: React.FC = () => {
     }
 
     setIsRecording(true);
-    setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "Chat de voz iniciado. Estou ouvindo..." }]);
-
-    // Setup audio contexts
-    inputAudioContext.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
-    outputAudioContext.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
-    nextAudioStartTime.current = 0;
     
-    sessionPromise.current = connectToLive({
-      onopen: async () => {
-        mediaStream.current = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const source = inputAudioContext.current!.createMediaStreamSource(mediaStream.current);
-        scriptProcessor.current = inputAudioContext.current!.createScriptProcessor(4096, 1, 1);
-        
-        scriptProcessor.current.onaudioprocess = (audioProcessingEvent) => {
-          const inputData = audioProcessingEvent.inputBuffer.getChannelData(0);
-          const l = inputData.length;
-          const int16 = new Int16Array(l);
-          for (let i = 0; i < l; i++) {
-            int16[i] = inputData[i] * 32768;
-          }
-          const pcmBlob: GenAiBlob = {
-              data: encode(new Uint8Array(int16.buffer)),
-              mimeType: 'audio/pcm;rate=16000',
-          };
-          if (sessionPromise.current) {
-            sessionPromise.current.then((session) => {
-              session.sendRealtimeInput({ media: pcmBlob });
-            });
-          }
-        };
-        source.connect(scriptProcessor.current);
-        scriptProcessor.current.connect(inputAudioContext.current!.destination);
-      },
-      onmessage: async (message: LiveServerMessage) => {
-        const base64Audio = message.serverContent?.modelTurn?.parts[0]?.inlineData?.data;
-        if (base64Audio) {
-            const ctx = outputAudioContext.current!;
-            nextAudioStartTime.current = Math.max(nextAudioStartTime.current, ctx.currentTime);
-            const audioBuffer = await decodeAudioData(decode(base64Audio), ctx, 24000, 1);
-            const sourceNode = ctx.createBufferSource();
-            sourceNode.buffer = audioBuffer;
-            sourceNode.connect(ctx.destination);
-            sourceNode.addEventListener('ended', () => audioSources.current.delete(sourceNode));
-            sourceNode.start(nextAudioStartTime.current);
-            nextAudioStartTime.current += audioBuffer.duration;
-            audioSources.current.add(sourceNode);
-        }
-
-        if (message.serverContent?.interrupted) {
-            for (const source of audioSources.current.values()) {
-                source.stop();
+    try {
+      // Setup audio contexts
+      inputAudioContext.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
+      outputAudioContext.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+      nextAudioStartTime.current = 0;
+      
+      sessionPromise.current = connectToLive({
+        onopen: async () => {
+          mediaStream.current = await navigator.mediaDevices.getUserMedia({ audio: true });
+          const source = inputAudioContext.current!.createMediaStreamSource(mediaStream.current);
+          scriptProcessor.current = inputAudioContext.current!.createScriptProcessor(4096, 1, 1);
+          
+          scriptProcessor.current.onaudioprocess = (audioProcessingEvent) => {
+            const inputData = audioProcessingEvent.inputBuffer.getChannelData(0);
+            const l = inputData.length;
+            const int16 = new Int16Array(l);
+            for (let i = 0; i < l; i++) {
+              int16[i] = inputData[i] * 32768;
             }
-            audioSources.current.clear();
-            nextAudioStartTime.current = 0;
-        }
-        
-        const inputTranscription = message.serverContent?.inputTranscription?.text;
-        const outputTranscription = message.serverContent?.outputTranscription?.text;
-        
-        if (inputTranscription) {
-            setMessages(prev => {
-                const last = prev[prev.length - 1];
-                if (last?.role === ChatRole.USER && last.isTyping) {
-                    const newMessages = [...prev];
-                    newMessages[newMessages.length - 1].text += inputTranscription;
-                    return newMessages;
-                }
-                return [...prev, { role: ChatRole.USER, text: inputTranscription, isTyping: true }];
-            });
-        }
-        
-        if(outputTranscription){
-             setMessages(prev => {
-                const last = prev[prev.length - 1];
-                if (last?.role === ChatRole.MODEL && last.isTyping) {
-                    const newMessages = [...prev];
-                    newMessages[newMessages.length - 1].text += outputTranscription;
-                    return newMessages;
-                }
-                const lastUserMsg = prev[prev.length - 1];
-                if(lastUserMsg?.role === ChatRole.USER && lastUserMsg.isTyping) {
-                  const newMessages = [...prev];
-                  newMessages[newMessages.length-1].isTyping = false;
-                  return [...newMessages, { role: ChatRole.MODEL, text: outputTranscription, isTyping: true }];
-                }
-                return [...prev, { role: ChatRole.MODEL, text: outputTranscription, isTyping: true }];
-            });
-        }
+            const pcmBlob: GenAiBlob = {
+                data: encode(new Uint8Array(int16.buffer)),
+                mimeType: 'audio/pcm;rate=16000',
+            };
+            if (sessionPromise.current) {
+              sessionPromise.current.then((session) => {
+                session.sendRealtimeInput({ media: pcmBlob });
+              });
+            }
+          };
+          source.connect(scriptProcessor.current);
+          scriptProcessor.current.connect(inputAudioContext.current!.destination);
+        },
+        onmessage: async (message: LiveServerMessage) => {
+          const base64Audio = message.serverContent?.modelTurn?.parts[0]?.inlineData?.data;
+          if (base64Audio) {
+              const ctx = outputAudioContext.current!;
+              nextAudioStartTime.current = Math.max(nextAudioStartTime.current, ctx.currentTime);
+              const audioBuffer = await decodeAudioData(decode(base64Audio), ctx, 24000, 1);
+              const sourceNode = ctx.createBufferSource();
+              sourceNode.buffer = audioBuffer;
+              sourceNode.connect(ctx.destination);
+              sourceNode.addEventListener('ended', () => audioSources.current.delete(sourceNode));
+              sourceNode.start(nextAudioStartTime.current);
+              nextAudioStartTime.current += audioBuffer.duration;
+              audioSources.current.add(sourceNode);
+          }
 
-        if(message.serverContent?.turnComplete) {
-           setMessages(prev => prev.map(m => ({...m, isTyping: false})));
-        }
-      },
-      onerror: (e: ErrorEvent) => {
-        console.error("Live session error:", e);
-        setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "Erro no chat de voz. Por favor, tente novamente." }]);
-        setIsRecording(false);
-      },
-      onclose: (e: CloseEvent) => {
-        console.log("Live session closed.");
-        setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "Chat de voz encerrado." }]);
-        setIsRecording(false);
-      },
-    });
+          if (message.serverContent?.interrupted) {
+              for (const source of audioSources.current.values()) {
+                  source.stop();
+              }
+              audioSources.current.clear();
+              nextAudioStartTime.current = 0;
+          }
+          
+          const inputTranscription = message.serverContent?.inputTranscription?.text;
+          const outputTranscription = message.serverContent?.outputTranscription?.text;
+          
+          if (inputTranscription) {
+              setMessages(prev => {
+                  const last = prev[prev.length - 1];
+                  if (last?.role === ChatRole.USER && last.isTyping) {
+                      const newMessages = [...prev];
+                      newMessages[newMessages.length - 1].text += inputTranscription;
+                      return newMessages;
+                  }
+                  return [...prev, { role: ChatRole.USER, text: inputTranscription, isTyping: true }];
+              });
+          }
+          
+          if(outputTranscription){
+               setMessages(prev => {
+                  const last = prev[prev.length - 1];
+                  if (last?.role === ChatRole.MODEL && last.isTyping) {
+                      const newMessages = [...prev];
+                      newMessages[newMessages.length - 1].text += outputTranscription;
+                      return newMessages;
+                  }
+                  const lastUserMsg = prev[prev.length - 1];
+                  if(lastUserMsg?.role === ChatRole.USER && lastUserMsg.isTyping) {
+                    const newMessages = [...prev];
+                    newMessages[newMessages.length-1].isTyping = false;
+                    return [...newMessages, { role: ChatRole.MODEL, text: outputTranscription, isTyping: true }];
+                  }
+                  return [...prev, { role: ChatRole.MODEL, text: outputTranscription, isTyping: true }];
+              });
+          }
 
+          if(message.serverContent?.turnComplete) {
+             setMessages(prev => prev.map(m => ({...m, isTyping: false})));
+          }
+        },
+        onerror: (e: ErrorEvent) => {
+          console.error("Live session error:", e);
+          setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "Erro no chat de voz. Por favor, tente novamente." }]);
+          setIsRecording(false);
+        },
+        onclose: (e: CloseEvent) => {
+          console.log("Live session closed.");
+          setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "Chat de voz encerrado." }]);
+          setIsRecording(false);
+        },
+      });
+      setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "Chat de voz iniciado. Estou ouvindo..." }]);
+    } catch(error) {
+        const errorMessage = error instanceof Error ? error.message : "Erro ao iniciar o chat de voz.";
+        console.error("Live session setup error:", error);
+        setMessages(prev => [...prev, { role: ChatRole.MODEL, text: errorMessage }]);
+        setIsRecording(false); // Reset state on setup failure
+    }
   }, [isRecording]);
   
   return (

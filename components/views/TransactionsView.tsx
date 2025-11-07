@@ -10,6 +10,8 @@ import { LoadingSpinner } from '../LoadingSpinner';
 
 const TransactionRow: React.FC<{ transaction: Transaction }> = ({ transaction }) => {
     const isExpense = transaction.type === TransactionType.DESPESA;
+    const amount = isExpense ? -Math.abs(transaction.amount) : transaction.amount;
+    
     return (
         <tr className="hover:bg-white/5 transition-colors">
             <td className="p-4">
@@ -25,7 +27,7 @@ const TransactionRow: React.FC<{ transaction: Transaction }> = ({ transaction })
             </td>
             <td className="p-4 text-right">
                  <p className={`font-semibold text-base ${isExpense ? 'text-red-400' : 'text-green-400'}`}>
-                    {isExpense ? '' : '+'} {formatCurrencyBRL(transaction.amount)}
+                    {isExpense ? '' : '+'} {formatCurrencyBRL(amount)}
                 </p>
             </td>
             <td className="p-4 text-gray-300 hidden md:table-cell">

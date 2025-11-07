@@ -1,10 +1,14 @@
-
 import { GoogleGenAI, GenerateContentResponse, LiveSession, LiveServerMessage, Modality } from "@google/genai";
 import { ChatMessage, ChatRole } from '../types';
 
-// Per coding guidelines, API key is obtained exclusively from process.env.API_KEY.
-// The client must be initialized with this key.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Helper function to get the Gemini client using the key from localStorage
+const getAiClient = (): GoogleGenAI => {
+    const apiKey = localStorage.getItem('gemini_api_key');
+    if (!apiKey) {
+        throw new Error("Chave de API do Gemini não encontrada. Por favor, adicione sua chave nas Configurações.");
+    }
+    return new GoogleGenAI({ apiKey });
+}
 
 export const getChatResponseStream = async (
   history: ChatMessage[],
@@ -14,6 +18,8 @@ export const getChatResponseStream = async (
   useMaps: boolean,
   location: { latitude: number; longitude: number } | null
 ) => {
+  const ai = getAiClient(); // Initialize client with key from localStorage
+
   const contents = history.map(msg => ({
     role: msg.role === ChatRole.USER ? 'user' : 'model',
     parts: [{ text: msg.text || '' }],
@@ -61,6 +67,7 @@ export const connectToLive = (callbacks: {
     onerror: (e: ErrorEvent) => void;
     onclose: (e: CloseEvent) => void;
 }): Promise<LiveSession> => {
+  const ai = getAiClient(); // Initialize client with key from localStorage
   return ai.live.connect({
     model: 'gemini-2.5-flash-native-audio-preview-09-2025',
     callbacks,

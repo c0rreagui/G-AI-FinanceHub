@@ -22,7 +22,7 @@ const GoalCard: React.FC<{ goal: Goal }> = ({ goal }) => {
                     <Badge color={isCompleted ? 'green' : 'blue'}>{goal.status}</Badge>
                 </div>
                 <p className="text-sm text-gray-400 mt-1">
-                    Prazo final: {new Date(goal.deadline).toLocaleDateString('pt-BR')}
+                    Prazo final: {new Date(goal.deadline).toLocaleString('pt-BR')}
                 </p>
                 <div className="my-4">
                     <div className="flex justify-between text-white font-bold text-2xl">

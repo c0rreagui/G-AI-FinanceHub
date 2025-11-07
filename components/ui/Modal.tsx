@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { XIcon } from '../Icons';
 
 interface ModalProps {
