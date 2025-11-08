@@ -82,9 +82,9 @@ interface DashboardDataContextType {
   loading: boolean;
   error: string | null;
   clearError: () => void;
-  addTransaction: (transactionData: Omit<Transaction, 'id' | 'category'>) => Promise<void>;
-  addGoal: (goalData: Omit<Goal, 'id' | 'currentAmount' | 'status'>) => Promise<void>;
-  addDebt: (debtData: Omit<Debt, 'id' | 'paidAmount' | 'status'>) => Promise<void>;
+  addTransaction: (transactionData: Omit<Transaction, 'id' | 'category' | 'user_id'>) => Promise<void>;
+  addGoal: (goalData: Omit<Goal, 'id' | 'currentAmount' | 'status' | 'user_id'>) => Promise<void>;
+  addDebt: (debtData: Omit<Debt, 'id' | 'paidAmount' | 'status' | 'user_id'>) => Promise<void>;
 }
 
 const DashboardDataContext = createContext<DashboardDataContextType | undefined>(
@@ -282,9 +282,14 @@ export const DashboardDataProvider: React.FC<{ children: ReactNode }> = ({
     setError(null);
   };
   
-  const addTransaction = async (transactionData: Omit<Transaction, 'id' | 'category'>) => {
+  const addTransaction = async (transactionData: Omit<Transaction, 'id' | 'category' | 'user_id'>) => {
+    if (!user) {
+        setError("Usuário não autenticado.");
+        throw new Error("Usuário não autenticado.");
+    }
     try {
-        const { data, error } = await supabase.from('transactions').insert([transactionData]).select('*, categories(*)').single();
+        const newTx = { ...transactionData, user_id: user.id };
+        const { data, error } = await supabase.from('transactions').insert([newTx]).select('*, categories(*)').single();
         if (error) throw error;
         
         // Update state optimistically
@@ -312,8 +317,13 @@ export const DashboardDataProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  const addGoal = async (goalData: Omit<Goal, 'id' | 'currentAmount' | 'status'>) => {
+  const addGoal = async (goalData: Omit<Goal, 'id' | 'currentAmount' | 'status' | 'user_id'>) => {
+    if (!user) {
+      setError("Usuário não autenticado.");
+      throw new Error("Usuário não autenticado.");
+    }
       const newGoal = {
+        user_id: user.id,
         name: goalData.name,
         target_amount: goalData.targetAmount,
         deadline: goalData.deadline,
@@ -337,8 +347,13 @@ export const DashboardDataProvider: React.FC<{ children: ReactNode }> = ({
       }
   };
 
-  const addDebt = async (debtData: Omit<Debt, 'id' | 'paidAmount' | 'status'>) => {
+  const addDebt = async (debtData: Omit<Debt, 'id' | 'paidAmount' | 'status' | 'user_id'>) => {
+    if (!user) {
+      setError("Usuário não autenticado.");
+      throw new Error("Usuário não autenticado.");
+    }
     const newDebt = {
+        user_id: user.id,
         name: debtData.name,
         total_amount: debtData.totalAmount,
         interest_rate: debtData.interestRate,

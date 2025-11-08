@@ -34,6 +34,7 @@ export interface Installment {
 
 export interface Transaction {
   id: string;
+  user_id?: string;
   description: string;
   amount: number;
   date: string;
@@ -84,6 +85,7 @@ export enum GoalStatus {
 
 export interface Goal {
     id: string;
+    user_id?: string;
     name: string;
     targetAmount: number;
     currentAmount: number;
@@ -98,6 +100,7 @@ export enum DebtStatus {
 
 export interface Debt {
     id: string;
+    user_id?: string;
     name: string;
     totalAmount: number;
     paidAmount: number;
