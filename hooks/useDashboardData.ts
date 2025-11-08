@@ -1,12 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
-  ReactNode,
-} from 'react';
+import * as React from 'react';
 import {
   Account,
   Achievement,
@@ -87,32 +79,32 @@ interface DashboardDataContextType {
   addDebt: (debtData: Omit<Debt, 'id' | 'paidAmount' | 'status' | 'user_id'>) => Promise<void>;
 }
 
-const DashboardDataContext = createContext<DashboardDataContextType | undefined>(
+const DashboardDataContext = React.createContext<DashboardDataContextType | undefined>(
   undefined
 );
 
-export const DashboardDataProvider: React.FC<{ children: ReactNode }> = ({
+export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const { user } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
 
-  const [summary, setSummary] = useState<Summary>({
+  const [summary, setSummary] = React.useState<Summary>({
     totalBalance: 0,
     monthlyIncome: 0,
     monthlyExpenses: 0,
   });
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [goals, setGoals] = useState<Goal[]>([]);
-  const [debts, setDebts] = useState<Debt[]>([]);
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [categories, setCategories] = useState<Record<string, Category>>({});
-  const [scheduledTransactions, setScheduledTransactions] = useState<ScheduledTransaction[]>([]);
-  const [userLevel, setUserLevel] = useState<UserLevel | null>(null);
-  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [transactions, setTransactions] = React.useState<Transaction[]>([]);
+  const [goals, setGoals] = React.useState<Goal[]>([]);
+  const [debts, setDebts] = React.useState<Debt[]>([]);
+  const [accounts, setAccounts] = React.useState<Account[]>([]);
+  const [categories, setCategories] = React.useState<Record<string, Category>>({});
+  const [scheduledTransactions, setScheduledTransactions] = React.useState<ScheduledTransaction[]>([]);
+  const [userLevel, setUserLevel] = React.useState<UserLevel | null>(null);
+  const [achievements, setAchievements] = React.useState<Achievement[]>([]);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = React.useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -242,7 +234,7 @@ export const DashboardDataProvider: React.FC<{ children: ReactNode }> = ({
     }
   }, []);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (user) {
       fetchData();
     } else {
@@ -261,7 +253,7 @@ export const DashboardDataProvider: React.FC<{ children: ReactNode }> = ({
   }, [fetchData, user]);
 
   // Calculate summary whenever accounts or transactions change
-  useEffect(() => {
+  React.useEffect(() => {
     const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
 
     const now = new Date();
@@ -379,7 +371,7 @@ export const DashboardDataProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  const value = useMemo(() => ({
+  const value = React.useMemo(() => ({
     summary,
     transactions,
     goals,
@@ -411,10 +403,6 @@ export const DashboardDataProvider: React.FC<{ children: ReactNode }> = ({
     error,
   ]);
 
-  // FIX: Replaced JSX with React.createElement to resolve parsing errors in a .ts file.
-  // Using JSX syntax requires a .tsx file extension. Without it, the TypeScript parser
-  // misinterprets JSX tags as language operators, causing the reported errors.
-  // This is the equivalent function call that JSX compiles to, and it works in a .ts file.
   return React.createElement(
     DashboardDataContext.Provider,
     { value: value },
@@ -423,7 +411,7 @@ export const DashboardDataProvider: React.FC<{ children: ReactNode }> = ({
 };
 
 export const useDashboardData = () => {
-  const context = useContext(DashboardDataContext);
+  const context = React.useContext(DashboardDataContext);
   if (context === undefined) {
     throw new Error('useDashboardData must be used within a DashboardDataProvider');
   }

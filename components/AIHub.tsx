@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { ChatMessage, ChatRole } from '../types';
+import { ChatMessage, ChatRole, TransactionType } from '../types';
 import { ChatMessageDisplay } from './ChatMessageDisplay';
 import { LoadingSpinner } from './LoadingSpinner';
 import { MicIcon, PaperclipIcon, SendIcon, SearchIcon, MapPinIcon, HomeIcon } from './Icons';
@@ -8,6 +8,7 @@ import { useGeolocation } from '../hooks/useGeolocation';
 import { LiveServerMessage, LiveSession, Blob as GenAiBlob } from '@google/genai';
 import { PageHeader } from './layout/PageHeader';
 import { LiveStatusIndicator } from './ui/LiveStatusIndicator';
+import { useDialog } from '../hooks/useDialog';
 
 export const AIHub: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -23,6 +24,7 @@ export const AIHub: React.FC = () => {
   const [useMaps, setUseMaps] = useState(false);
   
   const { location, error: geoError } = useGeolocation();
+  const { openDialog } = useDialog();
 
   const sessionPromise = useRef<Promise<LiveSession> | null>(null);
   const inputAudioContext = useRef<AudioContext | null>(null);
@@ -66,8 +68,10 @@ export const AIHub: React.FC = () => {
     setInput('');
     setImage(null);
     
+    let stream; // Define stream here to access it in the whole function scope
+
     try {
-      const stream = await getChatResponseStream(chatHistory, input, imagePayload, useSearch, useMaps, location);
+      stream = await getChatResponseStream(chatHistory, input, imagePayload, useSearch, useMaps, location);
       let fullResponse = "";
       let groundingData: any[] = [];
       
@@ -106,6 +110,37 @@ export const AIHub: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
+    
+    if (!stream) return;
+
+    // --- Lógica para Function Calling ---
+    const response = await (stream as any).response;
+    const part = response.candidates[0]?.content.parts.find((part: any) => part.functionCall);
+    const call = part?.functionCall;
+
+    if (call && call.name === 'handleNewTransaction') {
+      const args = call.args;
+
+      // Prepara os dados para o modal
+      const prefillData = {
+        description: args.description || '',
+        amount: args.amount || 0, // Manter o valor original (negativo para despesa)
+        type: (args.amount < 0) ? TransactionType.DESPESA : TransactionType.RECEITA,
+      };
+
+      // Abre o modal de transação com os dados preenchidos
+      openDialog('add-transaction', { prefill: prefillData });
+
+      // Envia uma mensagem de confirmação no chat
+      setMessages(prev => [
+        ...prev,
+        {
+          role: ChatRole.MODEL,
+          text: `Claro! Abri o formulário para você. Por favor, revise os detalhes (especialmente a Categoria e a Conta) e clique em "Salvar".`,
+        },
+      ]);
+    }
+
   };
 
   const toggleRecording = useCallback(async () => {

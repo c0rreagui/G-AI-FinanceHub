@@ -36,6 +36,30 @@ export const getChatResponseStream = async (
   const tools: any[] = [];
   if (useSearch) tools.push({ googleSearch: {} });
   if (useMaps) tools.push({ googleMaps: {} });
+
+  // --- Adicionando a nova ferramenta de Function Calling ---
+  tools.push({
+    functionDeclarations: [
+      {
+        name: 'handleNewTransaction',
+        description: 'Inicia o processo de adicionar uma nova transação (despesa ou receita) quando o usuário solicitar explicitamente.',
+        parameters: {
+          type: 'OBJECT',
+          properties: {
+            description: {
+              type: 'STRING',
+              description: 'A descrição da transação. Ex: "Almoço", "Salário"',
+            },
+            amount: {
+              type: 'NUMBER',
+              description: 'O valor da transação. Despesas devem ser números negativos (ex: -50.00). Receitas devem ser números positivos (ex: 1000.00).',
+            },
+          },
+          required: ['description', 'amount'],
+        },
+      },
+    ],
+  });
   
   if (tools.length > 0) {
     config.tools = tools;

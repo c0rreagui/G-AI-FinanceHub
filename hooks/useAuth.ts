@@ -1,5 +1,4 @@
-// FIX: Import `React` default export to use `React.FC` and `React.createElement`.
-import React, { useState, useEffect, createContext, useContext, ReactNode } from 'react';
+import * as React from 'react';
 import { supabase } from '../services/supabaseClient';
 import { Session, User } from '@supabase/supabase-js';
 
@@ -9,14 +8,14 @@ interface AuthContextType {
   loading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [session, setSession] = React.useState<Session | null>(null);
+  const [user, setUser] = React.useState<User | null>(null);
+  const [loading, setLoading] = React.useState(true);
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Tenta pegar a sessão ativa quando o app carrega
     const getActiveSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -47,14 +46,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     loading,
   };
 
-  // FIX: Replaced JSX with React.createElement to resolve parsing errors in a .ts file.
-  // Using JSX syntax requires a .tsx file extension. Without it, the TypeScript parser
-  // misinterprets JSX tags as language operators, causing errors.
   return React.createElement(AuthContext.Provider, { value: value }, children);
 };
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
+  const context = React.useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
