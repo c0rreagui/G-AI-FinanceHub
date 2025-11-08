@@ -40,6 +40,7 @@ import {
   Tool,
   Trophy,
 } from '../components/Icons';
+import { useAuth } from './useAuth';
 
 // --- MOCK ICONS ---
 // This maps category IDs from the DB to React components
@@ -93,6 +94,7 @@ const DashboardDataContext = createContext<DashboardDataContextType | undefined>
 export const DashboardDataProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -241,8 +243,22 @@ export const DashboardDataProvider: React.FC<{ children: ReactNode }> = ({
   }, []);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (user) {
+      fetchData();
+    } else {
+      // Se o usuário deslogar, limpa os dados
+      setLoading(false);
+      setTransactions([]);
+      setAccounts([]);
+      setGoals([]);
+      setDebts([]);
+      setCategories({});
+      setScheduledTransactions([]);
+      setUserLevel(null);
+      setAchievements([]);
+      setSummary({ totalBalance: 0, monthlyIncome: 0, monthlyExpenses: 0 });
+    }
+  }, [fetchData, user]);
 
   // Calculate summary whenever accounts or transactions change
   useEffect(() => {

@@ -6,9 +6,18 @@ import { AchievementsList } from '../ui/AchievementsList';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { LoadingSpinner } from '../LoadingSpinner';
 import { ApiKeySettings } from '../ui/ApiKeySettings';
+import { useAuth } from '../../hooks/useAuth';
+import { supabase } from '../../services/supabaseClient';
+import { Button } from '../ui/Button';
 
 export const SettingsView: React.FC = () => {
     const { loading } = useDashboardData();
+    const { user } = useAuth();
+
+    const handleLogout = async () => {
+      await supabase.auth.signOut();
+      // O App.tsx vai detectar isso automaticamente e mostrar a tela de login
+    };
 
     return (
         <>
@@ -26,6 +35,14 @@ export const SettingsView: React.FC = () => {
                     <UserProfileCard />
                     <ApiKeySettings />
                     <AchievementsList />
+                    <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6 mt-6">
+                      <p className="text-center text-gray-400 text-sm mb-4">
+                        Logado como: <strong className="text-white">{user?.email}</strong>
+                      </p>
+                      <Button onClick={handleLogout} variant="secondary" className="w-full">
+                        Sair (Logout)
+                      </Button>
+                    </div>
                 </div>
             )}
         </>
