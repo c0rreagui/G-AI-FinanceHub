@@ -34,32 +34,36 @@ export const getChatResponseStream = async (
 
   const config: any = {};
   const tools: any[] = [];
-  if (useSearch) tools.push({ googleSearch: {} });
-  if (useMaps) tools.push({ googleMaps: {} });
 
-  // --- Adicionando a nova ferramenta de Function Calling ---
-  tools.push({
-    functionDeclarations: [
-      {
-        name: 'handleNewTransaction',
-        description: 'Inicia o processo de adicionar uma nova transação (despesa ou receita) quando o usuário solicitar explicitamente.',
-        parameters: {
-          type: 'OBJECT',
-          properties: {
-            description: {
-              type: 'STRING',
-              description: 'A descrição da transação. Ex: "Almoço", "Salário"',
+  // As ferramentas de grounding (Search, Maps) são exclusivas e não podem ser misturadas com function calling.
+  if (useSearch || useMaps) {
+    if (useSearch) tools.push({ googleSearch: {} });
+    if (useMaps) tools.push({ googleMaps: {} });
+  } else {
+    // Adiciona a ferramenta de function calling apenas se o grounding não estiver ativo.
+    tools.push({
+      functionDeclarations: [
+        {
+          name: 'handleNewTransaction',
+          description: 'Inicia o processo de adicionar uma nova transação (despesa ou receita) quando o usuário solicitar explicitamente.',
+          parameters: {
+            type: 'OBJECT',
+            properties: {
+              description: {
+                type: 'STRING',
+                description: 'A descrição da transação. Ex: "Almoço", "Salário"',
+              },
+              amount: {
+                type: 'NUMBER',
+                description: 'O valor da transação. Despesas devem ser números negativos (ex: -50.00). Receitas devem ser números positivos (ex: 1000.00).',
+              },
             },
-            amount: {
-              type: 'NUMBER',
-              description: 'O valor da transação. Despesas devem ser números negativos (ex: -50.00). Receitas devem ser números positivos (ex: 1000.00).',
-            },
+            required: ['description', 'amount'],
           },
-          required: ['description', 'amount'],
         },
-      },
-    ],
-  });
+      ],
+    });
+  }
   
   if (tools.length > 0) {
     config.tools = tools;
@@ -76,11 +80,14 @@ export const getChatResponseStream = async (
     }
   }
 
-  return ai.models.generateContentStream({
+  // FIX: Adicionado `await` para garantir que a promise (se houver) seja resolvida.
+  // Em cenários com 'tools', a chamada pode se comportar de forma assíncrona.
+  const result = await ai.models.generateContentStream({
     model: 'gemini-2.5-flash',
     contents,
     config,
   });
+  return result;
 };
 
 // --- Live API and Audio Helper Functions ---

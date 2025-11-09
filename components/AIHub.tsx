@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { ChatMessage, ChatRole, TransactionType } from '../types';
 import { ChatMessageDisplay } from './ChatMessageDisplay';
@@ -52,6 +53,7 @@ export const AIHub: React.FC = () => {
     }
   };
 
+  // SUBSTITUA O handleSend INTEIRO POR ESTE CÓDIGO CORRIGIDO:
   const handleSend = async () => {
     if (!input.trim() && !image) return;
     setIsLoading(true);
@@ -68,21 +70,35 @@ export const AIHub: React.FC = () => {
     setInput('');
     setImage(null);
     
-    let stream; // Define stream here to access it in the whole function scope
-
     try {
-      stream = await getChatResponseStream(chatHistory, input, imagePayload, useSearch, useMaps, location);
+      // 1. CORREÇÃO: Pega o objeto de resultado INTEIRO
+      const result = await getChatResponseStream(
+        chatHistory,
+        input,
+        imagePayload,
+        useSearch,
+        useMaps,
+        location
+      );
+
+      // 2. CORREÇÃO: Acessa as propriedades .stream e .response
+      const stream = result.stream;
+      const responsePromise = result.response;
+
+      // 3. PREPARA O STREAMING DE TEXTO
       let fullResponse = "";
       let groundingData: any[] = [];
-      
       setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "", isTyping: true }]);
 
+      // 4. PROCESSA O STREAM DE TEXTO (AGORA VAI FUNCIONAR)
       for await (const chunk of stream) {
-        const chunkText = chunk.text;
+        const chunkText = chunk.text ?? ''; 
         fullResponse += chunkText;
+        
         if(chunk.candidates?.[0]?.groundingMetadata?.groundingChunks) {
           groundingData = chunk.candidates[0].groundingMetadata.groundingChunks;
         }
+
         setMessages(prev => {
           const newMessages = [...prev];
           const lastMessage = newMessages[newMessages.length - 1];
@@ -94,6 +110,7 @@ export const AIHub: React.FC = () => {
         });
       }
       
+      // Para o indicador de "digitando" do texto
       setMessages(prev => {
           const newMessages = [...prev];
           const lastMessage = newMessages[newMessages.length - 1];
@@ -101,46 +118,52 @@ export const AIHub: React.FC = () => {
             lastMessage.isTyping = false;
           }
           return newMessages;
-        });
+      });
+
+      // 5. PROCESSA A RESPOSTA FINAL (PARA FUNCTION CALLING)
+      const response = await responsePromise;
+      const part = response.candidates[0]?.content.parts.find((part: any) => part.functionCall);
+      const call = part?.functionCall;
+
+      if (call && call.name === 'handleNewTransaction') {
+        const args = call.args;
+
+        const prefillData = {
+          description: args.description || '',
+          amount: Math.abs(args.amount || 0), // O form espera um número positivo
+          type: (args.amount < 0) ? TransactionType.DESPESA : TransactionType.RECEITA,
+        };
+
+        openDialog('add-transaction', { prefill: prefillData });
+
+        setMessages(prev => [
+          ...prev,
+          {
+            role: ChatRole.MODEL,
+            text: `Claro! Abri o formulário para você. Por favor, revise os detalhes (especialmente a Categoria e a Conta) e clique em "Salvar".`,
+          },
+        ]);
+      }
 
     } catch (error) {
       console.error("Error generating content:", error);
       const errorMessage = error instanceof Error ? error.message : "Desculpe, encontrei um erro. Por favor, tente novamente.";
+      
+      // Garante que a mensagem de "digitando" seja removida em caso de erro
+      setMessages(prev => {
+          const newMessages = [...prev];
+          const lastMessage = newMessages[newMessages.length - 1];
+          if(lastMessage && lastMessage.role === ChatRole.MODEL && lastMessage.isTyping) {
+            // Remove a mensagem de "digitando" que falhou
+            return newMessages.slice(0, -1);
+          }
+          return newMessages;
+      });
+
       setMessages(prev => [...prev, { role: ChatRole.MODEL, text: errorMessage }]);
     } finally {
       setIsLoading(false);
     }
-    
-    if (!stream) return;
-
-    // --- Lógica para Function Calling ---
-    const response = await (stream as any).response;
-    const part = response.candidates[0]?.content.parts.find((part: any) => part.functionCall);
-    const call = part?.functionCall;
-
-    if (call && call.name === 'handleNewTransaction') {
-      const args = call.args;
-
-      // Prepara os dados para o modal
-      const prefillData = {
-        description: args.description || '',
-        amount: args.amount || 0, // Manter o valor original (negativo para despesa)
-        type: (args.amount < 0) ? TransactionType.DESPESA : TransactionType.RECEITA,
-      };
-
-      // Abre o modal de transação com os dados preenchidos
-      openDialog('add-transaction', { prefill: prefillData });
-
-      // Envia uma mensagem de confirmação no chat
-      setMessages(prev => [
-        ...prev,
-        {
-          role: ChatRole.MODEL,
-          text: `Claro! Abri o formulário para você. Por favor, revise os detalhes (especialmente a Categoria e a Conta) e clique em "Salvar".`,
-        },
-      ]);
-    }
-
   };
 
   const toggleRecording = useCallback(async () => {
