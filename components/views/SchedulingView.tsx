@@ -7,6 +7,7 @@ import { formatCurrencyBRL, formatDate } from '../../utils/formatters';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { LoadingSpinner } from '../LoadingSpinner';
+import { useDialog } from '../../hooks/useDialog';
 
 const ScheduledTransactionCard: React.FC<{ item: ScheduledTransaction }> = ({ item }) => {
     const isExpense = item.type === TransactionType.DESPESA;
@@ -34,6 +35,7 @@ const ScheduledTransactionCard: React.FC<{ item: ScheduledTransaction }> = ({ it
 
 export const SchedulingView: React.FC = () => {
     const { scheduledTransactions, loading } = useDashboardData();
+    const { openDialog } = useDialog();
 
     return (
         <>
@@ -41,7 +43,7 @@ export const SchedulingView: React.FC = () => {
                 icon={Calendar}
                 title="Agendamentos"
                 breadcrumbs={['FinanceHub', 'Agendamentos']}
-                actions={<Button><PlusCircle className="w-4 h-4 mr-2"/> Novo Agendamento</Button>}
+                actions={<Button onClick={() => openDialog('add-scheduling')}><PlusCircle className="w-4 h-4 mr-2"/> Novo Agendamento</Button>}
             />
             {loading ? (
                 <div className="flex-grow flex items-center justify-center">

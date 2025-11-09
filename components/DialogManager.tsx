@@ -3,6 +3,7 @@ import { useDialog } from '../hooks/useDialog';
 import { AddGoalForm } from './forms/AddGoalForm';
 import { AddDebtForm } from './forms/AddDebtForm';
 import { AddTransactionForm } from './forms/AddTransactionForm';
+import { AddSchedulingForm } from './forms/AddSchedulingForm';
 
 export const DialogManager: React.FC = () => {
   const { dialogType, closeDialog, dialogProps } = useDialog();
@@ -14,6 +15,8 @@ export const DialogManager: React.FC = () => {
       return <AddDebtForm isOpen={true} onClose={closeDialog} {...dialogProps} />;
     case 'add-transaction':
       return <AddTransactionForm isOpen={true} onClose={closeDialog} {...dialogProps} />;
+    case 'add-scheduling':
+      return <AddSchedulingForm isOpen={true} onClose={closeDialog} {...dialogProps} />;
     default:
       return null;
   }

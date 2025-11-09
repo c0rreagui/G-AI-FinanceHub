@@ -24,6 +24,7 @@ interface DashboardDataContextType {
     addTransaction: (transaction: Omit<Transaction, 'id' | 'category'>) => Promise<void>;
     addGoal: (goal: Omit<Goal, 'id'|'currentAmount'|'status'>) => Promise<void>;
     addDebt: (debt: Omit<Debt, 'id'|'paidAmount'|'status'>) => Promise<void>;
+    addScheduledTransaction: (scheduledTx: Omit<ScheduledTransaction, 'id'|'category'|'nextDueDate'>) => Promise<void>;
 }
 
 const DashboardDataContext = createContext<DashboardDataContextType | undefined>(undefined);
@@ -56,51 +57,61 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const clearError = () => setError(null);
     
-    const categoryMap = new Map(MOCK_CATEGORIES.map(c => [c.id, c]));
+    const categoryMap = useMemo(() => new Map(MOCK_CATEGORIES.map(c => [c.id, c])), []);
 
     const fetchData = useCallback(async () => {
         if (!user) return;
         setLoading(true);
         setError(null);
         try {
-            // Mock data for demonstration purposes. In a real app, this would be an API call.
-            const today = new Date();
-            const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1).toISOString();
+            const [
+                transactionsResponse,
+                goalsResponse,
+                debtsResponse,
+                scheduledTransactionsResponse,
+            ] = await Promise.all([
+                supabase.from('transactions').select('*').eq('user_id', user.id).order('date', { ascending: false }),
+                supabase.from('goals').select('*').eq('user_id', user.id),
+                supabase.from('debts').select('*').eq('user_id', user.id),
+                supabase.from('scheduled_transactions').select('*').eq('user_id', user.id),
+            ]);
 
-            const initialTransactions: Transaction[] = [
-                { id: '1', user_id: user.id, description: 'Almoço no restaurante', amount: -45.50, date: new Date().toISOString(), type: TransactionType.DESPESA, category: MOCK_CATEGORIES[0] },
-                { id: '2', user_id: user.id, description: 'Salário do mês', amount: 5000, date: firstDayOfMonth, type: TransactionType.RECEITA, category: MOCK_CATEGORIES[4] },
-                { id: '3', user_id: user.id, description: 'Compra de Jogo', amount: -150, date: new Date(Date.now() - 2 * 86400000).toISOString(), type: TransactionType.DESPESA, category: MOCK_CATEGORIES[8] },
-                { id: '4', user_id: user.id, description: 'Uber para o trabalho', amount: -25.00, date: new Date(Date.now() - 3 * 86400000).toISOString(), type: TransactionType.DESPESA, category: MOCK_CATEGORIES[2] },
-                { id: '5', user_id: user.id, description: 'Aluguel', amount: -1500, date: new Date(Date.now() - 5 * 86400000).toISOString(), type: TransactionType.DESPESA, category: MOCK_CATEGORIES[5] },
-            ];
-            setTransactions(initialTransactions);
-
-            setGoals([
-                { id: 'g1', name: 'Viagem para o Japão', targetAmount: 20000, currentAmount: 8500, deadline: '2025-12-31T00:00:00Z', status: GoalStatus.EM_ANDAMENTO },
-                { id: 'g2', name: 'Reserva de Emergência', targetAmount: 15000, currentAmount: 15000, deadline: '2024-06-30T00:00:00Z', status: GoalStatus.CONCLUIDA },
-            ]);
-            setDebts([
-                { id: 'd1', name: 'Financiamento do Carro', totalAmount: 45000, paidAmount: 20000, interestRate: 12.5, category: 'Veículo', status: DebtStatus.ATIVA },
-            ]);
-            setScheduledTransactions([
-                { id: 'st1', description: 'Assinatura Netflix', amount: 39.90, type: TransactionType.DESPESA, category: MOCK_CATEGORIES[1], startDate: '2023-01-10T00:00:00Z', frequency: ScheduledTransactionFrequency.MENSAL, nextDueDate: new Date(today.getFullYear(), today.getMonth() + 1, 10).toISOString() },
-                { id: 'st2', description: 'Conta de Internet', amount: 120.00, type: TransactionType.DESPESA, category: MOCK_CATEGORIES[5], startDate: '2023-01-15T00:00:00Z', frequency: ScheduledTransactionFrequency.MENSAL, nextDueDate: new Date(today.getFullYear(), today.getMonth() + 1, 15).toISOString() },
-            ]);
+            if (transactionsResponse.error) throw transactionsResponse.error;
+            if (goalsResponse.error) throw goalsResponse.error;
+            if (debtsResponse.error) throw debtsResponse.error;
+            if (scheduledTransactionsResponse.error) throw scheduledTransactionsResponse.error;
+            
+            const enrichedTransactions = transactionsResponse.data.map(t => ({
+                ...t,
+                category: categoryMap.get(t.category_id || 'cat12') || MOCK_CATEGORIES[11],
+            }));
+            setTransactions(enrichedTransactions);
+            
+            setGoals(goalsResponse.data as Goal[]);
+            setDebts(debtsResponse.data as Debt[]);
+            
+            const enrichedScheduled = scheduledTransactionsResponse.data.map(st => ({
+                ...st,
+                category: categoryMap.get(st.category_id || 'cat12') || MOCK_CATEGORIES[11],
+            }));
+            setScheduledTransactions(enrichedScheduled as ScheduledTransaction[]);
+            
+            // Mocked for now as tables don't exist
             setAchievements([
-                { id: 'ac1', name: 'Primeiros Passos', description: 'Adicionou sua primeira transação.', unlocked: true, dateUnlocked: new Date().toISOString(), icon: Wallet },
-                { id: 'ac2', name: 'Planejador', description: 'Criou sua primeira meta financeira.', unlocked: true, dateUnlocked: new Date().toISOString(), icon: Target },
+                { id: 'ac1', name: 'Primeiros Passos', description: 'Adicionou sua primeira transação.', unlocked: transactionsResponse.data.length > 0, dateUnlocked: new Date().toISOString(), icon: Wallet },
+                { id: 'ac2', name: 'Planejador', description: 'Criou sua primeira meta financeira.', unlocked: goalsResponse.data.length > 0, dateUnlocked: new Date().toISOString(), icon: Target },
                 { id: 'ac3', name: 'Economista', description: 'Manteve as despesas abaixo da receita por um mês.', unlocked: false, icon: Lightbulb },
             ]);
-            setUserLevel({ level: 5, xp: 450, xpToNextLevel: 1000, rank: UserRank.BRONZE });
-            
+            setUserLevel({ level: 1, xp: transactionsResponse.data.length * 10, xpToNextLevel: 100, rank: UserRank.BRONZE });
+
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Ocorreu um erro desconhecido.');
+            const supabaseError = err as any;
+            setError(supabaseError.message || 'Ocorreu um erro desconhecido ao carregar os dados.');
             console.error(err);
         } finally {
             setLoading(false);
         }
-    }, [user]);
+    }, [user, categoryMap]);
 
     useEffect(() => {
         fetchData();
@@ -118,45 +129,95 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             .filter(t => t.type === TransactionType.DESPESA && new Date(t.date).getMonth() === currentMonth && new Date(t.date).getFullYear() === currentYear)
             .reduce((sum, t) => sum + t.amount, 0);
 
-        const totalBalance = transactions.reduce((sum, t) => sum + t.amount, 12540.78); // Assuming a starting balance for demo
+        const totalBalance = transactions.reduce((sum, t) => sum + t.amount, 0);
 
         return { totalBalance, monthlyIncome, monthlyExpenses };
     }, [transactions]);
 
     const addTransaction = async (transactionData: Omit<Transaction, 'id' | 'category'>) => {
-        const newTransaction: Transaction = {
-            ...transactionData,
-            id: new Date().getTime().toString(),
-            category: categoryMap.get(transactionData.category_id || 'cat12') || MOCK_CATEGORIES[11],
-        };
+        if (!user) throw new Error("Usuário não autenticado.");
+        const { data, error } = await supabase
+            .from('transactions')
+            .insert({ ...transactionData, user_id: user.id })
+            .select()
+            .single();
+
+        if (error) {
+            setError(error.message);
+            throw error;
+        }
         
+        const newTransaction: Transaction = {
+            ...data,
+            category: categoryMap.get(data.category_id || 'cat12') || MOCK_CATEGORIES[11],
+        };
         setTransactions(prev => [newTransaction, ...prev]);
     };
 
     const addGoal = async (goalData: Omit<Goal, 'id'|'currentAmount'|'status'>) => {
-        const newGoal: Goal = {
+        if (!user) throw new Error("Usuário não autenticado.");
+        const newGoalPayload = {
             ...goalData,
-            id: new Date().getTime().toString(),
+            user_id: user.id,
             currentAmount: 0,
             status: GoalStatus.EM_ANDAMENTO,
         };
-        setGoals(prev => [newGoal, ...prev]);
+        const { data, error } = await supabase.from('goals').insert(newGoalPayload).select().single();
+
+        if (error) {
+            setError(error.message);
+            throw error;
+        }
+        setGoals(prev => [data as Goal, ...prev]);
     };
 
     const addDebt = async (debtData: Omit<Debt, 'id'|'paidAmount'|'status'>) => {
-        const newDebt: Debt = {
+        if (!user) throw new Error("Usuário não autenticado.");
+         const newDebtPayload = {
             ...debtData,
-            id: new Date().getTime().toString(),
+            user_id: user.id,
             paidAmount: 0,
             status: DebtStatus.ATIVA,
         };
-        setDebts(prev => [newDebt, ...prev]);
+        const { data, error } = await supabase.from('debts').insert(newDebtPayload).select().single();
+        if (error) {
+            setError(error.message);
+            throw error;
+        }
+        setDebts(prev => [data as Debt, ...prev]);
+    };
+
+    const addScheduledTransaction = async (scheduledTxData: Omit<ScheduledTransaction, 'id'|'category'|'nextDueDate'>) => {
+        if (!user) throw new Error("Usuário não autenticado.");
+
+        // Lógica simples para calcular o próximo vencimento
+        const today = new Date();
+        const nextDueDate = new Date(today.getFullYear(), today.getMonth() + 1, new Date(scheduledTxData.startDate).getDate()).toISOString();
+
+        const newScheduledTxPayload = {
+            ...scheduledTxData,
+            user_id: user.id,
+            nextDueDate: nextDueDate,
+        };
+        const { data, error } = await supabase.from('scheduled_transactions').insert(newScheduledTxPayload).select().single();
+
+        if (error) {
+            setError(error.message);
+            throw error;
+        }
+        
+        const newScheduledTransaction: ScheduledTransaction = {
+            ...data,
+            category: categoryMap.get(data.category_id || 'cat12') || MOCK_CATEGORIES[11],
+        };
+
+        setScheduledTransactions(prev => [newScheduledTransaction, ...prev]);
     };
 
     const value = {
         transactions, goals, debts, summary, scheduledTransactions, userLevel, achievements,
         categories: MOCK_CATEGORIES,
-        loading, error, clearError, addTransaction, addGoal, addDebt
+        loading, error, clearError, addTransaction, addGoal, addDebt, addScheduledTransaction
     };
 
     return React.createElement(DashboardDataContext.Provider, { value: value }, children);
