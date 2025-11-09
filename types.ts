@@ -8,12 +8,16 @@ export enum ChatRole {
 export interface ChatMessage {
   role: ChatRole;
   text: string;
-  imageUrl?: string;
+  imageUrl?: string; // Blob URL for display
+  imageData?: { // Base64 data for API history
+      data: string;
+      mimeType: string;
+  };
   isTyping?: boolean;
   grounding?: any[];
 }
 
-export type ViewType = 'home' | 'dashboard' | 'transactions' | 'insights' | 'goals' | 'debts' | 'scheduling' | 'tools' | 'settings';
+export type ViewType = 'home' | 'transactions' | 'insights' | 'goals' | 'debts' | 'scheduling' | 'tools' | 'settings';
 
 export enum TransactionType {
   RECEITA = 'Receita',
@@ -54,7 +58,7 @@ export interface Account {
 }
 
 export interface CreditCard {
-    id: string;
+    id:string;
     name: string;
     flag: string;
     limit: number;

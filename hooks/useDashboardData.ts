@@ -1,419 +1,171 @@
-import * as React from 'react';
+import React, { createContext, useState, useEffect, useCallback, useContext, useMemo } from 'react';
 import {
-  Account,
-  Achievement,
-  Category,
-  Debt,
-  Goal,
-  ScheduledTransaction,
-  Summary,
-  Transaction,
-  UserLevel,
-  GoalStatus,
-  DebtStatus,
-  TransactionType,
+    Transaction, Goal, Debt, Summary, ScheduledTransaction, UserLevel, Achievement, Category,
+    TransactionType, GoalStatus, DebtStatus, ScheduledTransactionFrequency, UserRank
 } from '../types';
-import { supabase } from '../services/supabaseClient';
 import {
-  Car,
-  Shirt,
-  Heart,
-  BookOpen,
-  Gift,
-  Plane,
-  Dumbbell,
-  Gamepad,
-  Film,
-  Utensils,
-  ShoppingCart,
-  PiggyBank,
-  Wallet,
-  ArrowUpRight as ArrowUpRightIcon,
-  Tool,
-  Trophy,
+    Utensils, ShoppingCart, Car, Shirt, PiggyBank, Heart, BookOpen, Gift, Plane, HomeIcon, Dumbbell, Gamepad, Film, ArrowUpRight, TrendingDown, Wallet, Lightbulb, Target
 } from '../components/Icons';
 import { useAuth } from './useAuth';
-
-// --- MOCK ICONS ---
-// This maps category IDs from the DB to React components
-const iconMap: { [key: string]: React.ElementType } = {
-  'cat1': Utensils,
-  'cat2': ShoppingCart,
-  'cat3': Car,
-  'cat4': Shirt,
-  'cat5': Heart,
-  'cat6': BookOpen,
-  'cat7': Gift,
-  'cat8': Plane,
-  'cat9': Dumbbell,
-  'cat10': Gamepad,
-  'cat11': Film,
-  'cat12': Tool, // Outros
-  'cat13': ArrowUpRightIcon, // Salário
-  'cat14': PiggyBank, // Investimentos/Rendimentos
-  'default': Wallet,
-};
-
-const defaultCategory: Category = {
-    id: 'default',
-    name: 'Desconhecida',
-    icon: Wallet,
-    color: '#94a3b8', // slate-400
-};
+import { supabase } from '../services/supabaseClient';
 
 interface DashboardDataContextType {
-  summary: Summary;
-  transactions: Transaction[];
-  goals: Goal[];
-  debts: Debt[];
-  accounts: Account[];
-  categories: Record<string, Category>;
-  scheduledTransactions: ScheduledTransaction[];
-  userLevel: UserLevel | null;
-  achievements: Achievement[];
-  loading: boolean;
-  error: string | null;
-  clearError: () => void;
-  addTransaction: (transactionData: Omit<Transaction, 'id' | 'category' | 'user_id'>) => Promise<void>;
-  addGoal: (goalData: Omit<Goal, 'id' | 'currentAmount' | 'status' | 'user_id'>) => Promise<void>;
-  addDebt: (debtData: Omit<Debt, 'id' | 'paidAmount' | 'status' | 'user_id'>) => Promise<void>;
+    transactions: Transaction[];
+    goals: Goal[];
+    debts: Debt[];
+    summary: Summary;
+    scheduledTransactions: ScheduledTransaction[];
+    userLevel: UserLevel;
+    achievements: Achievement[];
+    categories: Category[];
+    loading: boolean;
+    error: string | null;
+    clearError: () => void;
+    addTransaction: (transaction: Omit<Transaction, 'id' | 'category'>) => Promise<void>;
+    addGoal: (goal: Omit<Goal, 'id'|'currentAmount'|'status'>) => Promise<void>;
+    addDebt: (debt: Omit<Debt, 'id'|'paidAmount'|'status'>) => Promise<void>;
 }
 
-const DashboardDataContext = React.createContext<DashboardDataContextType | undefined>(
-  undefined
-);
+const DashboardDataContext = createContext<DashboardDataContextType | undefined>(undefined);
 
-export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  const { user } = useAuth();
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+const MOCK_CATEGORIES: Category[] = [
+    { id: 'cat1', name: 'Alimentação', icon: Utensils, color: '#f59e0b' },
+    { id: 'cat2', name: 'Compras', icon: ShoppingCart, color: '#8b5cf6' },
+    { id: 'cat3', name: 'Transporte', icon: Car, color: '#3b82f6' },
+    { id: 'cat4', name: 'Vestuário', icon: Shirt, color: '#ec4899' },
+    { id: 'cat5', name: 'Salário', icon: ArrowUpRight, color: '#10b981' },
+    { id: 'cat6', name: 'Moradia', icon: HomeIcon, color: '#6366f1' },
+    { id: 'cat7', name: 'Saúde', icon: Heart, color: '#ef4444' },
+    { id: 'cat8', name: 'Educação', icon: BookOpen, color: '#14b8a6' },
+    { id: 'cat9', name: 'Lazer', icon: Gamepad, color: '#d946ef' },
+    { id: 'cat10', name: 'Investimentos', icon: PiggyBank, color: '#22c55e' },
+    { id: 'cat11', name: 'Dívidas', icon: TrendingDown, color: '#f43f5e' },
+    { id: 'cat12', name: 'Outros', icon: Gift, color: '#a8a29e' },
+];
 
-  const [summary, setSummary] = React.useState<Summary>({
-    totalBalance: 0,
-    monthlyIncome: 0,
-    monthlyExpenses: 0,
-  });
-  const [transactions, setTransactions] = React.useState<Transaction[]>([]);
-  const [goals, setGoals] = React.useState<Goal[]>([]);
-  const [debts, setDebts] = React.useState<Debt[]>([]);
-  const [accounts, setAccounts] = React.useState<Account[]>([]);
-  const [categories, setCategories] = React.useState<Record<string, Category>>({});
-  const [scheduledTransactions, setScheduledTransactions] = React.useState<ScheduledTransaction[]>([]);
-  const [userLevel, setUserLevel] = React.useState<UserLevel | null>(null);
-  const [achievements, setAchievements] = React.useState<Achievement[]>([]);
+export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const { user } = useAuth();
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [goals, setGoals] = useState<Goal[]>([]);
+    const [debts, setDebts] = useState<Debt[]>([]);
+    const [scheduledTransactions, setScheduledTransactions] = useState<ScheduledTransaction[]>([]);
+    const [userLevel, setUserLevel] = useState<UserLevel>({ level: 1, xp: 0, xpToNextLevel: 100, rank: UserRank.BRONZE });
+    const [achievements, setAchievements] = useState<Achievement[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-  const fetchData = React.useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      // Fetch all data in parallel
-      const [
-        accountsRes,
-        categoriesRes,
-        transactionsRes,
-        goalsRes,
-        debtsRes,
-        scheduledTransactionsRes,
-        userLevelRes,
-        achievementsRes,
-      ] = await Promise.all([
-        supabase.from('accounts').select('*'),
-        supabase.from('categories').select('*'),
-        supabase.from('transactions').select('*, categories(*)').order('date', { ascending: false }),
-        supabase.from('goals').select('*').order('deadline', { ascending: true }),
-        supabase.from('debts').select('*'),
-        supabase.from('scheduled_transactions').select('*, categories(*)').order('next_due_date', { ascending: true }),
-        supabase.from('user_level').select('*').single(),
-        supabase.from('achievements').select('*'),
-      ]);
+    const clearError = () => setError(null);
+    
+    const categoryMap = new Map(MOCK_CATEGORIES.map(c => [c.id, c]));
 
-      // Check for errors in responses
-      const responses = [accountsRes, categoriesRes, transactionsRes, goalsRes, debtsRes, scheduledTransactionsRes, userLevelRes, achievementsRes];
-      for (const res of responses) {
-        if (res.error) throw res.error;
-      }
+    const fetchData = useCallback(async () => {
+        if (!user) return;
+        setLoading(true);
+        setError(null);
+        try {
+            // Mock data for demonstration purposes. In a real app, this would be an API call.
+            const today = new Date();
+            const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1).toISOString();
 
-      // Process Categories into a map for easy lookup
-      const fetchedCategories = categoriesRes.data?.reduce((acc, cat) => {
-        acc[cat.id] = { ...cat, icon: iconMap[cat.id] || iconMap['default'] };
-        return acc;
-      }, {} as Record<string, Category>) || {};
-      setCategories(fetchedCategories);
+            const initialTransactions: Transaction[] = [
+                { id: '1', user_id: user.id, description: 'Almoço no restaurante', amount: -45.50, date: new Date().toISOString(), type: TransactionType.DESPESA, category: MOCK_CATEGORIES[0] },
+                { id: '2', user_id: user.id, description: 'Salário do mês', amount: 5000, date: firstDayOfMonth, type: TransactionType.RECEITA, category: MOCK_CATEGORIES[4] },
+                { id: '3', user_id: user.id, description: 'Compra de Jogo', amount: -150, date: new Date(Date.now() - 2 * 86400000).toISOString(), type: TransactionType.DESPESA, category: MOCK_CATEGORIES[8] },
+                { id: '4', user_id: user.id, description: 'Uber para o trabalho', amount: -25.00, date: new Date(Date.now() - 3 * 86400000).toISOString(), type: TransactionType.DESPESA, category: MOCK_CATEGORIES[2] },
+                { id: '5', user_id: user.id, description: 'Aluguel', amount: -1500, date: new Date(Date.now() - 5 * 86400000).toISOString(), type: TransactionType.DESPESA, category: MOCK_CATEGORIES[5] },
+            ];
+            setTransactions(initialTransactions);
 
-      // Process Transactions, using joined category data first
-      const fetchedTransactions = transactionsRes.data?.map((tx: any) => {
-        let category: Category;
-        // Prioritize using the joined category data from `select('*, categories(*)')`
-        if (tx.categories && typeof tx.categories === 'object' && tx.categories.id) {
-            category = {
-                ...tx.categories,
-                icon: iconMap[tx.categories.id] || iconMap['default'],
-            };
-        } else {
-            // Fallback to manual lookup for robustness
-            category = fetchedCategories[tx.category_id] || defaultCategory;
+            setGoals([
+                { id: 'g1', name: 'Viagem para o Japão', targetAmount: 20000, currentAmount: 8500, deadline: '2025-12-31T00:00:00Z', status: GoalStatus.EM_ANDAMENTO },
+                { id: 'g2', name: 'Reserva de Emergência', targetAmount: 15000, currentAmount: 15000, deadline: '2024-06-30T00:00:00Z', status: GoalStatus.CONCLUIDA },
+            ]);
+            setDebts([
+                { id: 'd1', name: 'Financiamento do Carro', totalAmount: 45000, paidAmount: 20000, interestRate: 12.5, category: 'Veículo', status: DebtStatus.ATIVA },
+            ]);
+            setScheduledTransactions([
+                { id: 'st1', description: 'Assinatura Netflix', amount: 39.90, type: TransactionType.DESPESA, category: MOCK_CATEGORIES[1], startDate: '2023-01-10T00:00:00Z', frequency: ScheduledTransactionFrequency.MENSAL, nextDueDate: new Date(today.getFullYear(), today.getMonth() + 1, 10).toISOString() },
+                { id: 'st2', description: 'Conta de Internet', amount: 120.00, type: TransactionType.DESPESA, category: MOCK_CATEGORIES[5], startDate: '2023-01-15T00:00:00Z', frequency: ScheduledTransactionFrequency.MENSAL, nextDueDate: new Date(today.getFullYear(), today.getMonth() + 1, 15).toISOString() },
+            ]);
+            setAchievements([
+                { id: 'ac1', name: 'Primeiros Passos', description: 'Adicionou sua primeira transação.', unlocked: true, dateUnlocked: new Date().toISOString(), icon: Wallet },
+                { id: 'ac2', name: 'Planejador', description: 'Criou sua primeira meta financeira.', unlocked: true, dateUnlocked: new Date().toISOString(), icon: Target },
+                { id: 'ac3', name: 'Economista', description: 'Manteve as despesas abaixo da receita por um mês.', unlocked: false, icon: Lightbulb },
+            ]);
+            setUserLevel({ level: 5, xp: 450, xpToNextLevel: 1000, rank: UserRank.BRONZE });
+            
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Ocorreu um erro desconhecido.');
+            console.error(err);
+        } finally {
+            setLoading(false);
         }
-        return {
-          ...tx,
-          category: category,
+    }, [user]);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+
+    const summary = useMemo<Summary>(() => {
+        const currentMonth = new Date().getMonth();
+        const currentYear = new Date().getFullYear();
+
+        const monthlyIncome = transactions
+            .filter(t => t.type === TransactionType.RECEITA && new Date(t.date).getMonth() === currentMonth && new Date(t.date).getFullYear() === currentYear)
+            .reduce((sum, t) => sum + t.amount, 0);
+
+        const monthlyExpenses = transactions
+            .filter(t => t.type === TransactionType.DESPESA && new Date(t.date).getMonth() === currentMonth && new Date(t.date).getFullYear() === currentYear)
+            .reduce((sum, t) => sum + t.amount, 0);
+
+        const totalBalance = transactions.reduce((sum, t) => sum + t.amount, 12540.78); // Assuming a starting balance for demo
+
+        return { totalBalance, monthlyIncome, monthlyExpenses };
+    }, [transactions]);
+
+    const addTransaction = async (transactionData: Omit<Transaction, 'id' | 'category'>) => {
+        const newTransaction: Transaction = {
+            ...transactionData,
+            id: new Date().getTime().toString(),
+            category: categoryMap.get(transactionData.category_id || 'cat12') || MOCK_CATEGORIES[11],
         };
-      }) as Transaction[] || [];
-      setTransactions(fetchedTransactions);
-
-      // Process Scheduled Transactions, using joined data
-       const fetchedScheduledTransactions = scheduledTransactionsRes.data?.map((stx: any) => {
-          let category: Category;
-          if (stx.categories && typeof stx.categories === 'object' && stx.categories.id) {
-              category = {
-                  ...stx.categories,
-                  icon: iconMap[stx.categories.id] || iconMap['default'],
-              };
-          } else {
-              category = fetchedCategories[stx.category_id] || defaultCategory;
-          }
-          return {
-            ...stx,
-            nextDueDate: stx.next_due_date,
-            startDate: stx.start_date,
-            frequency: stx.frequency,
-            category: category
-          };
-        }) as ScheduledTransaction[] || [];
-      setScheduledTransactions(fetchedScheduledTransactions);
-      
-      // Set other states
-      setAccounts(accountsRes.data || []);
-      setGoals(goalsRes.data?.map((g: any) => ({
-        ...g,
-        targetAmount: g.target_amount,
-        currentAmount: g.current_amount,
-      })) as Goal[] || []);
-      setDebts(debtsRes.data?.map((d: any) => ({
-        ...d,
-        totalAmount: d.total_amount,
-        paidAmount: d.paid_amount,
-        interestRate: d.interest_rate,
-      })) as Debt[] || []);
-      setUserLevel(userLevelRes.data ? {
-        ...userLevelRes.data,
-        xpToNextLevel: userLevelRes.data.xp_to_next_level,
-      } as UserLevel : null);
-      setAchievements(achievementsRes.data?.map((a: any) => ({
-        ...a,
-        icon: Trophy, // All achievements use Trophy icon for simplicity now
-        dateUnlocked: a.date_unlocked,
-      })) as Achievement[] || []);
-
-    } catch (err: unknown) {
-      console.error("Error fetching data:", err);
-      let errorMessage = "Ocorreu um erro desconhecido ao buscar os dados.";
-
-      if (err instanceof Error) {
-          // Standard JavaScript error (e.g., network error)
-          errorMessage = err.message;
-      } else if (err && typeof err === 'object' && 'message' in err) {
-          // Duck-typed error object (like from Supabase)
-          errorMessage = String((err as { message: unknown }).message);
-      } else if (typeof err === 'string') {
-          // Just a string was thrown
-          errorMessage = err;
-      } else {
-          // Something else, try to serialize it safely
-          try {
-              errorMessage = `Ocorreu um erro inesperado: ${JSON.stringify(err, null, 2)}`;
-          } catch {
-              errorMessage = "Ocorreu um erro não serializável ao buscar os dados.";
-          }
-      }
-      
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  React.useEffect(() => {
-    if (user) {
-      fetchData();
-    } else {
-      // Se o usuário deslogar, limpa os dados
-      setLoading(false);
-      setTransactions([]);
-      setAccounts([]);
-      setGoals([]);
-      setDebts([]);
-      setCategories({});
-      setScheduledTransactions([]);
-      setUserLevel(null);
-      setAchievements([]);
-      setSummary({ totalBalance: 0, monthlyIncome: 0, monthlyExpenses: 0 });
-    }
-  }, [fetchData, user]);
-
-  // Calculate summary whenever accounts or transactions change
-  React.useEffect(() => {
-    const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
-
-    const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-
-    const monthlyIncome = transactions
-      .filter(t => t.type === TransactionType.RECEITA && new Date(t.date) >= startOfMonth)
-      .reduce((sum, t) => sum + t.amount, 0);
-
-    const monthlyExpenses = transactions
-      .filter(t => t.type === TransactionType.DESPESA && new Date(t.date) >= startOfMonth)
-      .reduce((sum, t) => sum + t.amount, 0);
-      
-    setSummary({ totalBalance, monthlyIncome, monthlyExpenses });
-  }, [accounts, transactions]);
-
-  const clearError = () => {
-    setError(null);
-  };
-  
-  const addTransaction = async (transactionData: Omit<Transaction, 'id' | 'category' | 'user_id'>) => {
-    if (!user) {
-        setError("Usuário não autenticado.");
-        throw new Error("Usuário não autenticado.");
-    }
-    try {
-        const newTx = { ...transactionData, user_id: user.id };
-        const { data, error } = await supabase.from('transactions').insert([newTx]).select('*, categories(*)').single();
-        if (error) throw error;
         
-        // Update state optimistically
-        const newTransaction = {
-          ...data,
-          category: categories[data.category_id],
-        } as Transaction;
-
-        setTransactions(prev => [newTransaction, ...prev].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
-
-        // Also update account balance
-        const accountToUpdate = accounts.find(acc => acc.id === transactionData.account_id);
-        if (accountToUpdate) {
-            const newBalance = accountToUpdate.balance + transactionData.amount;
-            const { error: accountError } = await supabase.from('accounts').update({ balance: newBalance }).eq('id', transactionData.account_id);
-            if (accountError) throw accountError;
-            // Update local account state to reflect change immediately
-            setAccounts(prev => prev.map(acc => acc.id === transactionData.account_id ? {...acc, balance: newBalance} : acc));
-        }
-
-    } catch (err: any) {
-        console.error("Error adding transaction:", err);
-        setError(err.message || 'Failed to add transaction.');
-        throw err; // Re-throw to be caught in the form if needed
-    }
-  };
-
-  const addGoal = async (goalData: Omit<Goal, 'id' | 'currentAmount' | 'status' | 'user_id'>) => {
-    if (!user) {
-      setError("Usuário não autenticado.");
-      throw new Error("Usuário não autenticado.");
-    }
-      const newGoal = {
-        user_id: user.id,
-        name: goalData.name,
-        target_amount: goalData.targetAmount,
-        deadline: goalData.deadline,
-        current_amount: 0,
-        status: GoalStatus.EM_ANDAMENTO,
-      };
-
-      try {
-        const { data, error } = await supabase.from('goals').insert([newGoal]).select().single();
-        if (error) throw error;
-        
-        setGoals(prev => [...prev, {
-            ...data,
-            targetAmount: data.target_amount,
-            currentAmount: data.current_amount,
-        }]);
-      } catch (err: any) {
-        console.error("Error adding goal:", err);
-        setError(err.message || 'Failed to add goal.');
-        throw err;
-      }
-  };
-
-  const addDebt = async (debtData: Omit<Debt, 'id' | 'paidAmount' | 'status' | 'user_id'>) => {
-    if (!user) {
-      setError("Usuário não autenticado.");
-      throw new Error("Usuário não autenticado.");
-    }
-    const newDebt = {
-        user_id: user.id,
-        name: debtData.name,
-        total_amount: debtData.totalAmount,
-        interest_rate: debtData.interestRate,
-        category: debtData.category,
-        paid_amount: 0,
-        status: DebtStatus.ATIVA,
+        setTransactions(prev => [newTransaction, ...prev]);
     };
 
-    try {
-        const { data, error } = await supabase.from('debts').insert([newDebt]).select().single();
-        if (error) throw error;
-        
-        setDebts(prev => [...prev, {
-            ...data,
-            totalAmount: data.total_amount,
-            paidAmount: data.paid_amount,
-            interestRate: data.interest_rate,
-        }]);
-    } catch(err: any) {
-        console.error("Error adding debt:", err);
-        setError(err.message || 'Failed to add debt.');
-        throw err;
-    }
-  };
+    const addGoal = async (goalData: Omit<Goal, 'id'|'currentAmount'|'status'>) => {
+        const newGoal: Goal = {
+            ...goalData,
+            id: new Date().getTime().toString(),
+            currentAmount: 0,
+            status: GoalStatus.EM_ANDAMENTO,
+        };
+        setGoals(prev => [newGoal, ...prev]);
+    };
 
-  const value = React.useMemo(() => ({
-    summary,
-    transactions,
-    goals,
-    debts,
-    accounts,
-    categories,
-    scheduledTransactions,
-    userLevel,
-    achievements,
-    loading,
-    error,
-    clearError,
-    addTransaction,
-    addGoal,
-    addDebt,
-    // Note: useCallback is not used for add functions here for simplicity. 
-    // In a larger app, they should be wrapped in useCallback.
-  }), [
-    summary,
-    transactions,
-    goals,
-    debts,
-    accounts,
-    categories,
-    scheduledTransactions,
-    userLevel,
-    achievements,
-    loading,
-    error,
-  ]);
+    const addDebt = async (debtData: Omit<Debt, 'id'|'paidAmount'|'status'>) => {
+        const newDebt: Debt = {
+            ...debtData,
+            id: new Date().getTime().toString(),
+            paidAmount: 0,
+            status: DebtStatus.ATIVA,
+        };
+        setDebts(prev => [newDebt, ...prev]);
+    };
 
-  return React.createElement(
-    DashboardDataContext.Provider,
-    { value: value },
-    children
-  );
+    const value = {
+        transactions, goals, debts, summary, scheduledTransactions, userLevel, achievements,
+        categories: MOCK_CATEGORIES,
+        loading, error, clearError, addTransaction, addGoal, addDebt
+    };
+
+    return React.createElement(DashboardDataContext.Provider, { value: value }, children);
 };
 
-export const useDashboardData = () => {
-  const context = React.useContext(DashboardDataContext);
-  if (context === undefined) {
-    throw new Error('useDashboardData must be used within a DashboardDataProvider');
-  }
-  return context;
+export const useDashboardData = (): DashboardDataContextType => {
+    const context = useContext(DashboardDataContext);
+    if (context === undefined) {
+        throw new Error('useDashboardData must be used within a DashboardDataProvider');
+    }
+    return context;
 };

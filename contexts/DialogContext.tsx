@@ -1,4 +1,4 @@
-import React, { createContext, useState, ReactNode } from 'react';
+import React, { createContext, useState } from 'react';
 
 type DialogType = 'add-goal' | 'add-debt' | 'add-transaction' | null;
 
@@ -11,7 +11,7 @@ interface DialogContextType {
 
 export const DialogContext = createContext<DialogContextType | undefined>(undefined);
 
-export const DialogProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const DialogProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [dialogType, setDialogType] = useState<DialogType>(null);
   const [dialogProps, setDialogProps] = useState<any>({});
 

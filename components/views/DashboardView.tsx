@@ -8,7 +8,7 @@ import { Transaction, TransactionType } from '../../types';
 import { Button } from '../ui/Button';
 import { useDialog } from '../../hooks/useDialog';
 import { ProgressBar } from '../ui/ProgressBar';
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
+import { ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 
 const SummaryCard: React.FC<{ title: string; amount: number; icon: React.ElementType; color: string; }> = ({ title, amount, icon: Icon, color }) => (
     <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6">
@@ -120,20 +120,10 @@ export const DashboardView: React.FC = () => {
                              <ResponsiveContainer>
                                 <PieChart>
                                     <Pie data={pieChartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} fill="#8884d8">
-                                        {/* FIX: Explicitly type `entry` as `any` to resolve TypeScript inference error. */}
                                         {pieChartData.map((entry: any, index) => (
                                             <Cell key={`cell-${index}`} fill={entry.color} />
                                         ))}
                                     </Pie>
-                                    <Tooltip
-                                        formatter={(value: number) => [formatCurrencyBRL(value), 'Valor']}
-                                        contentStyle={{
-                                            backgroundColor: 'rgba(20, 20, 30, 0.8)',
-                                            borderColor: 'rgba(255, 255, 255, 0.2)',
-                                            borderRadius: '1rem'
-                                        }}
-                                        cursor={{ fill: 'rgba(139, 92, 246, 0.1)'}}
-                                    />
                                     <Legend iconSize={10} />
                                 </PieChart>
                             </ResponsiveContainer>

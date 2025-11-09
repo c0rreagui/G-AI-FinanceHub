@@ -2,85 +2,78 @@ import React, { useState, useEffect } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { useDashboardData } from '../../hooks/useDashboardData';
-// FIX: Import `Account` and `Category` types to resolve type errors.
-import { TransactionType, Transaction, Account, Category } from '../../types';
+import { Transaction, TransactionType } from '../../types';
 import { TypeToggle } from '../ui/TypeToggle';
-import { ExtractedTransaction } from '../../services/transactionExtractor';
 import { CategoryPicker } from '../ui/CategoryPicker';
 
 interface AddTransactionFormProps {
   isOpen: boolean;
   onClose: () => void;
-  prefill?: ExtractedTransaction;
+  prefill?: Partial<Omit<Transaction, 'id' | 'category'>>;
 }
 
 export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, onClose, prefill }) => {
-  const { addTransaction, categories, accounts } = useDashboardData();
-  const [description, setDescription] = useState('');
-  const [amount, setAmount] = useState('');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [type, setType] = useState<TransactionType>(TransactionType.DESPESA);
-  const [categoryId, setCategoryId] = useState<string | null>(null);
-  const [accountId, setAccountId] = useState(accounts[0]?.id || '');
+  const { addTransaction, categories } = useDashboardData();
 
-  useEffect(() => {
-    if (prefill) {
-        setDescription(prefill.description || '');
-        if (prefill.amount) {
-            const absAmount = Math.abs(prefill.amount);
-            setAmount(absAmount.toString());
-            setType(prefill.amount < 0 ? TransactionType.DESPESA : TransactionType.RECEITA);
-        }
-    }
-  }, [prefill]);
+  const getInitialState = () => ({
+    description: prefill?.description || '',
+    amount: prefill?.amount ? String(Math.abs(prefill.amount)) : '',
+    date: prefill?.date ? new Date(prefill.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+    type: prefill?.type || TransactionType.DESPESA,
+    categoryId: prefill?.category_id || null
+  });
 
-  // Set default account when accounts are loaded
-  useEffect(() => {
-    if (!accountId && accounts.length > 0) {
-      setAccountId(accounts[0].id);
-    }
-  }, [accounts, accountId]);
+  const [description, setDescription] = useState(getInitialState().description);
+  const [amount, setAmount] = useState(getInitialState().amount);
+  const [date, setDate] = useState(getInitialState().date);
+  const [type, setType] = useState<TransactionType>(getInitialState().type);
+  const [categoryId, setCategoryId] = useState<string | null>(getInitialState().categoryId);
 
-
-  const handleTypeChange = (newType: TransactionType) => {
-    setType(newType);
-    setCategoryId(null); 
+  const resetForm = () => {
+    setDescription('');
+    setAmount('');
+    setDate(new Date().toISOString().split('T')[0]);
+    setType(TransactionType.DESPESA);
+    setCategoryId(null);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    if (isOpen) {
+      const initialState = getInitialState();
+      setDescription(initialState.description);
+      setAmount(initialState.amount);
+      setDate(initialState.date);
+      setType(initialState.type);
+      setCategoryId(initialState.categoryId);
+    }
+  }, [isOpen, prefill]);
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!description || !amount || !date || !categoryId || !accountId) {
+    if (!description || !amount || !date || !categoryId) {
         alert("Por favor, preencha todos os campos obrigatórios.");
         return;
     }
-    
-    const transactionAmount = type === TransactionType.DESPESA ? -Math.abs(parseFloat(amount)) : Math.abs(parseFloat(amount));
 
     const transactionData: Omit<Transaction, 'id' | 'category'> = {
-        description,
-        amount: transactionAmount,
-        date: new Date(date).toISOString(),
-        type,
-        category_id: categoryId,
-        account_id: accountId,
+      description,
+      amount: type === TransactionType.DESPESA ? -parseFloat(amount) : parseFloat(amount),
+      date,
+      type,
+      category_id: categoryId,
     };
 
-    await addTransaction(transactionData);
+    addTransaction(transactionData);
+    resetForm(); // Limpa o formulário imediatamente para o próximo input
     onClose();
   };
-  
-  const filteredCategories = Object.values(categories)
-    // FIX: Explicitly type `cat` as `Category` to resolve type errors and correct filtering logic.
-    .filter((cat: Category) => {
-        if (type === TransactionType.RECEITA) {
-            return ['cat13', 'cat14'].includes(cat.id);
-        }
-        return !['cat13', 'cat14'].includes(cat.id);
-    });
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Adicionar Nova Transação">
       <form onSubmit={handleSubmit} className="space-y-4">
+        
+        <TypeToggle selectedType={type} onTypeChange={setType} />
+
         <div>
           <label htmlFor="tx-description" className="block text-sm font-medium text-gray-300">
             Descrição
@@ -95,7 +88,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
           />
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4">
             <div>
               <label htmlFor="tx-amount" className="block text-sm font-medium text-gray-300">
                 Valor (R$)
@@ -105,38 +98,11 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                 id="tx-amount"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                placeholder="100.00"
+                placeholder="50.00"
                 step="0.01"
                 className="mt-1 block w-full bg-black/20 border border-white/20 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 required
               />
-            </div>
-            <TypeToggle selectedType={type} onTypeChange={handleTypeChange} />
-        </div>
-        
-        <CategoryPicker 
-            categories={filteredCategories}
-            selectedCategoryId={categoryId}
-            onSelectCategory={setCategoryId}
-        />
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="tx-account" className="block text-sm font-medium text-gray-300">
-                Conta
-              </label>
-              <select
-                id="tx-account"
-                value={accountId}
-                onChange={(e) => setAccountId(e.target.value)}
-                className="mt-1 block w-full bg-black/20 border border-white/20 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                required
-              >
-                  {/* FIX: Explicitly type `acc` as `Account` to resolve property access errors. */}
-                  {accounts.map((acc: Account) => (
-                      <option key={acc.id} value={acc.id}>{acc.name}</option>
-                  ))}
-              </select>
             </div>
             <div>
               <label htmlFor="tx-date" className="block text-sm font-medium text-gray-300">
@@ -152,6 +118,12 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
               />
             </div>
         </div>
+
+        <CategoryPicker 
+            categories={categories}
+            selectedCategoryId={categoryId}
+            onSelectCategory={setCategoryId}
+        />
         
         <div className="flex justify-end gap-2 pt-4">
           <Button type="button" variant="secondary" onClick={onClose}>

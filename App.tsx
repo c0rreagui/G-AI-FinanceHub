@@ -1,8 +1,8 @@
+// App Version: 1.4.0
 import React, { useState } from 'react';
 import { AppLayout } from './components/layout/AppLayout';
 import { ViewType } from './types';
 import { AIHub } from './components/AIHub';
-import { DashboardView } from './components/views/DashboardView';
 import { TransactionsView } from './components/views/TransactionsView';
 import { InsightsView } from './components/views/InsightsView';
 import { GoalsView } from './components/views/GoalsView';
@@ -15,11 +15,12 @@ import { SettingsView } from './components/views/SettingsView';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { AuthView } from './components/views/AuthView';
 import { LoadingSpinner } from './components/LoadingSpinner';
+import { ApiKeySetupView } from './components/views/ApiKeySetupView';
 
 // Componente principal que decide o que mostrar
 const AppContent: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewType>('home');
-  const { session, loading } = useAuth();
+  const { session, loading, apiKey } = useAuth();
 
   if (loading) {
     // Mostra um loading enquanto verifica se o usuário está logado
@@ -34,12 +35,17 @@ const AppContent: React.FC = () => {
     // Se NÃO há sessão, mostra a tela de Login
     return <AuthView />;
   }
+  
+  if (!apiKey) {
+    // Se HÁ sessão mas NÃO há chave de API, força a configuração
+    return <ApiKeySetupView />;
+  }
 
-  // Se HÁ sessão, mostra o app principal
+
+  // Se HÁ sessão e HÁ chave, mostra o app principal
   const renderView = () => {
     switch (currentView) {
       case 'home': return <AIHub />;
-      case 'dashboard': return <DashboardView />;
       case 'transactions': return <TransactionsView />;
       case 'insights': return <InsightsView />;
       case 'goals': return <GoalsView />;

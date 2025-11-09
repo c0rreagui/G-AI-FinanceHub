@@ -42,6 +42,9 @@ export const SettingsView: React.FC = () => {
                       <Button onClick={handleLogout} variant="secondary" className="w-full">
                         Sair (Logout)
                       </Button>
+                      <p className="text-center text-xs text-gray-600 mt-4 md:hidden">
+                        FinanceHub v1.4.0
+                      </p>
                     </div>
                 </div>
             )}

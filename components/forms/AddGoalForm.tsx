@@ -15,7 +15,13 @@ export const AddGoalForm: React.FC<AddGoalFormProps> = ({ isOpen, onClose }) => 
   const [targetAmount, setTargetAmount] = useState('');
   const [deadline, setDeadline] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const resetForm = () => {
+    setName('');
+    setTargetAmount('');
+    setDeadline('');
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !targetAmount || !deadline) return;
 
@@ -25,7 +31,8 @@ export const AddGoalForm: React.FC<AddGoalFormProps> = ({ isOpen, onClose }) => 
         deadline: new Date(deadline).toISOString(),
     };
 
-    addGoal(goalData);
+    await addGoal(goalData);
+    resetForm();
     onClose();
   };
 

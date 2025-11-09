@@ -7,7 +7,6 @@ import { DialogManager } from '../DialogManager';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { ErrorModal } from '../ui/ErrorModal';
 
-// Fix: Define the AppLayoutProps interface to resolve 'Cannot find name' error.
 interface AppLayoutProps {
   children: React.ReactNode;
   currentView: ViewType;

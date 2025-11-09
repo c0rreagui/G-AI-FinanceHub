@@ -16,7 +16,14 @@ export const AddDebtForm: React.FC<AddDebtFormProps> = ({ isOpen, onClose }) => 
   const [interestRate, setInterestRate] = useState('');
   const [category, setCategory] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const resetForm = () => {
+    setName('');
+    setTotalAmount('');
+    setInterestRate('');
+    setCategory('');
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !totalAmount || !interestRate) return;
 
@@ -27,7 +34,8 @@ export const AddDebtForm: React.FC<AddDebtFormProps> = ({ isOpen, onClose }) => 
         category: category || 'Outros',
     };
     
-    addDebt(debtData);
+    await addDebt(debtData);
+    resetForm();
     onClose();
   };
 

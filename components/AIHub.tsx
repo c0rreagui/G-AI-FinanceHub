@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { ChatMessage, ChatRole, TransactionType } from '../types';
 import { ChatMessageDisplay } from './ChatMessageDisplay';
@@ -6,10 +5,143 @@ import { LoadingSpinner } from './LoadingSpinner';
 import { MicIcon, PaperclipIcon, SendIcon, SearchIcon, MapPinIcon, HomeIcon } from './Icons';
 import { getChatResponseStream, connectToLive, encode, decode, decodeAudioData } from '../services/geminiService';
 import { useGeolocation } from '../hooks/useGeolocation';
-import { LiveServerMessage, LiveSession, Blob as GenAiBlob } from '@google/genai';
+import { LiveServerMessage, LiveSession, Blob as GenAiBlob } from '@google/ai/generativelanguage';
 import { PageHeader } from './layout/PageHeader';
 import { LiveStatusIndicator } from './ui/LiveStatusIndicator';
 import { useDialog } from '../hooks/useDialog';
+import { GenerateContentResponse } from '@google/genai';
+import { useAuth } from '../hooks/useAuth';
+
+// --- Funções Auxiliares para o AIHub ---
+
+/**
+ * Processa a resposta em streaming da API Gemini, atualizando a mensagem do modelo em tempo real.
+ */
+const processStreamedResponse = async (
+  stream: AsyncGenerator<GenerateContentResponse>,
+  setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>
+) => {
+  let fullResponse = "";
+  let groundingData: any[] = [];
+  setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "", isTyping: true }]);
+
+  for await (const chunk of stream) {
+    const chunkText = chunk.text ?? '';
+    fullResponse += chunkText;
+    
+    if (chunk.candidates?.[0]?.groundingMetadata?.groundingChunks) {
+      groundingData = chunk.candidates[0].groundingMetadata.groundingChunks;
+    }
+
+    setMessages(prev => {
+      const newMessages = [...prev];
+      const lastMessage = newMessages[newMessages.length - 1];
+      if (lastMessage?.role === ChatRole.MODEL) {
+        lastMessage.text = fullResponse;
+        lastMessage.grounding = groundingData;
+      }
+      return newMessages;
+    });
+  }
+  return { fullResponse, groundingData };
+};
+
+/**
+ * Lida com as chamadas de função retornadas pela API Gemini.
+ */
+const handleFunctionCall = (
+  response: GenerateContentResponse,
+  openDialog: (type: any, props?: any) => void,
+  setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>
+) => {
+  const part = response.candidates[0]?.content.parts.find((p: any) => p.functionCall);
+  const call = part?.functionCall;
+
+  if (call && call.name === 'handleNewTransaction') {
+    const args = call.args;
+    const prefillData = {
+      description: args.description || '',
+      amount: Math.abs(args.amount || 0),
+      type: (args.amount < 0) ? TransactionType.DESPESA : TransactionType.RECEITA,
+    };
+
+    openDialog('add-transaction', { prefill: prefillData });
+
+    setMessages(prev => [
+      ...prev,
+      {
+        role: ChatRole.MODEL,
+        text: `Claro! Abri o formulário para você. Por favor, revise os detalhes e clique em "Salvar".`,
+      },
+    ]);
+  }
+};
+
+/**
+ * Processa as mensagens recebidas da sessão de chat de voz (Live API).
+ */
+const processLiveMessage = async (
+    message: LiveServerMessage,
+    setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
+    outputAudioContextRef: React.MutableRefObject<AudioContext | null>,
+    nextAudioStartTimeRef: React.MutableRefObject<number>,
+    audioSourcesRef: React.MutableRefObject<Set<AudioBufferSourceNode>>
+) => {
+    const base64Audio = message.serverContent?.modelTurn?.parts[0]?.inlineData?.data;
+    if (base64Audio && outputAudioContextRef.current) {
+        const ctx = outputAudioContextRef.current;
+        nextAudioStartTimeRef.current = Math.max(nextAudioStartTimeRef.current, ctx.currentTime);
+        const audioBuffer = await decodeAudioData(decode(base64Audio), ctx, 24000, 1);
+        const sourceNode = ctx.createBufferSource();
+        sourceNode.buffer = audioBuffer;
+        sourceNode.connect(ctx.destination);
+        sourceNode.addEventListener('ended', () => audioSourcesRef.current.delete(sourceNode));
+        sourceNode.start(nextAudioStartTimeRef.current);
+        nextAudioStartTimeRef.current += audioBuffer.duration;
+        audioSourcesRef.current.add(sourceNode);
+    }
+
+    if (message.serverContent?.interrupted) {
+        for (const source of audioSourcesRef.current.values()) {
+            source.stop();
+        }
+        audioSourcesRef.current.clear();
+        nextAudioStartTimeRef.current = 0;
+    }
+
+    setMessages(prev => {
+        let newMessages = [...prev];
+        const inputTx = message.serverContent?.inputTranscription?.text;
+        const outputTx = message.serverContent?.outputTranscription?.text;
+
+        if (inputTx) {
+            const last = newMessages[newMessages.length - 1];
+            if (last?.role === ChatRole.USER && last.isTyping) {
+                last.text += inputTx;
+            } else {
+                newMessages.push({ role: ChatRole.USER, text: inputTx, isTyping: true });
+            }
+        }
+
+        if (outputTx) {
+            const last = newMessages[newMessages.length - 1];
+            if (last?.role === ChatRole.MODEL && last.isTyping) {
+                last.text += outputTx;
+            } else {
+                if (last?.role === ChatRole.USER && last.isTyping) last.isTyping = false;
+                newMessages.push({ role: ChatRole.MODEL, text: outputTx, isTyping: true });
+            }
+        }
+
+        if (message.serverContent?.turnComplete) {
+            newMessages = newMessages.map(m => ({ ...m, isTyping: false }));
+        }
+        return newMessages;
+    });
+};
+
+
+// --- Componente Principal do AIHub ---
 
 export const AIHub: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -26,6 +158,7 @@ export const AIHub: React.FC = () => {
   
   const { location, error: geoError } = useGeolocation();
   const { openDialog } = useDialog();
+  const { apiKey } = useAuth();
 
   const sessionPromise = useRef<Promise<LiveSession> | null>(null);
   const inputAudioContext = useRef<AudioContext | null>(null);
@@ -52,276 +185,157 @@ export const AIHub: React.FC = () => {
       reader.readAsDataURL(file);
     }
   };
-
-  // SUBSTITUA O handleSend INTEIRO POR ESTE CÓDIGO CORRIGIDO:
+  
   const handleSend = async () => {
+    if (!apiKey) {
+        setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "Por favor, configure sua chave de API do Gemini nas Configurações." }]);
+        return;
+    }
     if (!input.trim() && !image) return;
     setIsLoading(true);
 
+    const imagePayload = image ? { inlineData: { data: image.data, mimeType: image.mimeType } } : null;
+    const chatHistory: ChatMessage[] = messages.filter(m => !m.isTyping && (m.text || m.imageData));
+    
     const userMessage: ChatMessage = { role: ChatRole.USER, text: input };
     if (image) {
       userMessage.imageUrl = image.url;
+      userMessage.imageData = imagePayload?.inlineData;
     }
-    setMessages(prev => [...prev, userMessage]);
     
-    const chatHistory = messages.filter(m => !m.isTyping);
-    const imagePayload = image ? { inlineData: { data: image.data, mimeType: image.mimeType } } : null;
-
+    setMessages(prev => [...prev, userMessage]);
+    const currentInput = input;
     setInput('');
     setImage(null);
     
     try {
-      // 1. CORREÇÃO: Pega o objeto de resultado INTEIRO
-      const result = await getChatResponseStream(
-        chatHistory,
-        input,
-        imagePayload,
-        useSearch,
-        useMaps,
-        location
-      );
-
-      // 2. CORREÇÃO: Acessa as propriedades .stream e .response
-      const stream = result.stream;
-      const responsePromise = result.response;
-
-      // 3. PREPARA O STREAMING DE TEXTO
-      let fullResponse = "";
-      let groundingData: any[] = [];
-      setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "", isTyping: true }]);
-
-      // 4. PROCESSA O STREAM DE TEXTO (AGORA VAI FUNCIONAR)
-      for await (const chunk of stream) {
-        const chunkText = chunk.text ?? ''; 
-        fullResponse += chunkText;
-        
-        if(chunk.candidates?.[0]?.groundingMetadata?.groundingChunks) {
-          groundingData = chunk.candidates[0].groundingMetadata.groundingChunks;
-        }
-
-        setMessages(prev => {
-          const newMessages = [...prev];
-          const lastMessage = newMessages[newMessages.length - 1];
-          if(lastMessage && lastMessage.role === ChatRole.MODEL) {
-            lastMessage.text = fullResponse;
-            lastMessage.grounding = groundingData;
-          }
-          return newMessages;
-        });
-      }
+      const result = await getChatResponseStream(apiKey, chatHistory, currentInput, imagePayload, useSearch, useMaps, location);
+      const { fullResponse, groundingData } = await processStreamedResponse(result.stream, setMessages);
       
-      // Para o indicador de "digitando" do texto
       setMessages(prev => {
           const newMessages = [...prev];
           const lastMessage = newMessages[newMessages.length - 1];
-          if(lastMessage && lastMessage.role === ChatRole.MODEL) {
-            lastMessage.isTyping = false;
+          if (lastMessage?.role === ChatRole.MODEL && lastMessage.isTyping) {
+              if (fullResponse.trim()) {
+                  lastMessage.text = fullResponse;
+                  lastMessage.grounding = groundingData;
+                  lastMessage.isTyping = false;
+              } else {
+                  return newMessages.slice(0, -1);
+              }
           }
           return newMessages;
       });
 
-      // 5. PROCESSA A RESPOSTA FINAL (PARA FUNCTION CALLING)
-      const response = await responsePromise;
-      const part = response.candidates[0]?.content.parts.find((part: any) => part.functionCall);
-      const call = part?.functionCall;
-
-      if (call && call.name === 'handleNewTransaction') {
-        const args = call.args;
-
-        const prefillData = {
-          description: args.description || '',
-          amount: Math.abs(args.amount || 0), // O form espera um número positivo
-          type: (args.amount < 0) ? TransactionType.DESPESA : TransactionType.RECEITA,
-        };
-
-        openDialog('add-transaction', { prefill: prefillData });
-
-        setMessages(prev => [
-          ...prev,
-          {
-            role: ChatRole.MODEL,
-            text: `Claro! Abri o formulário para você. Por favor, revise os detalhes (especialmente a Categoria e a Conta) e clique em "Salvar".`,
-          },
-        ]);
-      }
+      const finalResponse = await result.response;
+      handleFunctionCall(finalResponse, openDialog, setMessages);
 
     } catch (error) {
       console.error("Error generating content:", error);
-      const errorMessage = error instanceof Error ? error.message : "Desculpe, encontrei um erro. Por favor, tente novamente.";
-      
-      // Garante que a mensagem de "digitando" seja removida em caso de erro
+      const errorMessage = error instanceof Error ? error.message : "Desculpe, encontrei um erro.";
       setMessages(prev => {
           const newMessages = [...prev];
           const lastMessage = newMessages[newMessages.length - 1];
-          if(lastMessage && lastMessage.role === ChatRole.MODEL && lastMessage.isTyping) {
-            // Remove a mensagem de "digitando" que falhou
+          if (lastMessage?.role === ChatRole.MODEL && lastMessage.isTyping) {
             return newMessages.slice(0, -1);
           }
           return newMessages;
       });
-
       setMessages(prev => [...prev, { role: ChatRole.MODEL, text: errorMessage }]);
     } finally {
       setIsLoading(false);
     }
   };
 
+  const cleanupLiveSession = useCallback(() => {
+    if (mediaStream.current) {
+      mediaStream.current.getTracks().forEach(track => track.stop());
+      mediaStream.current = null;
+    }
+    if (scriptProcessor.current) {
+      scriptProcessor.current.disconnect();
+      scriptProcessor.current = null;
+    }
+    if (inputAudioContext.current?.state !== 'closed') inputAudioContext.current?.close();
+    if (outputAudioContext.current?.state !== 'closed') outputAudioContext.current?.close();
+
+    sessionPromise.current = null;
+    audioSources.current.clear();
+    nextAudioStartTime.current = 0;
+    setLiveStatus('idle');
+    setIsRecording(false);
+  }, []);
+
+  const setupLiveSession = useCallback(async () => {
+    if (!apiKey) {
+      setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "Por favor, configure sua chave de API do Gemini nas Configurações para usar o chat de voz." }]);
+      setIsRecording(false);
+      return;
+    }
+    setLiveStatus('connecting');
+    inputAudioContext.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
+    outputAudioContext.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+    nextAudioStartTime.current = 0;
+
+    sessionPromise.current = connectToLive(apiKey, {
+      onopen: async () => {
+        setLiveStatus('connected');
+        setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "Chat de voz iniciado. Estou ouvindo..." }]);
+        
+        mediaStream.current = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const source = inputAudioContext.current!.createMediaStreamSource(mediaStream.current);
+        scriptProcessor.current = inputAudioContext.current!.createScriptProcessor(4096, 1, 1);
+
+        scriptProcessor.current.onaudioprocess = (audioProcessingEvent) => {
+          const inputData = audioProcessingEvent.inputBuffer.getChannelData(0);
+          const pcmBlob: GenAiBlob = {
+            data: encode(new Uint8Array(new Int16Array(inputData.map(f => f * 32768)).buffer)),
+            mimeType: 'audio/pcm;rate=16000',
+          };
+          sessionPromise.current?.then(session => session.sendRealtimeInput({ media: pcmBlob }));
+        };
+        source.connect(scriptProcessor.current);
+        scriptProcessor.current.connect(inputAudioContext.current!.destination);
+      },
+      onmessage: (msg) => processLiveMessage(msg, setMessages, outputAudioContext, nextAudioStartTime, audioSources),
+      onerror: (e: ErrorEvent) => {
+        console.error("Live session error:", e);
+        setLiveStatus('error');
+        setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "Erro na conexão de voz." }]);
+      },
+      onclose: () => {
+        console.log("Live session closed.");
+        if (liveStatus === 'closing') {
+           setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "Chat de voz encerrado." }]);
+        }
+        cleanupLiveSession();
+      },
+    });
+
+    sessionPromise.current.catch(error => {
+        const errorMessage = error instanceof Error ? error.message : "Erro ao iniciar o chat de voz.";
+        console.error("Live session setup error:", error);
+        setLiveStatus('error');
+        setMessages(prev => [...prev, { role: ChatRole.MODEL, text: errorMessage }]);
+        cleanupLiveSession();
+    });
+  }, [liveStatus, cleanupLiveSession, apiKey]);
+
   const toggleRecording = useCallback(async () => {
     if (isRecording) {
       setLiveStatus('closing');
-      if (sessionPromise.current) {
-        try {
-          const session = await sessionPromise.current;
-          session.close();
-        } catch (e) {
-          console.error("Error closing session:", e);
-          setIsRecording(false);
-          setLiveStatus('error');
-        }
-      } else {
-        setIsRecording(false);
-        setLiveStatus('idle');
+      try {
+        const session = await sessionPromise.current;
+        session?.close();
+      } catch (e) {
+        console.error("Error closing session:", e);
+        cleanupLiveSession();
       }
-      return;
+    } else {
+      setIsRecording(true);
+      await setupLiveSession();
     }
-
-    setIsRecording(true);
-    setLiveStatus('connecting');
-
-    try {
-      inputAudioContext.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
-      outputAudioContext.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
-      nextAudioStartTime.current = 0;
-
-      sessionPromise.current = connectToLive({
-        onopen: async () => {
-          setLiveStatus('connected');
-          setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "Chat de voz iniciado. Estou ouvindo..." }]);
-          mediaStream.current = await navigator.mediaDevices.getUserMedia({ audio: true });
-          const source = inputAudioContext.current!.createMediaStreamSource(mediaStream.current);
-          scriptProcessor.current = inputAudioContext.current!.createScriptProcessor(4096, 1, 1);
-
-          scriptProcessor.current.onaudioprocess = (audioProcessingEvent) => {
-            const inputData = audioProcessingEvent.inputBuffer.getChannelData(0);
-            const l = inputData.length;
-            const int16 = new Int16Array(l);
-            for (let i = 0; i < l; i++) {
-              int16[i] = inputData[i] * 32768;
-            }
-            const pcmBlob: GenAiBlob = {
-              data: encode(new Uint8Array(int16.buffer)),
-              mimeType: 'audio/pcm;rate=16000',
-            };
-            if (sessionPromise.current) {
-              sessionPromise.current.then((session) => {
-                session.sendRealtimeInput({ media: pcmBlob });
-              });
-            }
-          };
-          source.connect(scriptProcessor.current);
-          scriptProcessor.current.connect(inputAudioContext.current!.destination);
-        },
-        onmessage: async (message: LiveServerMessage) => {
-          const base64Audio = message.serverContent?.modelTurn?.parts[0]?.inlineData?.data;
-          if (base64Audio) {
-            const ctx = outputAudioContext.current!;
-            nextAudioStartTime.current = Math.max(nextAudioStartTime.current, ctx.currentTime);
-            const audioBuffer = await decodeAudioData(decode(base64Audio), ctx, 24000, 1);
-            const sourceNode = ctx.createBufferSource();
-            sourceNode.buffer = audioBuffer;
-            sourceNode.connect(ctx.destination);
-            sourceNode.addEventListener('ended', () => audioSources.current.delete(sourceNode));
-            sourceNode.start(nextAudioStartTime.current);
-            nextAudioStartTime.current += audioBuffer.duration;
-            audioSources.current.add(sourceNode);
-          }
-
-          if (message.serverContent?.interrupted) {
-            for (const source of audioSources.current.values()) {
-              source.stop();
-            }
-            audioSources.current.clear();
-            nextAudioStartTime.current = 0;
-          }
-
-          const inputTranscription = message.serverContent?.inputTranscription?.text;
-          const outputTranscription = message.serverContent?.outputTranscription?.text;
-
-          if (inputTranscription) {
-            setMessages(prev => {
-              const last = prev[prev.length - 1];
-              if (last?.role === ChatRole.USER && last.isTyping) {
-                const newMessages = [...prev];
-                newMessages[newMessages.length - 1].text += inputTranscription;
-                return newMessages;
-              }
-              return [...prev, { role: ChatRole.USER, text: inputTranscription, isTyping: true }];
-            });
-          }
-
-          if (outputTranscription) {
-            setMessages(prev => {
-              const last = prev[prev.length - 1];
-              if (last?.role === ChatRole.MODEL && last.isTyping) {
-                const newMessages = [...prev];
-                newMessages[newMessages.length - 1].text += outputTranscription;
-                return newMessages;
-              }
-              const lastUserMsg = prev[prev.length - 1];
-              if (lastUserMsg?.role === ChatRole.USER && lastUserMsg.isTyping) {
-                const newMessages = [...prev];
-                newMessages[newMessages.length - 1].isTyping = false;
-                return [...newMessages, { role: ChatRole.MODEL, text: outputTranscription, isTyping: true }];
-              }
-              return [...prev, { role: ChatRole.MODEL, text: outputTranscription, isTyping: true }];
-            });
-          }
-
-          if (message.serverContent?.turnComplete) {
-            setMessages(prev => prev.map(m => ({ ...m, isTyping: false })));
-          }
-        },
-        onerror: (e: ErrorEvent) => {
-          console.error("Live session error:", e);
-          setLiveStatus('error');
-          setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "Erro na conexão de voz. Verifique as permissões do microfone e tente novamente." }]);
-        },
-        onclose: (e: CloseEvent) => {
-          console.log("Live session closed.");
-          
-          if (liveStatus === 'closing') {
-             setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "Chat de voz encerrado." }]);
-          }
-
-          if (mediaStream.current) {
-            mediaStream.current.getTracks().forEach(track => track.stop());
-            mediaStream.current = null;
-          }
-          if (scriptProcessor.current) {
-            scriptProcessor.current.disconnect();
-            scriptProcessor.current = null;
-          }
-          if (inputAudioContext.current && inputAudioContext.current.state !== 'closed') {
-            inputAudioContext.current.close();
-          }
-          if (outputAudioContext.current && outputAudioContext.current.state !== 'closed') {
-            outputAudioContext.current.close();
-          }
-          sessionPromise.current = null;
-          audioSources.current.clear();
-          nextAudioStartTime.current = 0;
-          setLiveStatus('idle');
-          setIsRecording(false);
-        },
-      });
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Erro ao iniciar o chat de voz.";
-      console.error("Live session setup error:", error);
-      setLiveStatus('error');
-      setMessages(prev => [...prev, { role: ChatRole.MODEL, text: errorMessage }]);
-      setIsRecording(false);
-    }
-  }, [isRecording, liveStatus]);
+  }, [isRecording, setupLiveSession, cleanupLiveSession]);
   
   return (
     <>

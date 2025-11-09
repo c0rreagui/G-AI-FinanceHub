@@ -1,16 +1,8 @@
-import { GoogleGenAI, GenerateContentResponse, LiveSession, LiveServerMessage, Modality } from "@google/genai";
+import { GoogleGenAI, LiveSession, LiveServerMessage, Modality, GenerateContentResponse } from "@google/genai";
 import { ChatMessage, ChatRole } from '../types';
 
-// Helper function to get the Gemini client using the key from localStorage
-const getAiClient = (): GoogleGenAI => {
-    const apiKey = localStorage.getItem('gemini_api_key');
-    if (!apiKey) {
-        throw new Error("Chave de API do Gemini não encontrada. Por favor, adicione sua chave nas Configurações.");
-    }
-    return new GoogleGenAI({ apiKey });
-}
-
 export const getChatResponseStream = async (
+  apiKey: string, // A chave agora é um parâmetro
   history: ChatMessage[],
   prompt: string,
   image: { inlineData: { data: string; mimeType: string } } | null,
@@ -18,45 +10,59 @@ export const getChatResponseStream = async (
   useMaps: boolean,
   location: { latitude: number; longitude: number } | null
 ) => {
-  const ai = getAiClient(); // Initialize client with key from localStorage
+  // O cliente da IA é inicializado a cada chamada com a chave fornecida.
+  const ai = new GoogleGenAI({ apiKey });
 
-  const contents = history.map(msg => ({
-    role: msg.role === ChatRole.USER ? 'user' : 'model',
-    parts: [{ text: msg.text || '' }],
-  }));
+  // Mapeia o histórico do chat para o formato da API
+  const mappedHistory = history.map(msg => {
+    const parts: ({ text: string } | { inlineData: { data: string; mimeType: string } })[] = [];
+    
+    if (msg.imageData) {
+      parts.push({ inlineData: msg.imageData });
+    }
+    if (msg.text && msg.text.trim()) {
+      parts.push({ text: msg.text.trim() });
+    }
+    
+    return {
+      role: msg.role === ChatRole.USER ? 'user' : 'model',
+      parts,
+    };
+  }).filter(msg => msg.parts.length > 0) as { role: 'user' | 'model', parts: any[] }[];
 
-  const userParts = [];
+  const newPromptParts = [];
   if (image) {
-    userParts.push(image);
+    newPromptParts.push(image);
   }
-  userParts.push({ text: prompt });
-  contents.push({ role: 'user', parts: userParts });
+  if (prompt && prompt.trim()) {
+    newPromptParts.push({ text: prompt });
+  }
+
+  if (newPromptParts.length === 0) {
+    const emptyStream = (async function* () {
+        const response: GenerateContentResponse = { text: "Por favor, digite uma mensagem ou envie uma imagem.", candidates: [], functionCalls: [] };
+        yield response;
+    })();
+    return { stream: emptyStream, response: Promise.resolve({ text: "", candidates: [], functionCalls: [] }) };
+  }
 
   const config: any = {};
   const tools: any[] = [];
 
-  // As ferramentas de grounding (Search, Maps) são exclusivas e não podem ser misturadas com function calling.
   if (useSearch || useMaps) {
     if (useSearch) tools.push({ googleSearch: {} });
     if (useMaps) tools.push({ googleMaps: {} });
   } else {
-    // Adiciona a ferramenta de function calling apenas se o grounding não estiver ativo.
     tools.push({
       functionDeclarations: [
         {
           name: 'handleNewTransaction',
-          description: 'Inicia o processo de adicionar uma nova transação (despesa ou receita) quando o usuário solicitar explicitamente.',
+          description: 'Inicia o processo de adicionar uma nova transação (despesa ou receita).',
           parameters: {
             type: 'OBJECT',
             properties: {
-              description: {
-                type: 'STRING',
-                description: 'A descrição da transação. Ex: "Almoço", "Salário"',
-              },
-              amount: {
-                type: 'NUMBER',
-                description: 'O valor da transação. Despesas devem ser números negativos (ex: -50.00). Receitas devem ser números positivos (ex: 1000.00).',
-              },
+              description: { type: 'STRING', description: 'A descrição da transação. Ex: "Almoço", "Salário"' },
+              amount: { type: 'NUMBER', description: 'O valor da transação. Despesas são negativas (ex: -50). Receitas são positivas (ex: 1000).' },
             },
             required: ['description', 'amount'],
           },
@@ -66,39 +72,36 @@ export const getChatResponseStream = async (
   }
   
   if (tools.length > 0) {
-    config.tools = tools;
+      config.tools = tools;
   }
   
   if (useMaps && location) {
     config.toolConfig = {
       retrievalConfig: {
-        latLng: {
-          latitude: location.latitude,
-          longitude: location.longitude
-        }
+        latLng: { latitude: location.latitude, longitude: location.longitude }
       }
     }
   }
 
-  // FIX: Adicionado `await` para garantir que a promise (se houver) seja resolvida.
-  // Em cenários com 'tools', a chamada pode se comportar de forma assíncrona.
-  const result = await ai.models.generateContentStream({
+  const chat = ai.chats.create({
     model: 'gemini-2.5-flash',
-    contents,
+    history: mappedHistory,
     config,
   });
+
+  const result = await chat.sendMessageStream(newPromptParts);
+  
   return result;
 };
 
-// --- Live API and Audio Helper Functions ---
-
-export const connectToLive = (callbacks: {
+export const connectToLive = (apiKey: string, callbacks: { // A chave agora é um parâmetro
     onopen: () => void;
     onmessage: (message: LiveServerMessage) => void;
     onerror: (e: ErrorEvent) => void;
     onclose: (e: CloseEvent) => void;
 }): Promise<LiveSession> => {
-  const ai = getAiClient(); // Initialize client with key from localStorage
+  // O cliente da IA é inicializado a cada chamada com a chave fornecida.
+  const ai = new GoogleGenAI({ apiKey });
   return ai.live.connect({
     model: 'gemini-2.5-flash-native-audio-preview-09-2025',
     callbacks,
@@ -113,6 +116,8 @@ export const connectToLive = (callbacks: {
     },
   });
 };
+
+// --- Funções Auxiliares de Áudio (sem alteração) ---
 
 export function encode(bytes: Uint8Array): string {
   let binary = '';

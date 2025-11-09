@@ -2,10 +2,9 @@ import React from 'react';
 import { ViewType } from '../../types';
 import { 
     HomeIcon, 
-    BarChart as BarChartIcon,
     ArrowLeftRight,
     Target,
-    TrendingDown
+    Settings,
 } from '../Icons';
 
 interface MobileBottomNavProps {
@@ -15,16 +14,15 @@ interface MobileBottomNavProps {
 
 const mobileNavigation = [
   { name: 'Início', view: 'home', icon: HomeIcon },
-  { name: 'Dashboard', view: 'dashboard', icon: BarChartIcon },
   { name: 'Transações', view: 'transactions', icon: ArrowLeftRight },
   { name: 'Metas', view: 'goals', icon: Target },
-  { name: 'Dívidas', view: 'debts', icon: TrendingDown },
+  { name: 'Ajustes', view: 'settings', icon: Settings },
 ];
 
 export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ currentView, setCurrentView }) => {
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-black/50 backdrop-blur-lg border-t border-white/10 z-50">
-      <div className="grid grid-cols-5 gap-x-2 max-w-lg mx-auto">
+      <div className="grid grid-cols-4 gap-x-2 max-w-lg mx-auto">
         {mobileNavigation.map((item) => (
           <a
             key={item.name}
