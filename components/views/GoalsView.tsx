@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { PageHeader } from '../layout/PageHeader';
 import { Target, PlusCircle } from '../Icons';
 import { useDashboardData } from '../../hooks/useDashboardData';
@@ -10,13 +10,30 @@ import { Badge } from '../ui/Badge';
 import { useDialog } from '../../hooks/useDialog';
 import { GenericViewSkeleton } from './skeletons/GenericViewSkeleton';
 import { EmptyState } from '../ui/EmptyState';
+import { motion } from 'framer-motion';
 
-const GoalCard: React.FC<{ goal: Goal, onAddValue: (goal: Goal) => void }> = ({ goal, onAddValue }) => {
+const GoalCard: React.FC<{ goal: Goal, onAddValue: (goal: Goal) => void, isJustUpdated?: boolean }> = ({ goal, onAddValue, isJustUpdated }) => {
     const progress = Math.min((goal.currentAmount / goal.targetAmount) * 100, 100);
     const isCompleted = goal.status === GoalStatus.CONCLUIDA;
 
+    const cardVariants = {
+        rest: { 
+            scale: 1, 
+            borderColor: "rgba(255, 255, 255, 0.1)"
+        },
+        updated: {
+            scale: [1, 1.02, 1],
+            borderColor: ["rgba(255, 255, 255, 0.1)", "rgba(139, 92, 246, 0.7)", "rgba(255, 255, 255, 0.1)"],
+            transition: { duration: 0.8, ease: "easeInOut" }
+        }
+    };
+
     return (
-        <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6 flex flex-col">
+        <motion.div
+            variants={cardVariants}
+            animate={isJustUpdated ? "updated" : "rest"}
+            className="bg-white/5 border backdrop-blur-xl rounded-2xl p-6 flex flex-col shadow-lg"
+        >
             <div className="flex-grow">
                 <div className="flex justify-between items-start">
                     <h3 className="text-lg font-semibold text-white">{goal.name}</h3>
@@ -39,13 +56,22 @@ const GoalCard: React.FC<{ goal: Goal, onAddValue: (goal: Goal) => void }> = ({ 
                 <Button variant="secondary" className="w-full">Ver Detalhes</Button>
                 {!isCompleted && <Button className="w-full" onClick={() => onAddValue(goal)}>Adicionar Valor</Button>}
             </div>
-        </div>
+        </motion.div>
     );
 };
 
 export const GoalsView: React.FC = () => {
-    const { goals, loading } = useDashboardData();
+    const { goals, loading, lastUpdatedGoalId, clearLastUpdatedGoalId } = useDashboardData();
     const { openDialog } = useDialog();
+
+    useEffect(() => {
+        if (lastUpdatedGoalId) {
+            const timer = setTimeout(() => {
+                clearLastUpdatedGoalId();
+            }, 1000); // Duração um pouco maior que a animação para garantir
+            return () => clearTimeout(timer);
+        }
+    }, [lastUpdatedGoalId, clearLastUpdatedGoalId]);
 
     const handleOpenAddValue = (goal: Goal) => {
         openDialog('add-value-to-goal', { goal: goal });
@@ -66,7 +92,12 @@ export const GoalsView: React.FC = () => {
                     {goals.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {goals.map(goal => (
-                                <GoalCard key={goal.id} goal={goal} onAddValue={handleOpenAddValue} />
+                                <GoalCard 
+                                    key={goal.id} 
+                                    goal={goal} 
+                                    onAddValue={handleOpenAddValue} 
+                                    isJustUpdated={goal.id === lastUpdatedGoalId}
+                                />
                             ))}
                         </div>
                     ) : (

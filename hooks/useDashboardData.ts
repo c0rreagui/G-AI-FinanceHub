@@ -53,8 +53,11 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     const [loading, setLoading] = useState(true);
     const [isMutating, setIsMutating] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [lastUpdatedGoalId, setLastUpdatedGoalId] = useState<string | null>(null);
+
 
     const clearError = () => setError(null);
+    const clearLastUpdatedGoalId = () => setLastUpdatedGoalId(null);
     
     const categoryMap = useMemo(() => new Map(categories.map(c => [c.id, c])), [categories]);
 
@@ -308,6 +311,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
                 throw supabaseError;
             }
             setGoals(prev => prev.map(g => (g.id === goalId ? fromSupabase(data) : g)));
+            setLastUpdatedGoalId(goalId); // Trigger for animation
             showToast('Valor adicionado à meta!', { type: 'success' });
         } finally {
             setIsMutating(false);
@@ -384,7 +388,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const value = {
         transactions, goals, debts, summary, scheduledTransactions, userLevel, achievements,
-        categories, loading, isMutating, error, monthlyChartData, clearError, addTransaction, updateTransaction, addGoal, addDebt, addScheduledTransaction,
+        categories, loading, isMutating, error, monthlyChartData, lastUpdatedGoalId, clearError, clearLastUpdatedGoalId, addTransaction, updateTransaction, addGoal, addDebt, addScheduledTransaction,
         deleteTransaction, updateGoalValue, addPaymentToDebt
     };
 

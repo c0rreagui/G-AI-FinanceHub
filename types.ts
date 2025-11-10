@@ -203,7 +203,9 @@ export interface DashboardDataContextType {
     loading: boolean;
     isMutating: boolean;
     error: string | null;
+    lastUpdatedGoalId: string | null;
     clearError: () => void;
+    clearLastUpdatedGoalId: () => void;
     addTransaction: (transaction: Omit<Transaction, 'id' | 'category' | 'userId'>) => Promise<boolean>;
     updateTransaction: (transactionId: string, updates: Partial<Omit<Transaction, 'id' | 'category'>>) => Promise<boolean>;
     addGoal: (goal: Omit<Goal, 'id' | 'currentAmount' | 'status' | 'userId'>) => Promise<boolean>;
