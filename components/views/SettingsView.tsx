@@ -1,52 +1,44 @@
+// FIX: Implemented the SettingsView component to provide app settings and user profile information.
 import React from 'react';
 import { PageHeader } from '../layout/PageHeader';
 import { Settings } from '../Icons';
+import { ApiKeySettings } from '../ui/ApiKeySettings';
 import { UserProfileCard } from '../ui/UserProfileCard';
 import { AchievementsList } from '../ui/AchievementsList';
-import { useDashboardData } from '../../hooks/useDashboardData';
-import { LoadingSpinner } from '../LoadingSpinner';
-import { useAuth } from '../../hooks/useAuth';
-import { supabase } from '../../services/supabaseClient';
 import { Button } from '../ui/Button';
+import { supabase } from '../../services/supabaseClient';
 
 export const SettingsView: React.FC = () => {
-    const { loading } = useDashboardData();
-    const { user } = useAuth();
 
     const handleLogout = async () => {
-      await supabase.auth.signOut();
-      // O App.tsx vai detectar isso automaticamente e mostrar a tela de login
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+            console.error('Error logging out:', error);
+        }
+        // The auth listener in useAuth will handle the state change.
     };
 
     return (
         <>
-            <PageHeader
-                icon={Settings}
-                title="Configurações e Perfil"
-                breadcrumbs={['FinanceHub', 'Configurações']}
+            <PageHeader 
+                icon={Settings} 
+                title="Ajustes e Perfil" 
+                breadcrumbs={['FinanceHub', 'Ajustes']}
+                actions={<Button onClick={handleLogout} variant="secondary">Sair</Button>}
             />
-            {loading ? (
-                <div className="flex-grow flex items-center justify-center">
-                    <LoadingSpinner />
+            <div className="mt-6 flex-grow overflow-y-auto pr-2 space-y-6">
+                <ApiKeySettings />
+                <UserProfileCard />
+                <AchievementsList />
+
+                 <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6 mt-6">
+                    <h2 className="text-xl font-semibold text-white mb-2">Sobre</h2>
+                    <p className="text-sm text-gray-400">
+                        FinanceHub é seu assistente financeiro pessoal com tecnologia de IA.
+                    </p>
+                    <p className="text-xs text-gray-500 mt-4">Versão 2.0.23</p>
                 </div>
-            ) : (
-                <div className="mt-6 flex-grow overflow-y-auto pr-2">
-                    <UserProfileCard />
-                    <AchievementsList />
-                    <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6 mt-6">
-                      <p className="text-center text-gray-400 text-sm mb-4">
-                        Logado como: <strong className="text-white">{user?.email}</strong>
-                      </p>
-                      <Button onClick={handleLogout} variant="secondary" className="w-full">
-                        Sair (Logout)
-                      </Button>
-                      {/* CHORE: Update app version */}
-                      <p className="text-center text-xs text-gray-600 mt-4 md:hidden">
-                        FinanceHub v2.0.20
-                      </p>
-                    </div>
-                </div>
-            )}
+            </div>
         </>
     );
 };

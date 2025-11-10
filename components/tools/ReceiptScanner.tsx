@@ -1,125 +1,103 @@
-import React, { useState, useCallback } from 'react';
-import { extractTextFromImage } from '../../services/ocrService';
-import { extractTransactionsFromText, ExtractedTransaction } from '../../services/transactionExtractor';
+import React, { useState } from 'react';
 import { useDialog } from '../../hooks/useDialog';
+import { scanReceipt } from '../../services/ocrService';
+import { TransactionType } from '../../types';
 import { Button } from '../ui/Button';
-import { PaperclipIcon, PlusCircle, XIcon } from '../Icons';
-import { LoadingSpinner } from '../LoadingSpinner';
-import { formatCurrencyBRL, formatDate } from '../../utils/formatters';
+import { UploadCloud, Zap } from '../Icons';
 
-export const ReceiptScanner: React.FC = () => {
-    const [imageFile, setImageFile] = useState<File | null>(null);
-    const [imageUrl, setImageUrl] = useState<string | null>(null);
-    const [ocrProgress, setOcrProgress] = useState({ status: '', progress: 0 });
-    const [extractedTransactions, setExtractedTransactions] = useState<ExtractedTransaction[]>([]);
-    const [isProcessing, setIsProcessing] = useState(false);
+export const ReceiptScanner: React.FC<{ apiKey: string }> = ({ apiKey }) => {
     const { openDialog } = useDialog();
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
         if (file) {
-            reset();
             setImageFile(file);
-            setImageUrl(URL.createObjectURL(file));
+            setError(null);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
         }
     };
 
-    const reset = () => {
-        setImageFile(null);
-        setImageUrl(null);
-        setOcrProgress({ status: '', progress: 0 });
-        setExtractedTransactions([]);
-        setIsProcessing(false);
-    };
+    const handleScan = async () => {
+        if (!imageFile || !imagePreview) {
+            setError("Por favor, selecione uma imagem primeiro.");
+            return;
+        }
 
-    const handleScan = useCallback(async () => {
-        if (!imageFile) return;
-
-        setIsProcessing(true);
-        setExtractedTransactions([]);
-        
+        setIsLoading(true);
+        setError(null);
         try {
-            const text = await extractTextFromImage(imageFile, (log) => {
-                setOcrProgress({ status: log.status, progress: log.progress });
+            // 1. Converte a imagem para base64
+            const base64Image = imagePreview.split(',')[1];
+
+            // 2. Chama o serviço de OCR
+            const ocrResult = await scanReceipt(base64Image, imageFile.type, apiKey);
+
+            // 3. Abre o pop-up com os dados pré-preenchidos
+            openDialog('add-transaction', {
+                prefill: {
+                    description: ocrResult.description || 'Recibo Scaneado',
+                    amount: ocrResult.amount || 0,
+                    type: (ocrResult.amount || 0) < 0 ? TransactionType.DESPESA : TransactionType.RECEITA,
+                    date: new Date().toISOString().split('T')[0]
+                }
             });
-            
-            const transactions = extractTransactionsFromText(text);
-            setExtractedTransactions(transactions);
-            if(transactions.length === 0) {
-              setOcrProgress({ status: 'Nenhuma transação encontrada no texto.', progress: 1 });
-            }
-
-        } catch (error) {
-            console.error("OCR Error:", error);
-            setOcrProgress({ status: 'Erro ao processar a imagem.', progress: 1 });
+            // 4. Limpa o estado
+            setImageFile(null);
+            setImagePreview(null);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : "Erro desconhecido";
+            console.error("Erro no OCR:", err);
+            setError(`Não foi possível ler o recibo. Tente uma imagem mais nítida. (${errorMessage})`);
         } finally {
-            setIsProcessing(false);
+            setIsLoading(false);
         }
-
-    }, [imageFile]);
-    
-    const handleAddTransaction = (tx: ExtractedTransaction) => {
-        openDialog('add-transaction', { prefill: tx });
     };
 
     return (
         <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6">
-            <h3 className="text-lg font-semibold text-white">Scanner de Comprovantes (OCR)</h3>
-            <p className="text-sm text-gray-400 mt-2 mb-4">Envie a imagem de um comprovante ou extrato para extrair as transações automaticamente.</p>
+            <h3 className="text-lg font-semibold text-white">Scanner de Comprovantes (IA)</h3>
+            <p className="text-sm text-gray-400 mt-2 mb-4">Envie um comprovante para que a IA extraia os dados da transação.</p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                {/* Lado Esquerdo: Upload e Preview */}
-                <div className="space-y-4">
-                    <div className="w-full h-48 bg-black/20 rounded-lg border-2 border-dashed border-white/20 flex items-center justify-center relative">
-                        {imageUrl ? (
-                            <>
-                                <img src={imageUrl} alt="Preview" className="max-h-full max-w-full object-contain rounded"/>
-                                <button onClick={reset} className="absolute top-2 right-2 p-1 bg-black/50 rounded-full text-white hover:bg-black/80">
-                                    <XIcon className="w-5 h-5"/>
-                                </button>
-                            </>
-                        ) : (
-                            <label htmlFor="receipt-upload" className="text-center text-gray-400 cursor-pointer p-4">
-                                <PaperclipIcon className="w-8 h-8 mx-auto mb-2"/>
-                                Clique para selecionar uma imagem
-                            </label>
-                        )}
-                         <input id="receipt-upload" type="file" className="hidden" onChange={handleFileChange} accept="image/*" />
+            <label
+                htmlFor="receipt-upload"
+                className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-gray-600 rounded-lg cursor-pointer hover:bg-white/5 transition-colors"
+            >
+                {imagePreview ? (
+                    <img src={imagePreview} alt="Preview do recibo" className="h-full w-full object-contain rounded-lg" />
+                ) : (
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6 text-gray-400">
+                        <UploadCloud className="w-10 h-10 mb-3" />
+                        <p className="mb-2 text-sm">Clique para enviar ou arraste e solte</p>
+                        <p className="text-xs">(PNG, JPG ou WEBP)</p>
                     </div>
-                     <Button onClick={handleScan} disabled={!imageFile || isProcessing} className="w-full">
-                        {isProcessing ? <LoadingSpinner/> : null}
-                        {isProcessing ? `Processando... (${(ocrProgress.progress * 100).toFixed(0)}%)` : 'Escanear Imagem'}
-                    </Button>
-                    {isProcessing && <p className="text-xs text-center text-gray-400">{ocrProgress.status}</p>}
-                </div>
-
-                {/* Lado Direito: Resultados */}
-                <div className="space-y-4">
-                    <h4 className="font-semibold text-gray-200">Transações Encontradas:</h4>
-                    {extractedTransactions.length > 0 ? (
-                        <ul className="space-y-3 max-h-60 overflow-y-auto pr-2">
-                           {extractedTransactions.map((tx, index) => (
-                               <li key={index} className="bg-black/20 p-3 rounded-lg flex justify-between items-center">
-                                   <div>
-                                       <p className="font-semibold text-white truncate">{tx.description}</p>
-                                       <p className="text-sm text-gray-400">{formatDate(tx.date)}</p>
-                                   </div>
-                                   <div className="flex items-center gap-2">
-                                       <span className="font-semibold text-red-400">{formatCurrencyBRL(tx.amount)}</span>
-                                        <button onClick={() => handleAddTransaction(tx)} title="Adicionar Transação" className="p-1 text-gray-400 hover:text-green-400">
-                                            <PlusCircle className="w-5 h-5"/>
-                                        </button>
-                                   </div>
-                               </li>
-                           ))}
-                        </ul>
-                    ) : (
-                         <div className="text-center text-gray-500 py-8 border-2 border-dashed border-white/10 rounded-lg">
-                             <p>Nenhuma transação extraída ainda.</p>
-                         </div>
-                    )}
-                </div>
-            </div>
+                )}
+                <input id="receipt-upload" type="file" className="hidden" accept="image/png, image/jpeg, image/webp" onChange={handleFileChange} />
+            </label>
+            {error && (
+                <p className="text-red-400 text-sm mt-2 text-center">{error}</p>
+            )}
+            <Button
+                className="w-full mt-6"
+                onClick={handleScan}
+                disabled={!imageFile || isLoading}
+            >
+                {isLoading ? (
+                    'Lendo Recibo...'
+                ) : (
+                    <>
+                        <Zap className="w-4 h-4 mr-2" />
+                        Scanear e Lançar
+                    </>
+                )}
+            </Button>
         </div>
     );
 };

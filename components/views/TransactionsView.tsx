@@ -1,145 +1,94 @@
+// FIX: Implemented the TransactionsView component to display a list of transactions.
 import React, { useState, useMemo } from 'react';
 import { PageHeader } from '../layout/PageHeader';
-import { ArrowLeftRight, Filter, PlusCircle, XIcon } from '../Icons';
+import { ArrowLeftRight, PlusCircle, Filter } from '../Icons';
 import { useDashboardData } from '../../hooks/useDashboardData';
-import { Transaction, TransactionType } from '../../types';
 import { formatCurrencyBRL, formatDate } from '../../utils/formatters';
 import { LoadingSpinner } from '../LoadingSpinner';
+import { Transaction, TransactionType } from '../../types';
 import { Button } from '../ui/Button';
 import { useDialog } from '../../hooks/useDialog';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 
-const TransactionListItem: React.FC<{ 
-    transaction: Transaction, 
-    onDelete: (id: string) => void,
-    onEdit: (transaction: Transaction) => void
-}> = ({ transaction, onDelete, onEdit }) => {
-    const isExpense = transaction.amount < 0;
+const TransactionItem: React.FC<{ transaction: Transaction; onEdit: (tx: Transaction) => void }> = ({ transaction, onEdit }) => {
+    const isExpense = transaction.type === TransactionType.DESPESA;
+    // The amount in the hook is already negative for expenses
     const amount = transaction.amount;
+    const isMobile = useMediaQuery('(max-width: 640px)');
 
     return (
-        <div className="bg-white/5 p-4 rounded-lg flex items-center gap-4 group">
-            <div 
-                className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 cursor-pointer" 
-                style={{ backgroundColor: `${transaction.category.color}20` }}
-                onClick={() => onEdit(transaction)}
-            >
-                <transaction.category.icon className="w-6 h-6" style={{ color: transaction.category.color }} />
-            </div>
-            <div 
-                className="flex-grow grid grid-cols-2 md:grid-cols-4 gap-4 items-center cursor-pointer"
-                onClick={() => onEdit(transaction)}
-            >
-                <div>
+        <li 
+            className="flex items-center justify-between py-4 px-2 hover:bg-white/5 rounded-lg cursor-pointer transition-colors"
+            onClick={() => onEdit(transaction)}
+        >
+            <div className="flex items-center gap-4 flex-1 min-w-0">
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{backgroundColor: `${transaction.category.color}20`}}>
+                    <transaction.category.icon className="w-5 h-5" style={{color: transaction.category.color}} />
+                </div>
+                <div className="flex-1 min-w-0">
                     <p className="font-semibold text-white truncate">{transaction.description}</p>
-                    <p className="text-sm text-gray-400">{transaction.category.name}</p>
+                    <p className="text-sm text-gray-400">
+                        {isMobile ? formatDate(transaction.date, 'short') : `${transaction.category.name} • ${formatDate(transaction.date, 'short')}`}
+                    </p>
                 </div>
-                <div className="hidden md:block">
-                    <p className="text-gray-300">{formatDate(transaction.date, 'short')}</p>
-                </div>
-                <div className="hidden md:block">
-                     <p className="text-gray-300">Conta Principal</p>
-                </div>
-                <p className={`font-semibold text-right ${isExpense ? 'text-red-400' : 'text-green-400'}`}>
-                    {isExpense ? '' : '+'} {formatCurrencyBRL(amount)}
-                </p>
             </div>
-            <button 
-                onClick={() => onDelete(transaction.id)}
-                className="p-1 rounded-full text-gray-600 hover:text-red-400 hover:bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"
-                aria-label="Deletar transação"
-            >
-                <XIcon className="w-5 h-5" />
-            </button>
-        </div>
+            <p className={`font-semibold text-right pl-2 ${isExpense ? 'text-red-400' : 'text-green-400'}`}>
+                {amount < 0 ? '' : '+'} {formatCurrencyBRL(amount)}
+            </p>
+        </li>
     );
 };
 
 export const TransactionsView: React.FC = () => {
-    const { transactions, loading, deleteTransaction } = useDashboardData();
+    const { transactions, loading } = useDashboardData();
     const { openDialog } = useDialog();
-    const [filterText, setFilterText] = useState('');
-    const [showFilter, setShowFilter] = useState(false);
+    const [filter, setFilter] = useState('all'); // all, income, expenses
 
-    const filteredTransactions = useMemo(() => {
-        if (!filterText) return transactions;
-        return transactions.filter(t => 
-            t.description.toLowerCase().includes(filterText.toLowerCase())
-        );
-    }, [transactions, filterText]);
-
-    const handleDelete = async (id: string) => {
-        if (window.confirm("Tem certeza que deseja deletar esta transação?")) {
-            await deleteTransaction(id);
-            // O hook agora cuida de mostrar o erro, se houver.
-        }
-    };
+    const handleEditTransaction = (tx: Transaction) => {
+        openDialog('add-transaction', { prefill: tx });
+    }
     
-    const handleEdit = (transaction: Transaction) => {
-        openDialog('add-transaction', { prefill: transaction });
-    };
+    const filteredTransactions = useMemo(() => {
+        if (filter === 'income') {
+            return transactions.filter(t => t.type === TransactionType.RECEITA);
+        }
+        if (filter === 'expenses') {
+            return transactions.filter(t => t.type === TransactionType.DESPESA);
+        }
+        return transactions;
+    }, [transactions, filter]);
 
     return (
         <>
-            <PageHeader
-                icon={ArrowLeftRight}
-                title="Transações"
+            <PageHeader 
+                icon={ArrowLeftRight} 
+                title="Transações" 
                 breadcrumbs={['FinanceHub', 'Transações']}
                 actions={
-                    <div className="flex gap-2">
-                        <Button variant="secondary" onClick={() => setShowFilter(!showFilter)}>
-                            <Filter className="w-4 h-4" /> 
-                            {showFilter ? 'Fechar Filtro' : 'Filtrar'}
-                        </Button>
-                        <Button onClick={() => openDialog('add-transaction')}><PlusCircle className="w-4 h-4" /> Nova Transação</Button>
+                    <div className="flex items-center gap-2">
+                        <Button variant="secondary" onClick={() => alert('Filtros ainda não implementados.')}><Filter className="w-4 h-4 mr-2"/> Filtrar</Button>
+                        <Button onClick={() => openDialog('add-transaction')}><PlusCircle className="w-4 h-4 mr-2"/> Nova Transação</Button>
                     </div>
                 }
             />
-            {showFilter && (
-                 <div className="mt-4 bg-black/20 p-4 rounded-lg flex items-center gap-2">
-                    <Filter className="w-5 h-5 text-gray-400" />
-                    <input 
-                        type="text"
-                        value={filterText}
-                        onChange={(e) => setFilterText(e.target.value)}
-                        placeholder="Filtrar por descrição..."
-                        className="flex-1 bg-transparent text-white placeholder-gray-500 focus:outline-none"
-                    />
-                    {filterText && (
-                        <button onClick={() => setFilterText('')} className="text-gray-400 hover:text-white">
-                            <XIcon className="w-5 h-5" />
-                        </button>
-                    )}
-                </div>
-            )}
-            {loading ? (
+             {loading ? (
                 <div className="flex-grow flex items-center justify-center">
                     <LoadingSpinner />
                 </div>
-            ) : (
+             ) : (
                 <div className="mt-6 flex-grow overflow-y-auto pr-2">
                     {filteredTransactions.length > 0 ? (
-                        <div className="space-y-3">
-                            {filteredTransactions.map(item => (
-                                <TransactionListItem 
-                                    key={item.id} 
-                                    transaction={item} 
-                                    onDelete={handleDelete} 
-                                    onEdit={handleEdit}
-                                />
-                            ))}
-                        </div>
+                        <ul className="divide-y divide-white/10">
+                            {filteredTransactions.map(t => <TransactionItem key={t.id} transaction={t} onEdit={handleEditTransaction} />)}
+                        </ul>
                     ) : (
-                        <div className="text-center text-gray-400 py-8">
+                         <div className="text-center text-gray-400 py-8">
                             <p>Nenhuma transação encontrada.</p>
-                             {filterText ? (
-                                <p className="text-sm mt-2">Tente um termo de busca diferente.</p>
-                             ) : (
-                                <p className="text-sm mt-2">Clique em "Nova Transação" para adicionar a primeira.</p>
-                             )}
+                            <p className="text-sm mt-2">Clique em "Nova Transação" para adicionar sua primeira.</p>
                         </div>
                     )}
                 </div>
-            )}
+             )}
         </>
     );
 };
