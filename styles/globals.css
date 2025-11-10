@@ -73,65 +73,75 @@
 
   .aurora-shape {
     position: absolute;
-    mix-blend-mode: screen; /* Blend colors nicely */
-    filter: blur(150px);
+    mix-blend-mode: screen; /* Keep screen for soft light addition */
+    filter: blur(180px);   /* Increased blur for softer effect */
     will-change: transform, opacity;
-    border-radius: 50%;
+    border-radius: 9999px; /* Use pill shape for ellipses */
   }
 
+  /* Main green aurora curtain */
   .aurora-shape-1 {
-    width: 900px;
-    height: 800px;
-    top: -20%;
-    left: -10%;
-    background-color: oklch(0.6 0.25 270 / 0.4); /* Primary Purple, but with alpha */
-    animation: move-aurora-1 25s ease-in-out infinite alternate;
+    width: 70vw;
+    height: 120vh;
+    top: -60vh;
+    left: -15vw;
+    background-color: oklch(0.7 0.25 150 / 0.5); /* Aurora Green */
+    animation: aurora-flow-1 30s ease-in-out infinite alternate;
   }
 
+  /* Pink/purple lower glow */
   .aurora-shape-2 {
-    width: 800px;
-    height: 700px;
-    bottom: -30%;
-    right: -20%;
-    background-color: oklch(0.7 0.25 180 / 0.5); /* Greenish-Cyan */
-    animation: move-aurora-2 30s ease-in-out infinite alternate;
+    width: 90vw;
+    height: 80vh;
+    bottom: -50vh;
+    right: -20vw;
+    background-color: oklch(0.6 0.28 330 / 0.4); /* Magenta/Pink */
+    animation: aurora-flow-2 40s ease-in-out infinite alternate;
+    animation-delay: -5s; /* Stagger start times */
   }
   
+  /* Faster moving cyan ray */
   .aurora-shape-3 {
-    width: 600px;
-    height: 600px;
-    top: 30%;
-    right: 10%;
-    background-color: oklch(0.7 0.3 320 / 0.3); /* Magenta */
-    animation: move-aurora-3 20s ease-in-out infinite alternate;
+    width: 40vw;
+    height: 140vh;
+    top: -70vh;
+    right: 5vw;
+    background-color: oklch(0.75 0.22 195 / 0.3); /* Bright Cyan */
+    animation: aurora-flow-3 25s ease-in-out infinite alternate;
   }
   
+  /* Deep purple base layer, slow movement */
   .aurora-shape-4 {
-    width: 700px;
-    height: 700px;
-    bottom: 10%;
-    left: 20%;
-    background-color: oklch(0.8 0.2 195 / 0.2); /* Bright Cyan */
-    animation: move-aurora-4 35s ease-in-out infinite alternate;
+    width: 80vw;
+    height: 100vh;
+    bottom: -40vh;
+    left: 10vw;
+    background-color: oklch(0.5 0.2 280 / 0.3); /* Deep Purple */
+    animation: aurora-flow-4 50s ease-in-out infinite alternate;
+    animation-delay: -10s;
   }
 }
 
-@keyframes move-aurora-1 {
-  from { transform: translate(-10%, -10%) rotate(0deg); opacity: 0.8; }
-  to { transform: translate(10%, 10%) rotate(45deg); opacity: 1; }
+/* Keyframes with more steps and natural movement */
+@keyframes aurora-flow-1 {
+  0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 0.7; }
+  50% { transform: translate(10vw, 30vh) rotate(15deg) scale(1.1); opacity: 0.9; }
+  100% { transform: translate(-10vw, 0) rotate(-5deg) scale(1); opacity: 0.7; }
 }
 
-@keyframes move-aurora-2 {
-  from { transform: translate(20%, 20%) rotate(0deg); opacity: 0.7; }
-  to { transform: translate(-20%, -20%) rotate(-60deg); opacity: 0.9; }
+@keyframes aurora-flow-2 {
+  from { transform: translate(0, 0) scale(1.2); opacity: 0.6; }
+  to { transform: translate(-20vw, -20vh) scale(1); opacity: 0.8; }
 }
 
-@keyframes move-aurora-3 {
-  from { transform: translate(0, 0) scale(1); opacity: 0.6; }
-  to { transform: translate(15%, -15%) scale(1.2); opacity: 0.8; }
+@keyframes aurora-flow-3 {
+  0% { transform: translate(0, 0) rotate(20deg) scale(1); opacity: 0.5; }
+  33% { transform: translate(-15vw, 40vh) rotate(-5deg) scale(1.2); opacity: 0.3; }
+  66% { transform: translate(10vw, 20vh) rotate(5deg) scale(0.9); opacity: 0.7; }
+  100% { transform: translate(0, 0) rotate(20deg) scale(1); opacity: 0.5; }
 }
 
-@keyframes move-aurora-4 {
-  from { transform: translate(0, 0) rotate(0deg) scale(1.1); opacity: 0.5; }
-  to { transform: translate(-20%, 10%) rotate(30deg) scale(1); opacity: 0.7; }
+@keyframes aurora-flow-4 {
+  from { transform: translate(0, 0) rotate(10deg) scale(1.3); opacity: 0.5; }
+  to { transform: translate(5vw, 15vh) rotate(0deg) scale(1.1); opacity: 0.7; }
 }
