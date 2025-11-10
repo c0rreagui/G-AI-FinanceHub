@@ -1,6 +1,6 @@
 import React, { createContext, useState } from 'react';
 
-type DialogType = 'add-goal' | 'add-debt' | 'add-transaction' | 'add-scheduling' | null;
+type DialogType = 'add-goal' | 'add-debt' | 'add-transaction' | 'add-scheduling' | 'add-value-to-goal' | null;
 
 interface DialogContextType {
   dialogType: DialogType;

@@ -1,22 +1,5 @@
 import React from 'react';
 
-export enum ChatRole {
-  USER = 'user',
-  MODEL = 'model',
-}
-
-export interface ChatMessage {
-  role: ChatRole;
-  text: string;
-  imageUrl?: string; // Blob URL for display
-  imageData?: { // Base64 data for API history
-      data: string;
-      mimeType: string;
-  };
-  isTyping?: boolean;
-  grounding?: any[];
-}
-
 export type ViewType = 'home' | 'transactions' | 'insights' | 'goals' | 'debts' | 'scheduling' | 'tools' | 'settings';
 
 export enum TransactionType {
@@ -198,4 +181,22 @@ export interface WishlistItem {
     price: number;
     priority: 'Baixa' | 'Média' | 'Alta';
     savedAmount: number;
+}
+
+// FIX: Adicionando tipos ausentes para o chat com IA
+export enum ChatRole {
+  USER = 'user',
+  MODEL = 'model',
+}
+
+export interface ChatMessage {
+  role: ChatRole;
+  text: string;
+  isTyping?: boolean;
+  imageUrl?: string;
+  imageData?: {
+    data: string;
+    mimeType: string;
+  };
+  grounding?: any[];
 }

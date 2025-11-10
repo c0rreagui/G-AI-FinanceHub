@@ -6,6 +6,9 @@ interface AuthContextType {
   session: Session | null;
   user: User | null;
   loading: boolean;
+  // FIX: Adicionando apiKey e setApiKey ao contexto de autenticação
+  apiKey: string | null;
+  setApiKey: (key: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -14,6 +17,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  // FIX: Lógica para gerenciar a chave de API do Gemini no localStorage
+  const [apiKey, setApiKeyState] = useState<string | null>(() => {
+    try {
+      return localStorage.getItem('gemini-api-key');
+    } catch (e) {
+      console.error("Não foi possível ler a chave de API do localStorage", e);
+      return null;
+    }
+  });
+
+  const setApiKey = (key: string) => {
+    try {
+      localStorage.setItem('gemini-api-key', key);
+      setApiKeyState(key);
+    } catch (e) {
+      console.error("Não foi possível salvar a chave de API no localStorage", e);
+    }
+  };
 
   useEffect(() => {
     // Tenta pegar a sessão ativa quando o app carrega
@@ -45,6 +66,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     session,
     user,
     loading,
+    // FIX: Expondo apiKey e setApiKey no provedor de contexto
+    apiKey,
+    setApiKey,
   };
 
   return React.createElement(AuthContext.Provider, { value: value }, children);

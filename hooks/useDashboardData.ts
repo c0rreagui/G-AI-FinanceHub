@@ -4,7 +4,8 @@ import {
     TransactionType, GoalStatus, DebtStatus, ScheduledTransactionFrequency, UserRank
 } from '../types';
 import {
-    Utensils, ShoppingCart, Car, Shirt, PiggyBank, Heart, BookOpen, Gift, Plane, HomeIcon, Dumbbell, Gamepad, Film, ArrowUpRight, TrendingDown, Wallet, Lightbulb, Target
+    Utensils, ShoppingCart, Car, Shirt, PiggyBank, Heart, BookOpen, Gift, Plane, HomeIcon, Dumbbell, Gamepad, Film, // FIX: Corrected typo in icon import from 'ArrowUpright' to 'ArrowUpRight'.
+ArrowUpRight, TrendingDown, Wallet, Lightbulb, Target
 } from '../components/Icons';
 import { useAuth } from './useAuth';
 import { supabase } from '../services/supabaseClient';
@@ -21,10 +22,13 @@ interface DashboardDataContextType {
     loading: boolean;
     error: string | null;
     clearError: () => void;
-    addTransaction: (transaction: Omit<Transaction, 'id' | 'category'>) => Promise<void>;
-    addGoal: (goal: Omit<Goal, 'id'|'currentAmount'|'status'>) => Promise<void>;
-    addDebt: (debt: Omit<Debt, 'id'|'paidAmount'|'status'>) => Promise<void>;
-    addScheduledTransaction: (scheduledTx: Omit<ScheduledTransaction, 'id'|'category'|'nextDueDate'>) => Promise<void>;
+    addTransaction: (transaction: Omit<Transaction, 'id' | 'category'>) => Promise<boolean>;
+    updateTransaction: (transactionId: string, updates: Partial<Omit<Transaction, 'id' | 'category'>>) => Promise<boolean>;
+    addGoal: (goal: Omit<Goal, 'id'|'currentAmount'|'status'>) => Promise<boolean>;
+    addDebt: (debt: Omit<Debt, 'id'|'paidAmount'|'status'>) => Promise<boolean>;
+    addScheduledTransaction: (scheduledTx: Omit<ScheduledTransaction, 'id'|'category'|'nextDueDate'>) => Promise<boolean>;
+    deleteTransaction: (transactionId: string) => Promise<boolean>;
+    updateGoalValue: (goalId: string, newCurrentAmount: number) => Promise<void>;
 }
 
 const DashboardDataContext = createContext<DashboardDataContextType | undefined>(undefined);
@@ -96,7 +100,6 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             }));
             setScheduledTransactions(enrichedScheduled as ScheduledTransaction[]);
             
-            // Mocked for now as tables don't exist
             setAchievements([
                 { id: 'ac1', name: 'Primeiros Passos', description: 'Adicionou sua primeira transação.', unlocked: transactionsResponse.data.length > 0, dateUnlocked: new Date().toISOString(), icon: Wallet },
                 { id: 'ac2', name: 'Planejador', description: 'Criou sua primeira meta financeira.', unlocked: goalsResponse.data.length > 0, dateUnlocked: new Date().toISOString(), icon: Target },
@@ -121,103 +124,147 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         const currentMonth = new Date().getMonth();
         const currentYear = new Date().getFullYear();
 
-        const monthlyIncome = transactions
-            .filter(t => t.type === TransactionType.RECEITA && new Date(t.date).getMonth() === currentMonth && new Date(t.date).getFullYear() === currentYear)
+        const monthlyTransactions = transactions.filter(t => 
+            new Date(t.date).getMonth() === currentMonth && 
+            new Date(t.date).getFullYear() === currentYear
+        );
+
+        const monthlyIncome = monthlyTransactions
+            .filter(t => t.amount > 0)
             .reduce((sum, t) => sum + t.amount, 0);
 
-        const monthlyExpenses = transactions
-            .filter(t => t.type === TransactionType.DESPESA && new Date(t.date).getMonth() === currentMonth && new Date(t.date).getFullYear() === currentYear)
+        const monthlyExpenses = monthlyTransactions
+            .filter(t => t.amount < 0)
             .reduce((sum, t) => sum + t.amount, 0);
-
+        
         const totalBalance = transactions.reduce((sum, t) => sum + t.amount, 0);
 
         return { totalBalance, monthlyIncome, monthlyExpenses };
     }, [transactions]);
 
-    const addTransaction = async (transactionData: Omit<Transaction, 'id' | 'category'>) => {
+    const addTransaction = async (transactionData: Omit<Transaction, 'id' | 'category'>): Promise<boolean> => {
+        if (!user) {
+            setError("Usuário não autenticado.");
+            return false;
+        }
+        const payload = {
+            ...transactionData,
+            amount: transactionData.type === TransactionType.DESPESA 
+                ? -Math.abs(transactionData.amount) 
+                : Math.abs(transactionData.amount),
+            user_id: user.id,
+        };
+
+        const { data, error } = await supabase.from('transactions').insert(payload).select().single();
+
+        if (error) {
+            setError(error.message);
+            return false;
+        }
+        
+        const newTransaction: Transaction = { ...data, category: categoryMap.get(data.category_id || 'cat12') || MOCK_CATEGORIES[11] };
+        setTransactions(prev => [newTransaction, ...prev].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+        return true;
+    };
+    
+    const updateTransaction = async (transactionId: string, updates: Partial<Omit<Transaction, 'id' | 'category'>>): Promise<boolean> => {
+        if (!user) {
+            setError("Usuário não autenticado.");
+            return false;
+        }
+        const payload = { ...updates };
+        if (payload.amount !== undefined && payload.type !== undefined) {
+             payload.amount = payload.type === TransactionType.DESPESA 
+                ? -Math.abs(payload.amount) 
+                : Math.abs(payload.amount);
+        }
+
+        const { data, error } = await supabase.from('transactions').update(payload).eq('id', transactionId).eq('user_id', user.id).select().single();
+
+        if (error) {
+            setError(error.message);
+            return false;
+        }
+        
+        const updatedTransaction: Transaction = { ...data, category: categoryMap.get(data.category_id || 'cat12') || MOCK_CATEGORIES[11] };
+        setTransactions(prev => prev.map(t => (t.id === transactionId ? updatedTransaction : t)));
+        return true;
+    };
+
+    const deleteTransaction = async (transactionId: string): Promise<boolean> => {
+        if (!user) {
+            setError("Usuário não autenticado.");
+            throw new Error("Usuário não autenticado.");
+        }
+
+        const { error } = await supabase
+            .from('transactions')
+            .delete()
+            .eq('id', transactionId)
+            .eq('user_id', user.id);
+
+        if (error) {
+            console.error("Erro ao deletar:", error);
+            setError(error.message);
+            throw error;
+        }
+
+        setTransactions(prev => prev.filter(t => t.id !== transactionId));
+        return true;
+    };
+
+    const addGoal = async (goalData: Omit<Goal, 'id'|'currentAmount'|'status'>): Promise<boolean> => {
+        if (!user) { setError("Usuário não autenticado."); return false; }
+        const { data, error } = await supabase.from('goals').insert({ ...goalData, user_id: user.id, currentAmount: 0, status: GoalStatus.EM_ANDAMENTO }).select().single();
+        if (error) { setError(error.message); return false; }
+        setGoals(prev => [data as Goal, ...prev]);
+        return true;
+    };
+
+    const updateGoalValue = async (goalId: string, newCurrentAmount: number) => {
         if (!user) throw new Error("Usuário não autenticado.");
         const { data, error } = await supabase
-            .from('transactions')
-            .insert({ ...transactionData, user_id: user.id })
+            .from('goals')
+            .update({ currentAmount: newCurrentAmount })
+            .eq('id', goalId)
             .select()
             .single();
-
         if (error) {
             setError(error.message);
             throw error;
         }
         
-        const newTransaction: Transaction = {
-            ...data,
-            category: categoryMap.get(data.category_id || 'cat12') || MOCK_CATEGORIES[11],
-        };
-        setTransactions(prev => [newTransaction, ...prev]);
+        // Atualiza o estado local
+        setGoals(prev => 
+            prev.map(g => (g.id === goalId ? data as Goal : g))
+        );
     };
 
-    const addGoal = async (goalData: Omit<Goal, 'id'|'currentAmount'|'status'>) => {
-        if (!user) throw new Error("Usuário não autenticado.");
-        const newGoalPayload = {
-            ...goalData,
-            user_id: user.id,
-            currentAmount: 0,
-            status: GoalStatus.EM_ANDAMENTO,
-        };
-        const { data, error } = await supabase.from('goals').insert(newGoalPayload).select().single();
-
-        if (error) {
-            setError(error.message);
-            throw error;
-        }
-        setGoals(prev => [data as Goal, ...prev]);
-    };
-
-    const addDebt = async (debtData: Omit<Debt, 'id'|'paidAmount'|'status'>) => {
-        if (!user) throw new Error("Usuário não autenticado.");
-         const newDebtPayload = {
-            ...debtData,
-            user_id: user.id,
-            paidAmount: 0,
-            status: DebtStatus.ATIVA,
-        };
-        const { data, error } = await supabase.from('debts').insert(newDebtPayload).select().single();
-        if (error) {
-            setError(error.message);
-            throw error;
-        }
+    const addDebt = async (debtData: Omit<Debt, 'id'|'paidAmount'|'status'>): Promise<boolean> => {
+        if (!user) { setError("Usuário não autenticado."); return false; }
+        const { data, error } = await supabase.from('debts').insert({ ...debtData, user_id: user.id, paidAmount: 0, status: DebtStatus.ATIVA }).select().single();
+        if (error) { setError(error.message); return false; }
         setDebts(prev => [data as Debt, ...prev]);
+        return true;
     };
 
-    const addScheduledTransaction = async (scheduledTxData: Omit<ScheduledTransaction, 'id'|'category'|'nextDueDate'>) => {
-        if (!user) throw new Error("Usuário não autenticado.");
+    const addScheduledTransaction = async (scheduledTxData: Omit<ScheduledTransaction, 'id'|'category'|'nextDueDate'>): Promise<boolean> => {
+        if (!user) { setError("Usuário não autenticado."); return false; }
+        const nextDueDate = new Date(new Date().getFullYear(), new Date().getMonth() + 1, new Date(scheduledTxData.startDate).getDate()).toISOString();
+        const { data, error } = await supabase.from('scheduled_transactions').insert({ ...scheduledTxData, user_id: user.id, nextDueDate }).select().single();
 
-        // Lógica simples para calcular o próximo vencimento
-        const today = new Date();
-        const nextDueDate = new Date(today.getFullYear(), today.getMonth() + 1, new Date(scheduledTxData.startDate).getDate()).toISOString();
-
-        const newScheduledTxPayload = {
-            ...scheduledTxData,
-            user_id: user.id,
-            nextDueDate: nextDueDate,
-        };
-        const { data, error } = await supabase.from('scheduled_transactions').insert(newScheduledTxPayload).select().single();
-
-        if (error) {
-            setError(error.message);
-            throw error;
-        }
+        if (error) { setError(error.message); return false; }
         
-        const newScheduledTransaction: ScheduledTransaction = {
-            ...data,
-            category: categoryMap.get(data.category_id || 'cat12') || MOCK_CATEGORIES[11],
-        };
-
+        const newScheduledTransaction: ScheduledTransaction = { ...data, category: categoryMap.get(data.category_id || 'cat12') || MOCK_CATEGORIES[11] };
         setScheduledTransactions(prev => [newScheduledTransaction, ...prev]);
+        return true;
     };
 
     const value = {
         transactions, goals, debts, summary, scheduledTransactions, userLevel, achievements,
         categories: MOCK_CATEGORIES,
-        loading, error, clearError, addTransaction, addGoal, addDebt, addScheduledTransaction
+        loading, error, clearError, addTransaction, updateTransaction, addGoal, addDebt, addScheduledTransaction,
+        deleteTransaction, updateGoalValue,
     };
 
     return React.createElement(DashboardDataContext.Provider, { value: value }, children);

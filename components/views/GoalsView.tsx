@@ -10,7 +10,7 @@ import { Badge } from '../ui/Badge';
 import { useDialog } from '../../hooks/useDialog';
 import { LoadingSpinner } from '../LoadingSpinner';
 
-const GoalCard: React.FC<{ goal: Goal }> = ({ goal }) => {
+const GoalCard: React.FC<{ goal: Goal, onAddValue: (goal: Goal) => void }> = ({ goal, onAddValue }) => {
     const progress = Math.min((goal.currentAmount / goal.targetAmount) * 100, 100);
     const isCompleted = goal.status === GoalStatus.CONCLUIDA;
 
@@ -22,7 +22,7 @@ const GoalCard: React.FC<{ goal: Goal }> = ({ goal }) => {
                     <Badge color={isCompleted ? 'green' : 'blue'}>{goal.status}</Badge>
                 </div>
                 <p className="text-sm text-gray-400 mt-1">
-                    Prazo final: {new Date(goal.deadline).toLocaleString('pt-BR')}
+                    Prazo final: {new Date(goal.deadline).toLocaleDateString('pt-BR')}
                 </p>
                 <div className="my-4">
                     <div className="flex justify-between text-white font-bold text-2xl">
@@ -36,7 +36,7 @@ const GoalCard: React.FC<{ goal: Goal }> = ({ goal }) => {
             </div>
             <div className="mt-6 flex gap-2">
                 <Button variant="secondary" className="w-full">Ver Detalhes</Button>
-                {!isCompleted && <Button className="w-full">Adicionar Valor</Button>}
+                {!isCompleted && <Button className="w-full" onClick={() => onAddValue(goal)}>Adicionar Valor</Button>}
             </div>
         </div>
     );
@@ -46,13 +46,17 @@ export const GoalsView: React.FC = () => {
     const { goals, loading } = useDashboardData();
     const { openDialog } = useDialog();
 
+    const handleOpenAddValue = (goal: Goal) => {
+        openDialog('add-value-to-goal', { goal: goal });
+    };
+
     return (
         <>
             <PageHeader 
                 icon={Target} 
                 title="Minhas Metas" 
                 breadcrumbs={['FinanceHub', 'Metas']}
-                actions={<Button onClick={() => openDialog('add-goal')}><PlusCircle className="w-4 h-4 mr-2"/> Nova Meta</Button>}
+                actions={<Button onClick={() => openDialog('add-goal')}><PlusCircle className="w-4 h-4"/> Nova Meta</Button>}
             />
             {loading ? (
                  <div className="flex-grow flex items-center justify-center">
@@ -63,7 +67,7 @@ export const GoalsView: React.FC = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {goals.length > 0 ? (
                             goals.map(goal => (
-                                <GoalCard key={goal.id} goal={goal} />
+                                <GoalCard key={goal.id} goal={goal} onAddValue={handleOpenAddValue} />
                             ))
                         ) : (
                              <div className="col-span-full text-center text-gray-400 py-8">

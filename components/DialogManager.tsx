@@ -4,6 +4,7 @@ import { AddGoalForm } from './forms/AddGoalForm';
 import { AddDebtForm } from './forms/AddDebtForm';
 import { AddTransactionForm } from './forms/AddTransactionForm';
 import { AddSchedulingForm } from './forms/AddSchedulingForm';
+import { AddValueToGoalForm } from './forms/AddValueToGoalForm';
 
 export const DialogManager: React.FC = () => {
   const { dialogType, closeDialog, dialogProps } = useDialog();
@@ -17,6 +18,8 @@ export const DialogManager: React.FC = () => {
       return <AddTransactionForm isOpen={true} onClose={closeDialog} {...dialogProps} />;
     case 'add-scheduling':
       return <AddSchedulingForm isOpen={true} onClose={closeDialog} {...dialogProps} />;
+    case 'add-value-to-goal':
+      return <AddValueToGoalForm isOpen={true} onClose={closeDialog} {...dialogProps} />;
     default:
       return null;
   }

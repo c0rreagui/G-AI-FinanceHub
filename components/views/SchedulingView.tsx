@@ -43,7 +43,7 @@ export const SchedulingView: React.FC = () => {
                 icon={Calendar}
                 title="Agendamentos"
                 breadcrumbs={['FinanceHub', 'Agendamentos']}
-                actions={<Button onClick={() => openDialog('add-scheduling')}><PlusCircle className="w-4 h-4 mr-2"/> Novo Agendamento</Button>}
+                actions={<Button onClick={() => openDialog('add-scheduling')}><PlusCircle className="w-4 h-4"/> Novo Agendamento</Button>}
             />
             {loading ? (
                 <div className="flex-grow flex items-center justify-center">

@@ -5,21 +5,22 @@ import { useDashboardData } from '../../hooks/useDashboardData';
 import { Transaction, TransactionType } from '../../types';
 import { TypeToggle } from '../ui/TypeToggle';
 import { CategoryPicker } from '../ui/CategoryPicker';
+import { XIcon } from '../Icons';
 
 interface AddTransactionFormProps {
   isOpen: boolean;
   onClose: () => void;
-  prefill?: Partial<Omit<Transaction, 'id' | 'category'>>;
+  prefill?: Partial<Omit<Transaction, 'id' | 'category'>> | Transaction;
 }
 
 export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, onClose, prefill }) => {
-  const { addTransaction, categories } = useDashboardData();
+  const { addTransaction, categories, updateTransaction, deleteTransaction } = useDashboardData();
 
   const getInitialState = () => ({
     description: prefill?.description || '',
     amount: prefill?.amount ? String(Math.abs(prefill.amount)) : '',
     date: prefill?.date ? new Date(prefill.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-    type: prefill?.type || TransactionType.DESPESA,
+    type: prefill?.amount && prefill.amount < 0 ? TransactionType.DESPESA : (prefill?.type || TransactionType.DESPESA),
     categoryId: prefill?.category_id || null
   });
 
@@ -28,6 +29,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
   const [date, setDate] = useState(getInitialState().date);
   const [type, setType] = useState<TransactionType>(getInitialState().type);
   const [categoryId, setCategoryId] = useState<string | null>(getInitialState().categoryId);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const resetForm = () => {
     setDescription('');
@@ -48,28 +50,57 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
     }
   }, [isOpen, prefill]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!description || !amount || !date || !categoryId) {
         alert("Por favor, preencha todos os campos obrigatórios.");
         return;
     }
-
-    const transactionData: Omit<Transaction, 'id' | 'category'> = {
+    const transactionData = {
       description,
-      amount: type === TransactionType.DESPESA ? -parseFloat(amount) : parseFloat(amount),
+      amount: parseFloat(amount),
       date,
       type,
       category_id: categoryId,
     };
-
-    addTransaction(transactionData);
-    resetForm(); // Limpa o formulário imediatamente para o próximo input
-    onClose();
+    
+    let success = false;
+    if (prefill && 'id' in prefill) {
+        // MODO DE ATUALIZAÇÃO
+        success = await updateTransaction(prefill.id, transactionData);
+    } else {
+        // MODO DE CRIAÇÃO
+        success = await addTransaction(transactionData);
+    }
+    
+    if (success) {
+      resetForm();
+      onClose();
+    }
+    // Se não houver sucesso, o ErrorModal será exibido pelo hook e o formulário permanecerá aberto.
   };
 
+  const handleDelete = async () => {
+    if (prefill && 'id' in prefill) {
+        if (window.confirm("Tem certeza que deseja deletar esta transação?")) {
+            setIsDeleting(true);
+            try {
+                await deleteTransaction(prefill.id);
+                resetForm();
+                onClose();
+            } catch (error) {
+                alert("Erro ao deletar transação.");
+            } finally {
+                setIsDeleting(false);
+            }
+        }
+    }
+  };
+
+  const isEditMode = prefill && 'id' in prefill;
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Adicionar Nova Transação">
+    <Modal isOpen={isOpen} onClose={onClose} title={isEditMode ? "Editar Transação" : "Adicionar Nova Transação"}>
       <form onSubmit={handleSubmit} className="space-y-4">
         
         <TypeToggle selectedType={type} onTypeChange={setType} />
@@ -125,11 +156,30 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
             onSelectCategory={setCategoryId}
         />
         
-        <div className="flex justify-end gap-2 pt-4">
-          <Button type="button" variant="secondary" onClick={onClose}>
-            Cancelar
-          </Button>
-          <Button type="submit">Salvar Transação</Button>
+        <div className="flex justify-between items-center gap-2 pt-4">
+          {/* Botão de Excluir (só aparece no modo de edição) */}
+          {prefill && 'id' in prefill ? (
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="!bg-red-900/50 !text-red-400 hover:!bg-red-900"
+            >
+              <XIcon className="w-4 h-4 mr-2" />
+              {isDeleting ? 'Excluindo...' : 'Excluir'}
+            </Button>
+          ) : (
+            <div></div> /* Espaçador para manter o layout */
+          )}
+
+          {/* Botões de Ação Padrão */}
+          <div className="flex gap-2">
+            <Button type="button" variant="secondary" onClick={onClose}>
+              Cancelar
+            </Button>
+            <Button type="submit">Salvar Transação</Button>
+          </div>
         </div>
       </form>
     </Modal>

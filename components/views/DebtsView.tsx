@@ -55,7 +55,7 @@ export const DebtsView: React.FC = () => {
                 icon={TrendingDown} 
                 title="Controle de Dívidas" 
                 breadcrumbs={['FinanceHub', 'Dívidas']}
-                actions={<Button onClick={() => openDialog('add-debt')}><PlusCircle className="w-4 h-4 mr-2"/> Adicionar Dívida</Button>}
+                actions={<Button onClick={() => openDialog('add-debt')}><PlusCircle className="w-4 h-4"/> Adicionar Dívida</Button>}
             />
              {loading ? (
                 <div className="flex-grow flex items-center justify-center">

@@ -8,16 +8,27 @@ import { LoadingSpinner } from '../LoadingSpinner';
 import { Button } from '../ui/Button';
 import { useDialog } from '../../hooks/useDialog';
 
-const TransactionListItem: React.FC<{ transaction: Transaction }> = ({ transaction }) => {
-    const isExpense = transaction.type === TransactionType.DESPESA;
-    const amount = isExpense ? -Math.abs(transaction.amount) : transaction.amount;
-    
+const TransactionListItem: React.FC<{ 
+    transaction: Transaction, 
+    onDelete: (id: string) => void,
+    onEdit: (transaction: Transaction) => void
+}> = ({ transaction, onDelete, onEdit }) => {
+    const isExpense = transaction.amount < 0;
+    const amount = transaction.amount;
+
     return (
-        <div className="bg-white/5 p-4 rounded-lg flex items-center gap-4">
-            <div className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${transaction.category.color}20` }}>
+        <div className="bg-white/5 p-4 rounded-lg flex items-center gap-4 group">
+            <div 
+                className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 cursor-pointer" 
+                style={{ backgroundColor: `${transaction.category.color}20` }}
+                onClick={() => onEdit(transaction)}
+            >
                 <transaction.category.icon className="w-6 h-6" style={{ color: transaction.category.color }} />
             </div>
-            <div className="flex-grow grid grid-cols-2 md:grid-cols-4 gap-4 items-center">
+            <div 
+                className="flex-grow grid grid-cols-2 md:grid-cols-4 gap-4 items-center cursor-pointer"
+                onClick={() => onEdit(transaction)}
+            >
                 <div>
                     <p className="font-semibold text-white truncate">{transaction.description}</p>
                     <p className="text-sm text-gray-400">{transaction.category.name}</p>
@@ -32,12 +43,19 @@ const TransactionListItem: React.FC<{ transaction: Transaction }> = ({ transacti
                     {isExpense ? '' : '+'} {formatCurrencyBRL(amount)}
                 </p>
             </div>
+            <button 
+                onClick={() => onDelete(transaction.id)}
+                className="p-1 rounded-full text-gray-600 hover:text-red-400 hover:bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                aria-label="Deletar transação"
+            >
+                <XIcon className="w-5 h-5" />
+            </button>
         </div>
     );
 };
 
 export const TransactionsView: React.FC = () => {
-    const { transactions, loading } = useDashboardData();
+    const { transactions, loading, deleteTransaction } = useDashboardData();
     const { openDialog } = useDialog();
     const [filterText, setFilterText] = useState('');
     const [showFilter, setShowFilter] = useState(false);
@@ -49,6 +67,17 @@ export const TransactionsView: React.FC = () => {
         );
     }, [transactions, filterText]);
 
+    const handleDelete = async (id: string) => {
+        if (window.confirm("Tem certeza que deseja deletar esta transação?")) {
+            await deleteTransaction(id);
+            // O hook agora cuida de mostrar o erro, se houver.
+        }
+    };
+    
+    const handleEdit = (transaction: Transaction) => {
+        openDialog('add-transaction', { prefill: transaction });
+    };
+
     return (
         <>
             <PageHeader
@@ -58,10 +87,10 @@ export const TransactionsView: React.FC = () => {
                 actions={
                     <div className="flex gap-2">
                         <Button variant="secondary" onClick={() => setShowFilter(!showFilter)}>
-                            <Filter className="w-4 h-4 mr-2" /> 
+                            <Filter className="w-4 h-4" /> 
                             {showFilter ? 'Fechar Filtro' : 'Filtrar'}
                         </Button>
-                        <Button onClick={() => openDialog('add-transaction')}><PlusCircle className="w-4 h-4 mr-2" /> Nova Transação</Button>
+                        <Button onClick={() => openDialog('add-transaction')}><PlusCircle className="w-4 h-4" /> Nova Transação</Button>
                     </div>
                 }
             />
@@ -91,7 +120,12 @@ export const TransactionsView: React.FC = () => {
                     {filteredTransactions.length > 0 ? (
                         <div className="space-y-3">
                             {filteredTransactions.map(item => (
-                                <TransactionListItem key={item.id} transaction={item} />
+                                <TransactionListItem 
+                                    key={item.id} 
+                                    transaction={item} 
+                                    onDelete={handleDelete} 
+                                    onEdit={handleEdit}
+                                />
                             ))}
                         </div>
                     ) : (
