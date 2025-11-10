@@ -60,7 +60,7 @@ const AppContent: React.FC = () => {
         {renderView()}
       </AppLayout>
       <div className="fixed bottom-1 right-2 text-xs text-white/20 pointer-events-none select-none">
-        v2.0.23
+        v2.0.26
       </div>
     </>
   );

@@ -73,7 +73,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
           </li>
           <li className="mt-auto">
              <div className="text-xs text-white/20 pointer-events-none select-none mb-4">
-                FinanceHub v2.0.23
+                FinanceHub v2.0.26
             </div>
             <ul role="list" className="-mx-2 space-y-1">
               {secondaryNavigation.map((item) => (

@@ -36,7 +36,7 @@ export const SettingsView: React.FC = () => {
                     <p className="text-sm text-gray-400">
                         FinanceHub é seu assistente financeiro pessoal com tecnologia de IA.
                     </p>
-                    <p className="text-xs text-gray-500 mt-4">Versão 2.0.23</p>
+                    <p className="text-xs text-gray-500 mt-4">Versão 2.0.26</p>
                 </div>
             </div>
         </>

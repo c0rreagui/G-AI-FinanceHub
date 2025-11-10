@@ -23,7 +23,11 @@ export const scanReceipt = async (base64Image: string, mimeType: string, apiKey:
   };
 
   const textPart = {
-    text: `Analise a imagem deste recibo ou comprovante. Extraia a descrição principal (nome do estabelecimento ou produto principal) e o valor total pago. Retorne um objeto JSON com as chaves "description" (string) e "amount" (number). O valor deve ser um número. Se for uma despesa, o valor deve ser negativo. Se não conseguir determinar, retorne null para os campos.`
+    text: `Você é um assistente de OCR focado em finanças. Analise esta imagem de um recibo. Extraia APENAS o valor total e o nome do estabelecimento. Responda APENAS com um objeto JSON.
+
+Exemplo de resposta:
+{ "description": "Nome do Estabelecimento", "amount": 120.50 }
+Se o valor for "120,50", formate para "120.50". Se você não conseguir encontrar os dados, retorne: { "description": null, "amount": null }`
   };
 
   try {
@@ -35,8 +39,8 @@ export const scanReceipt = async (base64Image: string, mimeType: string, apiKey:
         responseSchema: {
           type: Type.OBJECT,
           properties: {
-            description: { type: Type.STRING, description: "Descrição da transação" },
-            amount: { type: Type.NUMBER, description: "Valor da transação (negativo se for despesa)" }
+            description: { type: Type.STRING, description: "Nome do estabelecimento ou descrição principal" },
+            amount: { type: Type.NUMBER, description: "Valor total da transação. Deve ser um número." }
           },
         }
       },
@@ -46,13 +50,17 @@ export const scanReceipt = async (base64Image: string, mimeType: string, apiKey:
     if (!jsonText) {
         return { description: null, amount: null };
     }
-    const parsedResult = JSON.parse(jsonText);
-    return {
-        description: parsedResult.description || null,
-        amount: parsedResult.amount || null,
-    };
+    const data = JSON.parse(jsonText) as OcrResult;
+
+    // Garante que o valor seja negativo se for um recibo (despesa)
+    if (data.amount && data.amount > 0) {
+      data.amount = -Math.abs(data.amount);
+    }
+
+    return data;
+
   } catch (error) {
-    console.error("Erro ao processar recibo com Gemini:", error);
-    throw new Error("Não foi possível analisar o recibo com a IA.");
+    console.error("Erro ao processar o recibo:", error);
+    throw new Error("Falha ao analisar a imagem do recibo.");
   }
 };
