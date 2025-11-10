@@ -183,21 +183,11 @@ export interface WishlistItem {
     savedAmount: number;
 }
 
-// FIX: Added ChatRole and ChatMessage types for the AIHub component.
-export enum ChatRole {
-  USER = 'user',
-  MODEL = 'model',
+export interface MonthlyChartData {
+    name: string;
+    receita: number;
+    despesa: number;
 }
-
-export interface ChatMessage {
-  role: ChatRole;
-  text: string;
-  imageUrl?: string;
-  imageData?: { data: string; mimeType: string };
-  isTyping?: boolean;
-  grounding?: any[];
-}
-
 
 // Define a interface para o contexto de dados do dashboard.
 export interface DashboardDataContextType {
@@ -209,7 +199,9 @@ export interface DashboardDataContextType {
     userLevel: UserLevel;
     achievements: Achievement[];
     categories: Category[];
+    monthlyChartData: MonthlyChartData[];
     loading: boolean;
+    isMutating: boolean;
     error: string | null;
     clearError: () => void;
     addTransaction: (transaction: Omit<Transaction, 'id' | 'category' | 'userId'>) => Promise<boolean>;

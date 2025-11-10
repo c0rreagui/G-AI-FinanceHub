@@ -12,6 +12,7 @@ import {
 } from '../Icons';
 import { motion } from 'framer-motion';
 import { APP_VERSION } from '../../config';
+import { useDashboardData } from '../../hooks/useDashboardData';
 
 interface SidebarProps {
   currentView: ViewType;
@@ -33,12 +34,21 @@ const secondaryNavigation = [
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView }) => {
+  const { isMutating } = useDashboardData();
   return (
     <aside className="flex flex-col gap-y-5 overflow-y-auto bg-black/25 backdrop-blur-md px-6 w-64 border-r border-white/10 flex-shrink-0">
-      <div className="flex h-20 shrink-0 items-center">
+      <div className="flex h-20 shrink-0 items-center gap-2">
         <h1 className="text-3xl font-black bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent drop-shadow-lg">
             FinanceHub
         </h1>
+        {isMutating && (
+           <div className="w-3 h-3">
+             <span className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
+            </span>
+           </div>
+        )}
       </div>
       <nav className="flex flex-1 flex-col">
         <ul role="list" className="flex flex-1 flex-col gap-y-7">

@@ -1,2 +1,3 @@
 // config.ts
-export const APP_VERSION = '5.0.0';
+// FIX: Updated app version sequentially.
+export const APP_VERSION = '5.0.8';

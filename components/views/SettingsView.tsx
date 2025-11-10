@@ -2,8 +2,6 @@ import React from 'react';
 import { PageHeader } from '../layout/PageHeader';
 import { Settings } from '../Icons';
 import { ApiKeySettings } from '../ui/ApiKeySettings';
-import { UserProfileCard } from '../ui/UserProfileCard';
-import { AchievementsList } from '../ui/AchievementsList';
 import { Button } from '../ui/Button';
 import { supabase } from '../../services/supabaseClient';
 import { motion } from 'framer-motion';
@@ -46,8 +44,6 @@ export const SettingsView: React.FC = () => {
                 animate="visible"
             >
                 <motion.div variants={itemVariants}><ApiKeySettings /></motion.div>
-                <motion.div variants={itemVariants}><UserProfileCard /></motion.div>
-                <motion.div variants={itemVariants}><AchievementsList /></motion.div>
 
                  <motion.div variants={itemVariants} className="bg-black/20 border border-white/10 backdrop-blur-xl rounded-2xl p-6">
                     <h2 className="text-xl font-semibold text-white mb-2">Sobre</h2>

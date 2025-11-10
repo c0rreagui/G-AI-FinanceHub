@@ -6,6 +6,9 @@ import { Transaction, TransactionType } from '../../types';
 import { TypeToggle } from '../ui/TypeToggle';
 import { CategoryPicker } from '../ui/CategoryPicker';
 import { TrashIcon } from '../Icons';
+import { Input } from '../ui/Input';
+import { LoadingSpinner } from '../LoadingSpinner';
+import { ConfirmationModal } from '../ui/ConfirmationModal';
 
 interface AddTransactionFormProps {
   isOpen: boolean;
@@ -13,15 +16,11 @@ interface AddTransactionFormProps {
   prefill?: Partial<Omit<Transaction, 'id' | 'category'>> | Transaction;
 }
 
-const FormInput: React.FC<React.InputHTMLAttributes<HTMLInputElement>> = (props) => (
-  <input
-    {...props}
-    className="mt-1 block w-full bg-black/20 border border-white/20 rounded-xl shadow-sm py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition"
-  />
-);
-
 export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, onClose, prefill }) => {
   const { addTransaction, categories, updateTransaction, deleteTransaction } = useDashboardData();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const getInitialState = () => ({
     description: prefill?.description || '',
@@ -36,7 +35,6 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
   const [date, setDate] = useState(getInitialState().date);
   const [type, setType] = useState<TransactionType>(getInitialState().type);
   const [categoryId, setCategoryId] = useState<string | null>(getInitialState().categoryId);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   const resetForm = () => {
     setDescription('');
@@ -59,10 +57,11 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!description || !amount || !date || !categoryId) {
-        alert("Por favor, preencha todos os campos obrigatórios.");
+    if (!description || !amount || !date || !categoryId || isSubmitting) {
         return;
     }
+    
+    setIsSubmitting(true);
     const transactionData = {
       description,
       amount: parseFloat(amount),
@@ -73,13 +72,12 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
     
     let success = false;
     if (prefill && 'id' in prefill) {
-        // MODO DE ATUALIZAÇÃO
         success = await updateTransaction(prefill.id, transactionData);
     } else {
-        // MODO DE CRIAÇÃO
         success = await addTransaction(transactionData);
     }
     
+    setIsSubmitting(false);
     if (success) {
       resetForm();
       onClose();
@@ -88,17 +86,13 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
 
   const handleDelete = async () => {
     if (prefill && 'id' in prefill) {
-        if (window.confirm("Tem certeza que deseja deletar esta transação?")) {
-            setIsDeleting(true);
-            try {
-                await deleteTransaction(prefill.id);
-                resetForm();
-                onClose();
-            } catch (error) {
-                alert("Erro ao deletar transação.");
-            } finally {
-                setIsDeleting(false);
-            }
+        setIsDeleting(true);
+        const success = await deleteTransaction(prefill.id);
+        setIsDeleting(false);
+        if (success) {
+            setShowDeleteConfirm(false);
+            resetForm();
+            onClose();
         }
     }
   };
@@ -106,82 +100,87 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
   const isEditMode = prefill && 'id' in prefill;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={isEditMode ? "Editar Transação" : "Adicionar Nova Transação"}>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        
-        <TypeToggle selectedType={type} onTypeChange={setType} />
+    <>
+      <Modal isOpen={isOpen} onClose={onClose} title={isEditMode ? "Editar Transação" : "Adicionar Nova Transação"}>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          
+          <TypeToggle selectedType={type} onTypeChange={setType} />
 
-        <div>
-          <label htmlFor="tx-description" className="block text-sm font-medium text-gray-300">
-            Descrição
-          </label>
-          <FormInput
-            type="text"
+          <Input
             id="tx-description"
+            label="Descrição"
+            type="text"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             required
+            disabled={isSubmitting}
           />
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="tx-amount" className="block text-sm font-medium text-gray-300">
-                Valor (R$)
-              </label>
-              <FormInput
-                type="number"
+          
+          <div className="grid grid-cols-2 gap-4">
+              <Input
                 id="tx-amount"
+                label="Valor (R$)"
+                type="number"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="50.00"
                 step="0.01"
                 required
+                disabled={isSubmitting}
               />
-            </div>
-            <div>
-              <label htmlFor="tx-date" className="block text-sm font-medium text-gray-300">
-                Data
-              </label>
-              <FormInput
-                type="date"
+              <Input
                 id="tx-date"
+                label="Data"
+                type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
                 required
+                disabled={isSubmitting}
               />
-            </div>
-        </div>
-
-        <CategoryPicker 
-            categories={categories}
-            selectedCategoryId={categoryId}
-            onSelectCategory={setCategoryId}
-        />
-        
-        <div className="flex justify-between items-center gap-2 pt-4">
-          {isEditMode ? (
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={isDeleting}
-            >
-              <TrashIcon className="w-4 h-4" />
-              {isDeleting ? 'Excluindo...' : ''}
-            </Button>
-          ) : (
-            <div></div> /* Espaçador */
-          )}
-
-          <div className="flex gap-2">
-            <Button type="button" variant="secondary" onClick={onClose}>
-              Cancelar
-            </Button>
-            <Button type="submit">Salvar Transação</Button>
           </div>
-        </div>
-      </form>
-    </Modal>
+
+          <CategoryPicker 
+              categories={categories}
+              selectedCategoryId={categoryId}
+              onSelectCategory={setCategoryId}
+          />
+          
+          <div className="flex justify-between items-center gap-2 pt-4">
+            {isEditMode ? (
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={() => setShowDeleteConfirm(true)}
+                disabled={isSubmitting || isDeleting}
+              >
+                <TrashIcon className="w-4 h-4" />
+              </Button>
+            ) : (
+              <div></div> /* Espaçador */
+            )}
+
+            <div className="flex gap-2">
+              <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? <LoadingSpinner /> : isEditMode ? 'Salvar Alterações' : 'Adicionar'}
+              </Button>
+            </div>
+          </div>
+        </form>
+      </Modal>
+
+      <ConfirmationModal
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDelete}
+        title="Confirmar Exclusão"
+        confirmText={isDeleting ? 'Excluindo...' : 'Excluir'}
+        confirmVariant="destructive"
+      >
+        <p>Tem certeza que deseja excluir esta transação? Esta ação não pode ser desfeita.</p>
+      </ConfirmationModal>
+    </>
   );
 };

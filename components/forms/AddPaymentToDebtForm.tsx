@@ -4,6 +4,8 @@ import { Button } from '../ui/Button';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { Debt } from '../../types';
 import { formatCurrencyBRL } from '../../utils/formatters';
+import { Input } from '../ui/Input';
+import { LoadingSpinner } from '../LoadingSpinner';
 
 interface AddPaymentToDebtFormProps {
   isOpen: boolean;
@@ -14,14 +16,14 @@ interface AddPaymentToDebtFormProps {
 export const AddPaymentToDebtForm: React.FC<AddPaymentToDebtFormProps> = ({ isOpen, onClose, debt }) => {
   const { addPaymentToDebt } = useDashboardData();
   const [amount, setAmount] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const remainingAmount = debt.totalAmount - debt.paidAmount;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const valueToAdd = parseFloat(amount);
-    if (!valueToAdd || valueToAdd <= 0) {
-      alert("Por favor, insira um valor de pagamento positivo.");
+    if (!valueToAdd || valueToAdd <= 0 || isSubmitting) {
       return;
     }
     if (valueToAdd > remainingAmount) {
@@ -29,13 +31,16 @@ export const AddPaymentToDebtForm: React.FC<AddPaymentToDebtFormProps> = ({ isOp
             return;
         }
     }
-
+    
+    setIsSubmitting(true);
     try {
       await addPaymentToDebt(debt.id, valueToAdd);
       setAmount('');
       onClose();
     } catch (error) {
-      alert("Erro ao adicionar pagamento à dívida.");
+      // O erro já é tratado e exibido como toast pelo hook
+    } finally {
+        setIsSubmitting(false);
     }
   };
   
@@ -45,27 +50,25 @@ export const AddPaymentToDebtForm: React.FC<AddPaymentToDebtFormProps> = ({ isOp
         <p className="text-gray-300">
           Saldo Restante: <span className="font-bold text-white">{formatCurrencyBRL(remainingAmount)}</span>
         </p>
-        <div>
-          <label htmlFor="debt-payment-amount" className="block text-sm font-medium text-gray-300">
-            Valor do Pagamento (R$)
-          </label>
-          <input
-            type="number"
-            id="debt-payment-amount"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder="250.00"
-            step="0.01"
-            className="mt-1 block w-full bg-black/20 border border-white/20 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-indigo-500"
-            required
-            autoFocus
-          />
-        </div>
+        <Input
+          id="debt-payment-amount"
+          label="Valor do Pagamento (R$)"
+          type="number"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          placeholder="250.00"
+          step="0.01"
+          required
+          autoFocus
+          disabled={isSubmitting}
+        />
         <div className="flex justify-end gap-2 pt-4">
-          <Button type="button" variant="secondary" onClick={onClose}>
+          <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
             Cancelar
           </Button>
-          <Button type="submit">Confirmar Pagamento</Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? <LoadingSpinner/> : 'Confirmar Pagamento'}
+          </Button>
         </div>
       </form>
     </Modal>

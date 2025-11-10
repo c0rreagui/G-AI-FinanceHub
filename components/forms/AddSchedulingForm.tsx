@@ -5,6 +5,8 @@ import { useDashboardData } from '../../hooks/useDashboardData';
 import { TransactionType, ScheduledTransactionFrequency, ScheduledTransaction } from '../../types';
 import { TypeToggle } from '../ui/TypeToggle';
 import { CategoryPicker } from '../ui/CategoryPicker';
+import { Input } from '../ui/Input';
+import { LoadingSpinner } from '../LoadingSpinner';
 
 interface AddSchedulingFormProps {
   isOpen: boolean;
@@ -19,6 +21,7 @@ export const AddSchedulingForm: React.FC<AddSchedulingFormProps> = ({ isOpen, on
   const [type, setType] = useState<TransactionType>(TransactionType.DESPESA);
   const [categoryId, setCategoryId] = useState<string | null>(null);
   const [frequency, setFrequency] = useState(ScheduledTransactionFrequency.MENSAL);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const resetForm = () => {
     setDescription('');
@@ -31,11 +34,11 @@ export const AddSchedulingForm: React.FC<AddSchedulingFormProps> = ({ isOpen, on
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!description || !amount || !startDate || !categoryId) {
-        alert("Por favor, preencha todos os campos.");
+    if (!description || !amount || !startDate || !categoryId || isSubmitting) {
         return;
     }
     
+    setIsSubmitting(true);
     const scheduledTxData: Omit<ScheduledTransaction, 'id' | 'category' | 'nextDueDate'> = {
         description,
         amount: type === TransactionType.DESPESA ? -parseFloat(amount) : parseFloat(amount),
@@ -45,13 +48,12 @@ export const AddSchedulingForm: React.FC<AddSchedulingFormProps> = ({ isOpen, on
         frequency,
     };
 
-    try {
-        await addScheduledTransaction(scheduledTxData);
-        resetForm();
-        onClose();
-    } catch (error) {
-        console.error("Failed to add scheduled transaction:", error);
-        alert("Ocorreu um erro ao salvar o agendamento.");
+    const success = await addScheduledTransaction(scheduledTxData);
+    setIsSubmitting(false);
+
+    if(success) {
+      resetForm();
+      onClose();
     }
   };
 
@@ -59,46 +61,58 @@ export const AddSchedulingForm: React.FC<AddSchedulingFormProps> = ({ isOpen, on
     <Modal isOpen={isOpen} onClose={onClose} title="Adicionar Novo Agendamento">
       <form onSubmit={handleSubmit} className="space-y-4">
         <TypeToggle selectedType={type} onTypeChange={setType} />
-        <input
+        <Input
+          id="sched-description"
+          label="Descrição"
           type="text"
-          placeholder="Descrição"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="mt-1 block w-full bg-black/20 border border-white/20 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-indigo-500"
           required
         />
-        <input
-          type="number"
-          placeholder="Valor (R$)"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          className="mt-1 block w-full bg-black/20 border border-white/20 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-indigo-500"
-          required
-        />
-        <input
-          type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          className="mt-1 block w-full bg-black/20 border border-white/20 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-indigo-500"
-          required
-        />
-        <select
-            value={frequency}
-            onChange={(e) => setFrequency(e.target.value as ScheduledTransactionFrequency)}
-            className="mt-1 block w-full bg-black/20 border border-white/20 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-indigo-500"
-        >
-            {Object.values(ScheduledTransactionFrequency).map(freq => (
-                <option key={freq} value={freq}>{freq}</option>
-            ))}
-        </select>
+        <div className="grid grid-cols-2 gap-4">
+          <Input
+            id="sched-amount"
+            label="Valor (R$)"
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            step="0.01"
+            required
+          />
+          <Input
+            id="sched-start-date"
+            label="Data de Início"
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="sched-frequency" className="block text-sm font-medium text-gray-300">
+            Frequência
+          </label>
+          <select
+              id="sched-frequency"
+              value={frequency}
+              onChange={(e) => setFrequency(e.target.value as ScheduledTransactionFrequency)}
+              className="mt-1 block w-full bg-black/20 border border-white/20 rounded-xl shadow-sm py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition"
+          >
+              {Object.values(ScheduledTransactionFrequency).map(freq => (
+                  <option key={freq} value={freq}>{freq}</option>
+              ))}
+          </select>
+        </div>
         <CategoryPicker 
             categories={categories}
             selectedCategoryId={categoryId}
             onSelectCategory={setCategoryId}
         />
         <div className="flex justify-end gap-2 pt-4">
-          <Button type="button" variant="secondary" onClick={onClose}>Cancelar</Button>
-          <Button type="submit">Salvar Agendamento</Button>
+          <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>Cancelar</Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? <LoadingSpinner /> : 'Salvar Agendamento'}
+          </Button>
         </div>
       </form>
     </Modal>

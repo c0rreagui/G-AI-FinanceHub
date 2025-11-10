@@ -1,21 +1,19 @@
 // FIX: Implemented the TransactionsView component to display a list of transactions.
 import React, { useState, useMemo } from 'react';
 import { PageHeader } from '../layout/PageHeader';
-import { ArrowLeftRight, PlusCircle, Filter } from '../Icons';
+import { ArrowLeftRight, PlusCircle } from '../Icons';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { formatCurrencyBRL, formatDate } from '../../utils/formatters';
 import { Transaction, TransactionType } from '../../types';
 import { Button } from '../ui/Button';
 import { useDialog } from '../../hooks/useDialog';
-import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { TransactionsViewSkeleton } from './skeletons/TransactionsViewSkeleton';
 import { EmptyState } from '../ui/EmptyState';
+import { motion } from 'framer-motion';
 
 const TransactionItem: React.FC<{ transaction: Transaction; onEdit: (tx: Transaction) => void }> = ({ transaction, onEdit }) => {
-    const isExpense = transaction.type === TransactionType.DESPESA;
-    // The amount in the hook is already negative for expenses
+    // A remoção do hook useMediaQuery e da variável isMobile garante que a categoria seja sempre exibida.
     const amount = transaction.amount;
-    const isMobile = useMediaQuery('(max-width: 640px)');
 
     return (
         <li 
@@ -29,7 +27,8 @@ const TransactionItem: React.FC<{ transaction: Transaction; onEdit: (tx: Transac
                 <div className="flex-1 min-w-0">
                     <p className="font-semibold text-white truncate">{transaction.description}</p>
                     <p className="text-sm text-gray-400">
-                        {isMobile ? formatDate(transaction.date, 'short') : `${transaction.category.name} • ${formatDate(transaction.date, 'short')}`}
+                        {/* A categoria agora é sempre exibida, melhorando a clareza da informação. */}
+                        {transaction.category.name} • {formatDate(transaction.date, 'short')}
                     </p>
                 </div>
             </div>
@@ -39,6 +38,20 @@ const TransactionItem: React.FC<{ transaction: Transaction; onEdit: (tx: Transac
         </li>
     );
 };
+
+const FilterButton: React.FC<{label: string, value: string, activeFilter: string, onClick: (value: string) => void}> = 
+({ label, value, activeFilter, onClick }) => {
+    const isActive = activeFilter === value;
+    return (
+        <button
+            onClick={() => onClick(value)}
+            className={`relative px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${isActive ? 'text-white' : 'text-gray-400 hover:text-white'}`}
+        >
+            {isActive && <motion.div layoutId="filter-active-pill" className="absolute inset-0 bg-white/10 rounded-lg" />}
+            <span className="relative">{label}</span>
+        </button>
+    );
+}
 
 export const TransactionsView: React.FC = () => {
     const { transactions, loading } = useDashboardData();
@@ -67,8 +80,12 @@ export const TransactionsView: React.FC = () => {
                 breadcrumbs={['FinanceHub', 'Transações']}
                 actions={
                     <div className="flex items-center gap-2">
-                        <Button variant="secondary" onClick={() => alert('Filtros ainda não implementados.')}><Filter className="w-4 h-4 mr-2"/> Filtrar</Button>
-                        <Button onClick={() => openDialog('add-transaction')}><PlusCircle className="w-4 h-4 mr-2"/> Nova Transação</Button>
+                         <div className="flex items-center p-1 bg-black/20 rounded-xl border border-white/10">
+                            <FilterButton label="Todas" value="all" activeFilter={filter} onClick={setFilter} />
+                            <FilterButton label="Receitas" value="income" activeFilter={filter} onClick={setFilter} />
+                            <FilterButton label="Despesas" value="expenses" activeFilter={filter} onClick={setFilter} />
+                        </div>
+                        <Button onClick={() => openDialog('add-transaction')}><PlusCircle className="w-4 h-4 mr-2"/> Nova</Button>
                     </div>
                 }
             />

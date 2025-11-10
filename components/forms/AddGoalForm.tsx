@@ -3,6 +3,8 @@ import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { Goal } from '../../types';
+import { Input } from '../ui/Input';
+import { LoadingSpinner } from '../LoadingSpinner';
 
 interface AddGoalFormProps {
   isOpen: boolean;
@@ -14,6 +16,7 @@ export const AddGoalForm: React.FC<AddGoalFormProps> = ({ isOpen, onClose }) => 
   const [name, setName] = useState('');
   const [targetAmount, setTargetAmount] = useState('');
   const [deadline, setDeadline] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const resetForm = () => {
     setName('');
@@ -23,67 +26,60 @@ export const AddGoalForm: React.FC<AddGoalFormProps> = ({ isOpen, onClose }) => 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !targetAmount || !deadline) return;
+    if (!name || !targetAmount || !deadline || isSubmitting) return;
 
+    setIsSubmitting(true);
     const goalData: Omit<Goal, 'id' | 'currentAmount' | 'status'> = {
         name,
         targetAmount: parseFloat(targetAmount),
         deadline: new Date(deadline).toISOString(),
     };
 
-    await addGoal(goalData);
-    resetForm();
-    onClose();
+    const success = await addGoal(goalData);
+    setIsSubmitting(false);
+
+    if(success) {
+      resetForm();
+      onClose();
+    }
   };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Adicionar Nova Meta">
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="goal-name" className="block text-sm font-medium text-gray-300">
-            Nome da Meta
-          </label>
-          <input
-            type="text"
-            id="goal-name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="mt-1 block w-full bg-black/20 border border-white/20 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="goal-amount" className="block text-sm font-medium text-gray-300">
-            Valor Alvo (R$)
-          </label>
-          <input
-            type="number"
-            id="goal-amount"
-            value={targetAmount}
-            onChange={(e) => setTargetAmount(e.target.value)}
-            placeholder="5000.00"
-            className="mt-1 block w-full bg-black/20 border border-white/20 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="goal-deadline" className="block text-sm font-medium text-gray-300">
-            Prazo Final
-          </label>
-          <input
-            type="date"
-            id="goal-deadline"
-            value={deadline}
-            onChange={(e) => setDeadline(e.target.value)}
-            className="mt-1 block w-full bg-black/20 border border-white/20 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            required
-          />
-        </div>
+        <Input
+          id="goal-name"
+          label="Nome da Meta"
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+        <Input
+          id="goal-amount"
+          label="Valor Alvo (R$)"
+          type="number"
+          value={targetAmount}
+          onChange={(e) => setTargetAmount(e.target.value)}
+          placeholder="5000.00"
+          step="0.01"
+          required
+        />
+        <Input
+          id="goal-deadline"
+          label="Prazo Final"
+          type="date"
+          value={deadline}
+          onChange={(e) => setDeadline(e.target.value)}
+          required
+        />
         <div className="flex justify-end gap-2 pt-4">
-          <Button type="button" variant="secondary" onClick={onClose}>
+          <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
             Cancelar
           </Button>
-          <Button type="submit">Salvar Meta</Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? <LoadingSpinner /> : 'Salvar Meta'}
+          </Button>
         </div>
       </form>
     </Modal>
