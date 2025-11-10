@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useContext } from 'react';
 import {
     Transaction, Goal, Debt, Summary, ScheduledTransaction, UserLevel, Achievement, Category,
-    TransactionType, GoalStatus, DebtStatus, UserRank, DashboardDataContextType, MonthlyChartData
+    TransactionType, GoalStatus, DebtStatus, UserRank, DashboardDataContextType, MonthlyChartData, ScheduledTransactionFrequency
 } from '../types';
 import {
     Wallet, Target, Lightbulb, Trophy
@@ -40,6 +40,40 @@ const toSupabase = <T extends Record<string, any>>(data: T): any => {
 
 const FALLBACK_CATEGORY: Category = { id: 'cat-fallback', name: 'Outros', icon: getIconByName('Gift'), color: '#a8a29e' };
 
+const calculateNextDueDate = (startDateString: string, frequency: ScheduledTransactionFrequency): string => {
+    const startDate = new Date(startDateString);
+    startDate.setUTCHours(12, 0, 0, 0); // Use UTC to avoid timezone shifts
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+
+    let nextDate = new Date(startDate);
+
+    // If the start date is in the future, that's the next due date.
+    if (nextDate >= today) {
+        return nextDate.toISOString();
+    }
+
+    // If start date is in the past, find the next occurrence from today.
+    while (nextDate < today) {
+        switch (frequency) {
+            case ScheduledTransactionFrequency.DIARIO:
+                nextDate.setUTCDate(nextDate.getUTCDate() + 1);
+                break;
+            case ScheduledTransactionFrequency.SEMANAL:
+                nextDate.setUTCDate(nextDate.getUTCDate() + 7);
+                break;
+            case ScheduledTransactionFrequency.MENSAL:
+                nextDate.setUTCMonth(nextDate.getUTCMonth() + 1);
+                break;
+            case ScheduledTransactionFrequency.ANUAL:
+                nextDate.setUTCFullYear(nextDate.getUTCFullYear() + 1);
+                break;
+        }
+    }
+    return nextDate.toISOString();
+};
+
+
 export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { user } = useAuth();
     const { showToast } = useToast();
@@ -54,7 +88,6 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     const [isMutating, setIsMutating] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [lastUpdatedGoalId, setLastUpdatedGoalId] = useState<string | null>(null);
-    // FIX: Added missing state and handler for lastUpdatedTransactionId to conform to DashboardDataContextType.
     const [lastUpdatedTransactionId, setLastUpdatedTransactionId] = useState<string | null>(null);
 
 
@@ -69,8 +102,6 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         setLoading(true);
         setError(null);
         try {
-            // Fetch categories first as other data depends on it for enrichment
-            // FIX: Removed the .or() filter as the 'categories' table doesn't have a user_id column
             const categoriesResponse = await supabase.from('categories').select('*');
             if (categoriesResponse.error) throw categoriesResponse.error;
             
@@ -81,7 +112,6 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             setCategories(fetchedCategories);
             const tempCategoryMap = new Map(fetchedCategories.map(c => [c.id, c]));
 
-            // Fetch rest of the data
             const [
                 transactionsResponse,
                 goalsResponse,
@@ -114,7 +144,6 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             }));
             setScheduledTransactions(enrichedScheduled);
             
-            // Gamification logic
             const monthlyIncome = enrichedTransactions.filter(t => t.type === TransactionType.RECEITA).reduce((sum, t) => sum + t.amount, 0);
             const monthlyExpenses = enrichedTransactions.filter(t => t.type === TransactionType.DESPESA).reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
@@ -160,7 +189,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
         const monthlyExpenses = monthlyTransactions
             .filter(t => t.type === TransactionType.DESPESA)
-            .reduce((sum, t) => sum + t.amount, 0); // Amount is already negative
+            .reduce((sum, t) => sum + t.amount, 0);
         
         const totalBalance = transactions.reduce((sum, t) => sum + t.amount, 0);
 
@@ -315,7 +344,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
                 throw supabaseError;
             }
             setGoals(prev => prev.map(g => (g.id === goalId ? fromSupabase(data) : g)));
-            setLastUpdatedGoalId(goalId); // Trigger for animation
+            setLastUpdatedGoalId(goalId);
             showToast('Valor adicionado à meta!', { type: 'success' });
         } finally {
             setIsMutating(false);
@@ -369,7 +398,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         if (!user) { setError("Usuário não autenticado."); return false; }
         setIsMutating(true);
         try {
-            const nextDueDateValue = new Date(new Date().getFullYear(), new Date().getMonth() + 1, new Date(scheduledTxData.startDate).getDate()).toISOString();
+            const nextDueDateValue = calculateNextDueDate(scheduledTxData.startDate, scheduledTxData.frequency);
             const payload = { ...toSupabase(scheduledTxData), user_id: user.id, next_due_date: nextDueDateValue };
             const { data, error: supabaseError } = await supabase.from('scheduled_transactions').insert(payload).select().single();
             if (supabaseError) { 
@@ -396,7 +425,6 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         deleteTransaction, updateGoalValue, addPaymentToDebt
     };
 
-    // FIX: Replaced JSX with React.createElement to resolve parsing errors in .ts file.
     return React.createElement(DashboardDataContext.Provider, { value: value }, children);
 };
 
