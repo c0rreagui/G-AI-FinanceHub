@@ -1,14 +1,16 @@
-import React, { createContext, useState, useEffect, useCallback, useContext, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useContext } from 'react';
 import {
     Transaction, Goal, Debt, Summary, ScheduledTransaction, UserLevel, Achievement, Category,
     TransactionType, GoalStatus, DebtStatus, ScheduledTransactionFrequency, UserRank, DashboardDataContextType
 } from '../types';
 import {
-    Utensils, ShoppingCart, Car, Shirt, PiggyBank, Heart, BookOpen, Gift, Plane, HomeIcon, Dumbbell, Gamepad, Film, // FIX: Corrected typo in icon import from 'ArrowUpright' to 'ArrowUpRight'.
+    Utensils, ShoppingCart, Car, Shirt, PiggyBank, Heart, BookOpen, Gift, Plane, HomeIcon, Dumbbell, Gamepad, Film,
 ArrowUpRight, TrendingDown, Wallet, Lightbulb, Target
 } from '../components/Icons';
 import { useAuth } from './useAuth';
 import { supabase } from '../services/supabaseClient';
+import { logger } from '../services/loggingService';
+import { DashboardDataContext } from '../contexts/DashboardDataContext';
 
 // Helper function to convert DB snake_case to app camelCase
 const fromSupabase = <T extends Record<string, any>>(data: T | null): any => {
@@ -34,8 +36,6 @@ const toSupabase = <T extends Record<string, any>>(data: T): any => {
     }
     return result;
 }
-
-const DashboardDataContext = createContext<DashboardDataContextType | undefined>(undefined);
 
 const MOCK_CATEGORIES: Category[] = [
     { id: 'cat1', name: 'Alimentação', icon: Utensils, color: '#f59e0b' },
@@ -113,8 +113,13 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
         } catch (err) {
             const supabaseError = err as any;
-            setError(supabaseError.message || 'Ocorreu um erro desconhecido ao carregar os dados.');
-            console.error(err);
+            const errorMessage = supabaseError.message || 'Ocorreu um erro desconhecido ao carregar os dados.';
+            setError(errorMessage);
+            logger.error("Falha ao carregar dados do dashboard", {
+                component: 'useDashboardData',
+                function: 'fetchData',
+                error: err,
+            });
         } finally {
             setLoading(false);
         }
@@ -160,10 +165,15 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             user_id: user.id,
         };
 
-        const { data, error } = await supabase.from('transactions').insert(payload).select().single();
+        const { data, error: supabaseError } = await supabase.from('transactions').insert(payload).select().single();
 
-        if (error) {
-            setError(error.message);
+        if (supabaseError) {
+            setError(supabaseError.message);
+            logger.error("Falha ao adicionar transação", {
+                component: "useDashboardData",
+                function: "addTransaction",
+                error: supabaseError
+            });
             return false;
         }
         
@@ -188,10 +198,15 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
                 : Math.abs(payload.amount);
         }
 
-        const { data, error } = await supabase.from('transactions').update(payload).eq('id', transactionId).eq('user_id', user.id).select().single();
+        const { data, error: supabaseError } = await supabase.from('transactions').update(payload).eq('id', transactionId).eq('user_id', user.id).select().single();
 
-        if (error) {
-            setError(error.message);
+        if (supabaseError) {
+            setError(supabaseError.message);
+            logger.error("Falha ao atualizar transação", {
+                component: "useDashboardData",
+                function: "updateTransaction",
+                error: supabaseError
+            });
             return false;
         }
         
@@ -205,20 +220,29 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const deleteTransaction = async (transactionId: string): Promise<boolean> => {
         if (!user) {
-            setError("Usuário não autenticado.");
-            throw new Error("Usuário não autenticado.");
+            const msg = "Usuário não autenticado.";
+            setError(msg);
+            logger.error(msg, {
+                component: "useDashboardData",
+                function: "deleteTransaction",
+            });
+            throw new Error(msg);
         }
 
-        const { error } = await supabase
+        const { error: supabaseError } = await supabase
             .from('transactions')
             .delete()
             .eq('id', transactionId)
             .eq('user_id', user.id);
 
-        if (error) {
-            console.error("Erro ao deletar:", error);
-            setError(error.message);
-            throw error;
+        if (supabaseError) {
+            setError(supabaseError.message);
+            logger.error("Falha ao deletar transação", {
+                component: "useDashboardData",
+                function: "deleteTransaction",
+                error: supabaseError
+            });
+            throw supabaseError;
         }
 
         setTransactions(prev => prev.filter(t => t.id !== transactionId));
@@ -235,9 +259,17 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             status: GoalStatus.EM_ANDAMENTO,
         };
 
-        const { data, error } = await supabase.from('goals').insert(payload).select().single();
+        const { data, error: supabaseError } = await supabase.from('goals').insert(payload).select().single();
 
-        if (error) { setError(error.message); return false; }
+        if (supabaseError) { 
+            setError(supabaseError.message);
+            logger.error("Falha ao adicionar meta", {
+                component: "useDashboardData",
+                function: "addGoal",
+                error: supabaseError
+            });
+            return false; 
+        }
         
         const newGoal: Goal = fromSupabase(data);
         setGoals(prev => [newGoal, ...prev]);
@@ -247,16 +279,21 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     const updateGoalValue = async (goalId: string, newCurrentAmount: number) => {
         if (!user) throw new Error("Usuário não autenticado.");
         
-        const { data, error } = await supabase
+        const { data, error: supabaseError } = await supabase
             .from('goals')
             .update({ current_amount: newCurrentAmount })
             .eq('id', goalId)
             .select()
             .single();
 
-        if (error) {
-            setError(error.message);
-            throw error;
+        if (supabaseError) {
+            setError(supabaseError.message);
+            logger.error("Falha ao atualizar valor da meta", {
+                component: "useDashboardData",
+                function: "updateGoalValue",
+                error: supabaseError
+            });
+            throw supabaseError;
         }
         
         const updatedGoal: Goal = fromSupabase(data);
@@ -275,8 +312,16 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             status: DebtStatus.ATIVA 
         };
 
-        const { data, error } = await supabase.from('debts').insert(payload).select().single();
-        if (error) { setError(error.message); return false; }
+        const { data, error: supabaseError } = await supabase.from('debts').insert(payload).select().single();
+        if (supabaseError) { 
+            setError(supabaseError.message); 
+            logger.error("Falha ao adicionar dívida", {
+                component: "useDashboardData",
+                function: "addDebt",
+                error: supabaseError
+            });
+            return false; 
+        }
         
         const newDebt: Debt = fromSupabase(data);
         setDebts(prev => [newDebt, ...prev]);
@@ -294,16 +339,21 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         const newPaidAmount = debtToUpdate.paidAmount + paymentAmount;
         const newStatus = newPaidAmount >= debtToUpdate.totalAmount ? DebtStatus.PAGA : DebtStatus.ATIVA;
 
-        const { data, error } = await supabase
+        const { data, error: supabaseError } = await supabase
             .from('debts')
             .update({ paid_amount: newPaidAmount, status: newStatus })
             .eq('id', debtId)
             .select()
             .single();
 
-        if (error) {
-            setError(error.message);
-            throw error;
+        if (supabaseError) {
+            setError(supabaseError.message);
+            logger.error("Falha ao adicionar pagamento à dívida", {
+                component: "useDashboardData",
+                function: "addPaymentToDebt",
+                error: supabaseError
+            });
+            throw supabaseError;
         }
 
         const updatedDebt: Debt = fromSupabase(data);
@@ -323,10 +373,15 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             next_due_date: nextDueDateValue
         };
 
-        const { data, error } = await supabase.from('scheduled_transactions').insert(payload).select().single();
+        const { data, error: supabaseError } = await supabase.from('scheduled_transactions').insert(payload).select().single();
 
-        if (error) { 
-            setError(error.message); 
+        if (supabaseError) { 
+            setError(supabaseError.message);
+            logger.error("Falha ao adicionar transação agendada", {
+                component: "useDashboardData",
+                function: "addScheduledTransaction",
+                error: supabaseError
+            });
             return false; 
         }
         

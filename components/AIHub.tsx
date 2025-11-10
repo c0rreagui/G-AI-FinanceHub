@@ -11,6 +11,9 @@ import { LiveStatusIndicator } from './ui/LiveStatusIndicator';
 import { useDialog } from '../hooks/useDialog';
 import { GenerateContentResponse } from '@google/genai';
 import { useAuth } from '../hooks/useAuth';
+import { ErrorModal } from './ui/ErrorModal';
+import { motion, AnimatePresence } from 'framer-motion';
+import { logger } from '../services/loggingService';
 
 // --- Funções Auxiliares para o AIHub ---
 
@@ -152,6 +155,7 @@ export const AIHub: React.FC = () => {
   const [image, setImage] = useState<{ url: string; data: string; mimeType: string } | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [liveStatus, setLiveStatus] = useState<'idle' | 'connecting' | 'connected' | 'error' | 'closing'>('idle');
+  const [apiError, setApiError] = useState<string | null>(null);
   
   const [useSearch, setUseSearch] = useState(false);
   const [useMaps, setUseMaps] = useState(false);
@@ -188,7 +192,7 @@ export const AIHub: React.FC = () => {
   
   const handleSend = async () => {
     if (!apiKey) {
-        setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "Por favor, configure sua chave de API do Gemini nas Configurações." }]);
+        setApiError("Por favor, configure sua chave de API do Gemini nas Configurações para conversar com a IA.");
         return;
     }
     if (!input.trim() && !image) return;
@@ -231,17 +235,13 @@ export const AIHub: React.FC = () => {
       handleFunctionCall(finalResponse, openDialog, setMessages);
 
     } catch (error) {
-      console.error("Error generating content:", error);
-      const errorMessage = error instanceof Error ? error.message : "Desculpe, encontrei um erro.";
-      setMessages(prev => {
-          const newMessages = [...prev];
-          const lastMessage = newMessages[newMessages.length - 1];
-          if (lastMessage?.role === ChatRole.MODEL && lastMessage.isTyping) {
-            return newMessages.slice(0, -1);
-          }
-          return newMessages;
+      const errorMessage = error instanceof Error ? error.message : "Ocorreu um erro desconhecido ao se comunicar com a IA.";
+      logger.error('Erro na comunicação com a API Gemini', { 
+        component: 'AIHub',
+        error: error 
       });
-      setMessages(prev => [...prev, { role: ChatRole.MODEL, text: errorMessage }]);
+      setApiError(errorMessage);
+      setMessages(prev => prev.filter(m => !m.isTyping));
     } finally {
       setIsLoading(false);
     }
@@ -268,7 +268,7 @@ export const AIHub: React.FC = () => {
 
   const setupLiveSession = useCallback(async () => {
     if (!apiKey) {
-      setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "Por favor, configure sua chave de API do Gemini nas Configurações para usar o chat de voz." }]);
+      setApiError("Por favor, configure sua chave de API do Gemini nas Configurações para usar o chat de voz.");
       setIsRecording(false);
       return;
     }
@@ -299,12 +299,18 @@ export const AIHub: React.FC = () => {
       },
       onmessage: (msg) => processLiveMessage(msg, setMessages, outputAudioContext, nextAudioStartTime, audioSources),
       onerror: (e: ErrorEvent) => {
-        console.error("Live session error:", e);
+        logger.error("Erro na sessão Live API (onerror)", {
+            component: "AIHub",
+            errorEvent: e,
+        });
         setLiveStatus('error');
-        setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "Erro na conexão de voz." }]);
+        setApiError(`Erro na conexão de voz: ${e.message}`);
       },
-      onclose: () => {
-        console.log("Live session closed.");
+      onclose: (e) => {
+        logger.info("Sessão Live API fechada", { 
+            component: "AIHub",
+            closeEvent: e 
+        });
         if (liveStatus === 'closing') {
            setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "Chat de voz encerrado." }]);
         }
@@ -314,9 +320,12 @@ export const AIHub: React.FC = () => {
 
     sessionPromise.current.catch(error => {
         const errorMessage = error instanceof Error ? error.message : "Erro ao iniciar o chat de voz.";
-        console.error("Live session setup error:", error);
+        logger.error("Erro na configuração da sessão Live API (catch)", {
+            component: "AIHub",
+            error,
+        });
         setLiveStatus('error');
-        setMessages(prev => [...prev, { role: ChatRole.MODEL, text: errorMessage }]);
+        setApiError(errorMessage);
         cleanupLiveSession();
     });
   }, [liveStatus, cleanupLiveSession, apiKey]);
@@ -328,7 +337,10 @@ export const AIHub: React.FC = () => {
         const session = await sessionPromise.current;
         session?.close();
       } catch (e) {
-        console.error("Error closing session:", e);
+        logger.error("Erro ao fechar a sessão Live API", {
+            component: "AIHub",
+            error: e
+        });
         cleanupLiveSession();
       }
     } else {
@@ -339,28 +351,46 @@ export const AIHub: React.FC = () => {
   
   return (
     <>
-      <PageHeader icon={HomeIcon} title="Início" breadcrumbs={['Início']} />
-      <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl shadow-2xl shadow-black/20 flex flex-col flex-grow mt-4 h-[calc(100%-80px)]">
+      <PageHeader icon={HomeIcon} title="Assistente IA" breadcrumbs={['FinanceHub', 'Início']} />
+      <div className="bg-black/20 border border-white/10 backdrop-blur-xl rounded-2xl shadow-2xl shadow-black/20 flex flex-col flex-grow mt-0 overflow-hidden h-full">
         <div className="flex-1 p-6 overflow-y-auto space-y-6">
-          {messages.map((msg, index) => (
-            <ChatMessageDisplay key={index} message={msg} />
-          ))}
-          {isLoading && !messages[messages.length-1]?.isTyping && <div className="flex justify-center"><LoadingSpinner /></div>}
+          <AnimatePresence>
+            {messages.map((msg, index) => (
+              <motion.div
+                key={index}
+                layout
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <ChatMessageDisplay message={msg} />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+          {isLoading && !messages.find(m => m.isTyping) && <div className="flex justify-center"><LoadingSpinner /></div>}
           <div ref={endOfMessagesRef} />
         </div>
-        <div className="p-4 border-t border-white/10">
-          {image && (
-            <div className="mb-2 flex items-center">
-              <img src={image.url} alt="upload preview" className="w-16 h-16 object-cover rounded-md" />
-              <button onClick={() => setImage(null)} className="ml-2 text-gray-400 hover:text-white">&times;</button>
-            </div>
-          )}
+        <div className="p-4 border-t border-white/10 bg-black/20">
+          <AnimatePresence>
+            {image && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mb-2 flex items-center"
+              >
+                <img src={image.url} alt="upload preview" className="w-16 h-16 object-cover rounded-md" />
+                <button onClick={() => setImage(null)} className="ml-2 text-gray-400 hover:text-white">&times;</button>
+              </motion.div>
+            )}
+          </AnimatePresence>
           
           <LiveStatusIndicator status={isRecording ? liveStatus : 'idle'} />
 
-          <div className="flex items-center bg-black/20 rounded-xl p-2">
+          <div className="flex items-center bg-black/30 rounded-xl p-2 focus-within:ring-2 focus-within:ring-indigo-500 transition-shadow duration-300">
             <label htmlFor="file-upload" className="cursor-pointer p-2 rounded-full hover:bg-white/10 transition-colors">
-              <PaperclipIcon />
+              <PaperclipIcon className="text-gray-400" />
             </label>
             <input id="file-upload" type="file" className="hidden" onChange={handleImageChange} accept="image/*" />
             
@@ -391,16 +421,22 @@ export const AIHub: React.FC = () => {
               disabled={isLoading || isRecording}
               className="flex-1 bg-transparent px-4 py-2 text-white placeholder-gray-500 focus:outline-none disabled:opacity-50"
             />
-            <button onClick={handleSend} disabled={isLoading || isRecording} className="p-2 rounded-full bg-indigo-500 hover:bg-indigo-600 transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed">
+            <motion.button 
+              onClick={handleSend} 
+              disabled={isLoading || isRecording || (!input.trim() && !image)} 
+              className="p-2 w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white transition-colors disabled:bg-gray-600 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
               <SendIcon />
-            </button>
+            </motion.button>
           </div>
           <div className="flex items-center justify-end space-x-4 mt-2 px-2">
-              <button onClick={() => setUseSearch(!useSearch)} className={`flex items-center space-x-1 text-xs transition-colors ${useSearch ? 'text-indigo-400' : 'text-gray-400 hover:text-white'}`}>
+              <button onClick={() => setUseSearch(!useSearch)} className={`flex items-center space-x-1 text-xs transition-colors ${useSearch ? 'text-indigo-400 font-semibold' : 'text-gray-400 hover:text-white'}`}>
                   <SearchIcon className="w-4 h-4" />
                   <span>Busca na Web</span>
               </button>
-              <button onClick={() => setUseMaps(!useMaps)} className={`flex items-center space-x-1 text-xs transition-colors ${useMaps ? 'text-indigo-400' : 'text-gray-400 hover:text-white'}`}>
+              <button onClick={() => setUseMaps(!useMaps)} className={`flex items-center space-x-1 text-xs transition-colors ${useMaps ? 'text-indigo-400 font-semibold' : 'text-gray-400 hover:text-white'}`}>
                   <MapPinIcon className="w-4 h-4" />
                   <span>Usar Mapas</span>
               </button>
@@ -408,6 +444,11 @@ export const AIHub: React.FC = () => {
           {useMaps && geoError && <p className="text-xs text-red-400 text-right mt-1 px-2">{geoError}</p>}
         </div>
       </div>
+      <ErrorModal 
+        isOpen={!!apiError} 
+        error={apiError} 
+        onClose={() => setApiError(null)} 
+      />
     </>
   );
 };

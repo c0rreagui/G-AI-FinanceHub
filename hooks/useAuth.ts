@@ -1,23 +1,13 @@
-import React, { useState, useEffect, createContext, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 import { supabase } from '../services/supabaseClient';
 import { Session, User } from '@supabase/supabase-js';
+import { AuthContext, AuthContextType } from '../contexts/AuthContext';
 
-// FIX: Adicionado apiKey e setApiKey para gerenciar a chave da API do Gemini.
-interface AuthContextType {
-  session: Session | null;
-  user: User | null;
-  loading: boolean;
-  apiKey: string | null;
-  setApiKey: (key: string) => void;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  // FIX: Estado para a chave da API, com persistência no localStorage.
   const [apiKey, setApiKeyState] = useState<string | null>(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('gemini_api_key');
@@ -58,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
 
-  const value = {
+  const value: AuthContextType = {
     session,
     user,
     loading,
@@ -69,7 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return React.createElement(AuthContext.Provider, { value: value }, children);
 };
 
-export const useAuth = () => {
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');

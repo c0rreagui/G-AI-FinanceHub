@@ -1,6 +1,7 @@
 import React from 'react';
 import { TransactionType } from '../../types';
 import { ArrowDownLeft, ArrowUpRight } from '../Icons';
+import { motion } from 'framer-motion';
 
 interface TypeToggleProps {
   selectedType: TransactionType;
@@ -13,12 +14,19 @@ export const TypeToggle: React.FC<TypeToggleProps> = ({ selectedType, onTypeChan
             <label className="block text-sm font-medium text-gray-300 mb-2">
                 Tipo
             </label>
-            <div className="flex w-full bg-black/20 p-1 rounded-lg">
+            <div className="relative flex w-full bg-black/20 p-1 rounded-xl">
+                {selectedType === TransactionType.DESPESA && (
+                    <motion.div layoutId="toggle-bg" className="absolute inset-1 rounded-lg bg-red-600/80" />
+                )}
+                {selectedType === TransactionType.RECEITA && (
+                    <motion.div layoutId="toggle-bg" className="absolute inset-1 rounded-lg bg-green-600/80" />
+                )}
+
                 <button
                     type="button"
                     onClick={() => onTypeChange(TransactionType.DESPESA)}
-                    className={`w-1/2 flex items-center justify-center gap-2 rounded-md py-2 text-sm font-semibold transition-colors ${
-                        selectedType === TransactionType.DESPESA ? 'bg-red-500/80 text-white' : 'text-gray-400 hover:bg-white/5'
+                    className={`relative w-1/2 flex items-center justify-center gap-2 rounded-md py-2.5 text-sm font-semibold transition-colors ${
+                        selectedType === TransactionType.DESPESA ? 'text-white' : 'text-gray-400 hover:text-white'
                     }`}
                     aria-pressed={selectedType === TransactionType.DESPESA}
                 >
@@ -28,8 +36,8 @@ export const TypeToggle: React.FC<TypeToggleProps> = ({ selectedType, onTypeChan
                 <button
                     type="button"
                     onClick={() => onTypeChange(TransactionType.RECEITA)}
-                    className={`w-1/2 flex items-center justify-center gap-2 rounded-md py-2 text-sm font-semibold transition-colors ${
-                        selectedType === TransactionType.RECEITA ? 'bg-green-500/80 text-white' : 'text-gray-400 hover:bg-white/5'
+                    className={`relative w-1/2 flex items-center justify-center gap-2 rounded-md py-2.5 text-sm font-semibold transition-colors ${
+                        selectedType === TransactionType.RECEITA ? 'text-white' : 'text-gray-400 hover:text-white'
                     }`}
                     aria-pressed={selectedType === TransactionType.RECEITA}
                 >

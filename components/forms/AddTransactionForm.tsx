@@ -5,13 +5,20 @@ import { useDashboardData } from '../../hooks/useDashboardData';
 import { Transaction, TransactionType } from '../../types';
 import { TypeToggle } from '../ui/TypeToggle';
 import { CategoryPicker } from '../ui/CategoryPicker';
-import { XIcon } from '../Icons';
+import { TrashIcon } from '../Icons';
 
 interface AddTransactionFormProps {
   isOpen: boolean;
   onClose: () => void;
   prefill?: Partial<Omit<Transaction, 'id' | 'category'>> | Transaction;
 }
+
+const FormInput: React.FC<React.InputHTMLAttributes<HTMLInputElement>> = (props) => (
+  <input
+    {...props}
+    className="mt-1 block w-full bg-black/20 border border-white/20 rounded-xl shadow-sm py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition"
+  />
+);
 
 export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, onClose, prefill }) => {
   const { addTransaction, categories, updateTransaction, deleteTransaction } = useDashboardData();
@@ -77,7 +84,6 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
       resetForm();
       onClose();
     }
-    // Se não houver sucesso, o ErrorModal será exibido pelo hook e o formulário permanecerá aberto.
   };
 
   const handleDelete = async () => {
@@ -109,12 +115,11 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
           <label htmlFor="tx-description" className="block text-sm font-medium text-gray-300">
             Descrição
           </label>
-          <input
+          <FormInput
             type="text"
             id="tx-description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="mt-1 block w-full bg-black/20 border border-white/20 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             required
           />
         </div>
@@ -124,14 +129,13 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
               <label htmlFor="tx-amount" className="block text-sm font-medium text-gray-300">
                 Valor (R$)
               </label>
-              <input
+              <FormInput
                 type="number"
                 id="tx-amount"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="50.00"
                 step="0.01"
-                className="mt-1 block w-full bg-black/20 border border-white/20 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 required
               />
             </div>
@@ -139,12 +143,11 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
               <label htmlFor="tx-date" className="block text-sm font-medium text-gray-300">
                 Data
               </label>
-              <input
+              <FormInput
                 type="date"
                 id="tx-date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="mt-1 block w-full bg-black/20 border border-white/20 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 required
               />
             </div>
@@ -157,23 +160,20 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
         />
         
         <div className="flex justify-between items-center gap-2 pt-4">
-          {/* Botão de Excluir (só aparece no modo de edição) */}
-          {prefill && 'id' in prefill ? (
+          {isEditMode ? (
             <Button
               type="button"
-              variant="secondary"
+              variant="destructive"
               onClick={handleDelete}
               disabled={isDeleting}
-              className="!bg-red-900/50 !text-red-400 hover:!bg-red-900"
             >
-              <XIcon className="w-4 h-4 mr-2" />
-              {isDeleting ? 'Excluindo...' : 'Excluir'}
+              <TrashIcon className="w-4 h-4" />
+              {isDeleting ? 'Excluindo...' : ''}
             </Button>
           ) : (
-            <div></div> /* Espaçador para manter o layout */
+            <div></div> /* Espaçador */
           )}
 
-          {/* Botões de Ação Padrão */}
           <div className="flex gap-2">
             <Button type="button" variant="secondary" onClick={onClose}>
               Cancelar

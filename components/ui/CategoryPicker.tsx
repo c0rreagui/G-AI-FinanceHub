@@ -1,5 +1,6 @@
 import React from 'react';
 import { Category } from '../../types';
+import { motion } from 'framer-motion';
 
 interface CategoryGridItemProps {
     category: Category;
@@ -9,19 +10,21 @@ interface CategoryGridItemProps {
 
 const CategoryGridItem: React.FC<CategoryGridItemProps> = ({ category, isSelected, onSelect }) => {
     return (
-        <button
+        <motion.button
             type="button"
             onClick={() => onSelect(category.id)}
-            className={`flex flex-col items-center justify-center gap-1 p-2 rounded-lg border-2 transition-all duration-200 ${
-                isSelected ? 'border-indigo-500 bg-indigo-500/20' : 'border-transparent bg-white/5 hover:bg-white/10'
+            className={`relative flex flex-col items-center justify-center gap-1 p-2 rounded-xl border-2 transition-all duration-200 ${
+                isSelected ? 'border-indigo-500/80 bg-indigo-500/20' : 'border-transparent bg-white/5 hover:bg-white/10'
             }`}
             title={category.name}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
         >
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${category.color}20` }}>
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${category.color}20` }}>
                 <category.icon className="w-5 h-5" style={{ color: category.color }} />
             </div>
             <span className={`text-xs text-center truncate w-full ${isSelected ? 'text-white font-semibold' : 'text-gray-300'}`}>{category.name}</span>
-        </button>
+        </motion.button>
     );
 };
 

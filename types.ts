@@ -182,8 +182,8 @@ export interface WishlistItem {
     priority: 'Baixa' | 'Média' | 'Alta';
     savedAmount: number;
 }
-// FIX: Adicionados tipos para o componente AIHub e serviço Gemini.
-// Inteligência Artificial / AI Hub
+
+// FIX: Added missing types for AI Chat feature
 export enum ChatRole {
     USER = 'user',
     MODEL = 'model',
@@ -192,14 +192,12 @@ export enum ChatRole {
 export interface ChatMessage {
     role: ChatRole;
     text: string;
+    imageData?: { data: string; mimeType: string };
+    imageUrl?: string;
     isTyping?: boolean;
-    imageUrl?: string; // for display in the UI
-    imageData?: { // for sending to the API
-        data: string;
-        mimeType: string;
-    };
-    grounding?: any[]; // for search/maps results
+    grounding?: any[];
 }
+
 
 // Define a interface para o contexto de dados do dashboard.
 export interface DashboardDataContextType {

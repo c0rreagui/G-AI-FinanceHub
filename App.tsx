@@ -5,7 +5,6 @@ import { DialogProvider } from './contexts/DialogContext';
 import { AuthView } from './components/views/AuthView';
 import { AppLayout } from './components/layout/AppLayout';
 import { ViewType } from './types';
-import { HomeDashboardView } from './components/views/HomeDashboardView';
 import { TransactionsView } from './components/views/TransactionsView';
 import { InsightsView } from './components/views/InsightsView';
 import { GoalsView } from './components/views/GoalsView';
@@ -14,6 +13,9 @@ import { SchedulingView } from './components/views/SchedulingView';
 import { ToolsView } from './components/views/ToolsView';
 import { SettingsView } from './components/views/SettingsView';
 import { LoadingSpinner } from './components/LoadingSpinner';
+import { HomeDashboardView } from './components/views/HomeDashboardView';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 const AppContent: React.FC = () => {
   const { user, loading } = useAuth();
@@ -32,35 +34,73 @@ const AppContent: React.FC = () => {
   }
   
   const renderView = () => {
+    const pageVariants = {
+      initial: { opacity: 0, y: 20 },
+      in: { opacity: 1, y: 0 },
+      out: { opacity: 0, y: -20 },
+    };
+    const pageTransition = {
+      type: 'tween',
+      ease: 'anticipate',
+      duration: 0.4,
+    };
+    
+    let viewComponent;
     switch (currentView) {
       case 'home':
-        return <HomeDashboardView />;
+        viewComponent = <HomeDashboardView />;
+        break;
       case 'transactions':
-        return <TransactionsView />;
+        viewComponent = <TransactionsView />;
+        break;
       case 'insights':
-        return <InsightsView />;
+        viewComponent = <InsightsView />;
+        break;
       case 'goals':
-        return <GoalsView />;
+        viewComponent = <GoalsView />;
+        break;
       case 'debts':
-        return <DebtsView />;
+        viewComponent = <DebtsView />;
+        break;
       case 'scheduling':
-        return <SchedulingView />;
+        viewComponent = <SchedulingView />;
+        break;
       case 'tools':
-        return <ToolsView />;
+        viewComponent = <ToolsView />;
+        break;
       case 'settings':
-        return <SettingsView />;
+        viewComponent = <SettingsView />;
+        break;
       default:
-        return <HomeDashboardView />;
+        viewComponent = <HomeDashboardView />;
+        break;
     }
+    
+    return (
+      <motion.div
+        key={currentView}
+        initial="initial"
+        animate="in"
+        exit="out"
+        variants={pageVariants}
+        transition={pageTransition}
+        className="flex flex-col flex-grow h-full"
+      >
+        {viewComponent}
+      </motion.div>
+    );
   };
 
   return (
     <>
       <AppLayout currentView={currentView} setCurrentView={setCurrentView}>
-        {renderView()}
+        <AnimatePresence mode="wait">
+          {renderView()}
+        </AnimatePresence>
       </AppLayout>
+      {/* FIX: Updated version number */}
       <div className="fixed bottom-1 right-2 text-xs text-white/20 pointer-events-none select-none">
-        v2.0.26
+        v4.0.1
       </div>
     </>
   );
@@ -68,13 +108,17 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <DashboardDataProvider>
-        <DialogProvider>
-          <AppContent />
-        </DialogProvider>
-      </DashboardDataProvider>
-    </AuthProvider>
+    <div>
+      <AuthProvider>
+        <DashboardDataProvider>
+          <DialogProvider>
+            <ErrorBoundary>
+              <AppContent />
+            </ErrorBoundary>
+          </DialogProvider>
+        </DashboardDataProvider>
+      </AuthProvider>
+    </div>
   );
 };
 

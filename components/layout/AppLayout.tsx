@@ -19,11 +19,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, currentView, set
 
   return (
     <>
-      <div className="flex h-screen bg-oklch-background text-oklch-foreground overflow-hidden">
+      <div className="flex h-screen w-screen bg-transparent text-oklch-foreground overflow-hidden">
         {isDesktop && <Sidebar currentView={currentView} setCurrentView={setCurrentView} />}
         
-        <main className={`flex-1 flex flex-col overflow-y-auto ${!isDesktop ? 'pb-16' : ''}`}>
-          <div className="p-4 sm:p-6 lg:p-8 flex-grow flex flex-col">
+        <main className={`flex-1 flex flex-col overflow-hidden ${!isDesktop ? 'pb-20' : ''}`}>
+          <div className="p-4 sm:p-6 lg:p-8 flex-grow flex flex-col h-full">
               {children}
           </div>
         </main>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { ChatMessage, ChatRole } from '../types';
-import { LoadingSpinner } from './LoadingSpinner';
+import { TypingIndicator } from './ui/TypingIndicator';
 
 interface ChatMessageDisplayProps {
   message: ChatMessage;
@@ -12,26 +12,22 @@ export const ChatMessageDisplay: React.FC<ChatMessageDisplayProps> = ({ message 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} items-end gap-3`}>
       {!isUser && (
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex-shrink-0 self-start"></div>
+        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex-shrink-0 self-start shadow-lg"></div>
       )}
       <div
-        className={`max-w-xl rounded-2xl p-4 shadow-lg ${
+        className={`max-w-xl rounded-2xl p-4 shadow-lg text-base ${
           isUser
-            ? 'bg-indigo-500 text-white rounded-br-none'
-            : 'bg-white/10 backdrop-blur-lg border border-white/10 text-gray-200 rounded-bl-none'
+            ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-br-none'
+            : 'bg-black/20 backdrop-blur-lg border border-white/10 text-gray-200 rounded-bl-none'
         }`}
       >
         {message.imageUrl && <img src={message.imageUrl} alt="Envio do usuário" className="rounded-lg mb-2 max-w-xs" />}
         
         {message.isTyping && !message.text ? (
-          <div className="flex justify-center items-center p-2">
-            <LoadingSpinner />
-          </div>
+          <TypingIndicator />
         ) : (
-          message.text
+          <div className="prose prose-invert prose-sm text-white" dangerouslySetInnerHTML={{ __html: message.text.replace(/\n/g, '<br />') }} />
         )}
-
-        {message.isTyping && message.text && <div className="inline-block w-1 h-4 bg-white animate-pulse ml-1"></div>}
         
         {message.grounding && message.grounding.length > 0 && (
           <div className="mt-4 pt-3 border-t border-white/20">

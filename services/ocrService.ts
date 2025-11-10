@@ -1,4 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
+import { logger } from "./loggingService";
 
 export interface OcrResult {
   description: string | null;
@@ -60,7 +61,11 @@ Se o valor for "120,50", formate para "120.50". Se você não conseguir encontra
     return data;
 
   } catch (error) {
-    console.error("Erro ao processar o recibo:", error);
+    logger.error("Erro ao processar o recibo com a API Gemini", {
+        component: "ocrService",
+        function: "scanReceipt",
+        error: error
+    });
     throw new Error("Falha ao analisar a imagem do recibo.");
   }
 };

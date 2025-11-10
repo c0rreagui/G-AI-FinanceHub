@@ -1,4 +1,3 @@
-// FIX: Implemented the SettingsView component to provide app settings and user profile information.
 import React from 'react';
 import { PageHeader } from '../layout/PageHeader';
 import { Settings } from '../Icons';
@@ -7,6 +6,7 @@ import { UserProfileCard } from '../ui/UserProfileCard';
 import { AchievementsList } from '../ui/AchievementsList';
 import { Button } from '../ui/Button';
 import { supabase } from '../../services/supabaseClient';
+import { motion } from 'framer-motion';
 
 export const SettingsView: React.FC = () => {
 
@@ -15,7 +15,19 @@ export const SettingsView: React.FC = () => {
         if (error) {
             console.error('Error logging out:', error);
         }
-        // The auth listener in useAuth will handle the state change.
+    };
+
+    const containerVariants = {
+      hidden: { opacity: 0 },
+      visible: {
+        opacity: 1,
+        transition: { staggerChildren: 0.1, delayChildren: 0.2 }
+      }
+    };
+  
+    const itemVariants = {
+      hidden: { y: 20, opacity: 0 },
+      visible: { y: 0, opacity: 1 }
     };
 
     return (
@@ -26,19 +38,25 @@ export const SettingsView: React.FC = () => {
                 breadcrumbs={['FinanceHub', 'Ajustes']}
                 actions={<Button onClick={handleLogout} variant="secondary">Sair</Button>}
             />
-            <div className="mt-6 flex-grow overflow-y-auto pr-2 space-y-6">
-                <ApiKeySettings />
-                <UserProfileCard />
-                <AchievementsList />
+            <motion.div 
+                className="flex-grow overflow-y-auto pr-2 space-y-6"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+            >
+                <motion.div variants={itemVariants}><ApiKeySettings /></motion.div>
+                <motion.div variants={itemVariants}><UserProfileCard /></motion.div>
+                <motion.div variants={itemVariants}><AchievementsList /></motion.div>
 
-                 <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6 mt-6">
+                 <motion.div variants={itemVariants} className="bg-black/20 border border-white/10 backdrop-blur-xl rounded-2xl p-6">
                     <h2 className="text-xl font-semibold text-white mb-2">Sobre</h2>
                     <p className="text-sm text-gray-400">
                         FinanceHub é seu assistente financeiro pessoal com tecnologia de IA.
                     </p>
-                    <p className="text-xs text-gray-500 mt-4">Versão 2.0.26</p>
-                </div>
-            </div>
+                    {/* FIX: Updated version number */}
+                    <p className="text-xs text-gray-500 mt-4">Versão 4.0.1</p>
+                </motion.div>
+            </motion.div>
         </>
     );
 };

@@ -1,6 +1,7 @@
 // Versão de Diagnóstico (Nível 7)
 import { GoogleGenAI, LiveSession, LiveServerMessage, Modality, GenerateContentResponse } from "@google/genai";
 import { ChatMessage, ChatRole } from '../types';
+import { logger } from "./loggingService";
 
 export const getChatResponseStream = async ( 
   apiKey: string, 
@@ -13,10 +14,16 @@ export const getChatResponseStream = async (
 ) => { 
   const ai = new GoogleGenAI({ apiKey });
 
-  console.log("--- INICIANDO DIAGNÓSTICO (NÍVEL 7) ---");
+  logger.debug("--- INICIANDO DIAGNÓSTICO (GEMINI SERVICE) ---", {
+    historyCount: history.length,
+    hasImage: !!image,
+    useSearch,
+    useMaps,
+    location
+  });
 
   // 1. Logando o histórico recebido do AIHub.tsx 
-  console.log("[Diagnóstico] Histórico recebido:", JSON.stringify(history, null, 2));
+  logger.debug("[Diagnóstico] Histórico recebido:", { history });
 
   const mappedHistory = history.map(msg => { 
     const parts: ({ text: string } | { inlineData: { data: string; mimeType: string } })[] = [];
@@ -34,7 +41,7 @@ export const getChatResponseStream = async (
   }).filter(msg => msg.parts.length > 0) as { role: 'user' | 'model', parts: any[] }[];
   
   // 2. Logando o histórico mapeado e filtrado 
-  console.log("[Diagnóstico] Histórico Mapeado e Filtrado:", JSON.stringify(mappedHistory, null, 2));
+  logger.debug("[Diagnóstico] Histórico Mapeado e Filtrado:", { mappedHistory });
 
   const newPromptParts = []; 
   if (image) { 
@@ -45,10 +52,10 @@ export const getChatResponseStream = async (
   }
 
   // 3. Logando o prompt final 
-  console.log("[Diagnóstico] Prompt enviado:", JSON.stringify(newPromptParts, null, 2));
+  logger.debug("[Diagnóstico] Prompt enviado:", { newPromptParts });
 
   if (newPromptParts.length === 0) { 
-    console.warn("[Diagnóstico] Nenhum prompt. Enviando resposta padrão."); 
+    logger.warn("[Diagnóstico] Nenhum prompt. Enviando resposta padrão.", { component: "geminiService" });
     const emptyStream = (async function* () { 
       const response: GenerateContentResponse = { text: "Por favor, digite uma mensagem ou envie uma imagem.", candidates: [], functionCalls: [] }; 
       yield response; 
@@ -99,16 +106,18 @@ export const getChatResponseStream = async (
     config, 
   });
 
-  console.log("[Diagnóstico] ENVIANDO REQUISIÇÃO PARA A API GEMINI...");
+  logger.info("[Diagnóstico] ENVIANDO REQUISIÇÃO PARA A API GEMINI...", { component: "geminiService" });
 
   try { 
     const result = await chat.sendMessageStream(newPromptParts); 
-    console.log("[Diagnóstico] Resposta recebida da API."); 
+    logger.info("[Diagnóstico] Resposta recebida da API.", { component: "geminiService" });
     return result; 
   } catch (error) { 
-    console.error("--- ERRO CAPTURADO PELO DIAGNÓSTICO ---"); 
-    console.error(error); 
-    console.error("--- FIM DO ERRO ---"); 
+    logger.error("--- ERRO CAPTURADO PELO DIAGNÓSTICO (GEMINI SERVICE) ---", {
+        component: "geminiService",
+        function: "getChatResponseStream",
+        error
+    });
     throw error; 
   } 
 };
