@@ -57,47 +57,81 @@
   }
 }
 
-/* Aurora Background Effect */
+/* New Aurora Background Effect */
 @layer base {
-  .aurora-background {
-    position: relative;
+  .aurora-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    isolation: isolate; /* Create a new stacking context */
+    z-index: -1; /* Place it behind all content */
+    pointer-events: none;
     overflow: hidden;
   }
-  .aurora-background::before, .aurora-background::after {
-    content: '';
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    width: 800px;
-    height: 800px;
+
+  .aurora-shape {
+    position: absolute;
+    mix-blend-mode: screen; /* Blend colors nicely */
+    filter: blur(150px);
+    will-change: transform, opacity;
     border-radius: 50%;
-    opacity: 0.15;
-    filter: blur(100px);
-    z-index: -1;
-    will-change: transform;
+  }
+
+  .aurora-shape-1 {
+    width: 900px;
+    height: 800px;
+    top: -20%;
+    left: -10%;
+    background-color: oklch(0.6 0.25 270 / 0.4); /* Primary Purple, but with alpha */
+    animation: move-aurora-1 25s ease-in-out infinite alternate;
+  }
+
+  .aurora-shape-2 {
+    width: 800px;
+    height: 700px;
+    bottom: -30%;
+    right: -20%;
+    background-color: oklch(0.7 0.25 180 / 0.5); /* Greenish-Cyan */
+    animation: move-aurora-2 30s ease-in-out infinite alternate;
   }
   
-  .aurora-background::before {
-    background: radial-gradient(circle, oklch(var(--primary-oklch)) 0%, transparent 70%);
-    transform: translate(-70%, -40%);
-    animation: aurora-one 20s linear infinite;
+  .aurora-shape-3 {
+    width: 600px;
+    height: 600px;
+    top: 30%;
+    right: 10%;
+    background-color: oklch(0.7 0.3 320 / 0.3); /* Magenta */
+    animation: move-aurora-3 20s ease-in-out infinite alternate;
   }
   
-  .aurora-background::after {
-    background: radial-gradient(circle, oklch(0.6 0.25 300) 0%, transparent 70%); /* A different hue */
-    transform: translate(30%, -60%);
-    animation: aurora-two 25s linear infinite;
+  .aurora-shape-4 {
+    width: 700px;
+    height: 700px;
+    bottom: 10%;
+    left: 20%;
+    background-color: oklch(0.8 0.2 195 / 0.2); /* Bright Cyan */
+    animation: move-aurora-4 35s ease-in-out infinite alternate;
   }
 }
 
-@keyframes aurora-one {
-  0% { transform: translate(-70%, -40%) rotate(0deg) scale(1); }
-  50% { transform: translate(-60%, -50%) rotate(180deg) scale(1.1); }
-  100% { transform: translate(-70%, -40%) rotate(360deg) scale(1); }
+@keyframes move-aurora-1 {
+  from { transform: translate(-10%, -10%) rotate(0deg); opacity: 0.8; }
+  to { transform: translate(10%, 10%) rotate(45deg); opacity: 1; }
 }
 
-@keyframes aurora-two {
-  0% { transform: translate(30%, -60%) rotate(0deg) scale(1); }
-  50% { transform: translate(40%, -70%) rotate(-180deg) scale(1.2); }
-  100% { transform: translate(30%, -60%) rotate(-360deg) scale(1); }
+@keyframes move-aurora-2 {
+  from { transform: translate(20%, 20%) rotate(0deg); opacity: 0.7; }
+  to { transform: translate(-20%, -20%) rotate(-60deg); opacity: 0.9; }
+}
+
+@keyframes move-aurora-3 {
+  from { transform: translate(0, 0) scale(1); opacity: 0.6; }
+  to { transform: translate(15%, -15%) scale(1.2); opacity: 0.8; }
+}
+
+@keyframes move-aurora-4 {
+  from { transform: translate(0, 0) rotate(0deg) scale(1.1); opacity: 0.5; }
+  to { transform: translate(-20%, 10%) rotate(30deg) scale(1); opacity: 0.7; }
 }
