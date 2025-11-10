@@ -1,15 +1,16 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+// FIX: Added ChatMessage and ChatRole to types.ts to resolve import error.
 import { ChatMessage, ChatRole, TransactionType } from '../types';
 import { ChatMessageDisplay } from './ChatMessageDisplay';
 import { LoadingSpinner } from './LoadingSpinner';
 import { MicIcon, PaperclipIcon, SendIcon, SearchIcon, MapPinIcon, HomeIcon } from './Icons';
+// FIX: Implemented missing functions in geminiService.ts to resolve import errors.
 import { getChatResponseStream, connectToLive, encode, decode, decodeAudioData } from '../services/geminiService';
 import { useGeolocation } from '../hooks/useGeolocation';
-import { LiveServerMessage, LiveSession, Blob as GenAiBlob } from '@google/ai/generativelanguage';
+import { LiveServerMessage, LiveSession, Blob as GenAiBlob, GenerateContentResponse } from '@google/genai';
 import { PageHeader } from './layout/PageHeader';
 import { LiveStatusIndicator } from './ui/LiveStatusIndicator';
 import { useDialog } from '../hooks/useDialog';
-import { GenerateContentResponse } from '@google/genai';
 import { useAuth } from '../hooks/useAuth';
 import { ErrorModal } from './ui/ErrorModal';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -20,47 +21,57 @@ import { logger } from '../services/loggingService';
 /**
  * Processa a resposta em streaming da API Gemini, atualizando a mensagem do modelo em tempo real.
  */
+// FIX: Refactored to correctly process streams and return the final response for function call handling.
 const processStreamedResponse = async (
   stream: AsyncGenerator<GenerateContentResponse>,
   setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>
 ) => {
-  let fullResponse = "";
+  let fullResponseText = "";
   let groundingData: any[] = [];
+  let functionCallResponse: GenerateContentResponse | null = null;
   setMessages(prev => [...prev, { role: ChatRole.MODEL, text: "", isTyping: true }]);
 
   for await (const chunk of stream) {
     const chunkText = chunk.text ?? '';
-    fullResponse += chunkText;
+    fullResponseText += chunkText;
     
     if (chunk.candidates?.[0]?.groundingMetadata?.groundingChunks) {
       groundingData = chunk.candidates[0].groundingMetadata.groundingChunks;
+    }
+    if (chunk.functionCalls) {
+        // The chunk with a function call is what we need to process later
+        functionCallResponse = chunk;
     }
 
     setMessages(prev => {
       const newMessages = [...prev];
       const lastMessage = newMessages[newMessages.length - 1];
       if (lastMessage?.role === ChatRole.MODEL) {
-        lastMessage.text = fullResponse;
+        lastMessage.text = fullResponseText;
         lastMessage.grounding = groundingData;
       }
       return newMessages;
     });
   }
-  return { fullResponse, groundingData };
+  return { fullResponseText, groundingData, functionCallResponse };
 };
+
 
 /**
  * Lida com as chamadas de função retornadas pela API Gemini.
  */
+// FIX: Updated to use the modern `response.functionCalls` property instead of iterating through parts.
 const handleFunctionCall = (
   response: GenerateContentResponse,
   openDialog: (type: any, props?: any) => void,
   setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>
 ) => {
-  const part = response.candidates[0]?.content.parts.find((p: any) => p.functionCall);
-  const call = part?.functionCall;
+  const calls = response.functionCalls;
+  if (!calls || calls.length === 0) return;
 
-  if (call && call.name === 'handleNewTransaction') {
+  const call = calls.find(c => c.name === 'handleNewTransaction');
+
+  if (call) {
     const args = call.args;
     const prefillData = {
       description: args.description || '',
@@ -190,6 +201,7 @@ export const AIHub: React.FC = () => {
     }
   };
   
+  // FIX: Refactored logic to correctly handle streaming responses and function calls.
   const handleSend = async () => {
     if (!apiKey) {
         setApiError("Por favor, configure sua chave de API do Gemini nas Configurações para conversar com a IA.");
@@ -204,7 +216,7 @@ export const AIHub: React.FC = () => {
     const userMessage: ChatMessage = { role: ChatRole.USER, text: input };
     if (image) {
       userMessage.imageUrl = image.url;
-      userMessage.imageData = imagePayload?.inlineData;
+      userMessage.imageData = { data: image.data, mimeType: image.mimeType };
     }
     
     setMessages(prev => [...prev, userMessage]);
@@ -213,26 +225,31 @@ export const AIHub: React.FC = () => {
     setImage(null);
     
     try {
-      const result = await getChatResponseStream(apiKey, chatHistory, currentInput, imagePayload, useSearch, useMaps, location);
-      const { fullResponse, groundingData } = await processStreamedResponse(result.stream, setMessages);
+      const stream = await getChatResponseStream(apiKey, chatHistory, currentInput, imagePayload, useSearch, useMaps, location);
+      const { fullResponseText, groundingData, functionCallResponse } = await processStreamedResponse(stream, setMessages);
       
       setMessages(prev => {
           const newMessages = [...prev];
           const lastMessage = newMessages[newMessages.length - 1];
           if (lastMessage?.role === ChatRole.MODEL && lastMessage.isTyping) {
-              if (fullResponse.trim()) {
-                  lastMessage.text = fullResponse;
+              if (fullResponseText.trim()) {
+                  lastMessage.text = fullResponseText;
                   lastMessage.grounding = groundingData;
                   lastMessage.isTyping = false;
               } else {
-                  return newMessages.slice(0, -1);
+                  if (functionCallResponse) {
+                      lastMessage.isTyping = false; // Stop typing indicator if there's a function call but no text
+                  } else {
+                     return newMessages.slice(0, -1); // Remove empty model message
+                  }
               }
           }
           return newMessages;
       });
 
-      const finalResponse = await result.response;
-      handleFunctionCall(finalResponse, openDialog, setMessages);
+      if (functionCallResponse) {
+        handleFunctionCall(functionCallResponse, openDialog, setMessages);
+      }
 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Ocorreu um erro desconhecido ao se comunicar com a IA.";
@@ -297,7 +314,7 @@ export const AIHub: React.FC = () => {
         source.connect(scriptProcessor.current);
         scriptProcessor.current.connect(inputAudioContext.current!.destination);
       },
-      onmessage: (msg) => processLiveMessage(msg, setMessages, outputAudioContext, nextAudioStartTime, audioSources),
+      onmessage: (msg: LiveServerMessage) => processLiveMessage(msg, setMessages, outputAudioContext, nextAudioStartTime, audioSources),
       onerror: (e: ErrorEvent) => {
         logger.error("Erro na sessão Live API (onerror)", {
             component: "AIHub",
@@ -306,7 +323,7 @@ export const AIHub: React.FC = () => {
         setLiveStatus('error');
         setApiError(`Erro na conexão de voz: ${e.message}`);
       },
-      onclose: (e) => {
+      onclose: (e: CloseEvent) => {
         logger.info("Sessão Live API fechada", { 
             component: "AIHub",
             closeEvent: e 

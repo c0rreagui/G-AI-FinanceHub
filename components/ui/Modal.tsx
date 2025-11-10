@@ -34,6 +34,9 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }
         >
           <motion.div
             className="relative w-full max-w-lg p-6 bg-black/30 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl shadow-black/40 text-white"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title"
             variants={modalVariants}
             initial="hidden"
             animate="visible"

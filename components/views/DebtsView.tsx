@@ -8,7 +8,8 @@ import { Button } from '../ui/Button';
 import { Debt, DebtStatus } from '../../types';
 import { Badge } from '../ui/Badge';
 import { useDialog } from '../../hooks/useDialog';
-import { LoadingSpinner } from '../LoadingSpinner';
+import { GenericViewSkeleton } from './skeletons/GenericViewSkeleton';
+import { EmptyState } from '../ui/EmptyState';
 
 const DebtCard: React.FC<{ debt: Debt; onPay: (debt: Debt) => void; }> = ({ debt, onPay }) => {
     const progress = Math.min((debt.paidAmount / debt.totalAmount) * 100, 100);
@@ -62,23 +63,22 @@ export const DebtsView: React.FC = () => {
                 actions={<Button onClick={() => openDialog('add-debt')}><PlusCircle className="w-4 h-4"/> Adicionar Dívida</Button>}
             />
              {loading ? (
-                <div className="flex-grow flex items-center justify-center">
-                    <LoadingSpinner />
-                </div>
+                <GenericViewSkeleton />
              ) : (
                 <div className="mt-6 flex-grow overflow-y-auto pr-2">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {debts.length > 0 ? (
-                            debts.map(debt => (
+                     {debts.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {debts.map(debt => (
                                 <DebtCard key={debt.id} debt={debt} onPay={handleOpenPayment} />
-                            ))
-                        ) : (
-                             <div className="col-span-full text-center text-gray-400 py-8">
-                                <p>Nenhuma dívida encontrada.</p>
-                                <p className="text-sm mt-2">Parece que você está livre de dívidas. Parabéns!</p>
-                            </div>
-                        )}
-                    </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <EmptyState
+                            icon={TrendingDown}
+                            title="Nenhuma Dívida Encontrada"
+                            description="Parece que você está com as contas em dia. Parabéns!"
+                        />
+                    )}
                 </div>
              )}
         </>

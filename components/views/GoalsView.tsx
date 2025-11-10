@@ -8,7 +8,8 @@ import { Button } from '../ui/Button';
 import { Goal, GoalStatus } from '../../types';
 import { Badge } from '../ui/Badge';
 import { useDialog } from '../../hooks/useDialog';
-import { LoadingSpinner } from '../LoadingSpinner';
+import { GenericViewSkeleton } from './skeletons/GenericViewSkeleton';
+import { EmptyState } from '../ui/EmptyState';
 
 const GoalCard: React.FC<{ goal: Goal, onAddValue: (goal: Goal) => void }> = ({ goal, onAddValue }) => {
     const progress = Math.min((goal.currentAmount / goal.targetAmount) * 100, 100);
@@ -59,23 +60,24 @@ export const GoalsView: React.FC = () => {
                 actions={<Button onClick={() => openDialog('add-goal')}><PlusCircle className="w-4 h-4"/> Nova Meta</Button>}
             />
             {loading ? (
-                 <div className="flex-grow flex items-center justify-center">
-                    <LoadingSpinner />
-                </div>
+                 <GenericViewSkeleton />
             ) : (
                 <div className="mt-6 flex-grow overflow-y-auto pr-2">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {goals.length > 0 ? (
-                            goals.map(goal => (
+                    {goals.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {goals.map(goal => (
                                 <GoalCard key={goal.id} goal={goal} onAddValue={handleOpenAddValue} />
-                            ))
-                        ) : (
-                             <div className="col-span-full text-center text-gray-400 py-8">
-                                <p>Nenhuma meta encontrada.</p>
-                                <p className="text-sm mt-2">Clique em "Nova Meta" para começar a planejar seu futuro!</p>
-                            </div>
-                        )}
-                    </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <EmptyState
+                            icon={Target}
+                            title="Nenhuma Meta Cadastrada"
+                            description="Defina suas metas financeiras para começar a economizar para o que é importante para você."
+                        >
+                             <Button onClick={() => openDialog('add-goal')}><PlusCircle className="w-4 h-4 mr-2"/> Criar Primeira Meta</Button>
+                        </EmptyState>
+                    )}
                 </div>
             )}
         </>

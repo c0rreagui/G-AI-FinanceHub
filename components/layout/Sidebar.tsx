@@ -11,6 +11,7 @@ import {
     Settings,
 } from '../Icons';
 import { motion } from 'framer-motion';
+import { APP_VERSION } from '../../config';
 
 interface SidebarProps {
   currentView: ViewType;
@@ -86,9 +87,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
             </ul>
           </li>
           <li className="mt-auto">
-            {/* FIX: Updated version number */}
              <div className="text-xs text-white/20 pointer-events-none select-none mb-4">
-                FinanceHub v4.0.1
+                FinanceHub v{APP_VERSION}
             </div>
             <ul role="list" className="-mx-2 space-y-1">
               {secondaryNavigation.map((item) => {

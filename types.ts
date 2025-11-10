@@ -183,19 +183,19 @@ export interface WishlistItem {
     savedAmount: number;
 }
 
-// FIX: Added missing types for AI Chat feature
+// FIX: Added ChatRole and ChatMessage types for the AIHub component.
 export enum ChatRole {
-    USER = 'user',
-    MODEL = 'model',
+  USER = 'user',
+  MODEL = 'model',
 }
 
 export interface ChatMessage {
-    role: ChatRole;
-    text: string;
-    imageData?: { data: string; mimeType: string };
-    imageUrl?: string;
-    isTyping?: boolean;
-    grounding?: any[];
+  role: ChatRole;
+  text: string;
+  imageUrl?: string;
+  imageData?: { data: string; mimeType: string };
+  isTyping?: boolean;
+  grounding?: any[];
 }
 
 

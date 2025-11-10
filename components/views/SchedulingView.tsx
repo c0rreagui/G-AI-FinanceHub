@@ -6,8 +6,9 @@ import { ScheduledTransaction, TransactionType } from '../../types';
 import { formatCurrencyBRL, formatDate } from '../../utils/formatters';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { LoadingSpinner } from '../LoadingSpinner';
 import { useDialog } from '../../hooks/useDialog';
+import { EmptyState } from '../ui/EmptyState';
+import { Skeleton } from '../ui/skeletons/Skeleton';
 
 const ScheduledTransactionCard: React.FC<{ item: ScheduledTransaction }> = ({ item }) => {
     const isExpense = item.type === TransactionType.DESPESA;
@@ -20,8 +21,8 @@ const ScheduledTransactionCard: React.FC<{ item: ScheduledTransaction }> = ({ it
             <div className="flex-grow">
                 <div className="flex justify-between items-center">
                     <h3 className="text-base font-semibold text-white">{item.description}</h3>
-                     <span className={`font-semibold text-lg ${isExpense ? 'text-red-400' : 'text-green-400'}`}>
-                        {isExpense ? '-' : '+'} {formatCurrencyBRL(item.amount)}
+                     <span className={`font-semibold text-lg ${item.amount < 0 ? 'text-red-400' : 'text-green-400'}`}>
+                        {item.amount < 0 ? '' : '+'} {formatCurrencyBRL(item.amount)}
                     </span>
                 </div>
                 <div className="flex justify-between items-center mt-2 text-sm text-gray-400">
@@ -32,6 +33,15 @@ const ScheduledTransactionCard: React.FC<{ item: ScheduledTransaction }> = ({ it
         </div>
     );
 }
+
+const SchedulingViewSkeleton: React.FC = () => (
+    <div className="mt-6 flex-grow space-y-4">
+        {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-28 rounded-2xl" />
+        ))}
+    </div>
+);
+
 
 export const SchedulingView: React.FC = () => {
     const { scheduledTransactions, loading } = useDashboardData();
@@ -46,9 +56,7 @@ export const SchedulingView: React.FC = () => {
                 actions={<Button onClick={() => openDialog('add-scheduling')}><PlusCircle className="w-4 h-4"/> Novo Agendamento</Button>}
             />
             {loading ? (
-                <div className="flex-grow flex items-center justify-center">
-                    <LoadingSpinner />
-                </div>
+                <SchedulingViewSkeleton />
             ) : (
                 <div className="mt-6 flex-grow overflow-y-auto pr-2">
                     {scheduledTransactions.length > 0 ? (
@@ -58,10 +66,15 @@ export const SchedulingView: React.FC = () => {
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center text-gray-400 py-8">
-                            <p>Nenhum agendamento encontrado.</p>
-                            <p className="text-sm mt-2">Adicione transações recorrentes para gerenciá-las aqui.</p>
-                        </div>
+                        <EmptyState
+                            icon={Calendar}
+                            title="Nenhum Agendamento"
+                            description="Adicione transações recorrentes, como aluguel ou assinaturas, para gerenciá-las aqui."
+                        >
+                            <Button onClick={() => openDialog('add-scheduling')}>
+                                <PlusCircle className="w-4 h-4 mr-2"/> Criar Agendamento
+                            </Button>
+                        </EmptyState>
                     )}
                 </div>
             )}

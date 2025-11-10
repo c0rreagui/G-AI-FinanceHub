@@ -4,11 +4,12 @@ import { PageHeader } from '../layout/PageHeader';
 import { ArrowLeftRight, PlusCircle, Filter } from '../Icons';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { formatCurrencyBRL, formatDate } from '../../utils/formatters';
-import { LoadingSpinner } from '../LoadingSpinner';
 import { Transaction, TransactionType } from '../../types';
 import { Button } from '../ui/Button';
 import { useDialog } from '../../hooks/useDialog';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { TransactionsViewSkeleton } from './skeletons/TransactionsViewSkeleton';
+import { EmptyState } from '../ui/EmptyState';
 
 const TransactionItem: React.FC<{ transaction: Transaction; onEdit: (tx: Transaction) => void }> = ({ transaction, onEdit }) => {
     const isExpense = transaction.type === TransactionType.DESPESA;
@@ -32,8 +33,8 @@ const TransactionItem: React.FC<{ transaction: Transaction; onEdit: (tx: Transac
                     </p>
                 </div>
             </div>
-            <p className={`font-semibold text-right pl-2 ${isExpense ? 'text-red-400' : 'text-green-400'}`}>
-                {amount < 0 ? '' : '+'} {formatCurrencyBRL(amount)}
+            <p className={`font-semibold text-right pl-2 ${transaction.amount < 0 ? 'text-red-400' : 'text-green-400'}`}>
+                {transaction.amount < 0 ? '' : '+'} {formatCurrencyBRL(amount)}
             </p>
         </li>
     );
@@ -72,9 +73,7 @@ export const TransactionsView: React.FC = () => {
                 }
             />
              {loading ? (
-                <div className="flex-grow flex items-center justify-center">
-                    <LoadingSpinner />
-                </div>
+                <TransactionsViewSkeleton />
              ) : (
                 <div className="mt-6 flex-grow overflow-y-auto pr-2">
                     {filteredTransactions.length > 0 ? (
@@ -82,10 +81,15 @@ export const TransactionsView: React.FC = () => {
                             {filteredTransactions.map(t => <TransactionItem key={t.id} transaction={t} onEdit={handleEditTransaction} />)}
                         </ul>
                     ) : (
-                         <div className="text-center text-gray-400 py-8">
-                            <p>Nenhuma transação encontrada.</p>
-                            <p className="text-sm mt-2">Clique em "Nova Transação" para adicionar sua primeira.</p>
-                        </div>
+                        <EmptyState
+                            icon={ArrowLeftRight}
+                            title="Nenhuma Transação Encontrada"
+                            description="Comece a registrar suas despesas e receitas para ver seu histórico financeiro aqui."
+                        >
+                            <Button onClick={() => openDialog('add-transaction')}>
+                                <PlusCircle className="w-4 h-4 mr-2"/> Nova Transação
+                            </Button>
+                        </EmptyState>
                     )}
                 </div>
              )}

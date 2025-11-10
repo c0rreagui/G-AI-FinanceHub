@@ -4,17 +4,21 @@ import { logger } from '../services/loggingService';
 import { Button } from './ui/Button';
 import { Zap } from './Icons';
 
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+}
+
 interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
 }
 
-export class ErrorBoundary extends React.Component<{ children: React.ReactNode }, ErrorBoundaryState> {
-  // FIX: The original code used a property initializer for state, which might cause issues with `this` context in some environments. Reverting to a classic constructor ensures `this.props` and `this.state` are correctly initialized and accessible, resolving the render error.
-  constructor(props: { children: React.ReactNode }) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
+export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  // FIX: Initialize state as a class property to fix issues with 'this.state' and 'this.props' not being recognized.
+  state: ErrorBoundaryState = {
+    hasError: false,
+    error: null,
+  };
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };

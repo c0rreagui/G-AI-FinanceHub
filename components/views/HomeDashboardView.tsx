@@ -2,11 +2,12 @@ import React from 'react';
 import { PageHeader } from '../layout/PageHeader';
 import { HomeIcon } from '../Icons';
 import { useDashboardData } from '../../hooks/useDashboardData';
-import { LoadingSpinner } from '../LoadingSpinner';
 import { QuickActions } from '../ui/QuickActions';
 import { formatCurrencyBRL } from '../../utils/formatters';
 import { ProgressBar } from '../ui/ProgressBar';
 import { GoalStatus } from '../../types';
+import { UpcomingPayments } from '../ui/UpcomingPayments';
+import { HomeDashboardSkeleton } from './skeletons/HomeDashboardSkeleton';
 
 const SummaryCard: React.FC<{ title: string; amount: number; }> = ({ title, amount }) => (
     <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6">
@@ -20,9 +21,14 @@ export const HomeDashboardView: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="flex-grow flex items-center justify-center">
-                <LoadingSpinner />
-            </div>
+            <>
+                <PageHeader
+                    icon={HomeIcon}
+                    title="Início"
+                    breadcrumbs={['FinanceHub', 'Início']}
+                />
+                <HomeDashboardSkeleton />
+            </>
         );
     }
     
@@ -36,17 +42,20 @@ export const HomeDashboardView: React.FC = () => {
                 breadcrumbs={['FinanceHub', 'Início']}
             />
             <div className="mt-6 flex-grow overflow-y-auto pr-2 space-y-6">
-                {/* 1. Quick Actions */}
+                {/* 1. Upcoming Payments */}
+                <UpcomingPayments />
+                
+                {/* 2. Quick Actions */}
                 <QuickActions />
 
-                {/* 2. Summary Cards */}
+                {/* 3. Summary Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <SummaryCard title="Saldo Atual" amount={summary.totalBalance} />
                     <SummaryCard title="Receitas do Mês" amount={summary.monthlyIncome} />
                     <SummaryCard title="Despesas do Mês" amount={Math.abs(summary.monthlyExpenses)} />
                 </div>
 
-                {/* 3. Goal Progress */}
+                {/* 4. Goal Progress */}
                 {firstGoal && (
                     <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6">
                         <h2 className="text-xl font-semibold text-white mb-4">Meta Principal: {firstGoal.name}</h2>

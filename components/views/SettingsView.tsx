@@ -7,6 +7,7 @@ import { AchievementsList } from '../ui/AchievementsList';
 import { Button } from '../ui/Button';
 import { supabase } from '../../services/supabaseClient';
 import { motion } from 'framer-motion';
+import { APP_VERSION } from '../../config';
 
 export const SettingsView: React.FC = () => {
 
@@ -53,8 +54,7 @@ export const SettingsView: React.FC = () => {
                     <p className="text-sm text-gray-400">
                         FinanceHub é seu assistente financeiro pessoal com tecnologia de IA.
                     </p>
-                    {/* FIX: Updated version number */}
-                    <p className="text-xs text-gray-500 mt-4">Versão 4.0.1</p>
+                    <p className="text-xs text-gray-500 mt-4">Versão {APP_VERSION}</p>
                 </motion.div>
             </motion.div>
         </>

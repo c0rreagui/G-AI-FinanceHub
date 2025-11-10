@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { DashboardDataProvider } from './hooks/useDashboardData';
 import { DialogProvider } from './contexts/DialogContext';
+import { ToastProvider } from './contexts/ToastContext';
 import { AuthView } from './components/views/AuthView';
 import { AppLayout } from './components/layout/AppLayout';
 import { ViewType } from './types';
@@ -16,6 +17,8 @@ import { LoadingSpinner } from './components/LoadingSpinner';
 import { HomeDashboardView } from './components/views/HomeDashboardView';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { ToastContainer } from './components/ui/ToastContainer';
+import { APP_VERSION } from './config';
 
 const AppContent: React.FC = () => {
   const { user, loading } = useAuth();
@@ -98,9 +101,8 @@ const AppContent: React.FC = () => {
           {renderView()}
         </AnimatePresence>
       </AppLayout>
-      {/* FIX: Updated version number */}
       <div className="fixed bottom-1 right-2 text-xs text-white/20 pointer-events-none select-none">
-        v4.0.1
+        v{APP_VERSION}
       </div>
     </>
   );
@@ -108,17 +110,18 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <div>
-      <AuthProvider>
+    <AuthProvider>
+      <ToastProvider>
         <DashboardDataProvider>
           <DialogProvider>
             <ErrorBoundary>
               <AppContent />
+              <ToastContainer />
             </ErrorBoundary>
           </DialogProvider>
         </DashboardDataProvider>
-      </AuthProvider>
-    </div>
+      </ToastProvider>
+    </AuthProvider>
   );
 };
 
