@@ -10,7 +10,7 @@ import { Badge } from '../ui/Badge';
 import { useDialog } from '../../hooks/useDialog';
 import { LoadingSpinner } from '../LoadingSpinner';
 
-const DebtCard: React.FC<{ debt: Debt }> = ({ debt }) => {
+const DebtCard: React.FC<{ debt: Debt; onPay: (debt: Debt) => void; }> = ({ debt, onPay }) => {
     const progress = Math.min((debt.paidAmount / debt.totalAmount) * 100, 100);
     const remainingAmount = debt.totalAmount - debt.paidAmount;
     
@@ -37,8 +37,8 @@ const DebtCard: React.FC<{ debt: Debt }> = ({ debt }) => {
                  </div>
             </div>
             <div className="mt-6 flex gap-2">
-                <Button variant="secondary" className="w-full">Histórico</Button>
-                {debt.status === DebtStatus.ATIVA && <Button className="w-full">Realizar Pagamento</Button>}
+                <Button variant="secondary" className="w-full" onClick={() => alert('Histórico de pagamentos ainda não implementado.')}>Histórico</Button>
+                {debt.status === DebtStatus.ATIVA && <Button className="w-full" onClick={() => onPay(debt)}>Realizar Pagamento</Button>}
             </div>
         </div>
     );
@@ -48,6 +48,10 @@ const DebtCard: React.FC<{ debt: Debt }> = ({ debt }) => {
 export const DebtsView: React.FC = () => {
     const { debts, loading } = useDashboardData();
     const { openDialog } = useDialog();
+
+    const handleOpenPayment = (debt: Debt) => {
+        openDialog('add-payment-to-debt', { debt: debt });
+    };
 
     return (
         <>
@@ -66,7 +70,7 @@ export const DebtsView: React.FC = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {debts.length > 0 ? (
                             debts.map(debt => (
-                                <DebtCard key={debt.id} debt={debt} />
+                                <DebtCard key={debt.id} debt={debt} onPay={handleOpenPayment} />
                             ))
                         ) : (
                              <div className="col-span-full text-center text-gray-400 py-8">

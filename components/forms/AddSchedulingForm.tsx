@@ -41,7 +41,7 @@ export const AddSchedulingForm: React.FC<AddSchedulingFormProps> = ({ isOpen, on
         amount: type === TransactionType.DESPESA ? -parseFloat(amount) : parseFloat(amount),
         startDate,
         type,
-        category_id: categoryId,
+        categoryId: categoryId,
         frequency,
     };
 

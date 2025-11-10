@@ -42,7 +42,7 @@ export const SettingsView: React.FC = () => {
                       </Button>
                       {/* CHORE: Update app version */}
                       <p className="text-center text-xs text-gray-600 mt-4 md:hidden">
-                        FinanceHub v2.0.17
+                        FinanceHub v2.0.20
                       </p>
                     </div>
                 </div>

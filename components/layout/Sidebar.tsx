@@ -92,7 +92,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
             </ul>
             {/* CHORE: Update app version */}
             <div className="mt-4 border-t border-white/10 pt-4 text-center text-xs text-gray-500">
-              <p>FinanceHub v2.0.17</p>
+              <p>FinanceHub v2.0.20</p>
             </div>
           </li>
         </ul>

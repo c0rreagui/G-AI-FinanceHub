@@ -1,4 +1,4 @@
-// App Version: 2.0.17
+// App Version: 2.0.20
 import React, { useState } from 'react';
 import { AppLayout } from './components/layout/AppLayout';
 import { ViewType } from './types';

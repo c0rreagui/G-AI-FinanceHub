@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useCallback, useContext, useMemo } from 'react';
 import {
     Transaction, Goal, Debt, Summary, ScheduledTransaction, UserLevel, Achievement, Category,
-    TransactionType, GoalStatus, DebtStatus, ScheduledTransactionFrequency, UserRank
+    TransactionType, GoalStatus, DebtStatus, ScheduledTransactionFrequency, UserRank, DashboardDataContextType
 } from '../types';
 import {
     Utensils, ShoppingCart, Car, Shirt, PiggyBank, Heart, BookOpen, Gift, Plane, HomeIcon, Dumbbell, Gamepad, Film, // FIX: Corrected typo in icon import from 'ArrowUpright' to 'ArrowUpRight'.
@@ -10,25 +10,29 @@ ArrowUpRight, TrendingDown, Wallet, Lightbulb, Target
 import { useAuth } from './useAuth';
 import { supabase } from '../services/supabaseClient';
 
-interface DashboardDataContextType {
-    transactions: Transaction[];
-    goals: Goal[];
-    debts: Debt[];
-    summary: Summary;
-    scheduledTransactions: ScheduledTransaction[];
-    userLevel: UserLevel;
-    achievements: Achievement[];
-    categories: Category[];
-    loading: boolean;
-    error: string | null;
-    clearError: () => void;
-    addTransaction: (transaction: Omit<Transaction, 'id' | 'category'>) => Promise<boolean>;
-    updateTransaction: (transactionId: string, updates: Partial<Omit<Transaction, 'id' | 'category'>>) => Promise<boolean>;
-    addGoal: (goal: Omit<Goal, 'id'|'currentAmount'|'status'>) => Promise<boolean>;
-    addDebt: (debt: Omit<Debt, 'id'|'paidAmount'|'status'>) => Promise<boolean>;
-    addScheduledTransaction: (scheduledTx: Omit<ScheduledTransaction, 'id'|'category'|'nextDueDate'>) => Promise<boolean>;
-    deleteTransaction: (transactionId: string) => Promise<boolean>;
-    updateGoalValue: (goalId: string, newCurrentAmount: number) => Promise<void>;
+// Helper function to convert DB snake_case to app camelCase
+const fromSupabase = <T extends Record<string, any>>(data: T | null): any => {
+    if (!data) return null;
+    const result: Record<string, any> = { ...data };
+    for (const key of Object.keys(result)) {
+        if (key.includes('_')) {
+            const camelCaseKey = key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+            if (camelCaseKey !== key) {
+                result[camelCaseKey] = result[key];
+            }
+        }
+    }
+    return result;
+}
+
+// Helper function to convert app camelCase to DB snake_case
+const toSupabase = <T extends Record<string, any>>(data: T): any => {
+    const result: Record<string, any> = {};
+    for (const key of Object.keys(data)) {
+        const snakeCaseKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+        result[snakeCaseKey] = data[key];
+    }
+    return result;
 }
 
 const DashboardDataContext = createContext<DashboardDataContextType | undefined>(undefined);
@@ -86,28 +90,19 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             if (scheduledTransactionsResponse.error) throw scheduledTransactionsResponse.error;
             
             const enrichedTransactions = transactionsResponse.data.map(t => ({
-                ...t,
+                ...fromSupabase(t),
                 category: categoryMap.get(t.category_id || 'cat12') || MOCK_CATEGORIES[11],
             }));
             setTransactions(enrichedTransactions);
             
-            setGoals(goalsResponse.data as Goal[]);
+            setGoals(goalsResponse.data.map(g => fromSupabase(g)));
+            setDebts(debtsResponse.data.map(d => fromSupabase(d)));
             
-            const enrichedDebts = (debtsResponse.data as any[]).map(d => ({
-                ...d,
-                totalAmount: d.total_amount,
-                interestRate: d.interest_rate,
-                paidAmount: d.paid_amount,
-            }));
-            setDebts(enrichedDebts as Debt[]);
-            
-            const enrichedScheduled = (scheduledTransactionsResponse.data as any[]).map(st => ({
-                ...st,
-                startDate: st.start_date,
-                nextDueDate: st.next_due_date,
+            const enrichedScheduled = scheduledTransactionsResponse.data.map(st => ({
+                ...fromSupabase(st),
                 category: categoryMap.get(st.category_id || 'cat12') || MOCK_CATEGORIES[11],
             }));
-            setScheduledTransactions(enrichedScheduled as ScheduledTransaction[]);
+            setScheduledTransactions(enrichedScheduled);
             
             setAchievements([
                 { id: 'ac1', name: 'Primeiros Passos', description: 'Adicionou sua primeira transação.', unlocked: transactionsResponse.data.length > 0, dateUnlocked: new Date().toISOString(), icon: Wallet },
@@ -151,13 +146,14 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         return { totalBalance, monthlyIncome, monthlyExpenses };
     }, [transactions]);
 
-    const addTransaction = async (transactionData: Omit<Transaction, 'id' | 'category'>): Promise<boolean> => {
+    const addTransaction = async (transactionData: Omit<Transaction, 'id' | 'category' | 'userId'>): Promise<boolean> => {
         if (!user) {
             setError("Usuário não autenticado.");
             return false;
         }
+        const mappedData = toSupabase(transactionData);
         const payload = {
-            ...transactionData,
+            ...mappedData,
             amount: transactionData.type === TransactionType.DESPESA 
                 ? -Math.abs(transactionData.amount) 
                 : Math.abs(transactionData.amount),
@@ -171,7 +167,10 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             return false;
         }
         
-        const newTransaction: Transaction = { ...data, category: categoryMap.get(data.category_id || 'cat12') || MOCK_CATEGORIES[11] };
+        const newTransaction: Transaction = { 
+            ...fromSupabase(data),
+            category: categoryMap.get(data.category_id || 'cat12') || MOCK_CATEGORIES[11] 
+        };
         setTransactions(prev => [newTransaction, ...prev].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
         return true;
     };
@@ -181,7 +180,8 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             setError("Usuário não autenticado.");
             return false;
         }
-        const payload = { ...updates };
+        
+        let payload = toSupabase(updates);
         if (payload.amount !== undefined && payload.type !== undefined) {
              payload.amount = payload.type === TransactionType.DESPESA 
                 ? -Math.abs(payload.amount) 
@@ -195,7 +195,10 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             return false;
         }
         
-        const updatedTransaction: Transaction = { ...data, category: categoryMap.get(data.category_id || 'cat12') || MOCK_CATEGORIES[11] };
+        const updatedTransaction: Transaction = {
+             ...fromSupabase(data),
+             category: categoryMap.get(data.category_id || 'cat12') || MOCK_CATEGORIES[11] 
+        };
         setTransactions(prev => prev.map(t => (t.id === transactionId ? updatedTransaction : t)));
         return true;
     };
@@ -222,41 +225,51 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         return true;
     };
 
-    const addGoal = async (goalData: Omit<Goal, 'id'|'currentAmount'|'status'>): Promise<boolean> => {
+    const addGoal = async (goalData: Omit<Goal, 'id'|'currentAmount'|'status'|'userId'>): Promise<boolean> => {
         if (!user) { setError("Usuário não autenticado."); return false; }
-        const { data, error } = await supabase.from('goals').insert({ ...goalData, user_id: user.id, currentAmount: 0, status: GoalStatus.EM_ANDAMENTO }).select().single();
+        
+        const payload = {
+            ...toSupabase(goalData),
+            user_id: user.id,
+            current_amount: 0,
+            status: GoalStatus.EM_ANDAMENTO,
+        };
+
+        const { data, error } = await supabase.from('goals').insert(payload).select().single();
+
         if (error) { setError(error.message); return false; }
-        setGoals(prev => [data as Goal, ...prev]);
+        
+        const newGoal: Goal = fromSupabase(data);
+        setGoals(prev => [newGoal, ...prev]);
         return true;
     };
 
     const updateGoalValue = async (goalId: string, newCurrentAmount: number) => {
         if (!user) throw new Error("Usuário não autenticado.");
+        
         const { data, error } = await supabase
             .from('goals')
-            .update({ currentAmount: newCurrentAmount })
+            .update({ current_amount: newCurrentAmount })
             .eq('id', goalId)
             .select()
             .single();
+
         if (error) {
             setError(error.message);
             throw error;
         }
         
-        // Atualiza o estado local
+        const updatedGoal: Goal = fromSupabase(data);
         setGoals(prev => 
-            prev.map(g => (g.id === goalId ? data as Goal : g))
+            prev.map(g => (g.id === goalId ? updatedGoal : g))
         );
     };
 
-    const addDebt = async (debtData: Omit<Debt, 'id'|'paidAmount'|'status'>): Promise<boolean> => {
+    const addDebt = async (debtData: Omit<Debt, 'id'|'paidAmount'|'status'|'userId'>): Promise<boolean> => {
         if (!user) { setError("Usuário não autenticado."); return false; }
         
-        const { totalAmount, interestRate, ...rest } = debtData;
         const payload = { 
-            ...rest,
-            total_amount: totalAmount,
-            interest_rate: interestRate, 
+            ...toSupabase(debtData),
             user_id: user.id, 
             paid_amount: 0, 
             status: DebtStatus.ATIVA 
@@ -265,16 +278,38 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         const { data, error } = await supabase.from('debts').insert(payload).select().single();
         if (error) { setError(error.message); return false; }
         
-        const returnedData = data as any;
-        const newDebt: Debt = {
-            ...returnedData,
-            totalAmount: returnedData.total_amount,
-            interestRate: returnedData.interest_rate,
-            paidAmount: returnedData.paid_amount,
-        };
-        
+        const newDebt: Debt = fromSupabase(data);
         setDebts(prev => [newDebt, ...prev]);
         return true;
+    };
+
+    const addPaymentToDebt = async (debtId: string, paymentAmount: number) => {
+        if (!user) throw new Error("Usuário não autenticado.");
+
+        const debtToUpdate = debts.find(d => d.id === debtId);
+        if (!debtToUpdate) {
+            throw new Error("Dívida não encontrada.");
+        }
+
+        const newPaidAmount = debtToUpdate.paidAmount + paymentAmount;
+        const newStatus = newPaidAmount >= debtToUpdate.totalAmount ? DebtStatus.PAGA : DebtStatus.ATIVA;
+
+        const { data, error } = await supabase
+            .from('debts')
+            .update({ paid_amount: newPaidAmount, status: newStatus })
+            .eq('id', debtId)
+            .select()
+            .single();
+
+        if (error) {
+            setError(error.message);
+            throw error;
+        }
+
+        const updatedDebt: Debt = fromSupabase(data);
+        setDebts(prev =>
+            prev.map(d => (d.id === debtId ? updatedDebt : d))
+        );
     };
 
     const addScheduledTransaction = async (scheduledTxData: Omit<ScheduledTransaction, 'id'|'category'|'nextDueDate'>): Promise<boolean> => {
@@ -282,10 +317,8 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
         const nextDueDateValue = new Date(new Date().getFullYear(), new Date().getMonth() + 1, new Date(scheduledTxData.startDate).getDate()).toISOString();
         
-        const { startDate, ...restOfData } = scheduledTxData;
         const payload = {
-            ...restOfData,
-            start_date: startDate,
+            ...toSupabase(scheduledTxData),
             user_id: user.id,
             next_due_date: nextDueDateValue
         };
@@ -297,11 +330,8 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             return false; 
         }
         
-        const returnedData = data as any;
         const newScheduledTransaction: ScheduledTransaction = { 
-            ...returnedData, 
-            startDate: returnedData.start_date,
-            nextDueDate: returnedData.next_due_date,
+            ...fromSupabase(data),
             category: categoryMap.get(data.category_id || 'cat12') || MOCK_CATEGORIES[11] 
         };
 
@@ -314,7 +344,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         transactions, goals, debts, summary, scheduledTransactions, userLevel, achievements,
         categories: MOCK_CATEGORIES,
         loading, error, clearError, addTransaction, updateTransaction, addGoal, addDebt, addScheduledTransaction,
-        deleteTransaction, updateGoalValue,
+        deleteTransaction, updateGoalValue, addPaymentToDebt
     };
 
     return React.createElement(DashboardDataContext.Provider, { value: value }, children);

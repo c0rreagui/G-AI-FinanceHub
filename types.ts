@@ -21,13 +21,13 @@ export interface Installment {
 
 export interface Transaction {
   id: string;
-  user_id?: string;
+  userId?: string;
   description: string;
   amount: number;
   date: string;
   type: TransactionType;
-  category_id?: string; // Foreign key from DB - made optional for mock data
-  account_id?: string; // Foreign key from DB
+  categoryId?: string;
+  accountId?: string;
   category: Category; // Joined data in the app
   installment?: Installment;
   cardName?: string; // Optional credit card name
@@ -72,7 +72,7 @@ export enum GoalStatus {
 
 export interface Goal {
     id: string;
-    user_id?: string;
+    userId?: string;
     name: string;
     targetAmount: number;
     currentAmount: number;
@@ -87,7 +87,7 @@ export enum DebtStatus {
 
 export interface Debt {
     id: string;
-    user_id?: string;
+    userId?: string;
     name: string;
     totalAmount: number;
     paidAmount: number;
@@ -108,7 +108,7 @@ export interface ScheduledTransaction {
     description: string;
     amount: number;
     type: TransactionType;
-    category_id?: string; // Foreign key from DB - made optional for mock data
+    categoryId?: string;
     category: Category; // Joined data in the app
     startDate: string;
     frequency: ScheduledTransactionFrequency;
@@ -199,4 +199,27 @@ export interface ChatMessage {
         mimeType: string;
     };
     grounding?: any[]; // for search/maps results
+}
+
+// Define a interface para o contexto de dados do dashboard.
+export interface DashboardDataContextType {
+    transactions: Transaction[];
+    goals: Goal[];
+    debts: Debt[];
+    summary: Summary;
+    scheduledTransactions: ScheduledTransaction[];
+    userLevel: UserLevel;
+    achievements: Achievement[];
+    categories: Category[];
+    loading: boolean;
+    error: string | null;
+    clearError: () => void;
+    addTransaction: (transaction: Omit<Transaction, 'id' | 'category' | 'userId'>) => Promise<boolean>;
+    updateTransaction: (transactionId: string, updates: Partial<Omit<Transaction, 'id' | 'category'>>) => Promise<boolean>;
+    addGoal: (goal: Omit<Goal, 'id' | 'currentAmount' | 'status' | 'userId'>) => Promise<boolean>;
+    addDebt: (debt: Omit<Debt, 'id' | 'paidAmount' | 'status' | 'userId'>) => Promise<boolean>;
+    addScheduledTransaction: (scheduledTx: Omit<ScheduledTransaction, 'id'|'category'|'nextDueDate'>) => Promise<boolean>;
+    deleteTransaction: (transactionId: string) => Promise<boolean>;
+    updateGoalValue: (goalId: string, newCurrentAmount: number) => Promise<void>;
+    addPaymentToDebt: (debtId: string, paymentAmount: number) => Promise<void>;
 }

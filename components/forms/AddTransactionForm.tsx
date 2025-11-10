@@ -21,7 +21,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
     amount: prefill?.amount ? String(Math.abs(prefill.amount)) : '',
     date: prefill?.date ? new Date(prefill.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
     type: prefill?.amount && prefill.amount < 0 ? TransactionType.DESPESA : (prefill?.type || TransactionType.DESPESA),
-    categoryId: prefill?.category_id || null
+    categoryId: prefill?.categoryId || null
   });
 
   const [description, setDescription] = useState(getInitialState().description);
@@ -61,7 +61,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
       amount: parseFloat(amount),
       date,
       type,
-      category_id: categoryId,
+      categoryId: categoryId,
     };
     
     let success = false;
