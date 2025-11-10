@@ -1,3 +1,8 @@
 // config.ts
-// FIX: Updated app version sequentially.
-export const APP_VERSION = '5.1.4';
+
+// A versão deve ser atualizada a cada alteração significativa.
+// Segue o padrão de versionamento semântico (MAJOR.MINOR.PATCH).
+export const APP_VERSION = '1.0.1';
+
+// Nome da versão, pode ser usado para codinomes ou temas.
+export const APP_VERSION_NAME = 'Aurora';
