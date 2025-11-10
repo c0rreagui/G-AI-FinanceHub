@@ -1,4 +1,4 @@
-// App Version: 2.0.11
+// App Version: 2.0.17
 import React, { useState } from 'react';
 import { AppLayout } from './components/layout/AppLayout';
 import { ViewType } from './types';
@@ -15,12 +15,11 @@ import { AuthProvider, useAuth } from './hooks/useAuth';
 import { AuthView } from './components/views/AuthView';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { HomeDashboardView } from './components/views/HomeDashboardView';
-import { ApiKeySetupView } from './components/views/ApiKeySetupView';
 
 // Componente principal que decide o que mostrar
 const AppContent: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewType>('home');
-  const { session, loading, apiKey } = useAuth();
+  const { session, loading } = useAuth();
 
   if (loading) {
     // Mostra um loading enquanto verifica se o usuário está logado
@@ -35,13 +34,8 @@ const AppContent: React.FC = () => {
     // Se NÃO há sessão, mostra a tela de Login
     return <AuthView />;
   }
-
-  if (!apiKey) {
-    // Se HÁ sessão mas NÃO há chave de API, força a configuração
-    return <ApiKeySetupView />;
-  }
   
-  // Se HÁ sessão e HÁ chave de API, mostra o app principal
+  // Se HÁ sessão, mostra o app principal
   const renderView = () => {
     switch (currentView) {
       case 'home': return <HomeDashboardView />;

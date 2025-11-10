@@ -182,21 +182,21 @@ export interface WishlistItem {
     priority: 'Baixa' | 'Média' | 'Alta';
     savedAmount: number;
 }
-
-// FIX: Adicionando tipos ausentes para o chat com IA
+// FIX: Adicionados tipos para o componente AIHub e serviço Gemini.
+// Inteligência Artificial / AI Hub
 export enum ChatRole {
-  USER = 'user',
-  MODEL = 'model',
+    USER = 'user',
+    MODEL = 'model',
 }
 
 export interface ChatMessage {
-  role: ChatRole;
-  text: string;
-  isTyping?: boolean;
-  imageUrl?: string;
-  imageData?: {
-    data: string;
-    mimeType: string;
-  };
-  grounding?: any[];
+    role: ChatRole;
+    text: string;
+    isTyping?: boolean;
+    imageUrl?: string; // for display in the UI
+    imageData?: { // for sending to the API
+        data: string;
+        mimeType: string;
+    };
+    grounding?: any[]; // for search/maps results
 }

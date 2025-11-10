@@ -2,11 +2,11 @@ import React, { useState, useEffect, createContext, useContext } from 'react';
 import { supabase } from '../services/supabaseClient';
 import { Session, User } from '@supabase/supabase-js';
 
+// FIX: Adicionado apiKey e setApiKey para gerenciar a chave da API do Gemini.
 interface AuthContextType {
   session: Session | null;
   user: User | null;
   loading: boolean;
-  // FIX: Adicionando apiKey e setApiKey ao contexto de autenticação
   apiKey: string | null;
   setApiKey: (key: string) => void;
 }
@@ -17,23 +17,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  // FIX: Lógica para gerenciar a chave de API do Gemini no localStorage
+  // FIX: Estado para a chave da API, com persistência no localStorage.
   const [apiKey, setApiKeyState] = useState<string | null>(() => {
-    try {
-      return localStorage.getItem('gemini-api-key');
-    } catch (e) {
-      console.error("Não foi possível ler a chave de API do localStorage", e);
-      return null;
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('gemini_api_key');
     }
+    return null;
   });
 
   const setApiKey = (key: string) => {
-    try {
-      localStorage.setItem('gemini-api-key', key);
-      setApiKeyState(key);
-    } catch (e) {
-      console.error("Não foi possível salvar a chave de API no localStorage", e);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('gemini_api_key', key);
     }
+    setApiKeyState(key);
   };
 
   useEffect(() => {
@@ -66,7 +62,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     session,
     user,
     loading,
-    // FIX: Expondo apiKey e setApiKey no provedor de contexto
     apiKey,
     setApiKey,
   };

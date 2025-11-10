@@ -92,10 +92,19 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             setTransactions(enrichedTransactions);
             
             setGoals(goalsResponse.data as Goal[]);
-            setDebts(debtsResponse.data as Debt[]);
             
-            const enrichedScheduled = scheduledTransactionsResponse.data.map(st => ({
+            const enrichedDebts = (debtsResponse.data as any[]).map(d => ({
+                ...d,
+                totalAmount: d.total_amount,
+                interestRate: d.interest_rate,
+                paidAmount: d.paid_amount,
+            }));
+            setDebts(enrichedDebts as Debt[]);
+            
+            const enrichedScheduled = (scheduledTransactionsResponse.data as any[]).map(st => ({
                 ...st,
+                startDate: st.start_date,
+                nextDueDate: st.next_due_date,
                 category: categoryMap.get(st.category_id || 'cat12') || MOCK_CATEGORIES[11],
             }));
             setScheduledTransactions(enrichedScheduled as ScheduledTransaction[]);
@@ -242,23 +251,64 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const addDebt = async (debtData: Omit<Debt, 'id'|'paidAmount'|'status'>): Promise<boolean> => {
         if (!user) { setError("Usuário não autenticado."); return false; }
-        const { data, error } = await supabase.from('debts').insert({ ...debtData, user_id: user.id, paidAmount: 0, status: DebtStatus.ATIVA }).select().single();
+        
+        const { totalAmount, interestRate, ...rest } = debtData;
+        const payload = { 
+            ...rest,
+            total_amount: totalAmount,
+            interest_rate: interestRate, 
+            user_id: user.id, 
+            paid_amount: 0, 
+            status: DebtStatus.ATIVA 
+        };
+
+        const { data, error } = await supabase.from('debts').insert(payload).select().single();
         if (error) { setError(error.message); return false; }
-        setDebts(prev => [data as Debt, ...prev]);
+        
+        const returnedData = data as any;
+        const newDebt: Debt = {
+            ...returnedData,
+            totalAmount: returnedData.total_amount,
+            interestRate: returnedData.interest_rate,
+            paidAmount: returnedData.paid_amount,
+        };
+        
+        setDebts(prev => [newDebt, ...prev]);
         return true;
     };
 
     const addScheduledTransaction = async (scheduledTxData: Omit<ScheduledTransaction, 'id'|'category'|'nextDueDate'>): Promise<boolean> => {
         if (!user) { setError("Usuário não autenticado."); return false; }
-        const nextDueDate = new Date(new Date().getFullYear(), new Date().getMonth() + 1, new Date(scheduledTxData.startDate).getDate()).toISOString();
-        const { data, error } = await supabase.from('scheduled_transactions').insert({ ...scheduledTxData, user_id: user.id, nextDueDate }).select().single();
 
-        if (error) { setError(error.message); return false; }
+        const nextDueDateValue = new Date(new Date().getFullYear(), new Date().getMonth() + 1, new Date(scheduledTxData.startDate).getDate()).toISOString();
         
-        const newScheduledTransaction: ScheduledTransaction = { ...data, category: categoryMap.get(data.category_id || 'cat12') || MOCK_CATEGORIES[11] };
+        const { startDate, ...restOfData } = scheduledTxData;
+        const payload = {
+            ...restOfData,
+            start_date: startDate,
+            user_id: user.id,
+            next_due_date: nextDueDateValue
+        };
+
+        const { data, error } = await supabase.from('scheduled_transactions').insert(payload).select().single();
+
+        if (error) { 
+            setError(error.message); 
+            return false; 
+        }
+        
+        const returnedData = data as any;
+        const newScheduledTransaction: ScheduledTransaction = { 
+            ...returnedData, 
+            startDate: returnedData.start_date,
+            nextDueDate: returnedData.next_due_date,
+            category: categoryMap.get(data.category_id || 'cat12') || MOCK_CATEGORIES[11] 
+        };
+
         setScheduledTransactions(prev => [newScheduledTransaction, ...prev]);
         return true;
     };
+
 
     const value = {
         transactions, goals, debts, summary, scheduledTransactions, userLevel, achievements,

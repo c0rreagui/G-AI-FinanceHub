@@ -8,7 +8,6 @@ import { LoadingSpinner } from '../LoadingSpinner';
 import { useAuth } from '../../hooks/useAuth';
 import { supabase } from '../../services/supabaseClient';
 import { Button } from '../ui/Button';
-import { ApiKeySettings } from '../ui/ApiKeySettings';
 
 export const SettingsView: React.FC = () => {
     const { loading } = useDashboardData();
@@ -32,7 +31,6 @@ export const SettingsView: React.FC = () => {
                 </div>
             ) : (
                 <div className="mt-6 flex-grow overflow-y-auto pr-2">
-                    <ApiKeySettings />
                     <UserProfileCard />
                     <AchievementsList />
                     <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6 mt-6">
@@ -44,7 +42,7 @@ export const SettingsView: React.FC = () => {
                       </Button>
                       {/* CHORE: Update app version */}
                       <p className="text-center text-xs text-gray-600 mt-4 md:hidden">
-                        FinanceHub v2.0.11
+                        FinanceHub v2.0.17
                       </p>
                     </div>
                 </div>
