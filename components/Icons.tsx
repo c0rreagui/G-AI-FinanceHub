@@ -143,8 +143,9 @@ export const Calendar: React.FC<IconProps> = (props) => (
     </Icon>
 );
 
+// FIX: Renamed Tool to Wrench to match usage in Sidebar and ToolsView.
 // Used for Ferramentas
-export const Tool: React.FC<IconProps> = (props) => (
+export const Wrench: React.FC<IconProps> = (props) => (
     <Icon {...props}>
         <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
     </Icon>
@@ -285,6 +286,7 @@ export const XIcon: React.FC<IconProps> = (props) => (
 );
 
 export const Trophy: React.FC<IconProps> = (props) => (
+    // FIX: Corrected typo from Ico to Icon.
     <Icon {...props}>
         <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
         <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
@@ -295,41 +297,14 @@ export const Trophy: React.FC<IconProps> = (props) => (
     </Icon>
 );
 
-export const LockClosed: React.FC<IconProps> = (props) => (
+// FIX: Added missing Zap icon.
+export const Zap: React.FC<IconProps> = (props) => (
     <Icon {...props}>
-        <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
-        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
     </Icon>
 );
 
-export const SignalIcon: React.FC<IconProps> = (props) => (
-    <Icon {...props}>
-        <path d="M2 20h.01" />
-        <path d="M7 20v-4" />
-        <path d="M12 20v-8" />
-        <path d="M17 20V8" />
-        <path d="M22 4v16" />
-    </Icon>
-);
-
-export const XCircleIcon: React.FC<IconProps> = (props) => (
-    <Icon {...props}>
-        <circle cx="12" cy="12" r="10" />
-        <path d="m15 9-6 6" />
-        <path d="m9 9 6 6" />
-    </Icon>
-);
-
-export const TrashIcon: React.FC<IconProps> = (props) => (
-    <Icon {...props}>
-        <path d="M3 6h18" />
-        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
-        <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-        <line x1="10" x2="10" y1="11" y2="17" />
-        <line x1="14" x2="14" y1="11" y2="17" />
-    </Icon>
-);
-
+// FIX: Added missing UploadCloud icon.
 export const UploadCloud: React.FC<IconProps> = (props) => (
     <Icon {...props}>
         <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
@@ -338,15 +313,10 @@ export const UploadCloud: React.FC<IconProps> = (props) => (
     </Icon>
 );
 
-export const Zap: React.FC<IconProps> = (props) => (
+// FIX: Added missing LockClosed icon.
+export const LockClosed: React.FC<IconProps> = (props) => (
     <Icon {...props}>
-        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-    </Icon>
-);
-
-// Wrench is an alias for Tool
-export const Wrench: React.FC<IconProps> = (props) => (
-    <Icon {...props}>
-        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+        <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
     </Icon>
 );

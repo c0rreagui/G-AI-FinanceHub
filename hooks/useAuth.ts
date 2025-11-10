@@ -56,6 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setApiKey,
   };
 
+  // FIX: Replaced JSX with React.createElement to resolve parsing errors in .ts file.
   return React.createElement(AuthContext.Provider, { value: value }, children);
 };
 

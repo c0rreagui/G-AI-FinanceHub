@@ -10,13 +10,15 @@ import { Badge } from '../ui/Badge';
 import { useDialog } from '../../hooks/useDialog';
 import { GenericViewSkeleton } from './skeletons/GenericViewSkeleton';
 import { EmptyState } from '../ui/EmptyState';
-import { motion } from 'framer-motion';
+// FIX: Import Variants type from framer-motion.
+import { motion, Variants } from 'framer-motion';
 
 const GoalCard: React.FC<{ goal: Goal, onAddValue: (goal: Goal) => void, isJustUpdated?: boolean }> = ({ goal, onAddValue, isJustUpdated }) => {
     const progress = Math.min((goal.currentAmount / goal.targetAmount) * 100, 100);
     const isCompleted = goal.status === GoalStatus.CONCLUIDA;
 
-    const cardVariants = {
+    // FIX: Explicitly typed cardVariants with Variants to fix type error.
+    const cardVariants: Variants = {
         rest: { 
             scale: 1, 
             borderColor: "rgba(255, 255, 255, 0.1)"

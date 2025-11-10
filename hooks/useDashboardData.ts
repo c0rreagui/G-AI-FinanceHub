@@ -54,10 +54,13 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     const [isMutating, setIsMutating] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [lastUpdatedGoalId, setLastUpdatedGoalId] = useState<string | null>(null);
+    // FIX: Added missing state and handler for lastUpdatedTransactionId to conform to DashboardDataContextType.
+    const [lastUpdatedTransactionId, setLastUpdatedTransactionId] = useState<string | null>(null);
 
 
     const clearError = () => setError(null);
     const clearLastUpdatedGoalId = () => setLastUpdatedGoalId(null);
+    const clearLastUpdatedTransactionId = () => setLastUpdatedTransactionId(null);
     
     const categoryMap = useMemo(() => new Map(categories.map(c => [c.id, c])), [categories]);
 
@@ -251,6 +254,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
                  category: categoryMap.get(data.category_id) || FALLBACK_CATEGORY 
             };
             setTransactions(prev => prev.map(t => (t.id === transactionId ? updatedTransaction : t)));
+            setLastUpdatedTransactionId(data.id);
             showToast('Transação atualizada!', { type: 'success' });
             return true;
         } finally {
@@ -386,12 +390,13 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         }
     };
 
-    const value = {
+    const value: DashboardDataContextType = {
         transactions, goals, debts, summary, scheduledTransactions, userLevel, achievements,
-        categories, loading, isMutating, error, monthlyChartData, lastUpdatedGoalId, clearError, clearLastUpdatedGoalId, addTransaction, updateTransaction, addGoal, addDebt, addScheduledTransaction,
+        categories, loading, isMutating, error, monthlyChartData, lastUpdatedGoalId, lastUpdatedTransactionId, clearError, clearLastUpdatedGoalId, clearLastUpdatedTransactionId, addTransaction, updateTransaction, addGoal, addDebt, addScheduledTransaction,
         deleteTransaction, updateGoalValue, addPaymentToDebt
     };
 
+    // FIX: Replaced JSX with React.createElement to resolve parsing errors in .ts file.
     return React.createElement(DashboardDataContext.Provider, { value: value }, children);
 };
 

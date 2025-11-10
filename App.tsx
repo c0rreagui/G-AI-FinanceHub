@@ -15,7 +15,8 @@ import { ToolsView } from './components/views/ToolsView';
 import { SettingsView } from './components/views/SettingsView';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { HomeDashboardView } from './components/views/HomeDashboardView';
-import { AnimatePresence, motion } from 'framer-motion';
+// FIX: Import Transition type from framer-motion to resolve type error.
+import { AnimatePresence, motion, Transition } from 'framer-motion';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ToastContainer } from './components/ui/ToastContainer';
 import { APP_VERSION } from './config';
@@ -42,7 +43,8 @@ const AppContent: React.FC = () => {
       in: { opacity: 1, y: 0 },
       out: { opacity: 0, y: -20 },
     };
-    const pageTransition = {
+    // FIX: Explicitly type pageTransition with the Transition type.
+    const pageTransition: Transition = {
       type: 'tween',
       ease: 'anticipate',
       duration: 0.4,

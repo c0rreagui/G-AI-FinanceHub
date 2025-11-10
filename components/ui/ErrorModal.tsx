@@ -1,7 +1,8 @@
 import React from 'react';
 import { XIcon, Zap } from '../Icons';
 import { Button } from './Button';
-import { motion, AnimatePresence } from 'framer-motion';
+// FIX: Import Variants type from framer-motion to resolve type error.
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 
 interface ErrorModalProps {
   isOpen: boolean;
@@ -18,7 +19,8 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({ isOpen, onClose, error }
     hidden: { opacity: 0 },
   };
 
-  const modalVariants = {
+  // FIX: Explicitly typed modalVariants with Variants to fix type error.
+  const modalVariants: Variants = {
     hidden: { y: "50px", opacity: 0 },
     visible: { y: "0", opacity: 1, transition: { type: "spring", damping: 25, stiffness: 200 } },
     exit: { y: "50px", opacity: 0, transition: { duration: 0.2 } },
