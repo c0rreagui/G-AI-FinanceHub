@@ -33,7 +33,7 @@ export const QuickActions: React.FC = () => {
       <ActionButton
         title="Nova Meta"
         icon={Target}
-        color="bg-indigo-500/80"
+        color="bg-cyan-500/80"
         onClick={() => openDialog('add-goal')}
       />
     </div>

@@ -20,7 +20,7 @@ export const UserProfileCard: React.FC = () => {
 
     if (loading || !userLevel) {
         return (
-            <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6 animate-pulse">
+            <div className="card animate-pulse">
                 <div className="flex items-center justify-between">
                     <div className="h-6 bg-gray-700 rounded w-3/4"></div>
                     <div className="h-5 bg-gray-700 rounded w-16"></div>
@@ -42,7 +42,7 @@ export const UserProfileCard: React.FC = () => {
     const progress = (userLevel.xp / userLevel.xpToNextLevel) * 100;
 
     return (
-        <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6">
+        <div className="card">
             <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-white">Seu Perfil de Gamificação</h2>
                 <Badge color={getRankColor(userLevel.rank)}>{userLevel.rank}</Badge>

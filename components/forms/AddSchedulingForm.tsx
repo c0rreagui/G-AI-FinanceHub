@@ -46,9 +46,13 @@ export const AddSchedulingForm: React.FC<AddSchedulingFormProps> = ({ isOpen, on
 
     setIsSubmitting(true);
     
+    // FIX: Garante que o valor seja negativo para despesas, corrigindo um bug crítico.
+    const numericAmount = parseFloat(amount);
+    const finalAmount = type === TransactionType.DESPESA ? -Math.abs(numericAmount) : Math.abs(numericAmount);
+
     const scheduledTxData = {
         description,
-        amount: parseFloat(amount),
+        amount: finalAmount,
         type,
         categoryId,
         startDate,

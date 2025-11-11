@@ -27,7 +27,9 @@ export const AddValueToGoalForm: React.FC<AddValueToGoalFormProps> = ({ isOpen, 
     
     setIsSubmitting(true);
     try {
-      await updateGoalValue(goal.id, goal.currentAmount + valueToAdd);
+      // FIX: Envia apenas o valor a ser adicionado, centralizando a lógica no hook.
+      // Isso garante que a transação de contrapartida seja criada corretamente.
+      await updateGoalValue(goal.id, valueToAdd);
       setAmount('');
       onClose();
     } catch (error) {

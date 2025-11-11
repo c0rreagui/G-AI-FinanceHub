@@ -1,8 +1,4 @@
 // config.ts
-
-// A versão deve ser atualizada a cada alteração significativa.
-// Segue o padrão de versionamento semântico (MAJOR.MINOR.PATCH).
-export const APP_VERSION = '5.5.0';
-
-// Nome da versão, pode ser usado para codinomes ou temas.
-export const APP_VERSION_NAME = 'Aurora Estável';
+// Atualizado para refletir a nova identidade visual.
+export const APP_VERSION = '7.1.0';
+export const APP_CODENAME = 'Aurora Íntegra';

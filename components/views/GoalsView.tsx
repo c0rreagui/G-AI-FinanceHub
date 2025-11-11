@@ -1,118 +1,115 @@
-import React, { useEffect } from 'react';
+// components/views/GoalsView.tsx
+import React from 'react';
 import { PageHeader } from '../layout/PageHeader';
-import { Target, PlusCircle } from '../Icons';
+import { Target, PlusCircle, TrashIcon } from '../Icons';
 import { useDashboardData } from '../../hooks/useDashboardData';
-import { formatCurrencyBRL } from '../../utils/formatters';
-import { ProgressBar } from '../ui/ProgressBar';
-import { Button } from '../ui/Button';
 import { Goal, GoalStatus } from '../../types';
+import { formatCurrencyBRL, formatDate } from '../../utils/formatters';
+import { Button } from '../ui/Button';
+import { ProgressBar } from '../ui/ProgressBar';
 import { Badge } from '../ui/Badge';
 import { useDialog } from '../../hooks/useDialog';
-import { GenericViewSkeleton } from './skeletons/GenericViewSkeleton';
 import { EmptyState } from '../ui/EmptyState';
-// FIX: Import Variants type from framer-motion.
-import { motion, Variants } from 'framer-motion';
+import { GenericViewSkeleton } from './skeletons/GenericViewSkeleton';
+import { motion } from 'framer-motion';
 
-const GoalCard: React.FC<{ goal: Goal, onAddValue: (goal: Goal) => void, isJustUpdated?: boolean }> = ({ goal, onAddValue, isJustUpdated }) => {
-    const progress = Math.min((goal.currentAmount / goal.targetAmount) * 100, 100);
-    const isCompleted = goal.status === GoalStatus.CONCLUIDA;
+const GoalCard: React.FC<{ goal: Goal }> = ({ goal }) => {
+    const { openDialog } = useDialog();
+    const { deleteGoal, mutatingIds } = useDashboardData();
+    const progress = (goal.currentAmount / goal.targetAmount) * 100;
+    const isCompleted = goal.status === GoalStatus.CONCLUIDO;
+    const isMutating = mutatingIds.has(goal.id);
 
-    // FIX: Explicitly typed cardVariants with Variants to fix type error.
-    const cardVariants: Variants = {
-        rest: { 
-            scale: 1, 
-            borderColor: "rgba(255, 255, 255, 0.1)"
-        },
-        updated: {
-            scale: [1, 1.02, 1],
-            borderColor: ["rgba(255, 255, 255, 0.1)", "rgba(139, 92, 246, 0.7)", "rgba(255, 255, 255, 0.1)"],
-            transition: { duration: 0.8, ease: "easeInOut" }
-        }
+    const handleDelete = () => {
+        openDialog('confirmation', {
+            title: 'Excluir Meta',
+            message: `Tem certeza que deseja excluir a meta "${goal.name}"? Todas as contribuições feitas para esta meta também serão removidas, e o valor retornará ao seu saldo.`,
+            confirmText: 'Sim, Excluir',
+            confirmVariant: 'destructive',
+            onConfirm: () => deleteGoal(goal.id),
+        });
     };
 
     return (
-        <motion.div
-            variants={cardVariants}
-            animate={isJustUpdated ? "updated" : "rest"}
-            className="bg-white/5 border backdrop-blur-xl rounded-2xl p-6 flex flex-col shadow-lg"
+        <motion.div 
+            className={`card flex flex-col justify-between transition-opacity ${isMutating ? 'opacity-50' : ''}`}
+            layout
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95 }}
         >
-            <div className="flex-grow">
+            <div>
                 <div className="flex justify-between items-start">
                     <h3 className="text-lg font-semibold text-white">{goal.name}</h3>
-                    <Badge color={isCompleted ? 'green' : 'blue'}>{goal.status}</Badge>
+                    <Badge color={isCompleted ? 'green' : 'blue'}>
+                        {isCompleted ? 'Concluído' : 'Em Andamento'}
+                    </Badge>
                 </div>
                 <p className="text-sm text-gray-400 mt-1">
-                    Prazo final: {new Date(goal.deadline).toLocaleDateString('pt-BR')}
+                    Prazo: {formatDate(goal.deadline, 'long')}
                 </p>
-                <div className="my-4">
-                    <div className="flex justify-between text-white font-bold text-2xl">
+                <div className="mt-4">
+                    <div className="flex justify-between text-sm text-white mb-1">
                         <span>{formatCurrencyBRL(goal.currentAmount)}</span>
+                        <span className="text-gray-400">{formatCurrencyBRL(goal.targetAmount)}</span>
                     </div>
-                    <div className="text-right text-gray-400 text-sm">
-                        de {formatCurrencyBRL(goal.targetAmount)}
-                    </div>
+                    <ProgressBar percentage={progress} color={isCompleted ? 'success' : 'primary'} />
                 </div>
-                <ProgressBar percentage={progress} color={isCompleted ? 'green' : 'indigo'}/>
             </div>
-            <div className="mt-6 flex gap-2">
-                <Button variant="secondary" className="w-full">Ver Detalhes</Button>
-                {!isCompleted && <Button className="w-full" onClick={() => onAddValue(goal)}>Adicionar Valor</Button>}
+            <div className="mt-6 flex items-center justify-between">
+                <button 
+                    onClick={handleDelete}
+                    disabled={isMutating}
+                    className="p-2 text-gray-500 hover:text-red-400 disabled:opacity-50"
+                    aria-label="Excluir meta"
+                >
+                    <TrashIcon className="w-5 h-5"/>
+                </button>
+                {!isCompleted && (
+                    <Button onClick={() => openDialog('add-value-to-goal', { goal })} size="sm" disabled={isMutating}>
+                        Adicionar Valor
+                    </Button>
+                )}
             </div>
         </motion.div>
     );
 };
 
 export const GoalsView: React.FC = () => {
-    const { goals, loading, lastUpdatedGoalId, clearLastUpdatedGoalId } = useDashboardData();
+    const { goals, loading } = useDashboardData();
     const { openDialog } = useDialog();
 
-    useEffect(() => {
-        if (lastUpdatedGoalId) {
-            const timer = setTimeout(() => {
-                clearLastUpdatedGoalId();
-            }, 1000); // Duração um pouco maior que a animação para garantir
-            return () => clearTimeout(timer);
-        }
-    }, [lastUpdatedGoalId, clearLastUpdatedGoalId]);
-
-    const handleOpenAddValue = (goal: Goal) => {
-        openDialog('add-value-to-goal', { goal: goal });
-    };
-
     return (
-        <>
+        <div className="flex flex-col h-full">
             <PageHeader 
                 icon={Target} 
-                title="Minhas Metas" 
+                title="Metas" 
                 breadcrumbs={['FinanceHub', 'Metas']}
                 actions={<Button onClick={() => openDialog('add-goal')}><PlusCircle className="w-4 h-4"/> Nova Meta</Button>}
             />
             {loading ? (
-                 <GenericViewSkeleton />
+                <GenericViewSkeleton />
             ) : (
-                <div className="mt-6 flex-grow overflow-y-auto pr-2">
+                <div className="flex-grow overflow-y-auto pr-2">
                     {goals.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {goals.map(goal => (
-                                <GoalCard 
-                                    key={goal.id} 
-                                    goal={goal} 
-                                    onAddValue={handleOpenAddValue} 
-                                    isJustUpdated={goal.id === lastUpdatedGoalId}
-                                />
+                                <GoalCard key={goal.id} goal={goal} />
                             ))}
                         </div>
                     ) : (
                         <EmptyState
                             icon={Target}
                             title="Nenhuma Meta Cadastrada"
-                            description="Defina suas metas financeiras para começar a economizar para o que é importante para você."
+                            description="Crie metas para economizar para um carro, uma viagem ou qualquer outro objetivo."
                         >
-                             <Button onClick={() => openDialog('add-goal')}><PlusCircle className="w-4 h-4 mr-2"/> Criar Primeira Meta</Button>
+                            <Button onClick={() => openDialog('add-goal')}>
+                                <PlusCircle className="w-4 h-4 mr-2"/> Criar Primeira Meta
+                            </Button>
                         </EmptyState>
                     )}
                 </div>
             )}
-        </>
+        </div>
     );
 };

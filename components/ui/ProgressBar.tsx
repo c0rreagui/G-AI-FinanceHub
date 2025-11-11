@@ -3,20 +3,21 @@ import React from 'react';
 
 interface ProgressBarProps {
     percentage: number;
-    color?: 'indigo' | 'green' | 'red';
+    color?: 'primary' | 'success' | 'danger';
 }
 
+// Updated to use the new Design System semantic colors.
 const colorClasses = {
-    indigo: 'bg-indigo-500',
-    green: 'bg-green-500',
-    red: 'bg-red-500',
+    primary: 'bg-[oklch(var(--primary-oklch))]',
+    success: 'bg-[oklch(var(--success-oklch))]',
+    danger: 'bg-[oklch(var(--danger-oklch))]',
 };
 
-export const ProgressBar: React.FC<ProgressBarProps> = ({ percentage, color = 'indigo' }) => {
+export const ProgressBar: React.FC<ProgressBarProps> = ({ percentage, color = 'primary' }) => {
     return (
         <div className="w-full bg-gray-700 rounded-full h-2">
             <div
-                className={`${colorClasses[color]} h-2 rounded-full`}
+                className={`${colorClasses[color]} h-2 rounded-full transition-all duration-500 ease-out`}
                 style={{ width: `${percentage}%` }}
             ></div>
         </div>

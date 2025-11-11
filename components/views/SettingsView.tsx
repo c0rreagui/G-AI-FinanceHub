@@ -45,7 +45,7 @@ export const SettingsView: React.FC = () => {
             >
                 <motion.div variants={itemVariants}><ApiKeySettings /></motion.div>
 
-                 <motion.div variants={itemVariants} className="bg-black/20 border border-white/10 backdrop-blur-xl rounded-2xl p-6">
+                 <motion.div variants={itemVariants} className="card">
                     <h2 className="text-xl font-semibold text-white mb-2">Sobre</h2>
                     <p className="text-sm text-gray-400">
                         FinanceHub é seu assistente financeiro pessoal com tecnologia de IA.

@@ -10,7 +10,7 @@ interface ButtonProps extends Omit<React.ComponentProps<typeof motion.button>, '
 }
 
 export const Button: React.FC<ButtonProps> = ({ children, variant = 'primary', size = 'default', ...props }) => {
-    const baseClasses = "rounded-xl font-semibold focus:outline-none disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg transition-all duration-300 ease-in-out transform";
+    const baseClasses = "rounded-lg font-semibold focus:outline-none disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg transition-all duration-300 ease-in-out transform";
     
     const sizeClasses = {
         default: 'px-5 py-2.5',
@@ -18,9 +18,9 @@ export const Button: React.FC<ButtonProps> = ({ children, variant = 'primary', s
     };
 
     const variantClasses = {
-        primary: 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:shadow-indigo-500/40 focus:ring-4 focus:ring-indigo-500/50',
-        secondary: 'bg-white/10 text-gray-200 hover:bg-white/20 focus:ring-4 focus:ring-white/30 border border-white/20',
-        destructive: 'bg-gradient-to-r from-red-500 to-pink-600 text-white hover:shadow-red-500/40 focus:ring-4 focus:ring-red-500/50',
+        primary: 'bg-gradient-to-br from-cyan-400 to-green-500 text-white hover:shadow-cyan-500/30 focus:ring-4 focus:ring-[oklch(var(--primary-oklch)_/_0.5)]',
+        secondary: 'bg-[oklch(var(--card-oklch))] text-gray-200 hover:bg-[oklch(var(--border-oklch))] focus:ring-4 focus:ring-white/30 border border-[oklch(var(--border-oklch))]',
+        destructive: 'bg-[oklch(var(--danger-oklch))] text-white hover:shadow-red-500/40 focus:ring-4 focus:ring-[oklch(var(--danger-oklch)_/_0.5)]',
     };
 
     return (

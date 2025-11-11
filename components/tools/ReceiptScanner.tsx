@@ -65,7 +65,7 @@ export const ReceiptScanner: React.FC = () => {
   };
 
   return (
-    <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6">
+    <div className="card">
       <h3 className="text-lg font-semibold text-white">Scanner de Comprovantes (IA)</h3>
       <p className="text-sm text-gray-400 mt-2 mb-4">Envie um comprovante para que a IA extraia os dados da transação.</p>
       <label 

@@ -7,65 +7,96 @@ import { Input } from '../ui/Input';
 import { TypeToggle } from '../ui/TypeToggle';
 import { CategoryPicker } from '../ui/CategoryPicker';
 import { LoadingSpinner } from '../LoadingSpinner';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { motion, AnimatePresence } from 'framer-motion';
+import { XIcon } from '../Icons';
 
 interface AddTransactionFormProps {
   isOpen: boolean;
   onClose: () => void;
-  prefill?: Partial<Transaction>;
+  prefill?: Partial<Omit<Transaction, 'id' | 'category'>>;
+  transactionToEdit?: Transaction;
 }
 
-export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, onClose, prefill }) => {
+const QuickValueChip: React.FC<{ value: number; onSelect: (value: number) => void }> = ({ value, onSelect }) => (
+    <button
+        type="button"
+        onClick={() => onSelect(value)}
+        className="px-3 py-1.5 text-sm font-semibold rounded-full bg-white/5 hover:bg-white/10 text-gray-300 transition-colors"
+    >
+        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)}
+    </button>
+);
+
+export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, onClose, prefill, transactionToEdit }) => {
   const { addTransaction, updateTransaction, categories } = useDashboardData();
-  
+  const isDesktop = useMediaQuery('(min-width: 768px)');
+
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [type, setType] = useState<TransactionType>(TransactionType.DESPESA);
   const [categoryId, setCategoryId] = useState<string | null>(null);
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const isEditing = !!prefill?.id;
+  
+  const isEditing = !!transactionToEdit;
+  const quickValues = [5, 10, 20, 50, 100];
 
   useEffect(() => {
-    if (isOpen && prefill) {
-      setDescription(prefill.description || '');
-      setAmount(prefill.amount ? String(Math.abs(prefill.amount)) : '');
-      setDate(prefill.date ? new Date(prefill.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]);
-      setType(prefill.type || TransactionType.DESPESA);
-      setCategoryId(prefill.categoryId || null);
-    } else if (isOpen) {
-        // Reset for new transaction, keeping prefilled type if available
-        resetForm(prefill?.type);
+    const dataToSet = transactionToEdit || prefill;
+    if (dataToSet && isOpen) {
+        setDescription(dataToSet.description || '');
+        setAmount(dataToSet.amount ? String(Math.abs(dataToSet.amount)) : '');
+        setType(dataToSet.type || TransactionType.DESPESA);
+        setCategoryId(dataToSet.categoryId || null);
+        setDate(dataToSet.date ? dataToSet.date.split('T')[0] : new Date().toISOString().split('T')[0]);
     }
-  }, [prefill, isOpen]);
+  }, [prefill, transactionToEdit, isOpen]);
 
-  const resetForm = (defaultType: TransactionType = TransactionType.DESPESA) => {
+  const resetForm = () => {
     setDescription('');
     setAmount('');
-    setDate(new Date().toISOString().split('T')[0]);
-    setType(defaultType);
+    setType(TransactionType.DESPESA);
     setCategoryId(null);
+    setDate(new Date().toISOString().split('T')[0]);
   };
+  
+  useEffect(() => {
+    if (!isOpen) {
+        setTimeout(resetForm, 200); // Reset after modal closes
+    }
+  }, [isOpen])
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!description || !amount || !date || !categoryId || isSubmitting) return;
-    
+    if (!description || !amount || !categoryId || isSubmitting) return;
+
     setIsSubmitting(true);
-    
-    const transactionData = {
-      description,
-      amount: parseFloat(amount),
-      date,
-      type,
-      categoryId,
-    };
+    const numericAmount = parseFloat(amount);
+    const finalAmount = type === TransactionType.DESPESA ? -Math.abs(numericAmount) : Math.abs(numericAmount);
 
     let success = false;
     if (isEditing) {
-        success = await updateTransaction(prefill.id!, transactionData);
+        const txData: Omit<Transaction, 'category'> & { id: string } = {
+            id: transactionToEdit.id,
+            description,
+            amount: finalAmount,
+            type,
+            categoryId,
+            date: new Date(date).toISOString(),
+        };
+        success = await updateTransaction(txData);
+
     } else {
-        success = await addTransaction(transactionData);
+        const txData: Omit<Transaction, 'id' | 'category'> = {
+            description,
+            amount: finalAmount,
+            type,
+            categoryId,
+            date: new Date(date).toISOString(),
+        };
+        success = await addTransaction(txData);
     }
     
     setIsSubmitting(false);
@@ -74,10 +105,9 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
       onClose();
     }
   };
-
-  return (
-    <Modal isOpen={isOpen} onClose={onClose} title={isEditing ? "Editar Transação" : "Adicionar Transação"}>
-      <form onSubmit={handleSubmit} className="space-y-4">
+  
+  const FormContent = (
+      <form onSubmit={handleSubmit} className="flex flex-col h-full space-y-4">
         <TypeToggle selectedType={type} onTypeChange={setType} />
         <Input
           id="tx-description"
@@ -94,7 +124,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              placeholder="100.00"
+              placeholder="50.00"
               step="0.01"
               required
             />
@@ -107,12 +137,24 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
               required
             />
         </div>
+
+        <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+                Valores Rápidos
+            </label>
+            <div className="flex items-center gap-2 flex-wrap">
+                {quickValues.map(val => (
+                    <QuickValueChip key={val} value={val} onSelect={(v) => setAmount(String(v))} />
+                ))}
+            </div>
+        </div>
+
         <CategoryPicker 
             categories={categories}
             selectedCategoryId={categoryId}
             onSelectCategory={setCategoryId}
         />
-        <div className="flex justify-end gap-2 pt-4">
+        <div className={`flex justify-end gap-2 ${isDesktop ? 'pt-4' : 'pt-4 mt-auto'}`}>
           <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
             Cancelar
           </Button>
@@ -121,6 +163,35 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
           </Button>
         </div>
       </form>
-    </Modal>
+  );
+
+  if (isDesktop) {
+      return (
+          <Modal isOpen={isOpen} onClose={onClose} title={isEditing ? "Editar Transação" : "Nova Transação"}>
+              {FormContent}
+          </Modal>
+      )
+  }
+
+  return (
+    <AnimatePresence>
+        {isOpen && (
+            <motion.div
+                className="fixed inset-0 z-50 flex flex-col bg-[oklch(var(--background-oklch))]"
+                initial={{ y: '100%' }}
+                animate={{ y: '0%' }}
+                exit={{ y: '100%' }}
+                transition={{ type: 'spring', stiffness: 400, damping: 40 }}
+            >
+                <div className="flex items-center justify-between p-4 border-b border-[oklch(var(--border-oklch))] flex-shrink-0">
+                    <h2 className="text-xl font-semibold text-white">{isEditing ? "Editar Transação" : "Nova Transação"}</h2>
+                    <button onClick={onClose} className="p-1 text-gray-400"><XIcon className="w-6 h-6" /></button>
+                </div>
+                <div className="flex-grow p-4 overflow-y-auto">
+                    {FormContent}
+                </div>
+            </motion.div>
+        )}
+    </AnimatePresence>
   );
 };

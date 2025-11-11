@@ -26,7 +26,7 @@ export const ApiKeySettings: React.FC = () => {
     };
 
     return (
-        <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6">
+        <div className="card">
             <h2 className="text-xl font-semibold text-white mb-2">Configuração da API Gemini</h2>
             <p className="text-sm text-gray-400 mb-4">
                 Insira sua chave de API do Google Gemini para habilitar as funcionalidades de IA.

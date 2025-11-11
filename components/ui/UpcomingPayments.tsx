@@ -16,8 +16,8 @@ const UpcomingPaymentItem: React.FC<{
     const isExpense = item.type === TransactionType.DESPESA;
 
     const colorClasses = {
-        red: 'text-red-400',
-        yellow: 'text-yellow-400',
+        red: 'text-[oklch(var(--danger-oklch))]',
+        yellow: 'text-[oklch(var(--warning-oklch))]',
         gray: 'text-gray-400',
     };
 
@@ -37,7 +37,7 @@ const UpcomingPaymentItem: React.FC<{
                 <p className={`text-sm font-medium ${colorClasses[color]}`}>{text}</p>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
-                <span className={`font-semibold text-right ${isExpense ? 'text-red-400' : 'text-green-400'}`}>
+                <span className={`font-semibold text-right ${isExpense ? 'text-[oklch(var(--danger-oklch))]' : 'text-[oklch(var(--success-oklch))]'}`}>
                     {formatCurrencyBRL(item.amount)}
                 </span>
                 <Button variant="secondary" size="sm" onClick={() => onLaunch(item)}>
@@ -95,12 +95,12 @@ export const UpcomingPayments: React.FC = () => {
     };
 
     return (
-        <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6">
+        <div className="card">
             <div className="flex items-center gap-3 mb-4">
-                <Calendar className="w-6 h-6 text-indigo-300" />
+                <Calendar className="w-6 h-6 text-cyan-300" />
                 <h2 className="text-xl font-semibold text-white">Pagamentos Próximos</h2>
             </div>
-            <ul className="divide-y divide-white/10">
+            <ul className="divide-y divide-[oklch(var(--border-oklch))]">
                 <AnimatePresence>
                     {upcomingPayments.map(item => (
                         <UpcomingPaymentItem 

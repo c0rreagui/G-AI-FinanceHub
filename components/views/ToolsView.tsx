@@ -16,9 +16,9 @@ export const ToolsView: React.FC = () => {
           <ReceiptScanner />
         ) : (
           // Se não existe, pede para o usuário configurar
-          <div className="text-center text-gray-400 p-8 bg-white/5 rounded-lg">
+          <div className="card text-center text-gray-400">
             <p>A ferramenta de Scanner (OCR) usa a API do Google AI.</p>
-            <p className="mt-2">Por favor, configure sua chave de API na tela de 'Configurações' para usar esta funcionalidade.</p>
+            <p className="mt-2">Por favor, configure sua chave de API na tela de 'Ajustes' para usar esta funcionalidade.</p>
           </div>
         )}
       </div>

@@ -27,9 +27,9 @@ const AchievementItem: React.FC<{ achievement: Achievement }> = ({ achievement }
 export const AchievementsList: React.FC = () => {
     const { achievements } = useDashboardData();
     return (
-        <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6 mt-6">
+        <div className="card mt-6">
             <h2 className="text-xl font-semibold text-white mb-2">Conquistas</h2>
-            <div className="divide-y divide-white/10 -m-4">
+            <div className="divide-y divide-[oklch(var(--border-oklch))] -m-4">
                 {achievements.map(ach => (
                     <AchievementItem key={ach.id} achievement={ach} />
                 ))}

@@ -14,7 +14,7 @@ const CategoryGridItem: React.FC<CategoryGridItemProps> = ({ category, isSelecte
             type="button"
             onClick={() => onSelect(category.id)}
             className={`relative flex flex-col items-center justify-center gap-1 p-2 rounded-xl border-2 transition-all duration-200 ${
-                isSelected ? 'border-indigo-500/80 bg-indigo-500/20' : 'border-transparent bg-white/5 hover:bg-white/10'
+                isSelected ? 'border-cyan-500/80 bg-cyan-500/20' : 'border-transparent bg-white/5 hover:bg-white/10'
             }`}
             title={category.name}
             whileHover={{ scale: 1.05 }}

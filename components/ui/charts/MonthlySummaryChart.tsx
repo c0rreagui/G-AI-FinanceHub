@@ -23,7 +23,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export const MonthlySummaryChart: React.FC<MonthlySummaryChartProps> = ({ data }) => {
     return (
-        <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6 h-80">
+        <div className="card h-80">
             <h3 className="text-lg font-semibold text-white mb-4">Resumo dos Últimos 6 Meses</h3>
             <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={data} margin={{ top: 5, right: 20, left: -20, bottom: 40 }}>
@@ -44,8 +44,8 @@ export const MonthlySummaryChart: React.FC<MonthlySummaryChartProps> = ({ data }
                         iconType="circle"
                         formatter={(value) => <span className="text-gray-300">{value}</span>}
                     />
-                    <Bar dataKey="receita" fill="#22c55e" name="Receita" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="despesa" fill="#ef4444" name="Despesa" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="receita" fill="oklch(var(--success-oklch))" name="Receita" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="despesa" fill="oklch(var(--danger-oklch))" name="Despesa" radius={[4, 4, 0, 0]} />
                 </BarChart>
             </ResponsiveContainer>
         </div>

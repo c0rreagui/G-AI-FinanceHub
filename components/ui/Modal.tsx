@@ -53,7 +53,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="w-full max-w-lg rounded-2xl bg-oklch-card border border-white/10 p-6 shadow-2xl shadow-black/40"
+              className="w-full max-w-lg rounded-2xl bg-[oklch(var(--card-oklch))] border border-[oklch(var(--border-oklch))] p-6 shadow-2xl shadow-black/40"
               // Impede que o clique no painel do modal feche-o (propagação)
               onClick={(e) => e.stopPropagation()}
             >

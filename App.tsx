@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { DashboardDataProvider } from './hooks/useDashboardData';
 import { DialogProvider } from './contexts/DialogContext';
@@ -15,15 +15,35 @@ import { ToolsView } from './components/views/ToolsView';
 import { SettingsView } from './components/views/SettingsView';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { HomeDashboardView } from './components/views/HomeDashboardView';
-// FIX: Import Transition type from framer-motion to resolve type error.
 import { AnimatePresence, motion, Transition } from 'framer-motion';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ToastContainer } from './components/ui/ToastContainer';
 import { APP_VERSION } from './config';
+import { OnboardingView } from './components/views/OnboardingView';
+import { logger } from './services/loggingService';
 
 const AppContent: React.FC = () => {
   const { user, loading } = useAuth();
   const [currentView, setCurrentView] = useState<ViewType>('home');
+  const [onboardingComplete, setOnboardingComplete] = useState<boolean>(() => {
+    try {
+        return localStorage.getItem('financehub_onboarded') === 'true';
+    } catch (error) {
+        logger.warn("Não foi possível acessar o localStorage para o status de onboarding.", { error });
+        return false;
+    }
+  });
+
+
+  const handleOnboardingComplete = () => {
+    try {
+        localStorage.setItem('financehub_onboarded', 'true');
+    } catch (error) {
+        logger.warn("Não foi possível salvar o status de onboarding no localStorage.", { error });
+    }
+    setOnboardingComplete(true);
+  };
+
 
   if (loading) {
     return (
@@ -37,13 +57,16 @@ const AppContent: React.FC = () => {
     return <AuthView />;
   }
   
+  if (!onboardingComplete) {
+      return <OnboardingView onComplete={handleOnboardingComplete} />;
+  }
+
   const renderView = () => {
     const pageVariants = {
       initial: { opacity: 0, y: 20 },
       in: { opacity: 1, y: 0 },
       out: { opacity: 0, y: -20 },
     };
-    // FIX: Explicitly type pageTransition with the Transition type.
     const pageTransition: Transition = {
       type: 'tween',
       ease: 'anticipate',

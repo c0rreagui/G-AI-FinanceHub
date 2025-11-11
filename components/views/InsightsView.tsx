@@ -1,48 +1,73 @@
-import React from 'react';
+// components/views/InsightsView.tsx
+import React, { useMemo } from 'react';
 import { PageHeader } from '../layout/PageHeader';
-import { Lightbulb, Utensils, ShoppingCart, ArrowUpRight, Wallet } from '../Icons';
+import { Lightbulb } from '../Icons';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { formatCurrencyBRL } from '../../utils/formatters';
 import { TransactionType } from '../../types';
 import { LoadingSpinner } from '../LoadingSpinner';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
+import { EmptyState } from '../ui/EmptyState';
 
-const InsightCard: React.FC<{ icon: React.ElementType, title: string, children: React.ReactNode, color: string }> = ({ icon: Icon, title, children, color }) => (
-    <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6">
-        <div className="flex items-center gap-4">
-            <div className={`w-12 h-12 rounded-lg flex items-center justify-center`} style={{backgroundColor: `${color}20`}}>
-                <Icon className="w-6 h-6" style={{color: color}}/>
-            </div>
-            <div>
-                <h3 className="text-lg font-semibold text-white">{title}</h3>
-            </div>
+// Tooltip customizado para exibir receitas e despesas formatadas.
+const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      const receitaPayload = payload.find((p: any) => p.dataKey === 'receita');
+      const despesaPayload = payload.find((p: any) => p.dataKey === 'despesa');
+      
+      return (
+        <div className="bg-black/50 border border-white/20 backdrop-blur-md p-3 rounded-lg text-sm">
+          <p className="label font-semibold text-white">{`${label}`}</p>
+          {receitaPayload && receitaPayload.value > 0 && (
+            <p className="text-green-400">{`Receita: ${formatCurrencyBRL(receitaPayload.value)}`}</p>
+          )}
+          {despesaPayload && despesaPayload.value > 0 && (
+            <p className="text-red-400">{`Despesa: ${formatCurrencyBRL(despesaPayload.value)}`}</p>
+          )}
         </div>
-        <div className="mt-4 text-gray-300 space-y-2">
-            {children}
-        </div>
-    </div>
-);
+      );
+    }
+    return null;
+};
+
+interface CategoryAnalysisData {
+    name: string;
+    receita: number;
+    despesa: number;
+    total: number;
+}
 
 export const InsightsView: React.FC = () => {
-    const { transactions, goals, loading } = useDashboardData();
+    const { transactions, loading } = useDashboardData();
 
-    if (loading) {
-        return (
-             <>
-                <PageHeader 
-                    icon={Lightbulb} 
-                    title="Insights & Análises" 
-                    breadcrumbs={['FinanceHub', 'Insights']} 
-                />
-                <div className="flex-grow flex items-center justify-center">
-                    <LoadingSpinner />
-                </div>
-            </>
-        );
-    }
+    // Analisa as transações dos últimos 6 meses e agrupa por categoria
+    const categoryAnalysis = useMemo((): CategoryAnalysisData[] => {
+        const sixMonthsAgo = new Date();
+        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+        
+        const relevantTransactions = transactions.filter(t => new Date(t.date) >= sixMonthsAgo);
 
-    // Simple logic for insights based on mock data
-    const foodExpenses = transactions.filter(t => t.category.id === 'cat1' && t.type === TransactionType.DESPESA).reduce((sum, t) => sum + Math.abs(t.amount), 0);
-    const emergencyGoal = goals.find(g => g.name === 'Reserva de Emergência');
+        const analysis: { [key: string]: { name: string; receita: number; despesa: number } } = {};
+
+        relevantTransactions.forEach(tx => {
+            const { category } = tx;
+            if (!analysis[category.id]) {
+                analysis[category.id] = { name: category.name, receita: 0, despesa: 0 };
+            }
+            if (tx.type === TransactionType.RECEITA) {
+                analysis[category.id].receita += tx.amount;
+            } else {
+                analysis[category.id].despesa += Math.abs(tx.amount);
+            }
+        });
+
+        return Object.values(analysis)
+            .map(item => ({ ...item, total: item.receita + item.despesa }))
+            .filter(item => item.total > 0)
+            .sort((a, b) => b.despesa - a.despesa) // Prioriza o sort por despesa
+            .slice(0, 15);
+
+    }, [transactions]);
 
     return (
         <>
@@ -51,30 +76,62 @@ export const InsightsView: React.FC = () => {
                 title="Insights & Análises" 
                 breadcrumbs={['FinanceHub', 'Insights']} 
             />
-            <div className="mt-6 flex-grow overflow-y-auto pr-2">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <InsightCard icon={Utensils} title="Análise de Gastos" color="#f59e0b">
-                        <p>Você gastou <span className="font-bold text-yellow-400">{formatCurrencyBRL(foodExpenses)}</span> com <span className="font-semibold">Alimentação</span> este mês.</p>
-                        <p>Isso representa <span className="font-bold text-yellow-400">5.8%</span> do seu gasto total com cartão de crédito. Considere cozinhar em casa para economizar.</p>
-                    </InsightCard>
-
-                    <InsightCard icon={Wallet} title="Progresso das Metas" color="#3b82f6">
-                         {emergencyGoal && emergencyGoal.status === 'Concluída' && (
-                            <p>Parabéns! Você completou sua meta de <span className="font-semibold text-blue-400">{emergencyGoal.name}</span>, atingindo <span className="font-bold text-blue-400">{formatCurrencyBRL(emergencyGoal.targetAmount)}</span>. Um passo importante para sua segurança financeira!</p>
-                         )}
-                         <p>Sua meta <span className="font-semibold text-blue-400">'Viagem para o Japão'</span> está 42.5% completa. Continue assim!</p>
-                    </InsightCard>
-
-                    <InsightCard icon={ArrowUpRight} title="Oportunidades" color="#10b981">
-                        <p>Detectamos que seu salário foi a única entrada de receita este mês. </p>
-                        <p>Considere explorar fontes de renda extra, como freelancing ou investimentos, para acelerar suas metas financeiras.</p>
-                    </InsightCard>
-                     <InsightCard icon={ShoppingCart} title="Assinaturas" color="#8b5cf6">
-                        <p>Não encontramos assinaturas recorrentes nos seus dados recentes.</p>
-                        <p>Fique de olho em cobranças mensais para garantir que você não está pagando por serviços que não utiliza.</p>
-                    </InsightCard>
+            {loading ? (
+                <div className="flex-grow flex items-center justify-center">
+                    <LoadingSpinner />
                 </div>
-            </div>
+            ) : (
+                <div className="mt-6 flex-grow flex flex-col overflow-y-auto pr-2">
+                     {transactions.length > 0 && categoryAnalysis.length > 0 ? (
+                        <div className="card h-[500px] md:h-[700px] flex-grow">
+                            <h3 className="text-lg font-semibold text-white mb-4">Fluxo por Categoria (Últimos 6 Meses)</h3>
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart 
+                                    data={categoryAnalysis} 
+                                    layout="vertical"
+                                    margin={{ top: 5, right: 30, left: 20, bottom: 20 }}
+                                    barCategoryGap="20%"
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" horizontal={false} />
+                                    <XAxis 
+                                        type="number"
+                                        tick={{ fill: '#d1d5db', fontSize: 12 }} 
+                                        stroke="rgba(255, 255, 255, 0.2)"
+                                        tickFormatter={(value) => formatCurrencyBRL(Number(value))}
+                                        axisLine={false}
+                                        tickLine={false}
+                                    />
+                                    <YAxis 
+                                        type="category" 
+                                        dataKey="name" 
+                                        tick={{ fill: '#d1d5db', fontSize: 12 }} 
+                                        stroke="rgba(255, 255, 255, 0.2)"
+                                        width={120} // Mais espaço para nomes de categoria
+                                        tickLine={false}
+                                        axisLine={false}
+                                    />
+                                    <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }} />
+                                    <Legend 
+                                        wrapperStyle={{ bottom: -5, left: 20 }}
+                                        iconType="circle"
+                                        formatter={(value) => <span className="text-gray-300 capitalize">{value}</span>}
+                                    />
+                                    <Bar dataKey="receita" name="Receita" fill="oklch(var(--success-oklch))" radius={4} />
+                                    <Bar dataKey="despesa" name="Despesa" fill="oklch(var(--danger-oklch))" radius={4} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    ) : (
+                        <div className="flex-grow">
+                            <EmptyState
+                                icon={Lightbulb}
+                                title="Sem Dados para Análise"
+                                description="Adicione algumas transações para começar a gerar insights sobre seus hábitos financeiros."
+                            />
+                        </div>
+                    )}
+                </div>
+            )}
         </>
     );
 };

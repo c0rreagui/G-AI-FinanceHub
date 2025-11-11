@@ -1,4 +1,12 @@
+import { Transaction } from '../types';
+
 export const formatCurrencyBRL = (amount: number): string => {
+  if (typeof amount !== 'number' || isNaN(amount)) {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(0);
+  }
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
@@ -51,4 +59,39 @@ export const formatDaysUntil = (dateString: string): { text: string; color: 'red
     return { text: `Vence em ${diffDays} dias`, color: 'yellow' };
   }
   return { text: `Vence em ${diffDays} dias`, color: 'gray' };
+};
+
+export const groupTransactionsByDate = (transactions: Transaction[]): { [key: string]: Transaction[] } => {
+  const groups: { [key: string]: Transaction[] } = {};
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  const isSameDay = (d1: Date, d2: Date) =>
+      d1.getFullYear() === d2.getFullYear() &&
+      d1.getMonth() === d2.getMonth() &&
+      d1.getDate() === d2.getDate();
+
+  transactions.forEach(tx => {
+      const txDate = new Date(tx.date);
+      let groupKey: string;
+
+      if (isSameDay(txDate, today)) {
+          groupKey = 'Hoje';
+      } else if (isSameDay(txDate, yesterday)) {
+          groupKey = 'Ontem';
+      } else {
+          groupKey = new Intl.DateTimeFormat('pt-BR', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+          }).format(txDate);
+      }
+
+      if (!groups[groupKey]) {
+          groups[groupKey] = [];
+      }
+      groups[groupKey].push(tx);
+  });
+  return groups;
 };

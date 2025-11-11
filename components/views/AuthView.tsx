@@ -53,14 +53,14 @@ export const AuthView: React.FC = () => {
                 className="w-full max-w-md space-y-8"
             >
                 <div>
-                    <h1 className="text-center text-6xl font-black bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(129,140,248,0.3)]">
+                    <h1 className="text-center text-6xl font-black bg-gradient-to-r from-cyan-400 to-green-400 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(34,211,238,0.2)]">
                         FinanceHub
                     </h1>
                     <p className="mt-2 text-center text-lg text-gray-400">
                         {isLogin ? 'Faça login para continuar' : 'Crie sua conta para começar'}
                     </p>
                 </div>
-                <div className="bg-black/30 border border-white/10 backdrop-blur-xl rounded-2xl shadow-2xl shadow-black/40 p-8">
+                <div className="bg-[oklch(var(--card-oklch))] border border-[oklch(var(--border-oklch))] rounded-2xl shadow-2xl shadow-black/40 p-8">
                     <form className="space-y-6" onSubmit={handleAuthAction}>
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-gray-300">
@@ -75,7 +75,7 @@ export const AuthView: React.FC = () => {
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="block w-full appearance-none rounded-xl border border-white/20 bg-black/20 px-4 py-3 text-white placeholder-gray-500 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm transition"
+                                    className="block w-full appearance-none rounded-lg border border-[oklch(var(--border-oklch))] bg-[oklch(var(--background-oklch))] px-4 py-3 text-white placeholder-gray-500 shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 sm:text-sm transition"
                                 />
                             </div>
                         </div>
@@ -93,7 +93,7 @@ export const AuthView: React.FC = () => {
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="block w-full appearance-none rounded-xl border border-white/20 bg-black/20 px-4 py-3 text-white placeholder-gray-500 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm transition"
+                                    className="block w-full appearance-none rounded-lg border border-[oklch(var(--border-oklch))] bg-[oklch(var(--background-oklch))] px-4 py-3 text-white placeholder-gray-500 shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 sm:text-sm transition"
                                 />
                             </div>
                         </div>
@@ -110,10 +110,10 @@ export const AuthView: React.FC = () => {
 
                     <div className="relative my-6">
                         <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                            <div className="w-full border-t border-white/10" />
+                            <div className="w-full border-t border-[oklch(var(--border-oklch))]" />
                         </div>
                         <div className="relative flex justify-center text-sm">
-                            <span className="bg-oklch-card px-2 text-gray-500" style={{backgroundColor: '#201833'}}>ou</span>
+                            <span className="bg-[oklch(var(--card-oklch))] px-2 text-gray-500">ou</span>
                         </div>
                     </div>
 
@@ -125,7 +125,7 @@ export const AuthView: React.FC = () => {
 
                     <p className="mt-6 text-center text-sm text-gray-400">
                         {isLogin ? 'Não tem uma conta?' : 'Já tem uma conta?'}
-                        <button onClick={() => { setIsLogin(!isLogin); setError(null); setMessage(null); }} className="ml-1 font-medium text-indigo-400 hover:text-indigo-300">
+                        <button onClick={() => { setIsLogin(!isLogin); setError(null); setMessage(null); }} className="ml-1 font-medium text-cyan-400 hover:text-cyan-300">
                             {isLogin ? 'Cadastre-se' : 'Faça login'}
                         </button>
                     </p>

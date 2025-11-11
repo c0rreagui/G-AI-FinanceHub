@@ -6,11 +6,12 @@ interface BadgeProps {
     color?: 'green' | 'red' | 'blue' | 'yellow' | 'gray';
 }
 
+// Updated to use the new Design System semantic colors for consistency.
 const colorClasses = {
-    green: 'bg-green-500/10 text-green-400 ring-green-500/20',
-    red: 'bg-red-500/10 text-red-400 ring-red-500/20',
-    blue: 'bg-blue-500/10 text-blue-400 ring-blue-500/20',
-    yellow: 'bg-yellow-500/10 text-yellow-400 ring-yellow-500/20',
+    green: 'bg-[oklch(var(--success-oklch)_/_0.1)] text-[oklch(var(--success-oklch))] ring-[oklch(var(--success-oklch)_/_0.2)]',
+    red: 'bg-[oklch(var(--danger-oklch)_/_0.1)] text-[oklch(var(--danger-oklch))] ring-[oklch(var(--danger-oklch)_/_0.2)]',
+    blue: 'bg-[oklch(var(--info-oklch)_/_0.1)] text-[oklch(var(--info-oklch))] ring-[oklch(var(--info-oklch)_/_0.2)]',
+    yellow: 'bg-[oklch(var(--warning-oklch)_/_0.1)] text-[oklch(var(--warning-oklch))] ring-[oklch(var(--warning-oklch)_/_0.2)]',
     gray: 'bg-gray-500/10 text-gray-400 ring-gray-500/20',
 };
 

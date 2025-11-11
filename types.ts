@@ -1,12 +1,37 @@
 import React from 'react';
 
-export type ViewType = 'home' | 'transactions' | 'insights' | 'goals' | 'debts' | 'scheduling' | 'tools' | 'settings';
-
+// Core Enums
 export enum TransactionType {
-  RECEITA = 'Receita',
-  DESPESA = 'Despesa',
+  RECEITA = 'RECEITA',
+  DESPESA = 'DESPESA',
 }
 
+export enum GoalStatus {
+  EM_ANDAMENTO = 'EM_ANDAMENTO',
+  CONCLUIDO = 'CONCLUIDO',
+}
+
+export enum DebtStatus {
+  ATIVA = 'ATIVA',
+  PAGA = 'PAGA',
+}
+
+export enum ScheduledTransactionFrequency {
+  DIARIO = 'Diário',
+  SEMANAL = 'Semanal',
+  MENSAL = 'Mensal',
+  ANUAL = 'Anual',
+}
+
+export enum UserRank {
+    BRONZE = 'Bronze',
+    PRATA = 'Prata',
+    OURO = 'Ouro',
+    PLATINA = 'Platina',
+    DIAMANTE = 'Diamante',
+}
+
+// Interfaces
 export interface Category {
   id: string;
   name: string;
@@ -14,114 +39,47 @@ export interface Category {
   color: string;
 }
 
-export interface Installment {
-  current: number;
-  total: number;
-}
-
 export interface Transaction {
   id: string;
-  userId?: string;
   description: string;
   amount: number;
-  date: string;
   type: TransactionType;
-  categoryId?: string;
-  accountId?: string;
-  category: Category; // Joined data in the app
-  installment?: Installment;
-  cardName?: string; // Optional credit card name
-}
-
-export interface Account {
-    id: string;
-    name: string;
-    type: 'Carteira' | 'Conta Corrente' | 'Poupança';
-    balance: number;
-}
-
-export interface CreditCard {
-    id:string;
-    name: string;
-    flag: string;
-    limit: number;
-    closingDay: number;
-}
-
-export interface Invoice {
-    id: string;
-    cardId: string;
-    closingDate: string;
-    dueDate: string;
-    totalAmount: number;
-    status: 'Aberta' | 'Fechada' | 'Paga';
-    transactions: Transaction[];
-}
-
-export interface Summary {
-    totalBalance: number;
-    monthlyIncome: number;
-    monthlyExpenses: number;
-}
-
-export enum GoalStatus {
-    EM_ANDAMENTO = 'Em Andamento',
-    CONCLUIDA = 'Concluída',
-    CANCELADA = 'Cancelada',
+  date: string; // ISO string
+  categoryId: string;
+  category: Category;
+  goalContributionId?: string;
+  debtPaymentId?: string;
 }
 
 export interface Goal {
-    id: string;
-    userId?: string;
-    name: string;
-    targetAmount: number;
-    currentAmount: number;
-    deadline: string;
-    status: GoalStatus;
-}
-
-export enum DebtStatus {
-    ATIVA = 'Ativa',
-    PAGA = 'Paga',
+  id: string;
+  name: string;
+  targetAmount: number;
+  currentAmount: number;
+  deadline: string; // ISO string
+  status: GoalStatus;
 }
 
 export interface Debt {
-    id: string;
-    userId?: string;
-    name: string;
-    totalAmount: number;
-    paidAmount: number;
-    interestRate: number;
-    category: string;
-    status: DebtStatus;
-}
-
-export enum ScheduledTransactionFrequency {
-    DIARIO = 'Diário',
-    SEMANAL = 'Semanal',
-    MENSAL = 'Mensal',
-    ANUAL = 'Anual',
+  id: string;
+  name: string;
+  totalAmount: number;
+  paidAmount: number;
+  interestRate: number; // Annual percentage
+  category: string;
+  status: DebtStatus;
 }
 
 export interface ScheduledTransaction {
-    id: string;
-    description: string;
-    amount: number;
-    type: TransactionType;
-    categoryId?: string;
-    category: Category; // Joined data in the app
-    startDate: string;
-    frequency: ScheduledTransactionFrequency;
-    nextDueDate: string;
-}
-
-// Gamificação
-export enum UserRank {
-    BRONZE = 'Bronze',
-    PRATA = 'Prata',
-    OURO = 'Ouro',
-    PLATINA = 'Platina',
-    DIAMANTE = 'Diamante',
+  id: string;
+  description: string;
+  amount: number;
+  type: TransactionType;
+  categoryId: string;
+  category: Category;
+  startDate: string; // ISO string
+  nextDueDate: string; // ISO string
+  frequency: ScheduledTransactionFrequency;
 }
 
 export interface UserLevel {
@@ -136,84 +94,49 @@ export interface Achievement {
     name: string;
     description: string;
     unlocked: boolean;
-    dateUnlocked?: string;
-    icon: React.ElementType;
+    dateUnlocked?: string; // ISO string
 }
 
-// Colaboração
-export interface Workspace {
-    id: string;
-    name: string;
-    members: string[]; // Array of user IDs
-}
-
-export interface SharedBudget {
-    id: string;
-    workspaceId: string;
-    name: string;
-    totalAmount: number;
-    spentAmount: number;
-    categories: Record<string, number>; // Category ID and its budget
-}
-
-// Investimentos
-export enum InvestmentType {
-    ACAO = 'Ação',
-    FUNDO_IMOBILIARIO = 'Fundo Imobiliário',
-    RENDA_FIXA = 'Renda Fixa',
-    CRIPTOMOEDA = 'Criptomoeda',
-}
-
-export interface Investment {
-    id: string;
-    name: string;
-    ticker: string;
-    type: InvestmentType;
-    quantity: number;
-    averagePrice: number;
-    currentValue: number;
-}
-
-// Lista de Desejos
-export interface WishlistItem {
-    id: string;
-    name: string;
-    price: number;
-    priority: 'Baixa' | 'Média' | 'Alta';
-    savedAmount: number;
+export interface SummaryData {
+  totalBalance: number;
+  monthlyIncome: number;
+  monthlyExpenses: number;
 }
 
 export interface MonthlyChartData {
-    name: string;
+    name: string; // Month name
     receita: number;
     despesa: number;
 }
 
-// Define a interface para o contexto de dados do dashboard.
+// View Management
+export type ViewType = 'home' | 'transactions' | 'insights' | 'goals' | 'debts' | 'scheduling' | 'tools' | 'settings';
+
+// Context
 export interface DashboardDataContextType {
-    transactions: Transaction[];
-    goals: Goal[];
-    debts: Debt[];
-    summary: Summary;
-    scheduledTransactions: ScheduledTransaction[];
-    userLevel: UserLevel;
-    achievements: Achievement[];
-    categories: Category[];
-    monthlyChartData: MonthlyChartData[];
-    loading: boolean;
-    isMutating: boolean;
-    error: string | null;
-    lastUpdatedGoalId: string | null;
-    lastUpdatedTransactionId: string | null;
-    clearError: () => void;
-    clearLastUpdatedGoalId: () => void;
-    clearLastUpdatedTransactionId: () => void;
-    addTransaction: (transaction: Omit<Transaction, 'id' | 'category' | 'userId'>) => Promise<boolean>;
-    updateTransaction: (transactionId: string, updates: Partial<Omit<Transaction, 'id' | 'category'>>) => Promise<boolean>;
-    addGoal: (goal: Omit<Goal, 'id' | 'currentAmount' | 'status' | 'userId'>) => Promise<boolean>;
-    addDebt: (debt: Omit<Debt, 'id' | 'paidAmount' | 'status' | 'userId'>) => Promise<boolean>;
-    addScheduledTransaction: (scheduledTx: Omit<ScheduledTransaction, 'id'|'category'|'nextDueDate'>) => Promise<boolean>;
-    deleteTransaction: (transactionId: string) => Promise<boolean>;
-    updateGoalValue: (goalId: string, newCurrentAmount: number) => Promise<void>;
-    addPaymentToDebt: (debtId: string, paymentAmount: number) => Promise<void>;
+  transactions: Transaction[];
+  goals: Goal[];
+  debts: Debt[];
+  scheduledTransactions: ScheduledTransaction[];
+  categories: Category[];
+  summary: SummaryData;
+  monthlyChartData: MonthlyChartData[];
+  userLevel: UserLevel | null;
+  achievements: Achievement[];
+  loading: boolean;
+  isMutating: boolean;
+  mutatingIds: Set<string>;
+  error: string | null;
+  addTransaction: (tx: Omit<Transaction, 'id' | 'category'>) => Promise<boolean>;
+  updateTransaction: (tx: Omit<Transaction, 'category'>) => Promise<boolean>;
+  deleteTransaction: (id: string) => Promise<boolean>;
+  updateTransactionsCategory: (ids: string[], categoryId: string) => Promise<boolean>;
+  addGoal: (goal: Omit<Goal, 'id' | 'currentAmount' | 'status'>) => Promise<boolean>;
+  updateGoalValue: (id: string, valueToAdd: number) => Promise<boolean>;
+  deleteGoal: (id: string) => Promise<boolean>;
+  addDebt: (debt: Omit<Debt, 'id' | 'paidAmount' | 'status'>) => Promise<boolean>;
+  addPaymentToDebt: (id: string, paymentAmount: number) => Promise<boolean>;
+  deleteDebt: (id: string) => Promise<boolean>;
+  addScheduledTransaction: (tx: Omit<ScheduledTransaction, 'id' | 'category' | 'nextDueDate'>) => Promise<boolean>;
+  clearError: () => void;
 }
