@@ -1,11 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { AuthProvider, useAuth } from './hooks/useAuth';
+// FIX: Corrected import path.
 import { DashboardDataProvider } from './hooks/useDashboardData';
 import { DialogProvider } from './contexts/DialogContext';
 import { useDialog } from './hooks/useDialog';
 import { ToastProvider } from './contexts/ToastContext';
+import { useToast } from './hooks/useToast';
+// FIX: Corrected import path.
 import { AuthView } from './components/views/AuthView';
 import { AppLayout } from './components/layout/AppLayout';
+// FIX: Corrected import path.
 import { ViewType } from './types';
 import { TransactionsView } from './components/views/TransactionsView';
 import { InsightsView } from './components/views/InsightsView';
@@ -19,17 +23,34 @@ import { HomeDashboardView } from './components/views/HomeDashboardView';
 import { AnimatePresence, motion, Transition } from 'framer-motion';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ToastContainer } from './components/ui/ToastContainer';
+// FIX: Corrected import path.
 import { APP_VERSION, APP_CODENAME } from './config';
 import { OnboardingView } from './components/views/OnboardingView';
 import { logger } from './services/loggingService';
+// FIX: Corrected import path.
 import { DevToolsView } from './components/views/DevToolsView';
 
+const GuestModeBanner: React.FC = () => {
+    const { logout } = useAuth();
+    return (
+        <div className="bg-yellow-500/20 text-yellow-200 text-center text-sm py-2 px-4 border-b border-yellow-500/30 flex items-center justify-center gap-1 sm:gap-2 flex-wrap">
+            <span>Você está no modo visitante. Seus dados são salvos localmente.</span>
+            <button onClick={logout} className="font-bold underline hover:text-white">
+                Crie uma conta
+            </button>
+            <span>para salvar seus dados na nuvem.</span>
+        </div>
+    );
+};
+
 const AppContent: React.FC = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, isGuest } = useAuth();
   const { openDialog } = useDialog();
+  const { showToast } = useToast();
   const [currentView, setCurrentView] = useState<ViewType>('home');
   const [onboardingComplete, setOnboardingComplete] = useState<boolean>(() => {
     try {
+        if (sessionStorage.getItem('guest_mode') === 'true') return true; // Guests skip onboarding
         return localStorage.getItem('financehub_onboarded') === 'true';
     } catch (error) {
         logger.warn("Não foi possível acessar o localStorage para o status de onboarding.", { error });
@@ -45,6 +66,7 @@ const AppContent: React.FC = () => {
         logger.warn("Não foi possível salvar o status de onboarding no localStorage.", { error });
     }
     setOnboardingComplete(true);
+    showToast('Tudo pronto!', { description: 'Bem-vindo ao seu novo dashboard!', type: 'success' });
 
     // Abre o modal relevante com base na escolha do usuário no onboarding
     switch (goalId) {
@@ -136,16 +158,17 @@ const AppContent: React.FC = () => {
     );
   }
 
-  if (!user) {
+  if (!user && !isGuest) {
     return <AuthView />;
   }
   
-  if (!onboardingComplete) {
+  if (!onboardingComplete && !isGuest) {
       return <OnboardingView onComplete={handleOnboardingComplete} />;
   }
 
   return (
     <>
+      {isGuest && <GuestModeBanner />}
       <AppLayout currentView={currentView} setCurrentView={setCurrentView}>
         <AnimatePresence mode="wait">
           {renderView()}

@@ -6,6 +6,7 @@ import { MobileBottomNav } from './MobileBottomNav';
 import { DialogManager } from '../DialogManager';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { ErrorModal } from '../ui/ErrorModal';
+import { useAuth } from '../../hooks/useAuth';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -16,10 +17,11 @@ interface AppLayoutProps {
 export const AppLayout: React.FC<AppLayoutProps> = ({ children, currentView, setCurrentView }) => {
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const { error, clearError } = useDashboardData();
+  const { isGuest } = useAuth();
 
   return (
     <>
-      <div className="flex h-screen w-screen bg-transparent text-oklch-foreground overflow-hidden">
+      <div className={`flex h-screen w-screen bg-transparent text-oklch-foreground overflow-hidden ${isGuest ? 'flex-col' : ''}`}>
         {isDesktop && <Sidebar currentView={currentView} setCurrentView={setCurrentView} />}
         
         <main className={`flex-1 flex flex-col overflow-hidden ${!isDesktop ? 'pb-20' : ''}`}>

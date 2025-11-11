@@ -110,7 +110,8 @@ const ScheduledTransactionCard: React.FC<{ item: ScheduledTransaction }> = ({ it
                             </span>
                         </div>
                         <div className="flex justify-between items-center mt-2 text-sm text-gray-400">
-                            <span>Próximo vencimento: {formatDate(item.nextDueDate)}</span>
+                            {/* FIX: Corrected field name to snake_case to match database schema. */}
+                            <span>Próximo vencimento: {formatDate(item.next_due_date)}</span>
                             <Badge color="blue">{item.frequency}</Badge>
                         </div>
                     </div>

@@ -38,11 +38,11 @@ export const AddValueToGoalForm: React.FC<AddValueToGoalFormProps> = ({ isOpen, 
   const [amount, setAmount] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const remainingAmount = Math.max(0, goal.targetAmount - goal.currentAmount);
+  // FIX: Corrected field names to snake_case to match database schema.
+  const remainingAmount = Math.max(0, goal.target_amount - goal.current_amount);
 
   const quickValues = useMemo(() => {
     const defaultValues = [10, 25, 50, 100];
-    // Fix: Explicitly type `smartValues` to allow an optional `text` property.
     const smartValues: { value: number; text?: string }[] = defaultValues.map(v => ({ value: v }));
     
     if (remainingAmount > 0 && !defaultValues.includes(remainingAmount)) {
@@ -73,7 +73,8 @@ export const AddValueToGoalForm: React.FC<AddValueToGoalFormProps> = ({ isOpen, 
     if (valueToAdd > remainingAmount) {
         openDialog('confirmation', {
             title: 'Contribuição Excedente',
-            message: `O valor de ${formatCurrencyBRL(valueToAdd)} fará com que o total ultrapasse a meta de ${formatCurrencyBRL(goal.targetAmount)}. Deseja continuar?`,
+            // FIX: Corrected field name to snake_case to match database schema.
+            message: `O valor de ${formatCurrencyBRL(valueToAdd)} fará com que o total ultrapasse a meta de ${formatCurrencyBRL(goal.target_amount)}. Deseja continuar?`,
             confirmText: 'Sim, Continuar',
             onConfirm: () => continueSubmission(valueToAdd),
         });
@@ -85,7 +86,8 @@ export const AddValueToGoalForm: React.FC<AddValueToGoalFormProps> = ({ isOpen, 
   const FormFields = (
     <>
       <p className="text-gray-300">
-        Valor Atual: <span className="font-semibold text-white">{formatCurrencyBRL(goal.currentAmount)}</span> / <span className="text-gray-400">{formatCurrencyBRL(goal.targetAmount)}</span>
+        {/* FIX: Corrected field names to snake_case to match database schema. */}
+        Valor Atual: <span className="font-semibold text-white">{formatCurrencyBRL(goal.current_amount)}</span> / <span className="text-gray-400">{formatCurrencyBRL(goal.target_amount)}</span>
       </p>
       <Input
         id="goal-value-amount"

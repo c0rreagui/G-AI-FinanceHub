@@ -41,7 +41,8 @@ export const AddGoalForm: React.FC<AddGoalFormProps> = ({ isOpen, onClose }) => 
     const [year, month, day] = deadline.split('-').map(Number);
     const utcDeadline = new Date(Date.UTC(year, month - 1, day));
     
-    const goalData: Omit<Goal, 'id' | 'currentAmount' | 'status'> = {
+    // FIX: Removed incorrect type annotation to allow type inference to match the `addGoal` function signature.
+    const goalData = {
         name,
         targetAmount: parsedAmount,
         deadline: utcDeadline.toISOString(),

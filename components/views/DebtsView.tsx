@@ -17,7 +17,8 @@ import { AnimatedCurrency } from '../ui/AnimatedCurrency';
 const DebtCard: React.FC<{ debt: Debt }> = ({ debt }) => {
     const { openDialog } = useDialog();
     const { deleteDebt, mutatingIds } = useDashboardData();
-    const progress = (debt.paidAmount / debt.totalAmount) * 100;
+    // FIX: Corrected field names to snake_case to match database schema.
+    const progress = (debt.paid_amount / debt.total_amount) * 100;
     const isPaid = debt.status === DebtStatus.PAGA;
     const isMutating = mutatingIds.has(debt.id);
 
@@ -47,14 +48,16 @@ const DebtCard: React.FC<{ debt: Debt }> = ({ debt }) => {
                     </Badge>
                 </div>
                 <div className="text-sm text-gray-400 mt-1 space-y-0.5">
-                    <p>Juros: <span className="font-medium text-gray-300">{debt.interestRate}% a.a.</span></p>
+                    {/* FIX: Corrected field name to snake_case to match database schema. */}
+                    <p>Juros: <span className="font-medium text-gray-300">{debt.interest_rate}% a.a.</span></p>
                     <p>Categoria: <span className="font-medium text-gray-300">{debt.category}</span></p>
                 </div>
 
                 <div className="mt-4">
                     <div className="flex justify-between text-sm text-white mb-1">
                         <span className="truncate">
-                            Pago <span className="font-bold"><AnimatedCurrency value={debt.paidAmount} /></span> de {formatCurrencyBRL(debt.totalAmount)}
+                            {/* FIX: Corrected field names to snake_case to match database schema. */}
+                            Pago <span className="font-bold"><AnimatedCurrency value={debt.paid_amount} /></span> de {formatCurrencyBRL(debt.total_amount)}
                         </span>
                         <span className="text-gray-300 font-medium">{`${progress.toFixed(0)}%`}</span>
                     </div>

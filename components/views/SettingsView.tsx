@@ -3,21 +3,12 @@ import { PageHeader } from '../layout/PageHeader';
 import { Settings } from '../Icons';
 import { ApiKeySettings } from '../ui/ApiKeySettings';
 import { Button } from '../ui/Button';
-import { supabase } from '../../services/supabaseClient';
 import { motion } from 'framer-motion';
 import { APP_VERSION } from '../../config';
 import { useAuth } from '../../hooks/useAuth';
 
 export const SettingsView: React.FC = () => {
-    const { setDeveloperMode } = useAuth();
-
-    const handleLogout = async () => {
-        setDeveloperMode(false); // Limpa o estado de desenvolvedor
-        const { error } = await supabase.auth.signOut();
-        if (error) {
-            console.error('Error logging out:', error);
-        }
-    };
+    const { logout } = useAuth();
 
     const containerVariants = {
       hidden: { opacity: 0 },
@@ -38,7 +29,7 @@ export const SettingsView: React.FC = () => {
                 icon={Settings} 
                 title="Ajustes e Perfil" 
                 breadcrumbs={['FinanceHub', 'Ajustes']}
-                actions={<Button onClick={handleLogout} variant="secondary">Sair</Button>}
+                actions={<Button onClick={logout} variant="secondary">Sair</Button>}
             />
             <motion.div 
                 className="flex-grow overflow-y-auto pr-2 space-y-6"

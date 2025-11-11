@@ -24,6 +24,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     return false;
   });
+  const [isGuest, setIsGuest] = useState<boolean>(() => {
+      if (typeof window !== 'undefined') {
+          return sessionStorage.getItem('guest_mode') === 'true';
+      }
+      return false;
+  });
+
 
   const setApiKey = (key: string) => {
     if (typeof window !== 'undefined') {
@@ -43,8 +50,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsDeveloper(isDev);
   };
 
+  const enterGuestMode = () => {
+    if (typeof window !== 'undefined') {
+        sessionStorage.setItem('guest_mode', 'true');
+    }
+    setIsGuest(true);
+  };
+
+  const logout = async () => {
+    if (isGuest) {
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('financehub_guest_data');
+            sessionStorage.removeItem('guest_mode');
+        }
+        setIsGuest(false);
+    } else {
+        const { error } = await supabase.auth.signOut();
+        if (error) console.error('Error logging out:', error);
+    }
+    setDeveloperMode(false); // Always reset dev mode on any logout
+    // The onAuthStateChange listener will handle setting user/session to null for supabase users
+    // For guests, we manually cleared state.
+  };
+
   useEffect(() => {
-    // Tenta pegar a sessão ativa quando o app carrega
+    // Se for um visitante, não precisamos verificar a sessão do Supabase.
+    if (isGuest) {
+      setLoading(false);
+      return;
+    }
+    
     const getInitialData = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
@@ -54,13 +89,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     getInitialData();
 
-    // Ouve mudanças na autenticação (login, logout)
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
+        // Ignora eventos do Supabase se estivermos no modo visitante
+        if (sessionStorage.getItem('guest_mode') === 'true') return;
+
         setSession(session);
         setUser(session?.user ?? null);
         if (!session) {
-            setDeveloperMode(false); // Garante que o modo dev é desativado no logout
+            setDeveloperMode(false);
         }
         setLoading(false);
       }
@@ -69,7 +106,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       authListener?.subscription.unsubscribe();
     };
-  }, []);
+  }, [isGuest]); // Re-executa se o status de visitante mudar
 
 
   const value: AuthContextType = useMemo(() => ({
@@ -80,7 +117,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setApiKey,
     isDeveloper,
     setDeveloperMode,
-  }), [session, user, loading, apiKey, isDeveloper]);
+    isGuest,
+    enterGuestMode,
+    logout,
+  }), [session, user, loading, apiKey, isDeveloper, isGuest]);
 
   return React.createElement(AuthContext.Provider, { value: value }, children);
 };

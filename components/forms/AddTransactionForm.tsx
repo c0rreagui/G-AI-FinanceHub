@@ -53,15 +53,13 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
         setDescription(dataToSet.description || '');
         setAmount(dataToSet.amount ? String(Math.abs(dataToSet.amount)) : '');
         
-        // FIX: Validação robusta do tipo da transação para evitar constraint violation.
-        // Se o tipo não for explicitamente 'receita', ele será 'despesa' por padrão.
-        // Isso protege contra valores inválidos como "Despesa", null, ou undefined.
         const sanitizedType = dataToSet.type === TransactionType.RECEITA 
             ? TransactionType.RECEITA 
             : TransactionType.DESPESA;
         setType(sanitizedType);
         
-        setCategoryId(dataToSet.categoryId || null);
+        // FIX: Corrected field name to snake_case to match database schema.
+        setCategoryId(dataToSet.category_id || null);
         setDate(dataToSet.date ? dataToSet.date.split('T')[0] : new Date().toISOString().split('T')[0]);
     }
   }, [prefill, transactionToEdit, isOpen]);
@@ -84,20 +82,22 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
 
     let success = false;
     if (isEditing) {
-        const txData: Omit<Transaction, 'category'> = {
+        // FIX: Use snake_case for database fields.
+        const txData = {
             id: transactionToEdit.id,
             description,
             amount: finalAmount,
             type,
             categoryId,
             date: new Date(date).toISOString(),
-            goalContributionId: transactionToEdit.goalContributionId, // FIX: Preserva o ID da meta
-            debtPaymentId: transactionToEdit.debtPaymentId, // FIX: Preserva o ID da dívida
+            goal_contribution_id: transactionToEdit.goal_contribution_id,
+            debt_payment_id: transactionToEdit.debt_payment_id,
         };
         success = await updateTransaction(txData);
 
     } else {
-        const txData: Omit<Transaction, 'id' | 'category'> = {
+        // FIX: Use snake_case for database fields.
+        const txData = {
             description,
             amount: finalAmount,
             type,

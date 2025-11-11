@@ -39,7 +39,8 @@ export const AddDebtForm: React.FC<AddDebtFormProps> = ({ isOpen, onClose }) => 
     if (!name || !totalAmount || !interestRate || isNaN(parsedAmount) || isNaN(parsedRate) || isSubmitting) return;
 
     setIsSubmitting(true);
-    const debtData: Omit<Debt, 'id' | 'paidAmount' | 'status'> = {
+    // FIX: Removed incorrect type annotation to allow type inference to match the `addDebt` function signature.
+    const debtData = {
         name,
         totalAmount: parsedAmount,
         interestRate: parsedRate,

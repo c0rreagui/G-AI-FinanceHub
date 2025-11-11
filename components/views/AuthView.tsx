@@ -1,206 +1,232 @@
-import React, { useState } from 'react';
+// components/views/AuthView.tsx
+import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../services/supabaseClient';
 import { Button } from '../ui/Button';
-import { LoadingSpinner } from '../LoadingSpinner';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Input } from '../ui/Input';
+import { LoadingSpinner } from '../LoadingSpinner';
 import { useAuth } from '../../hooks/useAuth';
+import { Zap } from '../Icons';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const PinView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-    const { setDeveloperMode } = useAuth();
-    const [pin, setPin] = useState('');
-    const [error, setError] = useState<string | null>(null);
-    const [loading, setLoading] = useState(false);
+const PinInput: React.FC<{ pin: string; onPinChange: (pin: string) => void; hasError: boolean }> = ({ pin, onPinChange, hasError }) => {
+    const inputRef = useRef<HTMLInputElement>(null);
 
-    const handlePinSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        setError(null);
-
-        if (pin === '2609') {
-            setLoading(true);
-            setDeveloperMode(true);
-            const { error } = await supabase.auth.signInWithPassword({
-                email: 'dev@financehub.com',
-                password: 'financehub-dev-password',
-            });
-            if (error) setError(error.message);
-            setLoading(false);
-        } else {
-            setError('PIN incorreto.');
+    useEffect(() => {
+        inputRef.current?.focus();
+    }, []);
+    
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value.replace(/[^0-9]/g, '');
+        if (value.length <= 4) {
+            onPinChange(value);
         }
     };
 
     return (
-        <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.3 }}
-        >
-             <h2 className="text-center text-xl font-semibold text-white">Acesso de Desenvolvedor</h2>
-            <p className="mt-2 text-center text-sm text-gray-400">
-                Insira o PIN para continuar.
-            </p>
-            <form className="mt-8 space-y-6" onSubmit={handlePinSubmit}>
-                <Input
-                    id="pin"
-                    label="PIN"
-                    name="pin"
-                    type="password"
-                    inputMode="numeric"
-                    autoComplete="one-time-code"
-                    required
-                    value={pin}
-                    onChange={(e) => setPin(e.target.value)}
-                    maxLength={4}
-                />
-                 {error && <p className="text-sm text-red-400 text-center">{error}</p>}
-                <div>
-                    <Button type="submit" disabled={loading} className="w-full">
-                        {loading ? <LoadingSpinner /> : 'Verificar'}
-                    </Button>
-                </div>
-                 <div>
-                    <Button type="button" onClick={onBack} variant="secondary" className="w-full">
-                        Voltar
-                    </Button>
-                </div>
-            </form>
-        </motion.div>
+        <div className="relative">
+            <input
+                ref={inputRef}
+                type="tel"
+                value={pin}
+                onChange={handleInputChange}
+                maxLength={4}
+                className="absolute inset-0 w-full h-full bg-transparent border-0 text-transparent outline-none caret-transparent"
+                aria-label="Insira o PIN de 4 dígitos"
+            />
+            <div className={`flex justify-center gap-3 cursor-text ${hasError ? 'animate-shake' : ''}`} onClick={() => inputRef.current?.focus()}>
+                {Array.from({ length: 4 }).map((_, index) => (
+                    <div
+                        key={index}
+                        className={`w-10 h-12 flex items-center justify-center text-2xl font-bold border-b-2 transition-colors duration-200 ${
+                            pin.length > index ? 'border-cyan-400 text-white' : 'border-gray-600'
+                        }`}
+                    >
+                        {pin[index] ? '●' : ''}
+                    </div>
+                ))}
+            </div>
+        </div>
     );
 };
 
 
 export const AuthView: React.FC = () => {
-    const [loading, setLoading] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [isLogin, setIsLogin] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [message, setMessage] = useState<string | null>(null);
+    const [isLogin, setIsLogin] = useState(true);
+    const [authMessage, setAuthMessage] = useState<string | null>(null);
     const [showPinInput, setShowPinInput] = useState(false);
+    const [pin, setPin] = useState('');
+    const [pinError, setPinError] = useState(false);
+    const { setDeveloperMode, enterGuestMode } = useAuth();
 
-    const handleAuthAction = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
+    const DEV_PIN = '2609';
+
+    useEffect(() => {
+        if (pin.length === 4) {
+            if (pin === DEV_PIN) {
+                handleDevLogin();
+                setShowPinInput(false);
+            } else {
+                setPinError(true);
+                setTimeout(() => {
+                    setPin('');
+                    setPinError(false);
+                }, 500);
+            }
+        }
+    }, [pin]);
+
+
+    const handleAuth = async (e: React.FormEvent) => {
+        e.preventDefault();
         setLoading(true);
         setError(null);
-        setMessage(null);
+        setAuthMessage(null);
 
         if (isLogin) {
             const { error } = await supabase.auth.signInWithPassword({ email, password });
             if (error) setError(error.message);
         } else {
-            const { error } = await supabase.auth.signUp({ email, password });
+            const { data, error } = await supabase.auth.signUp({ email, password });
             if (error) {
                 setError(error.message);
-            } else {
-                setMessage('Cadastro realizado! Verifique seu e-mail para confirmar a conta.');
+            } else if (data.user && data.user.identities && data.user.identities.length === 0) {
+                 setError("Este e-mail já está em uso. Tente fazer login.");
+            }
+            else {
+                setAuthMessage("Verifique seu e-mail para o link de confirmação!");
             }
         }
         setLoading(false);
     };
-
-    const handleGuestLogin = async () => {
+    
+    const handleDevLogin = async () => {
         setLoading(true);
         setError(null);
-        setMessage(null);
-        const { error } = await supabase.auth.signInWithPassword({
-            email: 'guest@financehub.com',
-            password: 'financehub-guest-password',
+        setAuthMessage(null);
+
+        const devEmail = 'dev@financehub.com';
+        const devPassword = 'password123';
+
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+            email: devEmail,
+            password: devPassword,
         });
-        if (error) setError(error.message);
+
+        if (signInData.user) {
+            setDeveloperMode(true);
+            setLoading(false);
+            return;
+        }
+        
+        if (signInError && signInError.message.includes('Invalid login credentials')) {
+            const { error: signUpError } = await supabase.auth.signUp({
+                email: devEmail,
+                password: devPassword,
+            });
+
+            if (signUpError) {
+                setError(signUpError.message);
+                setLoading(false);
+                return;
+            }
+
+            const { data: finalSignInData, error: finalSignInError } = await supabase.auth.signInWithPassword({
+                 email: devEmail,
+                 password: devPassword,
+            });
+
+            if (finalSignInData.user) {
+                setDeveloperMode(true);
+            } else {
+                setError(finalSignInError?.message || "Conta de dev criada, mas o login falhou.");
+            }
+
+        } else if (signInError) {
+            setError(signInError.message);
+        }
+        
         setLoading(false);
     };
+    
+    const togglePinInput = () => {
+        setShowPinInput(!showPinInput);
+        setPin('');
+        setError(null);
+    }
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-transparent p-4">
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="w-full max-w-md space-y-8"
-            >
-                <div>
-                    <h1 className="text-center text-6xl font-black bg-gradient-to-r from-cyan-400 to-green-400 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(34,211,238,0.2)]">
+            <div className="w-full max-w-sm">
+                <div className="text-center mb-8 relative">
+                     <div className="group absolute -top-2 right-0">
+                        <button 
+                            onClick={togglePinInput} 
+                            className="p-2 text-gray-400 hover:text-yellow-400 transition-colors"
+                            aria-label="Entrar como desenvolvedor"
+                        >
+                            <Zap className="w-5 h-5" />
+                        </button>
+                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-black/80 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                            Acesso de Desenvolvedor
+                        </div>
+                    </div>
+                    <h1 className="text-5xl font-black bg-gradient-to-r from-cyan-400 to-green-400 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(34,211,238,0.2)]">
                         FinanceHub
                     </h1>
+                    <p className="mt-2 text-gray-400">Seu copiloto financeiro inteligente.</p>
                 </div>
-                <div className="bg-[oklch(var(--card-oklch))] border border-[oklch(var(--border-oklch))] rounded-2xl shadow-2xl shadow-black/40 p-8 overflow-hidden">
-                   <AnimatePresence mode="wait">
-                    {!showPinInput ? (
-                        <motion.div
-                            key="auth-form"
-                            initial={{ opacity: 0, x: -50 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: 50 }}
-                            transition={{ duration: 0.3 }}
-                        >
-                             <p className="text-center text-lg text-gray-400">
-                                {isLogin ? 'Faça login para continuar' : 'Crie sua conta para começar'}
-                            </p>
-                            <form className="mt-8 space-y-6" onSubmit={handleAuthAction}>
-                                <Input
-                                    id="email"
-                                    label="Endereço de e-mail"
-                                    name="email"
-                                    type="email"
-                                    autoComplete="email"
-                                    required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                />
+                <div className="card p-8 min-h-[380px]">
+                    <AnimatePresence mode="wait">
+                        {showPinInput ? (
+                            <motion.div
+                                key="pin"
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                                className="flex flex-col items-center justify-center h-full"
+                            >
+                                <h3 className="text-lg font-semibold text-white mb-4">Acesso de Desenvolvedor</h3>
+                                <PinInput pin={pin} onPinChange={setPin} hasError={pinError} />
+                                {loading && <LoadingSpinner />}
+                            </motion.div>
+                        ) : (
+                            <motion.div
+                                key="auth"
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                            >
+                                <h2 className="text-xl font-semibold text-white text-center mb-6">{isLogin ? 'Entrar' : 'Criar Conta'}</h2>
+                                <form onSubmit={handleAuth} className="space-y-4">
+                                    <Input id="email" label="E-mail" type="email" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" />
+                                    <Input id="password" label="Senha" type="password" value={password} onChange={e => setPassword(e.target.value)} required autoComplete={isLogin ? "current-password" : "new-password"} />
+                                    
+                                    {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+                                    {authMessage && <p className="text-green-400 text-sm text-center">{authMessage}</p>}
 
-                                <Input
-                                    id="password"
-                                    label="Senha"
-                                    name="password"
-                                    type="password"
-                                    autoComplete="current-password"
-                                    required
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                />
-
-                                {error && <p className="text-sm text-red-400 text-center">{error}</p>}
-                                {message && <p className="text-sm text-green-400 text-center">{message}</p>}
-
-                                <div>
                                     <Button type="submit" disabled={loading} className="w-full">
-                                        {loading ? <LoadingSpinner /> : (isLogin ? 'Entrar' : 'Cadastrar')}
+                                        {loading ? <LoadingSpinner/> : (isLogin ? 'Entrar' : 'Criar Conta')}
+                                    </Button>
+                                </form>
+                                <div className="mt-6 text-center">
+                                    <button onClick={() => { setIsLogin(!isLogin); setError(null); setAuthMessage(null); }} className="text-sm text-cyan-400 hover:underline">
+                                        {isLogin ? 'Não tem uma conta? Cadastre-se' : 'Já tem uma conta? Entre'}
+                                    </button>
+                                </div>
+                                <div className="mt-4 text-center">
+                                     <Button onClick={enterGuestMode} variant="secondary" size="sm" disabled={loading} className="w-full">
+                                        Continuar como Visitante
                                     </Button>
                                 </div>
-                            </form>
-                            <div className="relative my-6">
-                                <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                                    <div className="w-full border-t border-[oklch(var(--border-oklch))]" />
-                                </div>
-                                <div className="relative flex justify-center text-sm">
-                                    <span className="bg-[oklch(var(--card-oklch))] px-2 text-gray-500">ou</span>
-                                </div>
-                            </div>
-
-                            <div className="space-y-3">
-                                <Button onClick={() => setShowPinInput(true)} variant="secondary" disabled={loading} className="w-full">
-                                    Entrar como Desenvolvedor
-                                </Button>
-                                <Button onClick={handleGuestLogin} variant="secondary" disabled={loading} className="w-full">
-                                    Entrar com Conta Teste
-                                </Button>
-                            </div>
-
-                            <p className="mt-6 text-center text-sm text-gray-400">
-                                {isLogin ? 'Não tem uma conta?' : 'Já tem uma conta?'}
-                                <button onClick={() => { setIsLogin(!isLogin); setError(null); setMessage(null); }} className="ml-1 font-medium text-cyan-400 hover:text-cyan-300">
-                                    {isLogin ? 'Cadastre-se' : 'Faça login'}
-                                </button>
-                            </p>
-                        </motion.div>
-                    ) : (
-                         <PinView onBack={() => setShowPinInput(false)} />
-                    )}
-                   </AnimatePresence>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
-            </motion.div>
+            </div>
         </div>
     );
 };

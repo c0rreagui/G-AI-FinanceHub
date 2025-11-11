@@ -9,6 +9,9 @@ export interface AuthContextType {
   setApiKey: (key: string) => void;
   isDeveloper: boolean;
   setDeveloperMode: (isDev: boolean) => void;
+  isGuest: boolean;
+  enterGuestMode: () => void;
+  logout: () => Promise<void>;
 }
 
 export const AuthContext = React.createContext<AuthContextType | undefined>(undefined);

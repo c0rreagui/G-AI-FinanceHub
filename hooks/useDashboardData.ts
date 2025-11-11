@@ -1,640 +1,290 @@
-import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
+// hooks/useDashboardData.ts
+// FIX: Imported React to resolve the "UMD global" error when using React.createElement.
+import React, { createContext, useState, useEffect, useContext, useCallback, useMemo, ReactNode } from 'react';
 import { supabase } from '../services/supabaseClient';
 import { useAuth } from './useAuth';
-import { useToast } from './useToast';
 import { 
     Transaction, 
     Goal, 
     Debt, 
     ScheduledTransaction, 
-    Category, 
-    SummaryData, 
-    MonthlyChartData,
-    UserLevel,
-    Achievement,
-    DashboardDataContextType, 
-    TransactionType,
+    Category,
+    DashboardDataContextType,
+    SummaryData,
     GoalStatus,
     DebtStatus,
-    UserRank
+    TransactionType,
+    MonthlyChartData,
+    UserLevel,
+    UserRank,
+    Achievement,
+    ScheduledTransactionFrequency,
 } from '../types';
-import { getIconByName } from '../utils/categoryIcons';
-import { logger } from '../services/loggingService';
 import { DashboardDataContext } from '../contexts/DashboardDataContext';
+import { getIconByName } from '../utils/categoryIcons';
+import { useToast } from './useToast';
+import { logger } from '../services/loggingService';
 
+const GUEST_DATA_KEY = 'financehub_guest_data';
 
-// --- DADOS MOCKADOS / CONFIGURAÇÃO ---
-
-// Categorias pré-definidas. Movidas para fora do componente para evitar recriação.
-const defaultCategoriesData: Omit<Category, 'icon'>[] = [
-    { id: 'cat_alimentacao', name: 'Alimentação', color: '#ff8c00' },
-    { id: 'cat_transporte', name: 'Transporte', color: '#4682b4' },
-    { id: 'cat_moradia', name: 'Moradia', color: '#dc143c' },
-    { id: 'cat_compras', name: 'Compras', color: '#9932cc' },
-    { id: 'cat_saude', name: 'Saúde', color: '#32cd32' },
-    { id: 'cat_lazer', name: 'Lazer', color: '#ff1493' },
-    { id: 'cat_educacao', name: 'Educação', color: '#1e90ff' },
-    { id: 'cat_salario', name: 'Salário', color: '#20b2aa' },
-    { id: 'cat_investimentos', name: 'Investimentos', color: '#ffd700' },
-    { id: 'cat_outros', name: 'Outros', color: '#808080' },
-    { id: 'cat_pagamento_divida', name: 'Pagamento de Dívida', color: '#f08080'},
-    { id: 'cat_contribuicao_meta', name: 'Contribuição de Meta', color: '#98fb98'},
+const getDefaultCategories = (userId: string | 'guest'): Omit<Category, 'id'>[] => [
+    { user_id: userId, name: 'Alimentação', icon: getIconByName('Utensils'), color: '#f59e0b' },
+    { user_id: userId, name: 'Compras', icon: getIconByName('ShoppingCart'), color: '#84cc16' },
+    { user_id: userId, name: 'Transporte', icon: getIconByName('Car'), color: '#3b82f6' },
+    { user_id: userId, name: 'Moradia', icon: getIconByName('HomeIcon'), color: '#14b8a6' },
+    { user_id: userId, name: 'Saúde', icon: getIconByName('Heart'), color: '#ef4444' },
+    { user_id: userId, name: 'Educação', icon: getIconByName('BookOpen'), color: '#a855f7' },
+    { user_id: userId, name: 'Lazer', icon: getIconByName('Gamepad'), color: '#ec4899' },
+    { user_id: userId, name: 'Salário', icon: getIconByName('Wallet'), color: '#22c55e' },
+    { user_id: userId, name: 'Investimentos', icon: getIconByName('PiggyBank'), color: '#10b981' },
+    { user_id: userId, name: 'Outros', icon: getIconByName('Gift'), color: '#6b7280' },
 ];
 
-const iconMapping: { [key: string]: string } = {
-    cat_alimentacao: 'Utensils',
-    cat_transporte: 'Car',
-    cat_moradia: 'HomeIcon',
-    cat_compras: 'ShoppingCart',
-    cat_saude: 'Heart',
-    cat_lazer: 'Gamepad',
-    cat_educacao: 'BookOpen',
-    cat_salario: 'Wallet',
-    cat_investimentos: 'TrendingUp',
-    cat_outros: 'Gift',
-    cat_pagamento_divida: 'TrendingDown',
-    cat_contribuicao_meta: 'Target'
+const generateMockData = (userId: string, categories: Category[]) => {
+    const now = new Date();
+    const goals: Goal[] = [];
+    const debts: Debt[] = [];
+    const transactions: Omit<Transaction, 'category' | 'id'>[] = [];
+    const scheduledTransactions: Omit<ScheduledTransaction, 'category' | 'id'>[] = [];
+
+    const catMap = new Map(categories.map(c => [c.name, c.id]));
+    const getRandomCatId = (type: 'receita' | 'despesa') => {
+        const despesaCats = ['Alimentação', 'Compras', 'Transporte', 'Moradia', 'Lazer'];
+        if (type === 'receita') return catMap.get('Salário')!;
+        return catMap.get(despesaCats[Math.floor(Math.random() * despesaCats.length)])!;
+    };
+
+    // 1. Metas
+    const goal1: Goal = {
+        id: crypto.randomUUID(),
+        user_id: userId,
+        name: 'Viagem para o Japão',
+        target_amount: 25000,
+        current_amount: 7500,
+        deadline: new Date(now.getFullYear() + 2, 5, 1).toISOString(),
+        status: GoalStatus.EM_ANDAMENTO,
+    };
+    goals.push(goal1);
+    transactions.push({
+        description: 'Contribuição para a meta: Viagem para o Japão',
+        amount: -7500,
+        type: TransactionType.DESPESA,
+        date: new Date(now.getFullYear(), now.getMonth() - 2, 15).toISOString(),
+        category_id: catMap.get('Investimentos')!,
+        user_id: userId,
+        goal_contribution_id: goal1.id,
+    });
+
+    // 2. Dívidas
+    const debt1: Debt = {
+        id: crypto.randomUUID(),
+        user_id: userId,
+        name: 'Financiamento do Carro',
+        total_amount: 60000,
+        paid_amount: 15000,
+        interest_rate: 18.5,
+        category: 'Automóvel',
+        status: DebtStatus.ATIVA,
+    };
+    debts.push(debt1);
+    transactions.push({
+        description: 'Pagamento da dívida: Financiamento do Carro',
+        amount: -15000,
+        type: TransactionType.DESPESA,
+        date: new Date(now.getFullYear(), now.getMonth() - 1, 5).toISOString(),
+        category_id: catMap.get('Transporte')!,
+        user_id: userId,
+        debt_payment_id: debt1.id,
+    });
+
+    // 3. Transações Recorrentes
+    for (let i = 0; i < 6; i++) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        transactions.push({
+            description: 'Salário',
+            amount: 7500,
+            type: TransactionType.RECEITA,
+            date: date.toISOString(),
+            category_id: catMap.get('Salário')!,
+            user_id: userId,
+        });
+        
+        for (let j = 0; j < 15; j++) {
+            transactions.push({
+                description: `Compra Aleatória ${i}-${j}`,
+                amount: -(Math.random() * 200 + 10),
+                type: TransactionType.DESPESA,
+                date: new Date(now.getFullYear(), now.getMonth() - i, Math.floor(Math.random() * 28) + 1).toISOString(),
+                category_id: getRandomCatId('despesa'),
+                user_id: userId,
+            });
+        }
+    }
+    
+    // 4. Agendamentos
+    scheduledTransactions.push({
+        description: 'Assinatura Netflix',
+        amount: -39.90,
+        type: TransactionType.DESPESA,
+        category_id: catMap.get('Lazer')!,
+        start_date: new Date(now.getFullYear(), now.getMonth(), 10).toISOString(),
+        next_due_date: new Date(now.getFullYear(), now.getMonth() + 1, 10).toISOString(),
+        frequency: ScheduledTransactionFrequency.MENSAL,
+        user_id: userId,
+    });
+     scheduledTransactions.push({
+        description: 'Aluguel',
+        amount: -2500,
+        type: TransactionType.DESPESA,
+        category_id: catMap.get('Moradia')!,
+        start_date: new Date(now.getFullYear(), now.getMonth(), 5).toISOString(),
+        next_due_date: new Date(now.getFullYear(), now.getMonth() + 1, 5).toISOString(),
+        frequency: ScheduledTransactionFrequency.MENSAL,
+        user_id: userId,
+    });
+
+    return { goals, debts, transactions, scheduledTransactions };
 };
 
-const initialAchievements: Omit<Achievement, 'unlocked' | 'dateUnlocked'>[] = [
-    { id: 'ach_first_transaction', name: 'Primeiros Passos', description: 'Adicione sua primeira transação.' },
-    { id: 'ach_first_goal', name: 'Sonhador', description: 'Crie sua primeira meta financeira.' },
-    { id: 'ach_first_debt_paid', name: 'Começando a Limpar', description: 'Faça o primeiro pagamento de uma dívida.' },
-    { id: 'ach_one_week_streak', name: 'Consistente', description: 'Use o app por 7 dias seguidos.' },
-];
-
-
 export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { user } = useAuth();
+    const { user, isGuest } = useAuth();
     const { showToast } = useToast();
-
-    // Estados de dados
-    const [transactions, setTransactions] = useState<Transaction[]>([]);
-    const [goals, setGoals] = useState<Goal[]>([]);
-    const [debts, setDebts] = useState<Debt[]>([]);
-    const [scheduledTransactions, setScheduledTransactions] = useState<ScheduledTransaction[]>([]);
-    const [achievements, setAchievements] = useState<Achievement[]>([]);
-    
-    // Estados de UI
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isMutating, setIsMutating] = useState(false);
     const [mutatingIds, setMutatingIds] = useState<Set<string>>(new Set());
 
-    // Dados derivados e processados
-    const categories = useMemo((): Category[] => {
-        return defaultCategoriesData.map(cat => ({
-            ...cat,
-            icon: getIconByName(iconMapping[cat.id] || 'Gift')
-        }));
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [goals, setGoals] = useState<Goal[]>([]);
+    const [debts, setDebts] = useState<Debt[]>([]);
+    const [scheduledTransactions, setScheduledTransactions] = useState<ScheduledTransaction[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
+
+    // --- GUEST DATA HANDLING ---
+    const getGuestData = useCallback(() => {
+        try {
+            const data = localStorage.getItem(GUEST_DATA_KEY);
+            return data ? JSON.parse(data) : { transactions: [], goals: [], debts: [], scheduledTransactions: [], categories: [] };
+        } catch (e) {
+            logger.error("Erro ao ler dados do visitante do localStorage", { error: e });
+            return { transactions: [], goals: [], debts: [], scheduledTransactions: [], categories: [] };
+        }
     }, []);
 
-    const categoriesById = useMemo(() => {
-        return categories.reduce((acc, cat) => {
-            acc[cat.id] = cat;
-            return acc;
-        }, {} as { [key: string]: Category });
-    }, [categories]);
+    const setGuestData = useCallback((data: any) => {
+        try {
+            localStorage.setItem(GUEST_DATA_KEY, JSON.stringify(data));
+        } catch (e) {
+            logger.error("Erro ao salvar dados do visitante no localStorage", { error: e });
+        }
+    }, []);
     
-    // Fallback de categoria robusto para evitar crashes.
-    const fallbackCategory = useMemo(() => {
-        return categoriesById['cat_outros'] || (categories.length > 0 ? categories[0] : { id: 'fallback', name: 'Outros', icon: getIconByName('Gift'), color: '#808080'});
-    }, [categoriesById, categories]);
-
-    // Função de tratamento de erro centralizada
-    const handleError = useCallback((err: any, context: string, userMessage?: string) => {
-        const errorMessage = userMessage || err.message || 'Ocorreu um erro desconhecido.';
-        logger.error(`Erro em ${context}`, { error: err });
-        setError(errorMessage);
-        showToast(`Erro: ${errorMessage}`, { type: 'error' });
+    // --- UTILITY FUNCTIONS ---
+    const withMutation = useCallback(async <T>(asyncFunc: () => Promise<T>, ...ids: string[]): Promise<T | null> => {
+        setIsMutating(true);
+        if (ids.length > 0) {
+            setMutatingIds(prev => new Set([...prev, ...ids]));
+        }
+        try {
+            const result = await asyncFunc();
+            return result;
+        } catch (e: any) {
+            const errorMessage = e.message || "Ocorreu um erro desconhecido.";
+            logger.error("Erro na mutação de dados", { error: e });
+            setError(errorMessage);
+            showToast('Erro na Operação', { description: errorMessage, type: 'error' });
+            return null;
+        } finally {
+            setIsMutating(false);
+            if (ids.length > 0) {
+                setMutatingIds(prev => {
+                    const newSet = new Set(prev);
+                    ids.forEach(id => newSet.delete(id));
+                    return newSet;
+                });
+            }
+        }
     }, [showToast]);
-    
-    // --- LÓGICA DE FETCH ---
+
+    // --- DATA FETCHING ---
     const fetchData = useCallback(async () => {
+        if (isGuest) {
+            setLoading(true);
+            setError(null);
+            let data = getGuestData();
+            if (!data.categories || data.categories.length === 0) {
+                data.categories = getDefaultCategories('guest').map(cat => ({ ...cat, id: crypto.randomUUID() }));
+                setGuestData(data);
+            }
+            const populatedCategories = data.categories.map((c: any) => ({ ...c, icon: getIconByName(c.icon.displayName || c.icon) }));
+            const categoryMap = new Map(populatedCategories.map((c: any) => [c.id, c]));
+            const fallbackCategory = populatedCategories.find((c: any) => c.name === 'Outros') || populatedCategories[0];
+            
+            setCategories(populatedCategories);
+            setTransactions(data.transactions?.map((tx: any) => ({ ...tx, category: categoryMap.get(tx.category_id) || fallbackCategory })).sort((a: Transaction, b: Transaction) => new Date(b.date).getTime() - new Date(a.date).getTime()) || []);
+            setGoals(data.goals?.sort((a: Goal, b: Goal) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime()) || []);
+            setDebts(data.debts || []);
+            setScheduledTransactions(data.scheduledTransactions?.map((stx: any) => ({ ...stx, category: categoryMap.get(stx.category_id) || fallbackCategory })).sort((a: ScheduledTransaction, b: ScheduledTransaction) => new Date(a.next_due_date).getTime() - new Date(b.next_due_date).getTime()) || []);
+            setLoading(false);
+            return;
+        }
+
         if (!user) return;
         setLoading(true);
+        setError(null);
         try {
+            let { data: categoriesData, error: categoriesError } = await supabase
+                .from('categories')
+                .select('*')
+                .eq('user_id', user.id);
+
+            if (categoriesError) throw categoriesError;
+
+            const populatedCategories: Category[] = categoriesData.map(c => ({...c, icon: getIconByName(c.icon) }));
+            setCategories(populatedCategories);
+            
+            const categoryMap = new Map(populatedCategories.map(c => [c.id, c]));
+            const fallbackCategory = populatedCategories.find(c => c.name === 'Outros') || populatedCategories[0];
+
             const [
                 { data: transactionsData, error: transactionsError },
                 { data: goalsData, error: goalsError },
                 { data: debtsData, error: debtsError },
-                { data: scheduledData, error: scheduledError },
-                { data: achievementsData, error: achievementsError }
+                { data: scheduledData, error: scheduledError }
             ] = await Promise.all([
                 supabase.from('transactions').select('*').eq('user_id', user.id).order('date', { ascending: false }),
-                supabase.from('goals').select('*').eq('user_id', user.id),
+                supabase.from('goals').select('*').eq('user_id', user.id).order('deadline', { ascending: true }),
                 supabase.from('debts').select('*').eq('user_id', user.id),
-                supabase.from('scheduled_transactions').select('*').eq('user_id', user.id),
-                supabase.from('achievements').select('*').eq('user_id', user.id),
+                supabase.from('scheduled_transactions').select('*').eq('user_id', user.id).order('next_due_date', { ascending: true })
             ]);
 
             if (transactionsError) throw transactionsError;
             if (goalsError) throw goalsError;
             if (debtsError) throw debtsError;
             if (scheduledError) throw scheduledError;
-            if (achievementsError) throw achievementsError;
-            
-            // Mapeia snake_case do DB para camelCase da aplicação
-            const mappedTransactions = transactionsData?.map(tx => {
-                const { category_id, goal_contribution_id, debt_payment_id, ...rest } = tx;
-                return { 
-                    ...rest, 
-                    categoryId: category_id, 
-                    goalContributionId: goal_contribution_id, 
-                    debtPaymentId: debt_payment_id,
-                    category: categoriesById[category_id] || fallbackCategory 
-                };
-            }) || [];
-            setTransactions(mappedTransactions);
-            
-            const mappedGoals = goalsData?.map(goal => {
-                const { target_amount, current_amount, ...rest } = goal;
-                return { ...rest, targetAmount: target_amount, currentAmount: current_amount };
-            }) || [];
-            setGoals(mappedGoals);
 
-            const mappedDebts = debtsData?.map(debt => {
-                const { total_amount, paid_amount, interest_rate, ...rest } = debt;
-                return { ...rest, totalAmount: total_amount, paidAmount: paid_amount, interestRate: interest_rate };
-            }) || [];
-            setDebts(mappedDebts);
+            setTransactions(transactionsData?.map(tx => ({...tx, category: categoryMap.get(tx.category_id) || fallbackCategory })) || []);
+            setGoals(goalsData || []);
+            setDebts(debtsData || []);
+            setScheduledTransactions(scheduledData?.map(stx => ({...stx, category: categoryMap.get(stx.category_id) || fallbackCategory })) || []);
 
-            const mappedScheduled = scheduledData?.map(stx => {
-                const { category_id, start_date, next_due_date, ...rest } = stx;
-                return { 
-                    ...rest, 
-                    categoryId: category_id, 
-                    startDate: start_date,
-                    nextDueDate: next_due_date,
-                    category: categoriesById[category_id] || fallbackCategory 
-                };
-            }) || [];
-            setScheduledTransactions(mappedScheduled);
-
-
-            const unlockedAchievements = achievementsData?.map(a => a.achievement_id) || [];
-            const processedAchievements = initialAchievements.map(ach => ({
-                ...ach,
-                unlocked: unlockedAchievements.includes(ach.id),
-                dateUnlocked: achievementsData?.find(a => a.achievement_id === ach.id)?.unlocked_at
-            }));
-            setAchievements(processedAchievements);
-
-        } catch (err: any) {
-            handleError(err, 'fetchData');
+        } catch (e: any) {
+            const errorMessage = e.message || "Falha ao carregar os dados.";
+            logger.error("Erro ao buscar dados do Supabase", { error: e });
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }
-    }, [user, categoriesById, handleError, fallbackCategory]);
+    }, [user, isGuest, getGuestData, setGuestData]);
 
     useEffect(() => {
         fetchData();
     }, [fetchData]);
 
-    // --- FUNÇÕES DE CRUD (COM UI OTIMISTA) ---
+    const clearError = () => setError(null);
 
-    // Transações
-    const addTransaction = useCallback(async (tx: Omit<Transaction, 'id' | 'category'>): Promise<boolean> => {
-        const tempId = `temp-${Date.now()}`;
-        const newTx: Transaction = { ...tx, id: tempId, category: categoriesById[tx.categoryId] || fallbackCategory };
-
-        setTransactions(prev => [newTx, ...prev].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
-        
-        const payload = {
-            description: tx.description,
-            amount: tx.amount,
-            type: String(tx.type).toLowerCase() === 'receita' ? 'receita' : 'despesa',
-            date: tx.date,
-            category_id: tx.categoryId,
-            goal_contribution_id: tx.goalContributionId,
-            debt_payment_id: tx.debtPaymentId,
-            user_id: user!.id,
-        };
-        const { data, error } = await supabase.from('transactions').insert(payload).select().single();
-
-        if (error) {
-            handleError(error, 'addTransaction');
-            setTransactions(prev => prev.filter(t => t.id !== tempId));
-            return false;
-        }
-        
-        showToast('Transação adicionada!', { type: 'success' });
-        
-        if (data) {
-            const { category_id, goal_contribution_id, debt_payment_id, ...rest } = data;
-            const finalTx: Transaction = {
-                ...rest,
-                categoryId: category_id,
-                goalContributionId: goal_contribution_id,
-                debtPaymentId: debt_payment_id,
-                category: categoriesById[category_id] || fallbackCategory
-            };
-            setTransactions(prev => prev.map(t => t.id === tempId ? finalTx : t));
-        }
-        return true;
-    }, [user, categoriesById, fallbackCategory, handleError, showToast]);
-        
-    const updateTransaction = useCallback(async (tx: Omit<Transaction, 'category'>): Promise<boolean> => {
-        const originalTransactions = [...transactions];
-        const updatedTx: Transaction = { ...tx, category: categoriesById[tx.categoryId] || fallbackCategory };
-
-        setTransactions(prev => prev.map(t => t.id === tx.id ? updatedTx : t));
-        
-        const payload = {
-            description: tx.description,
-            amount: tx.amount,
-            type: String(tx.type).toLowerCase() === 'receita' ? 'receita' : 'despesa',
-            date: tx.date,
-            category_id: tx.categoryId,
-            goal_contribution_id: tx.goalContributionId,
-            debt_payment_id: tx.debtPaymentId,
-        };
-        const { error } = await supabase.from('transactions').update(payload).eq('id', tx.id);
-
-        if (error) {
-            handleError(error, 'updateTransaction');
-            setTransactions(originalTransactions);
-            return false;
-        }
-
-        showToast('Transação atualizada!', { type: 'success' });
-        return true;
-    }, [transactions, categoriesById, fallbackCategory, handleError, showToast]);
-
-    const deleteTransaction = useCallback(async (id: string): Promise<boolean> => {
-        const originalTransactions = [...transactions];
-        
-        setTransactions(prev => prev.filter(t => t.id !== id));
-        const { error } = await supabase.from('transactions').delete().eq('id', id);
-
-        if (error) {
-            handleError(error, 'deleteTransaction');
-            setTransactions(originalTransactions);
-            return false;
-        }
-
-        showToast('Transação excluída.', { type: 'success' });
-        return true;
-    }, [transactions, handleError, showToast]);
-
-    const updateTransactionsCategory = useCallback(async (ids: string[], categoryId: string): Promise<boolean> => {
-        const originalTransactions = [...transactions];
-        const updatedCategory = categoriesById[categoryId] || fallbackCategory;
-        
-        setTransactions(prev => prev.map(tx => ids.includes(tx.id) ? { ...tx, categoryId, category: updatedCategory } : tx));
-        const { error } = await supabase.from('transactions').update({ category_id: categoryId }).in('id', ids);
-
-        if (error) {
-            handleError(error, 'updateTransactionsCategory');
-            setTransactions(originalTransactions);
-            return false;
-        }
-        showToast(`${ids.length} transações atualizadas!`, { type: 'success' });
-        return true;
-    }, [transactions, categoriesById, fallbackCategory, handleError, showToast]);
-
-    // Metas
-    const addGoal = useCallback(async (goal: Omit<Goal, 'id' | 'currentAmount' | 'status'>): Promise<Goal | null> => {
-        const tempId = `temp-goal-${Date.now()}`;
-        const newGoal: Goal = { ...goal, id: tempId, currentAmount: 0, status: GoalStatus.EM_ANDAMENTO };
-        
-        setGoals(prev => [newGoal, ...prev]);
-
-        const payload = {
-            name: goal.name,
-            target_amount: goal.targetAmount,
-            deadline: goal.deadline,
-            user_id: user!.id,
-            current_amount: 0,
-            status: GoalStatus.EM_ANDAMENTO
-        };
-        const { data, error } = await supabase.from('goals').insert(payload).select().single();
-        
-        if (error) {
-            handleError(error, 'addGoal');
-            setGoals(prev => prev.filter(g => g.id !== tempId));
-            return null;
-        }
-
-        showToast('Meta criada com sucesso!', { type: 'success' });
-        await fetchData(); // Refetch para sincronizar ID real e dados mapeados
-        
-        if (data) {
-            const { target_amount, current_amount, ...rest } = data;
-            return { ...rest, targetAmount: target_amount, currentAmount: current_amount };
-        }
-        return null;
-    }, [user, handleError, showToast, fetchData]);
-
-    const updateGoalValue = useCallback(async (id: string, valueToAdd: number): Promise<boolean> => {
-        const goal = goals.find(g => g.id === id);
-        if (!goal) return false;
-
-        const txSuccess = await addTransaction({
-            description: `Contribuição para a meta: ${goal.name}`, 
-            amount: -Math.abs(valueToAdd), // FIX: Despesas devem ter valor negativo
-            type: TransactionType.DESPESA, date: new Date().toISOString(),
-            categoryId: 'cat_contribuicao_meta', goalContributionId: id,
-        });
-
-        if (!txSuccess) {
-            handleError(new Error('A meta não foi atualizada porque o registro da transação falhou.'), 'updateGoalValue-tx-failure', 'Falha ao registrar a transação. A meta não foi alterada.');
-            return false;
-        }
-        
-        const originalGoals = [...goals];
-        const newAmount = goal.currentAmount + valueToAdd;
-        const newStatus = newAmount >= goal.targetAmount ? GoalStatus.CONCLUIDO : goal.status;
-        setGoals(prev => prev.map(g => g.id === id ? { ...g, currentAmount: newAmount, status: newStatus } : g));
-
-        const { error } = await supabase.from('goals').update({ current_amount: newAmount, status: newStatus }).eq('id', id);
-
-        if (error) {
-            handleError(error, 'updateGoalValue-goal-update-failure', 'A transação foi salva, mas a atualização da meta falhou. Sincronizando...');
-            setGoals(originalGoals); 
-            await fetchData(); 
-            return false;
-        }
-
-        showToast(`Valor adicionado à meta ${goal.name}!`, { type: 'success' });
-        return true;
-    }, [goals, addTransaction, handleError, showToast, fetchData]);
-
-    const deleteGoal = useCallback(async (id: string): Promise<boolean> => {
-        const originalGoals = [...goals];
-        const originalTransactions = [...transactions];
-        
-        setGoals(prev => prev.filter(g => g.id !== id));
-        setTransactions(prev => prev.filter(tx => tx.goalContributionId !== id));
-
-        const linkedTxIds = originalTransactions.filter(tx => tx.goalContributionId === id).map(tx => tx.id);
-        if (linkedTxIds.length > 0) {
-            const { error: txError } = await supabase.from('transactions').delete().in('id', linkedTxIds);
-            if (txError) {
-                handleError(txError, 'deleteGoal-tx-deletion');
-                setGoals(originalGoals);
-                setTransactions(originalTransactions);
-                return false;
-            }
-        }
-        
-        const { error: goalError } = await supabase.from('goals').delete().eq('id', id);
-
-        if (goalError) {
-            handleError(goalError, 'deleteGoal-goal-deletion');
-            setGoals(originalGoals);
-            setTransactions(originalTransactions);
-            await fetchData();
-            return false;
-        }
-
-        showToast('Meta e contribuições excluídas!', { type: 'success' });
-        return true;
-    }, [transactions, goals, handleError, showToast, fetchData]);
-
-    // Dívidas
-    const addDebt = useCallback(async (debt: Omit<Debt, 'id' | 'paidAmount' | 'status'>): Promise<Debt | null> => {
-        const tempId = `temp-debt-${Date.now()}`;
-        const newDebt: Debt = { ...debt, id: tempId, paidAmount: 0, status: DebtStatus.ATIVA };
-
-        setDebts(prev => [newDebt, ...prev]);
-
-        const payload = {
-            name: debt.name,
-            total_amount: debt.totalAmount,
-            interest_rate: debt.interestRate,
-            category: debt.category,
-            user_id: user!.id,
-            paid_amount: 0,
-            status: DebtStatus.ATIVA,
-        };
-        const { data, error } = await supabase.from('debts').insert(payload).select().single();
-        if (error) {
-            handleError(error, 'addDebt');
-            setDebts(prev => prev.filter(d => d.id !== tempId));
-            return null;
-        }
-        
-        showToast('Dívida registrada.', { type: 'success' });
-        await fetchData();
-        
-        if (data) {
-            const { total_amount, paid_amount, interest_rate, ...rest } = data;
-            return { ...rest, totalAmount: total_amount, paidAmount: paid_amount, interestRate: interest_rate };
-        }
-        return null;
-    }, [user, handleError, showToast, fetchData]);
-
-    const addPaymentToDebt = useCallback(async (id: string, paymentAmount: number): Promise<boolean> => {
-        const debt = debts.find(d => d.id === id);
-        if (!debt) return false;
-
-        const txSuccess = await addTransaction({
-            description: `Pagamento da dívida: ${debt.name}`, 
-            amount: -Math.abs(paymentAmount), // FIX: Despesas devem ter valor negativo
-            type: TransactionType.DESPESA, date: new Date().toISOString(),
-            categoryId: 'cat_pagamento_divida', debtPaymentId: id
-        });
-
-        if (!txSuccess) {
-            handleError(new Error('A dívida não foi atualizada porque o registro da transação falhou.'), 'addPaymentToDebt-tx-failure', 'Falha ao registrar a transação. A dívida não foi alterada.');
-            return false;
-        }
-
-        const originalDebts = [...debts];
-        const newPaidAmount = debt.paidAmount + paymentAmount;
-        const newStatus = newPaidAmount >= debt.totalAmount ? DebtStatus.PAGA : debt.status;
-        setDebts(prev => prev.map(d => d.id === id ? { ...d, paidAmount: newPaidAmount, status: newStatus } : d));
-
-        const { error } = await supabase.from('debts').update({ paid_amount: newPaidAmount, status: newStatus }).eq('id', id);
-
-        if (error) {
-            handleError(error, 'addPaymentToDebt-debt-update-failure', 'A transação foi salva, mas a atualização da dívida falhou. Sincronizando...');
-            setDebts(originalDebts);
-            await fetchData();
-            return false;
-        }
-
-        showToast(`Pagamento para ${debt.name} registrado!`, { type: 'success' });
-        return true;
-    }, [debts, addTransaction, handleError, showToast, fetchData]);
-
-    const deleteDebt = useCallback(async (id: string): Promise<boolean> => {
-        const originalDebts = [...debts];
-        const originalTransactions = [...transactions];
-
-        setDebts(prev => prev.filter(d => d.id !== id));
-        setTransactions(prev => prev.filter(tx => tx.debtPaymentId !== id));
-        
-        const linkedTxIds = originalTransactions.filter(tx => tx.debtPaymentId === id).map(tx => tx.id);
-        if (linkedTxIds.length > 0) {
-            const { error: txError } = await supabase.from('transactions').delete().in('id', linkedTxIds);
-            if (txError) {
-                handleError(txError, 'deleteDebt-tx-deletion');
-                setDebts(originalDebts);
-                setTransactions(originalTransactions);
-                return false;
-            }
-        }
-
-        const { error: debtError } = await supabase.from('debts').delete().eq('id', id);
-        if (debtError) {
-            handleError(debtError, 'deleteDebt-debt-deletion');
-            setDebts(originalDebts);
-            setTransactions(originalTransactions);
-            await fetchData();
-            return false;
-        }
-        
-        showToast('Dívida e pagamentos excluídos!', { type: 'success' });
-        return true;
-    }, [transactions, debts, handleError, showToast, fetchData]);
-
-    // Agendamentos
-    const addScheduledTransaction = useCallback(async (tx: Omit<ScheduledTransaction, 'id' | 'category' | 'nextDueDate'>): Promise<boolean> => {
-        const tempId = `temp-sch-${Date.now()}`;
-        const newScheduledTx: ScheduledTransaction = { 
-            ...tx, 
-            id: tempId, 
-            category: categoriesById[tx.categoryId] || fallbackCategory,
-            nextDueDate: new Date(tx.startDate).toISOString()
-        };
-
-        setScheduledTransactions(prev => [newScheduledTx, ...prev]);
-
-        const payload = {
-            description: tx.description,
-            amount: tx.amount,
-            type: String(tx.type).toLowerCase() === 'receita' ? 'receita' : 'despesa',
-            category_id: tx.categoryId,
-            start_date: tx.startDate,
-            frequency: tx.frequency,
-            next_due_date: newScheduledTx.nextDueDate,
-            user_id: user!.id
-        };
-        const { error } = await supabase.from('scheduled_transactions').insert(payload);
-
-        if (error) {
-            handleError(error, 'addScheduledTransaction');
-            setScheduledTransactions(prev => prev.filter(t => t.id !== tempId));
-            return false;
-        }
-        
-        showToast('Agendamento criado!', { type: 'success' });
-        await fetchData();
-        return true;
-    }, [user, categoriesById, fallbackCategory, handleError, showToast, fetchData]);
-
-    const updateScheduledTransaction = useCallback(async (tx: Omit<ScheduledTransaction, 'category'>): Promise<boolean> => {
-        const originalScheduled = [...scheduledTransactions];
-        const updatedTx: ScheduledTransaction = { ...tx, category: categoriesById[tx.categoryId] || fallbackCategory };
-        
-        setScheduledTransactions(prev => prev.map(item => item.id === tx.id ? updatedTx : item));
-
-        const payload = {
-            description: tx.description,
-            amount: tx.amount,
-            type: String(tx.type).toLowerCase() === 'receita' ? 'receita' : 'despesa',
-            category_id: tx.categoryId,
-            start_date: tx.startDate,
-            frequency: tx.frequency,
-            next_due_date: tx.nextDueDate,
-        };
-        const { error } = await supabase.from('scheduled_transactions').update(payload).eq('id', tx.id);
-        
-        if(error) {
-            handleError(error, 'updateScheduledTransaction');
-            setScheduledTransactions(originalScheduled);
-            return false;
-        }
-        
-        showToast('Agendamento atualizado!', { type: 'success' });
-        return true;
-    }, [scheduledTransactions, categoriesById, fallbackCategory, handleError, showToast]);
-
-    const deleteScheduledTransaction = useCallback(async (id: string): Promise<boolean> => {
-        const originalScheduled = [...scheduledTransactions];
-        setScheduledTransactions(prev => prev.filter(item => item.id !== id));
-        const { error } = await supabase.from('scheduled_transactions').delete().eq('id', id);
-
-        if (error) {
-            handleError(error, 'deleteScheduledTransaction');
-            setScheduledTransactions(originalScheduled);
-            return false;
-        }
-
-        showToast('Agendamento excluído.', { type: 'success' });
-        return true;
-    }, [scheduledTransactions, handleError, showToast]);
-
-    // --- FUNÇÕES DE DEVTOOLS ---
-    const addRandomTransactions = useCallback(async (count: number) => {
-        if (!user) return;
-        setIsMutating(true);
-        const descriptions = ['Supermercado', 'Gasolina', 'Restaurante', 'Cinema', 'Uber', 'Salário', 'Freelance'];
-        const expenseCategories = categories.filter(c => c.id !== 'cat_salario').map(c => c.id);
-        
-        const newTransactions = Array.from({ length: count }).map(() => {
-            const isExpense = Math.random() > 0.2; // 80% chance of expense
-            const amount = isExpense 
-                ? -(Math.random() * 200 + 5) // 5 a 205
-                : (Math.random() * 1500 + 500); // 500 a 2000
-            const date = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000); // last 30 days
-
-            return {
-                user_id: user.id,
-                description: descriptions[Math.floor(Math.random() * descriptions.length)],
-                amount: parseFloat(amount.toFixed(2)),
-                type: isExpense ? 'despesa' : 'receita',
-                date: date.toISOString(),
-                category_id: isExpense
-                    ? expenseCategories[Math.floor(Math.random() * expenseCategories.length)]
-                    : 'cat_salario',
-            };
-        });
-
-        const { error } = await supabase.from('transactions').insert(newTransactions);
-        if (error) {
-            handleError(error, 'addRandomTransactions');
-        } else {
-            showToast(`${count} transações aleatórias adicionadas!`, { type: 'success' });
-            await fetchData();
-        }
-        setIsMutating(false);
-    }, [user, categories, handleError, showToast, fetchData]);
-
-    const deleteAllUserData = useCallback(async () => {
-        if (!user) return;
-        setIsMutating(true);
-
-        const tables = ['transactions', 'goals', 'debts', 'scheduled_transactions', 'achievements'];
-        const promises = tables.map(table => supabase.from(table).delete().eq('user_id', user.id));
-
-        const results = await Promise.all(promises);
-        const someError = results.some(res => res.error);
-
-        if (someError) {
-            handleError(results.find(r => r.error)?.error, 'deleteAllUserData', 'Erro ao limpar todos os dados.');
-        } else {
-            showToast('Todos os dados do usuário foram resetados.', { type: 'success' });
-            await fetchData();
-        }
-        setIsMutating(false);
-    }, [user, handleError, showToast, fetchData]);
-
-    const grantXp = useCallback(async (amount: number) => {
-        const transactionsNeeded = Math.ceil(amount / 10);
-        showToast(`Adicionando ${transactionsNeeded} transações para conceder ${amount} XP...`, { type: 'info' });
-        await addRandomTransactions(transactionsNeeded);
-    }, [addRandomTransactions, showToast]);
-
-    const simulateError = useCallback(() => {
-        handleError(new Error("Erro simulado pelo DevTools"), "simulateError", "Este é um erro de teste para verificar o ErrorModal.");
-    }, [handleError]);
-
-
-    // --- DADOS DERIVADOS (SUMMARY, CHARTS, GAMIFICATION) ---
-    const summary: SummaryData = useMemo(() => {
+    // --- COMPUTED DATA (MEMOIZED) ---
+    const summary = useMemo<SummaryData>(() => {
         const now = new Date();
         const currentMonth = now.getMonth();
         const currentYear = now.getFullYear();
@@ -642,92 +292,479 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         const monthlyIncome = transactions
             .filter(t => t.type === TransactionType.RECEITA && new Date(t.date).getMonth() === currentMonth && new Date(t.date).getFullYear() === currentYear)
             .reduce((sum, t) => sum + t.amount, 0);
-        
+
         const monthlyExpenses = transactions
             .filter(t => t.type === TransactionType.DESPESA && new Date(t.date).getMonth() === currentMonth && new Date(t.date).getFullYear() === currentYear)
             .reduce((sum, t) => sum + t.amount, 0);
 
-        const totalBalance = transactions.reduce((sum, t) => sum + t.amount, 0);
+        const totalBalance = transactions.reduce((sum, t) => {
+            return t.type === TransactionType.RECEITA ? sum + t.amount : sum - Math.abs(t.amount)
+        }, 0);
 
         return { totalBalance, monthlyIncome, monthlyExpenses };
     }, [transactions]);
     
-    const monthlyChartData: MonthlyChartData[] = useMemo(() => {
-        const data: { [key: string]: { receita: number, despesa: number } } = {};
-        const monthLabels: string[] = [];
-        
-        for (let i = 5; i >= 0; i--) {
-            const d = new Date();
-            d.setMonth(d.getMonth() - i);
-            const monthKey = d.toLocaleString('pt-BR', { month: 'short' });
-            monthLabels.push(monthKey.charAt(0).toUpperCase() + monthKey.slice(1));
-            const key = `${d.getFullYear()}-${d.getMonth()}`;
-            data[key] = { receita: 0, despesa: 0 };
+    const monthlyChartData = useMemo<MonthlyChartData[]>(() => {
+        const data: { [key: string]: MonthlyChartData } = {};
+        const today = new Date();
+
+        for(let i=5; i >= 0; i--) {
+            const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
+            const monthName = date.toLocaleString('pt-BR', { month: 'short' }).replace('.', '').toUpperCase();
+            const year = date.getFullYear().toString().slice(-2);
+            const key = `${monthName}/${year}`;
+            data[key] = { name: key, receita: 0, despesa: 0 };
         }
-        
+
         transactions.forEach(tx => {
             const txDate = new Date(tx.date);
-            const key = `${txDate.getFullYear()}-${txDate.getMonth()}`;
-            if (data[key]) {
-                if (tx.type === TransactionType.RECEITA) data[key].receita += tx.amount;
-                else data[key].despesa += Math.abs(tx.amount);
+            const monthName = txDate.toLocaleString('pt-BR', { month: 'short' }).replace('.', '').toUpperCase();
+            const year = txDate.getFullYear().toString().slice(-2);
+            const key = `${monthName}/${year}`;
+
+            if(data[key]) {
+                 if (tx.type === TransactionType.RECEITA) {
+                    data[key].receita += tx.amount;
+                } else {
+                    data[key].despesa += Math.abs(tx.amount);
+                }
             }
         });
 
-        return monthLabels.map((label, index) => {
-            const d = new Date();
-            d.setMonth(d.getMonth() - (5 - index));
-            const key = `${d.getFullYear()}-${d.getMonth()}`;
-            return {
-                name: label,
-                ...data[key],
-            }
-        });
+        return Object.values(data);
+
     }, [transactions]);
     
     const userLevel: UserLevel | null = useMemo(() => {
-        if (loading) return null;
-        
-        const manualTransactions = transactions.filter(tx => !tx.goalContributionId && !tx.debtPaymentId);
-        
-        const xp = manualTransactions.length * 10 + goals.length * 50 + debts.filter(d => d.status === DebtStatus.PAGA).length * 100;
+        if (!user && !isGuest) return null;
+        const xp = (transactions.length * 10) + (goals.length * 50) + (debts.filter(d => d.status === DebtStatus.PAGA).length * 100);
         let level = 1;
         let xpToNextLevel = 100;
-        let requiredForLevelUp = 100;
+        let currentXp = xp;
         
-        while (xp >= requiredForLevelUp) {
+        while (currentXp >= xpToNextLevel) {
+            currentXp -= xpToNextLevel;
             level++;
             xpToNextLevel = Math.floor(xpToNextLevel * 1.5);
-            requiredForLevelUp += xpToNextLevel;
         }
 
         let rank = UserRank.BRONZE;
-        if (level >= 5) rank = UserRank.PRATA;
-        if (level >= 10) rank = UserRank.OURO;
-        if (level >= 20) rank = UserRank.PLATINA;
         if (level >= 50) rank = UserRank.DIAMANTE;
-
-        return { level, xp, xpToNextLevel: requiredForLevelUp, rank };
-    }, [transactions, goals, debts, loading]);
+        else if (level >= 25) rank = UserRank.PLATINA;
+        else if (level >= 10) rank = UserRank.OURO;
+        else if (level >= 5) rank = UserRank.PRATA;
+        
+        return { level, xp: currentXp, xpToNextLevel, rank };
+    }, [transactions, goals, debts, user, isGuest]);
     
-    const contextValue: DashboardDataContextType = useMemo(() => ({
-        transactions, goals, debts, scheduledTransactions, categories, summary, monthlyChartData,
-        userLevel, achievements, loading, isMutating, mutatingIds, error,
-        clearError: () => setError(null),
-        addTransaction, updateTransaction, deleteTransaction, updateTransactionsCategory,
-        addGoal, updateGoalValue, deleteGoal, addDebt, addPaymentToDebt, deleteDebt,
-        addScheduledTransaction, updateScheduledTransaction, deleteScheduledTransaction,
-        addRandomTransactions, deleteAllUserData, grantXp, simulateError,
+    const achievements: Achievement[] = useMemo(() => {
+        return [
+            { id: '1', name: 'Primeiros Passos', description: 'Adicione sua primeira transação.', unlocked: transactions.length > 0, dateUnlocked: transactions[0]?.date },
+            { id: '2', name: 'Planejador', description: 'Crie sua primeira meta financeira.', unlocked: goals.length > 0 },
+            { id: '3', name: 'Economista', description: 'Acumule R$ 1.000,00 em saldo.', unlocked: summary.totalBalance >= 1000 },
+            { id: '4', name: 'Livre de Dívidas', description: 'Pague sua primeira dívida.', unlocked: debts.some(d => d.status === DebtStatus.PAGA) },
+        ];
+    }, [transactions, goals, debts, summary.totalBalance]);
+
+    // --- CRUD FUNCTIONS ---
+    const addTransaction = (tx: Omit<Transaction, 'id' | 'category'|'user_id'|'category_id'> & {categoryId: string}) => withMutation(async () => {
+        if (isGuest) {
+            const data = getGuestData();
+            const newTx = { ...tx, id: crypto.randomUUID(), user_id: 'guest', category_id: tx.categoryId, created_at: new Date().toISOString() };
+            data.transactions.push(newTx);
+            setGuestData(data);
+            await fetchData();
+            showToast('Transação Adicionada!', { type: 'success' });
+            return true;
+        }
+        const { error } = await supabase.from('transactions').insert({ ...tx, category_id: tx.categoryId, user_id: user!.id });
+        if (error) throw error;
+        await fetchData();
+        showToast('Transação Adicionada!', { type: 'success' });
+        return true;
+    });
+
+    const updateTransaction = (tx: Omit<Transaction, 'category'|'user_id'|'category_id'> & {categoryId: string}) => withMutation(async () => {
+        if (isGuest) {
+            const data = getGuestData();
+            const index = data.transactions.findIndex((t: Transaction) => t.id === tx.id);
+            if (index > -1) {
+                data.transactions[index] = { ...data.transactions[index], ...tx, category_id: tx.categoryId };
+                setGuestData(data);
+            }
+            await fetchData();
+            showToast('Transação Atualizada!', { type: 'success' });
+            return true;
+        }
+        const { error } = await supabase.from('transactions').update({ ...tx, category_id: tx.categoryId }).eq('id', tx.id);
+        if (error) throw error;
+        await fetchData();
+        showToast('Transação Atualizada!', { type: 'success' });
+        return true;
+    }, tx.id);
+
+    const deleteTransaction = (id: string) => withMutation(async () => {
+        if (isGuest) {
+            const data = getGuestData();
+            data.transactions = data.transactions.filter((t: Transaction) => t.id !== id);
+            setGuestData(data);
+            await fetchData();
+            showToast('Transação Excluída!', { type: 'success' });
+            return true;
+        }
+        const { error } = await supabase.from('transactions').delete().eq('id', id);
+        if (error) throw error;
+        await fetchData();
+        showToast('Transação Excluída!', { type: 'success' });
+        return true;
+    }, id);
+    
+    const updateTransactionsCategory = (transactionIds: string[], newCategoryId: string) => withMutation(async () => {
+        if (isGuest) {
+            const data = getGuestData();
+            data.transactions.forEach((tx: Transaction) => {
+                if (transactionIds.includes(tx.id)) {
+                    tx.category_id = newCategoryId;
+                }
+            });
+            setGuestData(data);
+            await fetchData();
+            showToast(`${transactionIds.length} transações foram atualizadas!`, { type: 'success' });
+            return true;
+        }
+        const { error } = await supabase.from('transactions').update({ category_id: newCategoryId }).in('id', transactionIds);
+        if (error) throw error;
+        await fetchData();
+        showToast(`${transactionIds.length} transações foram atualizadas!`, { type: 'success' });
+        return true;
+    }, ...transactionIds);
+
+    const addGoal = (goal: Omit<Goal, 'id' | 'current_amount' | 'status' | 'user_id' | 'target_amount' | 'deadline'> & {targetAmount: number; deadline: string;}) => withMutation(async () => {
+        if (isGuest) {
+            const data = getGuestData();
+            const newGoal: Goal = {
+                id: crypto.randomUUID(),
+                name: goal.name,
+                target_amount: goal.targetAmount,
+                deadline: goal.deadline,
+                current_amount: 0,
+                status: GoalStatus.EM_ANDAMENTO,
+                user_id: 'guest',
+            };
+            data.goals.push(newGoal);
+            setGuestData(data);
+            await fetchData();
+            showToast('Meta Criada!', { description: 'Agora adicione o primeiro valor!', type: 'success' });
+            return newGoal;
+        }
+        const { data, error } = await supabase.from('goals').insert({ name: goal.name, target_amount: goal.targetAmount, deadline: goal.deadline, user_id: user!.id }).select().single();
+        if (error) throw error;
+        await fetchData();
+        showToast('Meta Criada!', { description: 'Agora adicione o primeiro valor!', type: 'success' });
+        return data as Goal;
+    });
+    
+    const updateGoalValue = (goalId: string, amount: number) => withMutation(async () => {
+        const goal = (isGuest ? getGuestData().goals : goals).find((g: Goal) => g.id === goalId);
+        if (!goal) throw new Error("Meta não encontrada.");
+
+        const tx: Omit<Transaction, 'id' | 'category'|'user_id'|'category_id'> & {categoryId: string} = {
+            description: `Contribuição para a meta: ${goal.name}`,
+            amount: amount,
+            type: TransactionType.DESPESA,
+            date: new Date().toISOString(),
+            categoryId: categories.find(c => c.name === 'Investimentos')?.id || categories[0].id,
+            goal_contribution_id: goalId,
+        };
+
+        if (isGuest) {
+            const data = getGuestData();
+            const newTx = { ...tx, id: crypto.randomUUID(), user_id: 'guest', category_id: tx.categoryId, created_at: new Date().toISOString() };
+            data.transactions.push(newTx);
+            const goalIndex = data.goals.findIndex((g: Goal) => g.id === goalId);
+            if (goalIndex > -1) {
+                data.goals[goalIndex].current_amount += Math.abs(newTx.amount);
+                if (data.goals[goalIndex].current_amount >= data.goals[goalIndex].target_amount) {
+                    data.goals[goalIndex].status = GoalStatus.CONCLUIDO;
+                }
+            }
+            setGuestData(data);
+        } else {
+            const { error } = await supabase.from('transactions').insert({ ...tx, category_id: tx.categoryId, user_id: user!.id });
+            if (error) throw error;
+        }
+        
+        await fetchData();
+        showToast('Valor Adicionado à Meta!', { type: 'success' });
+        
+        const updatedGoal = (isGuest ? getGuestData().goals : goals).find((g: Goal) => g.id === goalId);
+        if (updatedGoal && updatedGoal.status === GoalStatus.CONCLUIDO) {
+            showToast('Parabéns!', { description: `Meta "${goal.name}" concluída!`, type: 'success' });
+        }
+        return true;
+    }, goalId);
+
+    const deleteGoal = (id: string) => withMutation(async () => {
+        if (isGuest) {
+            const data = getGuestData();
+            data.transactions = data.transactions.filter((t: Transaction) => t.goal_contribution_id !== id);
+            data.goals = data.goals.filter((g: Goal) => g.id !== id);
+            setGuestData(data);
+        } else {
+            const { error: txError } = await supabase.from('transactions').delete().eq('goal_contribution_id', id);
+            if (txError) throw txError;
+            const { error } = await supabase.from('goals').delete().eq('id', id);
+            if (error) throw error;
+        }
+
+        await fetchData();
+        showToast('Meta Excluída!', { description: 'As contribuições foram removidas.', type: 'info' });
+        return true;
+    }, id);
+
+    const addDebt = (debt: Omit<Debt, 'id' | 'paid_amount' | 'status' | 'user_id' | 'total_amount' | 'interest_rate'> & {totalAmount: number; interestRate: number}) => withMutation(async () => {
+        if (isGuest) {
+            const data = getGuestData();
+            const newDebt: Debt = {
+                id: crypto.randomUUID(),
+                name: debt.name,
+                total_amount: debt.totalAmount,
+                interest_rate: debt.interestRate,
+                category: debt.category,
+                paid_amount: 0,
+                status: DebtStatus.ATIVA,
+                user_id: 'guest',
+            };
+            data.debts.push(newDebt);
+            setGuestData(data);
+            await fetchData();
+            showToast('Dívida Adicionada!', { type: 'success' });
+            return newDebt;
+        }
+        const { data, error } = await supabase.from('debts').insert({ name: debt.name, total_amount: debt.totalAmount, interest_rate: debt.interestRate, category: debt.category, user_id: user!.id }).select().single();
+        if (error) throw error;
+        await fetchData();
+        showToast('Dívida Adicionada!', { type: 'success' });
+        return data as Debt;
+    });
+
+    const addPaymentToDebt = (debtId: string, amount: number) => withMutation(async () => {
+        const debt = (isGuest ? getGuestData().debts : debts).find((d: Debt) => d.id === debtId);
+        if (!debt) throw new Error("Dívida não encontrada.");
+
+        const tx: Omit<Transaction, 'id' | 'category'|'user_id'|'category_id'> & {categoryId: string} = {
+            description: `Pagamento da dívida: ${debt.name}`,
+            amount: amount,
+            type: TransactionType.DESPESA,
+            date: new Date().toISOString(),
+            categoryId: categories.find(c => c.name === 'Outros')?.id || categories[0].id,
+            debt_payment_id: debtId,
+        };
+
+        if (isGuest) {
+            const data = getGuestData();
+            const newTx = { ...tx, id: crypto.randomUUID(), user_id: 'guest', category_id: tx.categoryId, created_at: new Date().toISOString() };
+            data.transactions.push(newTx);
+            const debtIndex = data.debts.findIndex((d: Debt) => d.id === debtId);
+            if (debtIndex > -1) {
+                data.debts[debtIndex].paid_amount += Math.abs(newTx.amount);
+                if (data.debts[debtIndex].paid_amount >= data.debts[debtIndex].total_amount) {
+                    data.debts[debtIndex].status = DebtStatus.PAGA;
+                }
+            }
+            setGuestData(data);
+        } else {
+            const { error } = await supabase.from('transactions').insert({ ...tx, category_id: tx.categoryId, user_id: user!.id });
+            if (error) throw error;
+        }
+
+        await fetchData();
+        showToast('Pagamento Realizado!', { type: 'success' });
+        
+        const updatedDebt = (isGuest ? getGuestData().debts : debts).find((d: Debt) => d.id === debtId);
+        if(updatedDebt && updatedDebt.status === DebtStatus.PAGA) {
+            showToast('Dívida Quitada!', { description: `Parabéns por quitar "${debt.name}"!`, type: 'success' });
+        }
+        return true;
+    }, debtId);
+    
+    const deleteDebt = (id: string) => withMutation(async () => {
+        if(isGuest) {
+            const data = getGuestData();
+            data.transactions = data.transactions.filter((t: Transaction) => t.debt_payment_id !== id);
+            data.debts = data.debts.filter((d: Debt) => d.id !== id);
+            setGuestData(data);
+        } else {
+            const { error: txError } = await supabase.from('transactions').delete().eq('debt_payment_id', id);
+            if (txError) throw txError;
+            const { error } = await supabase.from('debts').delete().eq('id', id);
+            if (error) throw error;
+        }
+
+        await fetchData();
+        showToast('Dívida Excluída!', { description: 'Os pagamentos foram removidos.', type: 'info' });
+        return true;
+    }, id);
+    
+    const calculateNextDueDate = (startDate: string, frequency: ScheduledTransactionFrequency): string => {
+        const date = new Date(startDate);
+        switch (frequency) {
+            case ScheduledTransactionFrequency.DIARIO: date.setDate(date.getDate() + 1); break;
+            case ScheduledTransactionFrequency.SEMANAL: date.setDate(date.getDate() + 7); break;
+            case ScheduledTransactionFrequency.QUINZENAL: date.setDate(date.getDate() + 15); break;
+            case ScheduledTransactionFrequency.MENSAL: date.setMonth(date.getMonth() + 1); break;
+            case ScheduledTransactionFrequency.ANUAL: date.setFullYear(date.getFullYear() + 1); break;
+        }
+        return date.toISOString();
+    };
+
+    const addScheduledTransaction = (item: Omit<ScheduledTransaction, 'id'|'category'|'next_due_date'|'user_id'|'category_id'|'start_date'> & {categoryId: string; startDate: string}) => withMutation(async () => {
+        const nextDueDate = calculateNextDueDate(item.startDate, item.frequency);
+        const newItem = { ...item, category_id: item.categoryId, start_date: item.startDate, next_due_date: nextDueDate, user_id: isGuest ? 'guest' : user!.id, id: crypto.randomUUID(), created_at: new Date().toISOString() };
+        
+        if (isGuest) {
+            const data = getGuestData();
+            data.scheduledTransactions.push(newItem);
+            setGuestData(data);
+        } else {
+            const { error } = await supabase.from('scheduled_transactions').insert({ ...item, category_id: item.categoryId, start_date: item.startDate, next_due_date: nextDueDate, user_id: user!.id });
+            if (error) throw error;
+        }
+        await fetchData();
+        showToast('Agendamento Criado!', { type: 'success' });
+        return true;
+    });
+
+    const updateScheduledTransaction = (item: Omit<ScheduledTransaction, 'category'|'user_id'|'category_id'|'start_date'> & {categoryId: string; startDate: string}) => withMutation(async () => {
+        if (isGuest) {
+            const data = getGuestData();
+            const index = data.scheduledTransactions.findIndex((st: ScheduledTransaction) => st.id === item.id);
+            if (index > -1) {
+                data.scheduledTransactions[index] = { ...data.scheduledTransactions[index], ...item, category_id: item.categoryId, start_date: item.startDate };
+                setGuestData(data);
+            }
+        } else {
+            const { error } = await supabase.from('scheduled_transactions').update({ ...item, category_id: item.categoryId, start_date: item.startDate }).eq('id', item.id);
+            if (error) throw error;
+        }
+        await fetchData();
+        showToast('Agendamento Atualizado!', { type: 'success' });
+        return true;
+    }, item.id);
+
+    const deleteScheduledTransaction = (id: string) => withMutation(async () => {
+        if (isGuest) {
+            const data = getGuestData();
+            data.scheduledTransactions = data.scheduledTransactions.filter((st: ScheduledTransaction) => st.id !== id);
+            setGuestData(data);
+        } else {
+            const { error } = await supabase.from('scheduled_transactions').delete().eq('id', id);
+            if (error) throw error;
+        }
+        await fetchData();
+        showToast('Agendamento Excluído!', { type: 'success' });
+        return true;
+    }, id);
+
+    const clearAllUserData = () => withMutation(async () => {
+        if (isGuest) {
+            localStorage.removeItem(GUEST_DATA_KEY);
+            await fetchData();
+            showToast('Todos os dados de visitante foram apagados!', { type: 'info' });
+            return;
+        }
+        if (!user) return;
+        const tables = ['transactions', 'goals', 'debts', 'scheduled_transactions', 'categories'];
+        for (const table of tables) {
+            const { error } = await supabase.from(table).delete().eq('user_id', user.id);
+            if(error) throw error;
+        }
+        await fetchData();
+        showToast('Todos os dados foram apagados!', { type: 'info' });
+    });
+
+    const addMockData = () => withMutation(async () => {
+        // 1. Limpa os dados existentes para evitar duplicação.
+        if (isGuest) {
+            localStorage.removeItem(GUEST_DATA_KEY);
+        } else if (user) {
+            const tables = ['transactions', 'goals', 'debts', 'scheduled_transactions'];
+            await Promise.all(tables.map(table => supabase.from(table).delete().eq('user_id', user.id)));
+        }
+
+        const userId = isGuest ? 'guest' : user!.id;
+        const mockCategories = getDefaultCategories(userId).map(c => ({...c, id: crypto.randomUUID()}));
+        const mockData = generateMockData(userId, mockCategories);
+
+        if (isGuest) {
+            const guestData = {
+                categories: mockCategories,
+                transactions: mockData.transactions.map(t => ({ ...t, id: crypto.randomUUID() })),
+                goals: mockData.goals,
+                debts: mockData.debts,
+                scheduledTransactions: mockData.scheduledTransactions.map(st => ({ ...st, id: crypto.randomUUID() })),
+            };
+            setGuestData(guestData);
+        } else if (user) {
+            const { error: catError } = await supabase.from('categories').upsert(mockCategories.map(({id, ...c}) => c), { onConflict: 'user_id, name' });
+            if(catError) throw catError;
+            
+            // Refetch categories to get correct IDs
+            let { data: newCategories } = await supabase.from('categories').select('*').eq('user_id', user.id);
+            if (!newCategories) throw new Error("Falha ao buscar categorias após inserção.");
+
+            const updatedMockData = generateMockData(user.id, newCategories as Category[]);
+
+            await Promise.all([
+                supabase.from('goals').insert(updatedMockData.goals),
+                supabase.from('debts').insert(updatedMockData.debts),
+                supabase.from('transactions').insert(updatedMockData.transactions),
+                supabase.from('scheduled_transactions').insert(updatedMockData.scheduledTransactions),
+            ]);
+        }
+        
+        await fetchData();
+        showToast('Dados Fictícios Adicionados!', { type: 'success' });
+    });
+
+
+    const value: DashboardDataContextType = useMemo(() => ({
+        transactions,
+        goals,
+        debts,
+        scheduledTransactions,
+        categories,
+        summary,
+        monthlyChartData,
+        userLevel,
+        achievements,
+        loading,
+        isMutating,
+        mutatingIds,
+        error,
+        clearError,
+        addTransaction,
+        updateTransaction,
+        deleteTransaction,
+        updateTransactionsCategory,
+        addGoal,
+        updateGoalValue,
+        deleteGoal,
+        addDebt,
+        addPaymentToDebt,
+        deleteDebt,
+        addScheduledTransaction,
+        updateScheduledTransaction,
+        deleteScheduledTransaction,
+        addMockData,
+        clearAllUserData,
     }), [
-        transactions, goals, debts, scheduledTransactions, categories, summary, monthlyChartData,
-        userLevel, achievements, loading, isMutating, mutatingIds, error,
-        addTransaction, updateTransaction, deleteTransaction, updateTransactionsCategory,
-        addGoal, updateGoalValue, deleteGoal, addDebt, addPaymentToDebt, deleteDebt,
-        addScheduledTransaction, updateScheduledTransaction, deleteScheduledTransaction,
-        addRandomTransactions, deleteAllUserData, grantXp, simulateError
+        transactions, goals, debts, scheduledTransactions, categories, summary, monthlyChartData, userLevel, achievements, 
+        loading, isMutating, mutatingIds, error, user, isGuest
     ]);
 
-    return React.createElement(DashboardDataContext.Provider, { value: contextValue }, children);
+    // FIX: Replaced JSX with `React.createElement` to avoid syntax errors in a `.ts` file.
+    return React.createElement(DashboardDataContext.Provider, { value: value }, children);
 };
 
 export const useDashboardData = (): DashboardDataContextType => {

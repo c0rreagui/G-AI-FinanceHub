@@ -35,8 +35,10 @@ export const AddSchedulingForm: React.FC<AddSchedulingFormProps> = ({ isOpen, on
         setDescription(itemToEdit.description);
         setAmount(String(Math.abs(itemToEdit.amount)));
         setType(itemToEdit.type);
-        setCategoryId(itemToEdit.categoryId);
-        setStartDate(itemToEdit.startDate.split('T')[0]);
+        // FIX: Corrected field name to snake_case to match database schema.
+        setCategoryId(itemToEdit.category_id);
+        // FIX: Corrected field name to snake_case to match database schema.
+        setStartDate(itemToEdit.start_date.split('T')[0]);
         setFrequency(itemToEdit.frequency);
     }
   }, [itemToEdit, isEditing, isOpen]);
@@ -68,6 +70,7 @@ export const AddSchedulingForm: React.FC<AddSchedulingFormProps> = ({ isOpen, on
 
     let success = false;
     if(isEditing) {
+        // FIX: Use snake_case for database fields.
         const updatedTxData = {
             id: itemToEdit.id,
             description,
@@ -76,10 +79,11 @@ export const AddSchedulingForm: React.FC<AddSchedulingFormProps> = ({ isOpen, on
             categoryId,
             startDate,
             frequency,
-            nextDueDate: itemToEdit.nextDueDate, // Manter o nextDueDate
+            next_due_date: itemToEdit.next_due_date, // Manter o nextDueDate
         };
         success = await updateScheduledTransaction(updatedTxData);
     } else {
+        // FIX: Use snake_case for database fields.
         const scheduledTxData = {
             description,
             amount: finalAmount,

@@ -17,11 +17,13 @@ import { AnimatedCurrency } from '../ui/AnimatedCurrency';
 const GoalCard: React.FC<{ goal: Goal }> = ({ goal }) => {
     const { openDialog } = useDialog();
     const { deleteGoal, mutatingIds } = useDashboardData();
-    const progress = (goal.currentAmount / goal.targetAmount) * 100;
+    // FIX: Corrected field names to snake_case to match database schema.
+    const progress = (goal.current_amount / goal.target_amount) * 100;
     const isCompleted = goal.status === GoalStatus.CONCLUIDO;
     const isMutating = mutatingIds.has(goal.id);
     const daysUntil = formatDaysUntil(goal.deadline);
-    const remainingAmount = Math.max(0, goal.targetAmount - goal.currentAmount);
+    // FIX: Corrected field names to snake_case to match database schema.
+    const remainingAmount = Math.max(0, goal.target_amount - goal.current_amount);
 
 
     const handleDelete = () => {

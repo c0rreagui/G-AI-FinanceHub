@@ -102,9 +102,11 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                         <div className="card">
                             <h2 className="text-xl font-semibold text-white mb-4">Meta Principal: {firstGoal.name}</h2>
                             <p className="text-sm text-gray-400 mt-2">
-                                {formatCurrencyBRL(firstGoal.currentAmount)} de {formatCurrencyBRL(firstGoal.targetAmount)}
+                                {/* FIX: Corrected field names to snake_case to match database schema. */}
+                                {formatCurrencyBRL(firstGoal.current_amount)} de {formatCurrencyBRL(firstGoal.target_amount)}
                             </p>
-                            <ProgressBar percentage={(firstGoal.currentAmount / firstGoal.targetAmount) * 100} color="primary" />
+                            {/* FIX: Corrected field names to snake_case to match database schema. */}
+                            <ProgressBar percentage={(firstGoal.current_amount / firstGoal.target_amount) * 100} color="primary" />
                         </div>
                     ) : (
                         <NoGoalCTA />

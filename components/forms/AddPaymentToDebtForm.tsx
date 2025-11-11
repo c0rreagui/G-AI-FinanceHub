@@ -39,7 +39,8 @@ export const AddPaymentToDebtForm: React.FC<AddPaymentToDebtFormProps> = ({ isOp
   const [isSubmitting, setIsSubmitting] = useState(false);
   const quickValues = [50, 100, 250, 500];
 
-  const remainingAmount = debt.totalAmount - debt.paidAmount;
+  // FIX: Corrected field names to snake_case to match database schema.
+  const remainingAmount = debt.total_amount - debt.paid_amount;
 
   const continueSubmission = async (paymentValue: number) => {
     setIsSubmitting(true);

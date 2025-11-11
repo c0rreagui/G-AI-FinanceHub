@@ -37,7 +37,7 @@ interface NavItemProps {
 
 const NavItem: React.FC<NavItemProps> = ({ name, view, icon: Icon, isActive, onClick }) => (
     <button
-      onClick={() => view && onClick(view)}
+      onClick={() => onClick(view)}
       className="relative flex flex-col items-center justify-center gap-1 text-xs font-medium w-full"
       aria-label={name}
       aria-current={isActive ? 'page' : undefined}

@@ -57,13 +57,16 @@ const TransactionItem: React.FC<{
     const [isDragging, setIsDragging] = useState(false);
     const amountColor = isExpense ? 'text-red-400' : 'text-green-400';
     const actionButtonsWidth = 160; // 2 buttons * 80px width
-    const isSystemTransaction = !!transaction.goalContributionId || !!transaction.debtPaymentId;
+    // FIX: Corrected field names to snake_case to match database schema.
+    const isSystemTransaction = !!transaction.goal_contribution_id || !!transaction.debt_payment_id;
     
     const handleLinkClick = (e: React.MouseEvent) => {
         e.stopPropagation(); // Previne que o clique selecione a linha
-        if (transaction.goalContributionId) {
+        // FIX: Corrected field names to snake_case to match database schema.
+        if (transaction.goal_contribution_id) {
             setCurrentView('goals');
-        } else if (transaction.debtPaymentId) {
+        // FIX: Corrected field names to snake_case to match database schema.
+        } else if (transaction.debt_payment_id) {
             setCurrentView('debts');
         }
     };
@@ -204,7 +207,8 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
     const selectableTransactions = useMemo(() => 
-        transactions.filter(tx => !tx.goalContributionId && !tx.debtPaymentId),
+        // FIX: Corrected field names to snake_case to match database schema.
+        transactions.filter(tx => !tx.goal_contribution_id && !tx.debt_payment_id),
     [transactions]);
     
     const handleSelect = (id: string) => {

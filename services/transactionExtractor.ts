@@ -2,7 +2,8 @@ import { linePatterns, parseBRL, normalizeDate } from './ocrBankPatterns';
 import { Transaction, TransactionType } from '../types';
 
 // O tipo de dado que será extraído e usado para preencher o formulário ou importar.
-export type ExtractedTransaction = Omit<Transaction, 'id' | 'category' | 'categoryId'>;
+// FIX: Corrected the Omit<> to include user_id and category_id, as these cannot be extracted from OCR text.
+export type ExtractedTransaction = Omit<Transaction, 'id' | 'category' | 'user_id' | 'category_id'>;
 
 /**
  * Analisa o texto bruto de um OCR, linha por linha, e extrai múltiplas transações.
