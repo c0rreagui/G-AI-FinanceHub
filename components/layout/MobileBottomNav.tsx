@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { ViewType, TransactionType } from '../../types';
 import {
     HomeIcon,
@@ -14,11 +14,13 @@ import {
     ArrowDownLeft,
     ArrowUpRight,
     Lightbulb,
+    Zap,
 } from '../Icons';
 import { useDialog } from '../../hooks/useDialog';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BottomSheet } from '../ui/BottomSheet';
 import { triggerHapticFeedback } from '../../utils/haptics';
+import { useAuth } from '../../hooks/useAuth';
 
 interface MobileBottomNavProps {
   currentView: ViewType;
@@ -55,14 +57,6 @@ const mainNavItems: { name: string; view: ViewType; icon: React.ElementType }[] 
   { name: 'Início', view: 'home', icon: HomeIcon },
   { name: 'Transações', view: 'transactions', icon: ArrowLeftRight },
   { name: 'Metas', view: 'goals', icon: Target },
-];
-
-const moreNavItems: { name: string; view: ViewType; icon: React.ElementType }[] = [
-    { name: 'Dívidas', view: 'debts', icon: TrendingDown },
-    { name: 'Agendamentos', view: 'scheduling', icon: Calendar },
-    { name: 'Insights', view: 'insights', icon: Lightbulb },
-    { name: 'Ferramentas', view: 'tools', icon: Wrench },
-    { name: 'Ajustes', view: 'settings', icon: Settings },
 ];
 
 const SpeedDial: React.FC = () => {
@@ -139,6 +133,22 @@ const SpeedDial: React.FC = () => {
 
 export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ currentView, setCurrentView }) => {
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
+  const { isDeveloper } = useAuth();
+
+  const moreNavItems = useMemo(() => {
+    // FIX: Explicitly type the array to ensure `item.view` is of type `ViewType`, not `string`.
+    const items: { name: string; view: ViewType; icon: React.ElementType }[] = [
+        { name: 'Dívidas', view: 'debts', icon: TrendingDown },
+        { name: 'Agendamentos', view: 'scheduling', icon: Calendar },
+        { name: 'Insights', view: 'insights', icon: Lightbulb },
+        { name: 'Ferramentas', view: 'tools', icon: Wrench },
+        { name: 'Ajustes', view: 'settings', icon: Settings },
+    ];
+    if (isDeveloper) {
+        items.push({ name: 'DevTools', view: 'devtools', icon: Zap });
+    }
+    return items;
+  }, [isDeveloper]);
   
   const handleMoreItemClick = (view: ViewType) => {
     setCurrentView(view);
@@ -188,9 +198,9 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ currentView, s
                 <button
                     key={item.view}
                     onClick={() => handleMoreItemClick(item.view)}
-                    className="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl text-gray-300 bg-white/5 hover:bg-white/10 transition-colors"
+                    className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl text-gray-300 transition-colors ${item.view === 'devtools' ? 'bg-yellow-500/10 hover:bg-yellow-500/20' : 'bg-white/5 hover:bg-white/10'}`}
                 >
-                    <item.icon className="w-8 h-8" />
+                    <item.icon className={`w-8 h-8 ${item.view === 'devtools' ? 'text-yellow-400' : ''}`} />
                     <span className="text-sm font-medium">{item.name}</span>
                 </button>
             ))}

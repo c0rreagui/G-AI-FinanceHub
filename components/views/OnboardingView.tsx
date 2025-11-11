@@ -58,6 +58,14 @@ export const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) =>
               <Button onClick={handleNext} className="mt-8">
                 Vamos Começar <ArrowUpRight className="w-4 h-4" />
               </Button>
+              <div className="mt-4">
+                <button
+                    onClick={() => onComplete(null)}
+                    className="text-sm text-gray-500 hover:text-gray-300 transition-colors"
+                >
+                    Pular por agora
+                </button>
+              </div>
             </motion.div>
           )}
 
@@ -89,6 +97,14 @@ export const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) =>
               <Button onClick={handleNext} disabled={!selectedGoal} className="mt-8">
                 Continuar
               </Button>
+              <div className="mt-4">
+                <button
+                    onClick={() => onComplete(null)}
+                    className="text-sm text-gray-500 hover:text-gray-300 transition-colors"
+                >
+                    Pular
+                </button>
+              </div>
             </motion.div>
           )}
           

@@ -9,10 +9,12 @@ import {
     Calendar,
     Wrench,
     Settings,
+    Zap,
 } from '../Icons';
 import { motion } from 'framer-motion';
 import { APP_VERSION, APP_CODENAME } from '../../config';
 import { useDashboardData } from '../../hooks/useDashboardData';
+import { useAuth } from '../../hooks/useAuth';
 
 interface SidebarProps {
   currentView: ViewType;
@@ -29,12 +31,18 @@ const navigation = [
   { name: 'Ferramentas', view: 'tools', icon: Wrench },
 ];
 
+const devNavigation = [
+    { name: 'DevTools', view: 'devtools', icon: Zap },
+];
+
 const secondaryNavigation = [
     { name: 'Ajustes', view: 'settings', icon: Settings },
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView }) => {
   const { isMutating } = useDashboardData();
+  const { isDeveloper } = useAuth();
+
   return (
     <aside className="flex flex-col gap-y-5 overflow-y-auto bg-[oklch(var(--card-oklch)_/_0.5)] px-6 w-64 border-r border-[oklch(var(--border-oklch))] flex-shrink-0">
       <div className="flex h-20 shrink-0 items-center gap-2">
@@ -91,6 +99,50 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
               })}
             </ul>
           </li>
+          
+          {isDeveloper && (
+            <li>
+                <div className="text-xs font-semibold leading-6 text-yellow-400">Modo Desenvolvedor</div>
+                <ul role="list" className="-mx-2 mt-2 space-y-1">
+                    {devNavigation.map((item) => {
+                        const isActive = currentView === item.view;
+                        return (
+                            <li key={item.name}>
+                                <a
+                                href="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setCurrentView(item.view as ViewType);
+                                }}
+                                className={`
+                                    group relative flex items-center gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold
+                                    ${isActive 
+                                    ? 'text-white bg-yellow-500/10' 
+                                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                    }
+                                `}
+                                >
+                                {isActive && (
+                                    <motion.span 
+                                        layoutId="sidebar-active-indicator"
+                                        className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 bg-yellow-400 rounded-r-full"
+                                    />
+                                )}
+                                <item.icon
+                                    className={`h-6 w-6 shrink-0 
+                                    ${isActive ? 'text-yellow-400' : 'text-gray-500 group-hover:text-white'}
+                                    `}
+                                    aria-hidden="true"
+                                />
+                                {item.name}
+                                </a>
+                            </li>
+                        )
+                    })}
+                </ul>
+            </li>
+          )}
+
           <li className="mt-auto">
              <div className="text-xs text-white/20 pointer-events-none select-none mb-4">
                 v{APP_VERSION} <span className="italic">({APP_CODENAME})</span>

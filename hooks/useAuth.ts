@@ -18,6 +18,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     return null;
   });
+  const [isDeveloper, setIsDeveloper] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('developer_mode') === 'true';
+    }
+    return false;
+  });
 
   const setApiKey = (key: string) => {
     if (typeof window !== 'undefined') {
@@ -28,6 +34,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
     setApiKeyState(key);
+  };
+
+  const setDeveloperMode = (isDev: boolean) => {
+    if (typeof window !== 'undefined') {
+        sessionStorage.setItem('developer_mode', String(isDev));
+    }
+    setIsDeveloper(isDev);
   };
 
   useEffect(() => {
@@ -46,6 +59,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+        if (!session) {
+            setDeveloperMode(false); // Garante que o modo dev é desativado no logout
+        }
         setLoading(false);
       }
     );
@@ -62,7 +78,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading,
     apiKey,
     setApiKey,
-  }), [session, user, loading, apiKey]);
+    isDeveloper,
+    setDeveloperMode,
+  }), [session, user, loading, apiKey, isDeveloper]);
 
   return React.createElement(AuthContext.Provider, { value: value }, children);
 };

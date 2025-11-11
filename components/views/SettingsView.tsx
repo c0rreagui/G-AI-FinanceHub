@@ -6,10 +6,13 @@ import { Button } from '../ui/Button';
 import { supabase } from '../../services/supabaseClient';
 import { motion } from 'framer-motion';
 import { APP_VERSION } from '../../config';
+import { useAuth } from '../../hooks/useAuth';
 
 export const SettingsView: React.FC = () => {
+    const { setDeveloperMode } = useAuth();
 
     const handleLogout = async () => {
+        setDeveloperMode(false); // Limpa o estado de desenvolvedor
         const { error } = await supabase.auth.signOut();
         if (error) {
             console.error('Error logging out:', error);

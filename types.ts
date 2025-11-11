@@ -110,7 +110,7 @@ export interface MonthlyChartData {
 }
 
 // View Management
-export type ViewType = 'home' | 'transactions' | 'insights' | 'goals' | 'debts' | 'scheduling' | 'tools' | 'settings';
+export type ViewType = 'home' | 'transactions' | 'insights' | 'goals' | 'debts' | 'scheduling' | 'tools' | 'settings' | 'devtools';
 
 // Context
 export interface DashboardDataContextType {
@@ -141,4 +141,9 @@ export interface DashboardDataContextType {
   updateScheduledTransaction: (tx: Omit<ScheduledTransaction, 'category'>) => Promise<boolean>;
   deleteScheduledTransaction: (id: string) => Promise<boolean>;
   clearError: () => void;
+  // Funções de DevTools
+  addRandomTransactions: (count: number) => Promise<void>;
+  deleteAllUserData: () => Promise<void>;
+  grantXp: (amount: number) => Promise<void>;
+  simulateError: () => void;
 }

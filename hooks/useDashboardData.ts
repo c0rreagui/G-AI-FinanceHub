@@ -134,22 +134,43 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             if (scheduledError) throw scheduledError;
             if (achievementsError) throw achievementsError;
             
-            // Mapeia o snake_case `category_id` do DB para o camelCase `categoryId` para consistência no estado da aplicação.
+            // Mapeia snake_case do DB para camelCase da aplicação
             const mappedTransactions = transactionsData?.map(tx => {
-                const { category_id, ...rest } = tx;
-                return { ...rest, categoryId: category_id, category: categoriesById[category_id] || fallbackCategory };
+                const { category_id, goal_contribution_id, debt_payment_id, ...rest } = tx;
+                return { 
+                    ...rest, 
+                    categoryId: category_id, 
+                    goalContributionId: goal_contribution_id, 
+                    debtPaymentId: debt_payment_id,
+                    category: categoriesById[category_id] || fallbackCategory 
+                };
             }) || [];
             setTransactions(mappedTransactions);
+            
+            const mappedGoals = goalsData?.map(goal => {
+                const { target_amount, current_amount, ...rest } = goal;
+                return { ...rest, targetAmount: target_amount, currentAmount: current_amount };
+            }) || [];
+            setGoals(mappedGoals);
 
-            setGoals(goalsData || []);
-            setDebts(debtsData || []);
+            const mappedDebts = debtsData?.map(debt => {
+                const { total_amount, paid_amount, interest_rate, ...rest } = debt;
+                return { ...rest, totalAmount: total_amount, paidAmount: paid_amount, interestRate: interest_rate };
+            }) || [];
+            setDebts(mappedDebts);
 
-            // Mapeia o snake_case `category_id` para transações agendadas também.
             const mappedScheduled = scheduledData?.map(stx => {
-                const { category_id, ...rest } = stx;
-                return { ...rest, categoryId: category_id, category: categoriesById[category_id] || fallbackCategory };
+                const { category_id, start_date, next_due_date, ...rest } = stx;
+                return { 
+                    ...rest, 
+                    categoryId: category_id, 
+                    startDate: start_date,
+                    nextDueDate: next_due_date,
+                    category: categoriesById[category_id] || fallbackCategory 
+                };
             }) || [];
             setScheduledTransactions(mappedScheduled);
+
 
             const unlockedAchievements = achievementsData?.map(a => a.achievement_id) || [];
             const processedAchievements = initialAchievements.map(ach => ({
@@ -179,15 +200,14 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
         setTransactions(prev => [newTx, ...prev].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
         
-        // FIX: Constrói um payload explícito para garantir que apenas os campos corretos sejam enviados.
         const payload = {
             description: tx.description,
             amount: tx.amount,
-            type: tx.type,
+            type: String(tx.type).toLowerCase() === 'receita' ? 'receita' : 'despesa',
             date: tx.date,
             category_id: tx.categoryId,
-            goalContributionId: tx.goalContributionId,
-            debtPaymentId: tx.debtPaymentId,
+            goal_contribution_id: tx.goalContributionId,
+            debt_payment_id: tx.debtPaymentId,
             user_id: user!.id,
         };
         const { data, error } = await supabase.from('transactions').insert(payload).select().single();
@@ -201,10 +221,12 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         showToast('Transação adicionada!', { type: 'success' });
         
         if (data) {
-            const { category_id, ...rest } = data;
+            const { category_id, goal_contribution_id, debt_payment_id, ...rest } = data;
             const finalTx: Transaction = {
                 ...rest,
                 categoryId: category_id,
+                goalContributionId: goal_contribution_id,
+                debtPaymentId: debt_payment_id,
                 category: categoriesById[category_id] || fallbackCategory
             };
             setTransactions(prev => prev.map(t => t.id === tempId ? finalTx : t));
@@ -218,15 +240,14 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
         setTransactions(prev => prev.map(t => t.id === tx.id ? updatedTx : t));
         
-        // FIX: Constrói um payload explícito, removendo 'category' e mapeando 'categoryId' para 'category_id'.
         const payload = {
             description: tx.description,
             amount: tx.amount,
-            type: tx.type,
+            type: String(tx.type).toLowerCase() === 'receita' ? 'receita' : 'despesa',
             date: tx.date,
             category_id: tx.categoryId,
-            goalContributionId: tx.goalContributionId,
-            debtPaymentId: tx.debtPaymentId,
+            goal_contribution_id: tx.goalContributionId,
+            debt_payment_id: tx.debtPaymentId,
         };
         const { error } = await supabase.from('transactions').update(payload).eq('id', tx.id);
 
@@ -279,7 +300,15 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         
         setGoals(prev => [newGoal, ...prev]);
 
-        const { data, error } = await supabase.from('goals').insert({ ...goal, user_id: user!.id, currentAmount: 0, status: GoalStatus.EM_ANDAMENTO }).select().single();
+        const payload = {
+            name: goal.name,
+            target_amount: goal.targetAmount,
+            deadline: goal.deadline,
+            user_id: user!.id,
+            current_amount: 0,
+            status: GoalStatus.EM_ANDAMENTO
+        };
+        const { data, error } = await supabase.from('goals').insert(payload).select().single();
         
         if (error) {
             handleError(error, 'addGoal');
@@ -288,17 +317,22 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         }
 
         showToast('Meta criada com sucesso!', { type: 'success' });
-        await fetchData(); // Refetch to sync real ID
-        return data;
+        await fetchData(); // Refetch para sincronizar ID real e dados mapeados
+        
+        if (data) {
+            const { target_amount, current_amount, ...rest } = data;
+            return { ...rest, targetAmount: target_amount, currentAmount: current_amount };
+        }
+        return null;
     }, [user, handleError, showToast, fetchData]);
 
     const updateGoalValue = useCallback(async (id: string, valueToAdd: number): Promise<boolean> => {
         const goal = goals.find(g => g.id === id);
         if (!goal) return false;
 
-        // ATOMICITY FIX: A transação DEVE ser confirmada no DB antes de atualizar a meta.
         const txSuccess = await addTransaction({
-            description: `Contribuição para a meta: ${goal.name}`, amount: -Math.abs(valueToAdd),
+            description: `Contribuição para a meta: ${goal.name}`, 
+            amount: -Math.abs(valueToAdd), // FIX: Despesas devem ter valor negativo
             type: TransactionType.DESPESA, date: new Date().toISOString(),
             categoryId: 'cat_contribuicao_meta', goalContributionId: id,
         });
@@ -308,18 +342,17 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             return false;
         }
         
-        // Optimistic UI update for the goal
         const originalGoals = [...goals];
         const newAmount = goal.currentAmount + valueToAdd;
         const newStatus = newAmount >= goal.targetAmount ? GoalStatus.CONCLUIDO : goal.status;
         setGoals(prev => prev.map(g => g.id === id ? { ...g, currentAmount: newAmount, status: newStatus } : g));
 
-        const { error } = await supabase.from('goals').update({ currentAmount: newAmount, status: newStatus }).eq('id', id);
+        const { error } = await supabase.from('goals').update({ current_amount: newAmount, status: newStatus }).eq('id', id);
 
         if (error) {
             handleError(error, 'updateGoalValue-goal-update-failure', 'A transação foi salva, mas a atualização da meta falhou. Sincronizando...');
-            setGoals(originalGoals); // Revert UI
-            await fetchData(); // Full sync to ensure consistency
+            setGoals(originalGoals); 
+            await fetchData(); 
             return false;
         }
 
@@ -331,7 +364,6 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         const originalGoals = [...goals];
         const originalTransactions = [...transactions];
         
-        // Optimistic UI update
         setGoals(prev => prev.filter(g => g.id !== id));
         setTransactions(prev => prev.filter(tx => tx.goalContributionId !== id));
 
@@ -367,7 +399,16 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
         setDebts(prev => [newDebt, ...prev]);
 
-        const { data, error } = await supabase.from('debts').insert({ ...debt, user_id: user!.id, paidAmount: 0, status: DebtStatus.ATIVA }).select().single();
+        const payload = {
+            name: debt.name,
+            total_amount: debt.totalAmount,
+            interest_rate: debt.interestRate,
+            category: debt.category,
+            user_id: user!.id,
+            paid_amount: 0,
+            status: DebtStatus.ATIVA,
+        };
+        const { data, error } = await supabase.from('debts').insert(payload).select().single();
         if (error) {
             handleError(error, 'addDebt');
             setDebts(prev => prev.filter(d => d.id !== tempId));
@@ -375,8 +416,13 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         }
         
         showToast('Dívida registrada.', { type: 'success' });
-        await fetchData(); // Sync real ID
-        return data;
+        await fetchData();
+        
+        if (data) {
+            const { total_amount, paid_amount, interest_rate, ...rest } = data;
+            return { ...rest, totalAmount: total_amount, paidAmount: paid_amount, interestRate: interest_rate };
+        }
+        return null;
     }, [user, handleError, showToast, fetchData]);
 
     const addPaymentToDebt = useCallback(async (id: string, paymentAmount: number): Promise<boolean> => {
@@ -384,7 +430,8 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         if (!debt) return false;
 
         const txSuccess = await addTransaction({
-            description: `Pagamento da dívida: ${debt.name}`, amount: -Math.abs(paymentAmount),
+            description: `Pagamento da dívida: ${debt.name}`, 
+            amount: -Math.abs(paymentAmount), // FIX: Despesas devem ter valor negativo
             type: TransactionType.DESPESA, date: new Date().toISOString(),
             categoryId: 'cat_pagamento_divida', debtPaymentId: id
         });
@@ -399,7 +446,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         const newStatus = newPaidAmount >= debt.totalAmount ? DebtStatus.PAGA : debt.status;
         setDebts(prev => prev.map(d => d.id === id ? { ...d, paidAmount: newPaidAmount, status: newStatus } : d));
 
-        const { error } = await supabase.from('debts').update({ paidAmount: newPaidAmount, status: newStatus }).eq('id', id);
+        const { error } = await supabase.from('debts').update({ paid_amount: newPaidAmount, status: newStatus }).eq('id', id);
 
         if (error) {
             handleError(error, 'addPaymentToDebt-debt-update-failure', 'A transação foi salva, mas a atualização da dívida falhou. Sincronizando...');
@@ -455,15 +502,14 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
         setScheduledTransactions(prev => [newScheduledTx, ...prev]);
 
-        // FIX: Constrói um payload explícito para a inserção.
         const payload = {
             description: tx.description,
             amount: tx.amount,
-            type: tx.type,
+            type: String(tx.type).toLowerCase() === 'receita' ? 'receita' : 'despesa',
             category_id: tx.categoryId,
-            startDate: tx.startDate,
+            start_date: tx.startDate,
             frequency: tx.frequency,
-            nextDueDate: newScheduledTx.nextDueDate,
+            next_due_date: newScheduledTx.nextDueDate,
             user_id: user!.id
         };
         const { error } = await supabase.from('scheduled_transactions').insert(payload);
@@ -475,7 +521,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         }
         
         showToast('Agendamento criado!', { type: 'success' });
-        await fetchData(); // Sync to get real ID and correct sorting
+        await fetchData();
         return true;
     }, [user, categoriesById, fallbackCategory, handleError, showToast, fetchData]);
 
@@ -485,15 +531,14 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         
         setScheduledTransactions(prev => prev.map(item => item.id === tx.id ? updatedTx : item));
 
-        // FIX: Constrói um payload explícito para a atualização.
         const payload = {
             description: tx.description,
             amount: tx.amount,
-            type: tx.type,
+            type: String(tx.type).toLowerCase() === 'receita' ? 'receita' : 'despesa',
             category_id: tx.categoryId,
-            startDate: tx.startDate,
+            start_date: tx.startDate,
             frequency: tx.frequency,
-            nextDueDate: tx.nextDueDate,
+            next_due_date: tx.nextDueDate,
         };
         const { error } = await supabase.from('scheduled_transactions').update(payload).eq('id', tx.id);
         
@@ -521,6 +566,72 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         showToast('Agendamento excluído.', { type: 'success' });
         return true;
     }, [scheduledTransactions, handleError, showToast]);
+
+    // --- FUNÇÕES DE DEVTOOLS ---
+    const addRandomTransactions = useCallback(async (count: number) => {
+        if (!user) return;
+        setIsMutating(true);
+        const descriptions = ['Supermercado', 'Gasolina', 'Restaurante', 'Cinema', 'Uber', 'Salário', 'Freelance'];
+        const expenseCategories = categories.filter(c => c.id !== 'cat_salario').map(c => c.id);
+        
+        const newTransactions = Array.from({ length: count }).map(() => {
+            const isExpense = Math.random() > 0.2; // 80% chance of expense
+            const amount = isExpense 
+                ? -(Math.random() * 200 + 5) // 5 a 205
+                : (Math.random() * 1500 + 500); // 500 a 2000
+            const date = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000); // last 30 days
+
+            return {
+                user_id: user.id,
+                description: descriptions[Math.floor(Math.random() * descriptions.length)],
+                amount: parseFloat(amount.toFixed(2)),
+                type: isExpense ? 'despesa' : 'receita',
+                date: date.toISOString(),
+                category_id: isExpense
+                    ? expenseCategories[Math.floor(Math.random() * expenseCategories.length)]
+                    : 'cat_salario',
+            };
+        });
+
+        const { error } = await supabase.from('transactions').insert(newTransactions);
+        if (error) {
+            handleError(error, 'addRandomTransactions');
+        } else {
+            showToast(`${count} transações aleatórias adicionadas!`, { type: 'success' });
+            await fetchData();
+        }
+        setIsMutating(false);
+    }, [user, categories, handleError, showToast, fetchData]);
+
+    const deleteAllUserData = useCallback(async () => {
+        if (!user) return;
+        setIsMutating(true);
+
+        const tables = ['transactions', 'goals', 'debts', 'scheduled_transactions', 'achievements'];
+        const promises = tables.map(table => supabase.from(table).delete().eq('user_id', user.id));
+
+        const results = await Promise.all(promises);
+        const someError = results.some(res => res.error);
+
+        if (someError) {
+            handleError(results.find(r => r.error)?.error, 'deleteAllUserData', 'Erro ao limpar todos os dados.');
+        } else {
+            showToast('Todos os dados do usuário foram resetados.', { type: 'success' });
+            await fetchData();
+        }
+        setIsMutating(false);
+    }, [user, handleError, showToast, fetchData]);
+
+    const grantXp = useCallback(async (amount: number) => {
+        const transactionsNeeded = Math.ceil(amount / 10);
+        showToast(`Adicionando ${transactionsNeeded} transações para conceder ${amount} XP...`, { type: 'info' });
+        await addRandomTransactions(transactionsNeeded);
+    }, [addRandomTransactions, showToast]);
+
+    const simulateError = useCallback(() => {
+        handleError(new Error("Erro simulado pelo DevTools"), "simulateError", "Este é um erro de teste para verificar o ErrorModal.");
+    }, [handleError]);
+
 
     // --- DADOS DERIVADOS (SUMMARY, CHARTS, GAMIFICATION) ---
     const summary: SummaryData = useMemo(() => {
@@ -606,12 +717,14 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         addTransaction, updateTransaction, deleteTransaction, updateTransactionsCategory,
         addGoal, updateGoalValue, deleteGoal, addDebt, addPaymentToDebt, deleteDebt,
         addScheduledTransaction, updateScheduledTransaction, deleteScheduledTransaction,
+        addRandomTransactions, deleteAllUserData, grantXp, simulateError,
     }), [
         transactions, goals, debts, scheduledTransactions, categories, summary, monthlyChartData,
         userLevel, achievements, loading, isMutating, mutatingIds, error,
         addTransaction, updateTransaction, deleteTransaction, updateTransactionsCategory,
         addGoal, updateGoalValue, deleteGoal, addDebt, addPaymentToDebt, deleteDebt,
-        addScheduledTransaction, updateScheduledTransaction, deleteScheduledTransaction
+        addScheduledTransaction, updateScheduledTransaction, deleteScheduledTransaction,
+        addRandomTransactions, deleteAllUserData, grantXp, simulateError
     ]);
 
     return React.createElement(DashboardDataContext.Provider, { value: contextValue }, children);

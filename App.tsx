@@ -22,6 +22,7 @@ import { ToastContainer } from './components/ui/ToastContainer';
 import { APP_VERSION, APP_CODENAME } from './config';
 import { OnboardingView } from './components/views/OnboardingView';
 import { logger } from './services/loggingService';
+import { DevToolsView } from './components/views/DevToolsView';
 
 const AppContent: React.FC = () => {
   const { user, loading } = useAuth();
@@ -102,6 +103,9 @@ const AppContent: React.FC = () => {
         break;
       case 'settings':
         viewComponent = <SettingsView />;
+        break;
+      case 'devtools':
+        viewComponent = <DevToolsView />;
         break;
       default:
         viewComponent = <HomeDashboardView setCurrentView={setCurrentView} />;
