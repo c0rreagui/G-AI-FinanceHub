@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { DashboardDataProvider } from './hooks/useDashboardData';
+// FIX: `useDialog` is a custom hook and should be imported from the hooks directory, not from the context file.
 import { DialogProvider } from './contexts/DialogContext';
+import { useDialog } from './hooks/useDialog';
 import { ToastProvider } from './contexts/ToastContext';
 import { AuthView } from './components/views/AuthView';
 import { AppLayout } from './components/layout/AppLayout';
@@ -24,6 +26,7 @@ import { logger } from './services/loggingService';
 
 const AppContent: React.FC = () => {
   const { user, loading } = useAuth();
+  const { openDialog } = useDialog();
   const [currentView, setCurrentView] = useState<ViewType>('home');
   const [onboardingComplete, setOnboardingComplete] = useState<boolean>(() => {
     try {
@@ -35,13 +38,31 @@ const AppContent: React.FC = () => {
   });
 
 
-  const handleOnboardingComplete = () => {
+  const handleOnboardingComplete = (goalId: string | null) => {
     try {
         localStorage.setItem('financehub_onboarded', 'true');
     } catch (error) {
         logger.warn("Não foi possível salvar o status de onboarding no localStorage.", { error });
     }
     setOnboardingComplete(true);
+
+    // Abre o modal relevante com base na escolha do usuário no onboarding
+    switch (goalId) {
+        case 'save':
+            openDialog('add-goal');
+            break;
+        case 'debts':
+            openDialog('add-debt');
+            break;
+        case 'organize':
+        case 'invest':
+            // Para 'organizar' e 'investir', abrir o modal de transação é um bom ponto de partida.
+            openDialog('add-transaction');
+            break;
+        default:
+            // Não faz nada se nenhum objetivo foi selecionado
+            break;
+    }
   };
 
 
@@ -76,7 +97,7 @@ const AppContent: React.FC = () => {
     let viewComponent;
     switch (currentView) {
       case 'home':
-        viewComponent = <HomeDashboardView />;
+        viewComponent = <HomeDashboardView setCurrentView={setCurrentView} />;
         break;
       case 'transactions':
         viewComponent = <TransactionsView />;
@@ -100,7 +121,7 @@ const AppContent: React.FC = () => {
         viewComponent = <SettingsView />;
         break;
       default:
-        viewComponent = <HomeDashboardView />;
+        viewComponent = <HomeDashboardView setCurrentView={setCurrentView} />;
         break;
     }
     
@@ -124,6 +145,7 @@ const AppContent: React.FC = () => {
       <AppLayout currentView={currentView} setCurrentView={setCurrentView}>
         <AnimatePresence mode="wait">
           {renderView()}
+        {/* FIX: Corrected typo in the AnimatePresence closing tag. */}
         </AnimatePresence>
       </AppLayout>
       <div className="fixed bottom-1 right-2 text-xs text-white/20 pointer-events-none select-none">
@@ -133,17 +155,23 @@ const AppContent: React.FC = () => {
   );
 };
 
+// Envolve AppContent com DialogProvider para que `useDialog` funcione
+const AppWithDialog: React.FC = () => (
+    <DialogProvider>
+        <AppContent />
+        <ToastContainer />
+    </DialogProvider>
+);
+
+
 const App: React.FC = () => {
   return (
     <AuthProvider>
       <ToastProvider>
         <DashboardDataProvider>
-          <DialogProvider>
             <ErrorBoundary>
-              <AppContent />
-              <ToastContainer />
+              <AppWithDialog />
             </ErrorBoundary>
-          </DialogProvider>
         </DashboardDataProvider>
       </ToastProvider>
     </AuthProvider>

@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { ViewType } from '../../types';
+import { ViewType, TransactionType } from '../../types';
 import {
     HomeIcon,
     ArrowLeftRight,
-    Lightbulb,
     Target,
     PlusCircle,
     TrendingDown,
@@ -11,10 +10,15 @@ import {
     Wrench,
     Settings,
     MoreHorizontal,
+    XIcon,
+    ArrowDownLeft,
+    ArrowUpRight,
+    Lightbulb,
 } from '../Icons';
 import { useDialog } from '../../hooks/useDialog';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { BottomSheet } from '../ui/BottomSheet';
+import { triggerHapticFeedback } from '../../utils/haptics';
 
 interface MobileBottomNavProps {
   currentView: ViewType;
@@ -54,13 +58,79 @@ const mainNavItems: { name: string; view: ViewType; icon: React.ElementType }[] 
 const moreNavItems: { name: string; view: ViewType; icon: React.ElementType }[] = [
     { name: 'Dívidas', view: 'debts', icon: TrendingDown },
     { name: 'Agendamentos', view: 'scheduling', icon: Calendar },
+    // FIX: Lightbulb icon was not found, it is now imported correctly.
     { name: 'Insights', view: 'insights', icon: Lightbulb },
     { name: 'Ferramentas', view: 'tools', icon: Wrench },
     { name: 'Ajustes', view: 'settings', icon: Settings },
-]
+];
+
+const SpeedDial: React.FC = () => {
+    const { openDialog } = useDialog();
+    const [isOpen, setIsOpen] = useState(false);
+
+    const handleAction = (action: () => void) => {
+        triggerHapticFeedback();
+        action();
+        setIsOpen(false);
+    };
+
+    const toggleOpen = () => {
+        triggerHapticFeedback(20);
+        setIsOpen(!isOpen);
+    };
+    
+    const actions = [
+        { icon: Target, label: 'Meta', onClick: () => handleAction(() => openDialog('add-goal')) },
+        { icon: ArrowUpRight, label: 'Receita', onClick: () => handleAction(() => openDialog('add-transaction', { prefill: { type: TransactionType.RECEITA } })) },
+        { icon: ArrowDownLeft, label: 'Despesa', onClick: () => handleAction(() => openDialog('add-transaction', { prefill: { type: TransactionType.DESPESA } })) },
+    ];
+
+    return (
+        <div className="flex items-center justify-center">
+             <AnimatePresence>
+                {isOpen && (
+                    <>
+                        <motion.div 
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          className="fixed inset-0 bg-black/50 z-40" 
+                          onClick={toggleOpen}
+                        />
+                        <div className="absolute bottom-24 flex flex-col items-center gap-4 z-50">
+                            {actions.map((action, index) => (
+                                <motion.div
+                                    key={action.label}
+                                    initial={{ opacity: 0, y: 50 }}
+                                    animate={{ opacity: 1, y: 0, transition: { delay: index * 0.05 } }}
+                                    exit={{ opacity: 0, y: 50 }}
+                                    className="flex items-center gap-3"
+                                >
+                                    <span className="bg-black/50 text-white text-xs font-semibold px-2 py-1 rounded-md">{action.label}</span>
+                                    <button onClick={action.onClick} className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center shadow-lg">
+                                        <action.icon className="w-6 h-6" />
+                                    </button>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </>
+                )}
+            </AnimatePresence>
+            <motion.button 
+                onClick={toggleOpen} 
+                className="relative z-50 flex items-center justify-center w-14 h-14 bg-gradient-to-r from-cyan-500 to-green-500 rounded-full text-white shadow-lg -translate-y-4"
+                whileTap={{ scale: 0.9 }}
+                animate={isOpen ? "open" : "closed"}
+            >
+                <motion.div variants={{ open: { rotate: 45 }, closed: { rotate: 0 } }}>
+                    <PlusCircle className="w-8 h-8" />
+                </motion.div>
+            </motion.button>
+        </div>
+    );
+}
 
 export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ currentView, setCurrentView }) => {
-  const { openDialog } = useDialog();
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   
   const handleMoreItemClick = (view: ViewType) => {
@@ -70,7 +140,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ currentView, s
 
   return (
     <>
-      <div className="fixed bottom-0 left-0 right-0 h-20 bg-[oklch(var(--background-oklch)_/_0.75)] backdrop-blur-xl border-t border-[oklch(var(--border-oklch))] z-50">
+      <div className="fixed bottom-0 left-0 right-0 h-20 bg-[oklch(var(--background-oklch)_/_0.75)] backdrop-blur-xl border-t border-[oklch(var(--border-oklch))] z-40">
         <div className="grid grid-cols-5 h-full items-center">
             <NavItem 
                 {...mainNavItems[0]}
@@ -83,11 +153,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ currentView, s
                 onClick={setCurrentView}
             />
             
-            <div className="flex items-center justify-center">
-                <button onClick={() => openDialog('add-transaction')} className="flex items-center justify-center w-14 h-14 bg-gradient-to-r from-cyan-500 to-green-500 rounded-full text-white shadow-lg -translate-y-4">
-                    <PlusCircle className="w-8 h-8" />
-                </button>
-            </div>
+            <SpeedDial />
 
             <NavItem 
                 {...mainNavItems[2]}

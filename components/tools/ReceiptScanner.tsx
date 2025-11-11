@@ -44,17 +44,19 @@ export const ReceiptScanner: React.FC = () => {
       // Chama o serviço de OCR com a apiKey
       const ocrResult = await scanReceipt(base64Image, imageFile.type, apiKey);
       
-      // Abre o pop-up com os dados
+      // Abre o pop-up com os dados e um callback de sucesso
       openDialog('add-transaction', {
         prefill: {
           description: ocrResult.description || 'Recibo Scaneado',
           amount: ocrResult.amount || 0,
           type: (ocrResult.amount || 0) < 0 ? TransactionType.DESPESA : TransactionType.RECEITA,
           date: new Date().toISOString().split('T')[0]
+        },
+        onSaveSuccess: () => {
+            setImageFile(null);
+            setImagePreview(null);
         }
       });
-      setImageFile(null);
-      setImagePreview(null);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Erro desconhecido";
       console.error("Erro no OCR:", err);

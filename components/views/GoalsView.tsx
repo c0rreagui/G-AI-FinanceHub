@@ -4,7 +4,7 @@ import { PageHeader } from '../layout/PageHeader';
 import { Target, PlusCircle, TrashIcon } from '../Icons';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { Goal, GoalStatus } from '../../types';
-import { formatCurrencyBRL, formatDate } from '../../utils/formatters';
+import { formatCurrencyBRL, formatDate, formatDaysUntil } from '../../utils/formatters';
 import { Button } from '../ui/Button';
 import { ProgressBar } from '../ui/ProgressBar';
 import { Badge } from '../ui/Badge';
@@ -19,6 +19,8 @@ const GoalCard: React.FC<{ goal: Goal }> = ({ goal }) => {
     const progress = (goal.currentAmount / goal.targetAmount) * 100;
     const isCompleted = goal.status === GoalStatus.CONCLUIDO;
     const isMutating = mutatingIds.has(goal.id);
+    const daysUntil = formatDaysUntil(goal.deadline);
+
 
     const handleDelete = () => {
         openDialog('confirmation', {
@@ -46,7 +48,7 @@ const GoalCard: React.FC<{ goal: Goal }> = ({ goal }) => {
                     </Badge>
                 </div>
                 <p className="text-sm text-gray-400 mt-1">
-                    Prazo: {formatDate(goal.deadline, 'long')}
+                    Prazo final: {formatDate(goal.deadline, 'long')}
                 </p>
                 <div className="mt-4">
                     <div className="flex justify-between text-sm text-white mb-1">
@@ -54,6 +56,11 @@ const GoalCard: React.FC<{ goal: Goal }> = ({ goal }) => {
                         <span className="text-gray-400">{formatCurrencyBRL(goal.targetAmount)}</span>
                     </div>
                     <ProgressBar percentage={progress} color={isCompleted ? 'success' : 'primary'} />
+                    {!isCompleted && (
+                         <div className="mt-2 text-right">
+                             <Badge color={daysUntil.color}>{daysUntil.text}</Badge>
+                         </div>
+                    )}
                 </div>
             </div>
             <div className="mt-6 flex items-center justify-between">

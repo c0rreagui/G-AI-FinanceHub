@@ -33,15 +33,16 @@ export const AddPaymentToDebtForm: React.FC<AddPaymentToDebtFormProps> = ({ isOp
     }
     
     setIsSubmitting(true);
-    try {
-      await addPaymentToDebt(debt.id, valueToAdd);
+    const success = await addPaymentToDebt(debt.id, valueToAdd);
+
+    // O modal só fecha se a operação completa (dívida + transação) for bem-sucedida.
+    if (success) {
       setAmount('');
       onClose();
-    } catch (error) {
-      // O erro já é tratado e exibido como toast pelo hook
-    } finally {
-        setIsSubmitting(false);
     }
+    // Se 'success' for falso, o erro já foi exibido por um toast no hook,
+    // e o modal permanece aberto para o usuário.
+    setIsSubmitting(false);
   };
   
   return (
@@ -67,7 +68,7 @@ export const AddPaymentToDebtForm: React.FC<AddPaymentToDebtFormProps> = ({ isOp
             Cancelar
           </Button>
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? <LoadingSpinner/> : 'Confirmar Pagamento'}
+            {isSubmitting ? <><LoadingSpinner/> Confirmando...</> : 'Confirmar Pagamento'}
           </Button>
         </div>
       </form>

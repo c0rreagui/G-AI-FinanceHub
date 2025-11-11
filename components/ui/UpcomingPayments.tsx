@@ -88,10 +88,10 @@ export const UpcomingPayments: React.FC = () => {
                 type: item.type,
                 categoryId: item.categoryId,
                 date: new Date().toISOString().split('T')[0], // Lança a transação com a data de hoje
-            }
+            },
+            // A notificação só é dispensada após o salvamento bem-sucedido.
+            onSaveSuccess: () => handleDismiss(item.id)
         });
-        // Dispensa a notificação após o lançamento
-        handleDismiss(item.id);
     };
 
     return (

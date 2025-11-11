@@ -45,7 +45,7 @@ export const BulkRecategorizeForm: React.FC<BulkRecategorizeFormProps> = ({ isOp
             Cancelar
           </Button>
           <Button type="submit" disabled={!selectedCategoryId || isSubmitting}>
-            {isSubmitting ? <LoadingSpinner /> : 'Salvar Alterações'}
+            {isSubmitting ? <><LoadingSpinner /> Salvando...</> : 'Salvar Alterações'}
           </Button>
         </div>
       </form>

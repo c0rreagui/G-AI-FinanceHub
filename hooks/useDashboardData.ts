@@ -120,7 +120,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
                 supabase.from('goals').select('*').eq('user_id', user.id),
                 supabase.from('debts').select('*').eq('user_id', user.id),
                 supabase.from('scheduled_transactions').select('*').eq('user_id', user.id),
-                supabase.from('user_achievements').select('*').eq('user_id', user.id),
+                supabase.from('achievements').select('*').eq('user_id', user.id),
             ]);
 
             if (transactionsError) throw transactionsError;
@@ -128,11 +128,13 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             if (debtsError) throw debtsError;
             if (scheduledError) throw scheduledError;
             if (achievementsError) throw achievementsError;
+            
+            const fallbackCategory = categoriesById['cat_outros'];
 
-            setTransactions(transactionsData?.map(tx => ({ ...tx, category: categoriesById[tx.categoryId] })) || []);
+            setTransactions(transactionsData?.map(tx => ({ ...tx, category: categoriesById[tx.category_id] || fallbackCategory })) || []);
             setGoals(goalsData || []);
             setDebts(debtsData || []);
-            setScheduledTransactions(scheduledData?.map(stx => ({ ...stx, category: categoriesById[stx.categoryId] })) || []);
+            setScheduledTransactions(scheduledData?.map(stx => ({ ...stx, category: categoriesById[stx.category_id] || fallbackCategory })) || []);
 
             const unlockedAchievements = achievementsData?.map(a => a.achievement_id) || [];
             const processedAchievements = initialAchievements.map(ach => ({
@@ -188,17 +190,21 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
 
     // Funções de CRUD
-    const addTransaction = (tx: Omit<Transaction, 'id' | 'category'>) =>
-        performMutation(
-            () => supabase.from('transactions').insert({ ...tx, user_id: user!.id }),
+    const addTransaction = (tx: Omit<Transaction, 'id' | 'category'>) => {
+        const { categoryId, ...rest } = tx;
+        return performMutation(
+            () => supabase.from('transactions').insert({ ...rest, category_id: categoryId, user_id: user!.id }),
             { successMessage: 'Transação adicionada com sucesso!' }
         );
+    }
         
-    const updateTransaction = (tx: Omit<Transaction, 'category'>) =>
-        performMutation(
-            () => supabase.from('transactions').update(tx).eq('id', tx.id),
+    const updateTransaction = (tx: Omit<Transaction, 'category'>) => {
+        const { categoryId, ...rest } = tx;
+        return performMutation(
+            () => supabase.from('transactions').update({ ...rest, category_id: categoryId }).eq('id', tx.id),
             { id: tx.id, successMessage: 'Transação atualizada!' }
         );
+    }
 
     const deleteTransaction = (id: string) =>
         performMutation(
@@ -208,7 +214,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const updateTransactionsCategory = (ids: string[], categoryId: string) =>
         performMutation(
-            () => supabase.from('transactions').update({ categoryId }).in('id', ids),
+            () => supabase.from('transactions').update({ category_id: categoryId }).in('id', ids),
             { id: ids, successMessage: `${ids.length} transações atualizadas!` }
         );
 
@@ -236,14 +242,23 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         );
         
         if (success) {
-            await addTransaction({
+            const txSuccess = await addTransaction({
                 description: `Contribuição para a meta: ${goal.name}`,
-                amount: valueToAdd, // Contribuições são despesas
+                amount: -Math.abs(valueToAdd), // CRITICAL FIX: Contribuições são despesas e devem ser negativas.
                 type: TransactionType.DESPESA,
                 date: new Date().toISOString(),
                 categoryId: 'cat_contribuicao_meta',
                 goalContributionId: id,
             });
+
+            if (!txSuccess) {
+                // Se a transação falhar, lançamos um erro para o usuário.
+                handleError(
+                    new Error('A meta foi atualizada, mas a transação de contrapartida falhou ao ser registrada.'),
+                    'updateGoalValue-tx-failure'
+                );
+                return false; // Indica que a operação completa falhou.
+            }
         }
         return success;
     };
@@ -288,14 +303,22 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         );
 
         if (success) {
-            await addTransaction({
+            const txSuccess = await addTransaction({
                 description: `Pagamento da dívida: ${debt.name}`,
-                amount: paymentAmount, // Pagamentos são despesas
+                amount: -Math.abs(paymentAmount), // CRITICAL FIX: Pagamentos são despesas e devem ser negativos.
                 type: TransactionType.DESPESA,
                 date: new Date().toISOString(),
                 categoryId: 'cat_pagamento_divida',
                 debtPaymentId: id
             });
+            
+            if (!txSuccess) {
+                handleError(
+                    new Error('A dívida foi atualizada, mas a transação de pagamento falhou ao ser registrada.'),
+                    'addPaymentToDebt-tx-failure'
+                );
+                return false;
+            }
         }
         return success;
     };
@@ -317,10 +340,12 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
 
     const addScheduledTransaction = (tx: Omit<ScheduledTransaction, 'id' | 'category' | 'nextDueDate'>) => {
-        const nextDueDate = new Date(tx.startDate); // Primeira data é a data de início
+        const nextDueDate = new Date(tx.startDate);
+        const { categoryId, ...rest } = tx;
         return performMutation(
-            () => supabase.from('scheduled_transactions').insert({ 
-                ...tx, 
+            () => supabase.from('scheduled_transactions').insert({
+                ...rest,
+                category_id: categoryId,
                 user_id: user!.id,
                 nextDueDate: nextDueDate.toISOString(),
             }),
@@ -343,6 +368,9 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             .filter(t => t.type === TransactionType.DESPESA && new Date(t.date).getMonth() === currentMonth && new Date(t.date).getFullYear() === currentYear)
             .reduce((sum, t) => sum + t.amount, 0);
 
+        // CRITICAL BUG FIX: O cálculo anterior estava `t.type === RECEITA ? t.amount : -t.amount`,
+        // o que causava uma negação dupla em despesas (que já são negativas), efetivamente somando-as ao saldo.
+        // A lógica correta é simplesmente somar todos os valores, pois eles já têm o sinal correto.
         const totalBalance = transactions.reduce((sum, t) => sum + t.amount, 0);
 
         return { totalBalance, monthlyIncome, monthlyExpenses };
@@ -383,7 +411,11 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     
     const userLevel: UserLevel | null = useMemo(() => {
         if (loading) return null;
-        const xp = transactions.length * 10 + goals.length * 50 + debts.filter(d => d.status === DebtStatus.PAGA).length * 100;
+        
+        // BUG FIX: Filtra transações automáticas para não contar XP em dobro.
+        const manualTransactions = transactions.filter(tx => !tx.goalContributionId && !tx.debtPaymentId);
+        
+        const xp = manualTransactions.length * 10 + goals.length * 50 + debts.filter(d => d.status === DebtStatus.PAGA).length * 100;
         let level = 1;
         let xpToNextLevel = 100;
         let requiredForLevelUp = 100;

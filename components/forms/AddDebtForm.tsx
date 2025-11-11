@@ -88,7 +88,7 @@ export const AddDebtForm: React.FC<AddDebtFormProps> = ({ isOpen, onClose }) => 
             Cancelar
           </Button>
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? <LoadingSpinner /> : 'Salvar Dívida'}
+            {isSubmitting ? <><LoadingSpinner /> Salvando...</> : 'Salvar Dívida'}
           </Button>
         </div>
       </form>

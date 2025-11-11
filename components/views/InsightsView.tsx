@@ -8,6 +8,7 @@ import { TransactionType } from '../../types';
 import { LoadingSpinner } from '../LoadingSpinner';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 import { EmptyState } from '../ui/EmptyState';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 // Tooltip customizado para exibir receitas e despesas formatadas.
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -39,6 +40,7 @@ interface CategoryAnalysisData {
 
 export const InsightsView: React.FC = () => {
     const { transactions, loading } = useDashboardData();
+    const isMobile = !useMediaQuery('(min-width: 768px)');
 
     // Analisa as transações dos últimos 6 meses e agrupa por categoria
     const categoryAnalysis = useMemo((): CategoryAnalysisData[] => {
@@ -89,7 +91,7 @@ export const InsightsView: React.FC = () => {
                                 <BarChart 
                                     data={categoryAnalysis} 
                                     layout="vertical"
-                                    margin={{ top: 5, right: 30, left: 20, bottom: 20 }}
+                                    margin={{ top: 5, right: isMobile ? 5 : 30, left: 20, bottom: 20 }}
                                     barCategoryGap="20%"
                                 >
                                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" horizontal={false} />
@@ -106,7 +108,7 @@ export const InsightsView: React.FC = () => {
                                         dataKey="name" 
                                         tick={{ fill: '#d1d5db', fontSize: 12 }} 
                                         stroke="rgba(255, 255, 255, 0.2)"
-                                        width={120} // Mais espaço para nomes de categoria
+                                        width={isMobile ? 100 : 120} // Mais espaço para nomes de categoria
                                         tickLine={false}
                                         axisLine={false}
                                     />

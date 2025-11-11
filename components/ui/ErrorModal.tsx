@@ -59,8 +59,8 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({ isOpen, onClose, error }
             exit="exit"
           >
             <div className="flex items-start">
-              <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-xl bg-[oklch(var(--danger-oklch)_/_0.2)]">
-                <Zap className="h-6 w-6 text-[oklch(var(--danger-oklch))]" aria-hidden="true" />
+              <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-xl bg-black/20">
+                <Zap className="h-6 w-6 text-red-400" aria-hidden="true" />
               </div>
               <div className="ml-4 flex-1">
                 <h2 id="error-modal-title" className="text-xl font-bold text-white">{getTitle()}</h2>

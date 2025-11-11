@@ -1,11 +1,9 @@
 import React from 'react';
 import { PageHeader } from '../layout/PageHeader';
-import { HomeIcon, Lightbulb } from '../Icons';
+import { HomeIcon } from '../Icons';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { QuickActions } from '../ui/QuickActions';
-import { formatCurrencyBRL } from '../../utils/formatters';
-import { ProgressBar } from '../ui/ProgressBar';
-import { GoalStatus, TransactionType } from '../../types';
+import { GoalStatus, ViewType } from '../../types';
 import { UpcomingPayments } from '../ui/UpcomingPayments';
 import { HomeDashboardSkeleton } from './skeletons/HomeDashboardSkeleton';
 import { UserProfileCard } from '../ui/UserProfileCard';
@@ -14,9 +12,15 @@ import { motion } from 'framer-motion';
 import { MonthlySummaryChart } from '../ui/charts/MonthlySummaryChart';
 import { AnimatedSummaryCard } from '../ui/AnimatedSummaryCard';
 import { ProactiveInsightCard } from '../ui/ProactiveInsightCard';
+import { formatCurrencyBRL } from '../../utils/formatters';
+import { ProgressBar } from '../ui/ProgressBar';
 
-export const HomeDashboardView: React.FC = () => {
-    const { summary, goals, transactions, monthlyChartData, loading } = useDashboardData();
+interface HomeDashboardViewProps {
+    setCurrentView: (view: ViewType) => void;
+}
+
+export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrentView }) => {
+    const { summary, goals, monthlyChartData, loading } = useDashboardData();
 
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -60,7 +64,7 @@ export const HomeDashboardView: React.FC = () => {
                 animate="visible"
             >
                 <motion.div variants={itemVariants}><UpcomingPayments /></motion.div>
-                <motion.div variants={itemVariants}><ProactiveInsightCard /></motion.div>
+                <motion.div variants={itemVariants}><ProactiveInsightCard setCurrentView={setCurrentView} /></motion.div>
                 <motion.div variants={itemVariants}><QuickActions /></motion.div>
                 
                 <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -69,6 +73,8 @@ export const HomeDashboardView: React.FC = () => {
                     <AnimatedSummaryCard title="Despesas do Mês" amount={Math.abs(summary.monthlyExpenses)} />
                 </motion.div>
                 
+                <motion.div variants={itemVariants}><UserProfileCard /></motion.div>
+
                 <motion.div variants={itemVariants}>
                     <MonthlySummaryChart data={monthlyChartData} />
                 </motion.div>
@@ -82,8 +88,7 @@ export const HomeDashboardView: React.FC = () => {
                         <ProgressBar percentage={(firstGoal.currentAmount / firstGoal.targetAmount) * 100} color="primary" />
                     </motion.div>
                 )}
-
-                <motion.div variants={itemVariants}><UserProfileCard /></motion.div>
+                
                 <motion.div variants={itemVariants}><AchievementsList /></motion.div>
             </motion.div>
         </>

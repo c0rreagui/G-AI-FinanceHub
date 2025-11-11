@@ -4,7 +4,7 @@ import { Button } from '../ui/Button';
 import { PiggyBank, TrendingDown, Wallet, ArrowUpRight, Zap } from '../Icons';
 
 interface OnboardingViewProps {
-  onComplete: () => void;
+  onComplete: (goalId: string | null) => void;
 }
 
 const goals = [
@@ -105,7 +105,7 @@ export const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) =>
               <Zap className="w-16 h-16 text-green-400 mx-auto mb-4" />
               <h2 className="text-3xl font-bold text-white">Tudo pronto!</h2>
               <p className="mt-2 text-gray-300 max-w-md mx-auto">Sua jornada para o controle financeiro começa agora. Explore o dashboard, adicione suas transações e alcance seus objetivos.</p>
-              <Button onClick={onComplete} className="mt-8">
+              <Button onClick={() => onComplete(selectedGoal)} className="mt-8">
                 Ir para o Dashboard
               </Button>
             </motion.div>

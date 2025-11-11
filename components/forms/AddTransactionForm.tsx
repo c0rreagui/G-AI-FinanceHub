@@ -16,6 +16,7 @@ interface AddTransactionFormProps {
   onClose: () => void;
   prefill?: Partial<Omit<Transaction, 'id' | 'category'>>;
   transactionToEdit?: Transaction;
+  onSaveSuccess?: () => void;
 }
 
 const QuickValueChip: React.FC<{ value: number; onSelect: (value: number) => void }> = ({ value, onSelect }) => (
@@ -28,7 +29,7 @@ const QuickValueChip: React.FC<{ value: number; onSelect: (value: number) => voi
     </button>
 );
 
-export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, onClose, prefill, transactionToEdit }) => {
+export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, onClose, prefill, transactionToEdit, onSaveSuccess }) => {
   const { addTransaction, updateTransaction, categories } = useDashboardData();
   const isDesktop = useMediaQuery('(min-width: 768px)');
 
@@ -102,12 +103,13 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
     setIsSubmitting(false);
 
     if (success) {
+      onSaveSuccess?.();
       onClose();
     }
   };
   
-  const FormContent = (
-      <form onSubmit={handleSubmit} className="flex flex-col h-full space-y-4">
+  const FormFields = (
+    <>
         <TypeToggle selectedType={type} onTypeChange={setType} />
         <Input
           id="tx-description"
@@ -137,7 +139,6 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
               required
             />
         </div>
-
         <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
                 Valores Rápidos
@@ -148,27 +149,33 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                 ))}
             </div>
         </div>
-
-        <CategoryPicker 
-            categories={categories}
-            selectedCategoryId={categoryId}
-            onSelectCategory={setCategoryId}
-        />
-        <div className={`flex justify-end gap-2 ${isDesktop ? 'pt-4' : 'pt-4 mt-auto'}`}>
-          <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
-            Cancelar
-          </Button>
-          <Button type="submit" disabled={isSubmitting || !categoryId}>
-            {isSubmitting ? <LoadingSpinner /> : (isEditing ? 'Salvar Alterações' : 'Salvar Transação')}
-          </Button>
+        <div>
+            <label className="block text-sm font-medium text-gray-300">
+                Categoria
+            </label>
+            <CategoryPicker 
+                categories={categories}
+                selectedCategoryId={categoryId}
+                onSelectCategory={setCategoryId}
+            />
         </div>
-      </form>
+    </>
   );
 
   if (isDesktop) {
       return (
           <Modal isOpen={isOpen} onClose={onClose} title={isEditing ? "Editar Transação" : "Nova Transação"}>
-              {FormContent}
+              <form onSubmit={handleSubmit} className="space-y-4">
+                  {FormFields}
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
+                      Cancelar
+                    </Button>
+                    <Button type="submit" disabled={isSubmitting || !categoryId}>
+                      {isSubmitting ? <><LoadingSpinner /> Salvando...</> : (isEditing ? 'Salvar Alterações' : 'Salvar Transação')}
+                    </Button>
+                  </div>
+              </form>
           </Modal>
       )
   }
@@ -183,12 +190,27 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                 exit={{ y: '100%' }}
                 transition={{ type: 'spring', stiffness: 400, damping: 40 }}
             >
+                {/* Header Fixo */}
                 <div className="flex items-center justify-between p-4 border-b border-[oklch(var(--border-oklch))] flex-shrink-0">
                     <h2 className="text-xl font-semibold text-white">{isEditing ? "Editar Transação" : "Nova Transação"}</h2>
                     <button onClick={onClose} className="p-1 text-gray-400"><XIcon className="w-6 h-6" /></button>
                 </div>
+                
+                {/* Conteúdo Rolável */}
                 <div className="flex-grow p-4 overflow-y-auto">
-                    {FormContent}
+                    <form id="mobile-tx-form" onSubmit={handleSubmit} className="space-y-6">
+                        {FormFields}
+                    </form>
+                </div>
+
+                {/* Rodapé Fixo */}
+                <div className="flex justify-end gap-2 p-4 border-t border-[oklch(var(--border-oklch))] flex-shrink-0">
+                  <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
+                    Cancelar
+                  </Button>
+                  <Button type="submit" form="mobile-tx-form" disabled={isSubmitting || !categoryId}>
+                    {isSubmitting ? <><LoadingSpinner /> Salvando...</> : (isEditing ? 'Salvar Alterações' : 'Salvar Transação')}
+                  </Button>
                 </div>
             </motion.div>
         )}

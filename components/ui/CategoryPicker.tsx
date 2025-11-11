@@ -1,6 +1,7 @@
 import React from 'react';
 import { Category } from '../../types';
 import { motion } from 'framer-motion';
+import { triggerHapticFeedback } from '../../utils/haptics';
 
 interface CategoryGridItemProps {
     category: Category;
@@ -9,10 +10,16 @@ interface CategoryGridItemProps {
 }
 
 const CategoryGridItem: React.FC<CategoryGridItemProps> = ({ category, isSelected, onSelect }) => {
+    
+    const handleSelect = () => {
+        triggerHapticFeedback();
+        onSelect(category.id);
+    };
+
     return (
         <motion.button
             type="button"
-            onClick={() => onSelect(category.id)}
+            onClick={handleSelect}
             className={`relative flex flex-col items-center justify-center gap-1 p-2 rounded-xl border-2 transition-all duration-200 ${
                 isSelected ? 'border-cyan-500/80 bg-cyan-500/20' : 'border-transparent bg-white/5 hover:bg-white/10'
             }`}
@@ -36,20 +43,15 @@ interface CategoryPickerProps {
 
 export const CategoryPicker: React.FC<CategoryPickerProps> = ({ categories, selectedCategoryId, onSelectCategory }) => {
     return (
-        <div>
-            <label className="block text-sm font-medium text-gray-300">
-                Categoria
-            </label>
-            <div className="mt-2 grid grid-cols-4 sm:grid-cols-6 gap-2">
-                {categories.map(cat => (
-                    <CategoryGridItem 
-                        key={cat.id}
-                        category={cat}
-                        isSelected={selectedCategoryId === cat.id}
-                        onSelect={onSelectCategory}
-                    />
-                ))}
-            </div>
+        <div className="mt-2 grid grid-cols-4 sm:grid-cols-6 gap-2">
+            {categories.map(cat => (
+                <CategoryGridItem 
+                    key={cat.id}
+                    category={cat}
+                    isSelected={selectedCategoryId === cat.id}
+                    onSelect={onSelectCategory}
+                />
+            ))}
         </div>
     );
 };

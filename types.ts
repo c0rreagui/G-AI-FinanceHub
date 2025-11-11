@@ -2,8 +2,8 @@ import React from 'react';
 
 // Core Enums
 export enum TransactionType {
-  RECEITA = 'RECEITA',
-  DESPESA = 'DESPESA',
+  RECEITA = 'receita',
+  DESPESA = 'despesa',
 }
 
 export enum GoalStatus {

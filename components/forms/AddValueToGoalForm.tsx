@@ -26,17 +26,16 @@ export const AddValueToGoalForm: React.FC<AddValueToGoalFormProps> = ({ isOpen, 
     }
     
     setIsSubmitting(true);
-    try {
-      // FIX: Envia apenas o valor a ser adicionado, centralizando a lógica no hook.
-      // Isso garante que a transação de contrapartida seja criada corretamente.
-      await updateGoalValue(goal.id, valueToAdd);
+    const success = await updateGoalValue(goal.id, valueToAdd);
+    
+    // O modal só fecha se a operação completa (meta + transação) for bem-sucedida.
+    if (success) {
       setAmount('');
       onClose();
-    } catch (error) {
-      // O erro já é tratado no hook com um toast
-    } finally {
-      setIsSubmitting(false);
     }
+    // Se 'success' for falso, o erro já foi exibido por um toast no hook,
+    // e o modal permanece aberto para o usuário.
+    setIsSubmitting(false);
   };
   
   return (
@@ -62,7 +61,7 @@ export const AddValueToGoalForm: React.FC<AddValueToGoalFormProps> = ({ isOpen, 
             Cancelar
           </Button>
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? <LoadingSpinner /> : 'Adicionar Valor'}
+            {isSubmitting ? <><LoadingSpinner /> Adicionando...</> : 'Adicionar Valor'}
           </Button>
         </div>
       </form>

@@ -2,6 +2,7 @@ import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { MonthlyChartData } from '../../../types';
 import { formatCurrencyBRL } from '../../../utils/formatters';
+import { useMediaQuery } from '../../../hooks/useMediaQuery';
 
 interface MonthlySummaryChartProps {
     data: MonthlyChartData[];
@@ -22,6 +23,8 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   };
 
 export const MonthlySummaryChart: React.FC<MonthlySummaryChartProps> = ({ data }) => {
+    const isMobile = !useMediaQuery('(min-width: 768px)');
+
     return (
         <div className="card h-80">
             <h3 className="text-lg font-semibold text-white mb-4">Resumo dos Últimos 6 Meses</h3>
@@ -31,7 +34,10 @@ export const MonthlySummaryChart: React.FC<MonthlySummaryChartProps> = ({ data }
                     <XAxis 
                         dataKey="name" 
                         tick={{ fill: '#9ca3af', fontSize: 12 }} 
-                        stroke="rgba(255, 255, 255, 0.2)" 
+                        stroke="rgba(255, 255, 255, 0.2)"
+                        angle={isMobile ? -35 : 0}
+                        textAnchor={isMobile ? 'end' : 'middle'}
+                        height={isMobile ? 60 : 30}
                     />
                     <YAxis 
                         tickFormatter={(value) => `R$${Number(value) / 1000}k`}

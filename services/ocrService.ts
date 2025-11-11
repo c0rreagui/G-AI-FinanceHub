@@ -53,11 +53,9 @@ Se o valor for "120,50", formate para "120.50". Se você não conseguir encontra
     }
     const data = JSON.parse(jsonText) as OcrResult;
 
-    // Garante que o valor seja negativo se for um recibo (despesa)
-    if (data.amount && data.amount > 0) {
-      data.amount = -Math.abs(data.amount);
-    }
-
+    // BUG FIX: Removida a lógica que forçava o valor a ser negativo.
+    // Agora, a função retorna o valor como extraído, permitindo que o usuário
+    // escaneie receitas e despesas. O formulário irá sugerir o tipo correto.
     return data;
 
   } catch (error) {

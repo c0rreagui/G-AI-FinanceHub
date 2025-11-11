@@ -78,7 +78,7 @@ export const AddGoalForm: React.FC<AddGoalFormProps> = ({ isOpen, onClose }) => 
             Cancelar
           </Button>
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? <LoadingSpinner /> : 'Salvar Meta'}
+            {isSubmitting ? <><LoadingSpinner /> Salvando...</> : 'Salvar Meta'}
           </Button>
         </div>
       </form>

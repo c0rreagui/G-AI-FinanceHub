@@ -1,11 +1,15 @@
 import React, { useMemo } from 'react';
 import { useDashboardData } from '../../hooks/useDashboardData';
-import { Lightbulb, TrendingDown } from '../Icons';
-import { TransactionType } from '../../types';
+import { Lightbulb } from '../Icons';
+import { TransactionType, ViewType } from '../../types';
 import { formatCurrencyBRL } from '../../utils/formatters';
 import { Button } from './Button';
 
-export const ProactiveInsightCard: React.FC = () => {
+interface ProactiveInsightCardProps {
+    setCurrentView: (view: ViewType) => void;
+}
+
+export const ProactiveInsightCard: React.FC<ProactiveInsightCardProps> = ({ setCurrentView }) => {
     const { transactions } = useDashboardData();
 
     const highestSpendingCategory = useMemo(() => {
@@ -47,7 +51,7 @@ export const ProactiveInsightCard: React.FC = () => {
         return null;
     }
 
-    const { name, icon: Icon, color, total } = highestSpendingCategory;
+    const { name, color, total } = highestSpendingCategory;
 
     return (
         <div className="card flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-cyan-900/20 border-cyan-500/30">
@@ -60,7 +64,7 @@ export const ProactiveInsightCard: React.FC = () => {
                     Sua maior despesa este mês foi com <span className="font-semibold" style={{color: color}}>{name}</span>, totalizando <span className="font-bold text-white">{formatCurrencyBRL(total)}</span>.
                 </p>
             </div>
-            <Button variant="secondary" size="sm">
+            <Button variant="secondary" size="sm" onClick={() => setCurrentView('insights')}>
                 Analisar Gastos
             </Button>
         </div>

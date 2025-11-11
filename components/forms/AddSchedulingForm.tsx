@@ -100,15 +100,15 @@ export const AddSchedulingForm: React.FC<AddSchedulingFormProps> = ({ isOpen, on
               required
             />
             <div>
-              <label htmlFor="sch-frequency" className="block text-sm font-medium text-gray-300">Frequência</label>
+              <label htmlFor="sch-frequency" className="block text-sm font-medium text-gray-300 mb-1.5">Frequência</label>
               <select
                 id="sch-frequency"
                 value={frequency}
                 onChange={(e) => setFrequency(e.target.value as ScheduledTransactionFrequency)}
-                className="mt-1 block w-full bg-black/20 border border-white/20 rounded-xl shadow-sm py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition"
+                className="block w-full bg-[oklch(var(--background-oklch))] border border-[oklch(var(--border-oklch))] rounded-lg shadow-sm py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-[oklch(var(--primary-oklch))] focus:border-[oklch(var(--primary-oklch))] sm:text-sm transition"
               >
                 {Object.values(ScheduledTransactionFrequency).map(f => (
-                  <option key={f} value={f}>{f}</option>
+                  <option key={f} value={f} className="bg-oklch-background text-white">{f}</option>
                 ))}
               </select>
             </div>
@@ -123,7 +123,7 @@ export const AddSchedulingForm: React.FC<AddSchedulingFormProps> = ({ isOpen, on
             Cancelar
           </Button>
           <Button type="submit" disabled={isSubmitting || !categoryId}>
-            {isSubmitting ? <LoadingSpinner /> : 'Salvar Agendamento'}
+            {isSubmitting ? <><LoadingSpinner /> Salvando...</> : 'Salvar Agendamento'}
           </Button>
         </div>
       </form>
