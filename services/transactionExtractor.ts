@@ -2,7 +2,6 @@ import { linePatterns, parseBRL, normalizeDate } from './ocrBankPatterns';
 import { Transaction, TransactionType } from '../types';
 
 // O tipo de dado que será extraído e usado para preencher o formulário ou importar.
-// FIX: Corrected typo in Omit from 'category_id' to 'categoryId' to match the Transaction interface.
 export type ExtractedTransaction = Omit<Transaction, 'id' | 'category' | 'categoryId'>;
 
 /**

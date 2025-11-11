@@ -17,6 +17,9 @@ enum LogLevel {
  * @param context Um objeto opcional com dados adicionais para ajudar na depuração.
  */
 const log = (level: LogLevel, message: string, context?: object) => {
+  // NOTA DE PRODUÇÃO: Em um ambiente real, esta função seria expandida para enviar logs
+  // para um serviço de monitoramento de terceiros (ex: Sentry, LogRocket, Datadog).
+  // Exemplo: if (process.env.NODE_ENV === 'production') { Sentry.captureMessage(...) }
   const timestamp = new Date().toISOString();
   const formattedMessage = `[${timestamp}] [${level}] :: ${message}`;
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { ChevronDown } from '../Icons'; // Usaremos o Chevron para a direita
 
 interface PageHeaderProps {
   icon: React.ElementType;
@@ -16,7 +17,14 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ icon: Icon, title, bread
           <h1 className="text-3xl font-bold tracking-tight text-white">{title}</h1>
         </div>
         <div className="mt-2 flex items-center gap-x-2 text-sm text-gray-400">
-          {breadcrumbs.join(' / ')}
+          {breadcrumbs.map((crumb, index) => (
+            <React.Fragment key={crumb}>
+              <span>{crumb}</span>
+              {index < breadcrumbs.length - 1 && (
+                <ChevronDown className="w-4 h-4 text-gray-500 -rotate-90" />
+              )}
+            </React.Fragment>
+          ))}
         </div>
       </div>
       {actions && <div className="flex-shrink-0">{actions}</div>}

@@ -25,8 +25,8 @@ import { DashboardDataContext } from '../contexts/DashboardDataContext';
 
 // --- DADOS MOCKADOS / CONFIGURAÇÃO ---
 
-// Categorias pré-definidas. Em um app real, viriam do backend.
-const defaultCategories: Omit<Category, 'icon'>[] = [
+// Categorias pré-definidas. Movidas para fora do componente para evitar recriação.
+const defaultCategoriesData: Omit<Category, 'icon'>[] = [
     { id: 'cat_alimentacao', name: 'Alimentação', color: '#ff8c00' },
     { id: 'cat_transporte', name: 'Transporte', color: '#4682b4' },
     { id: 'cat_moradia', name: 'Moradia', color: '#dc143c' },
@@ -83,7 +83,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // Dados derivados e processados
     const categories = useMemo((): Category[] => {
-        return defaultCategories.map(cat => ({
+        return defaultCategoriesData.map(cat => ({
             ...cat,
             icon: getIconByName(iconMapping[cat.id] || 'Gift')
         }));
@@ -95,10 +95,15 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             return acc;
         }, {} as { [key: string]: Category });
     }, [categories]);
+    
+    // Fallback de categoria robusto para evitar crashes.
+    const fallbackCategory = useMemo(() => {
+        return categoriesById['cat_outros'] || (categories.length > 0 ? categories[0] : { id: 'fallback', name: 'Outros', icon: getIconByName('Gift'), color: '#808080'});
+    }, [categoriesById, categories]);
 
     // Função de tratamento de erro centralizada
-    const handleError = useCallback((err: any, context: string) => {
-        const errorMessage = err.message || 'Ocorreu um erro desconhecido.';
+    const handleError = useCallback((err: any, context: string, userMessage?: string) => {
+        const errorMessage = userMessage || err.message || 'Ocorreu um erro desconhecido.';
         logger.error(`Erro em ${context}`, { error: err });
         setError(errorMessage);
         showToast(`Erro: ${errorMessage}`, { type: 'error' });
@@ -116,7 +121,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
                 { data: scheduledData, error: scheduledError },
                 { data: achievementsData, error: achievementsError }
             ] = await Promise.all([
-                supabase.from('transactions').select('*').eq('user_id', user.id),
+                supabase.from('transactions').select('*').eq('user_id', user.id).order('date', { ascending: false }),
                 supabase.from('goals').select('*').eq('user_id', user.id),
                 supabase.from('debts').select('*').eq('user_id', user.id),
                 supabase.from('scheduled_transactions').select('*').eq('user_id', user.id),
@@ -129,8 +134,6 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             if (scheduledError) throw scheduledError;
             if (achievementsError) throw achievementsError;
             
-            const fallbackCategory = categoriesById['cat_outros'];
-
             setTransactions(transactionsData?.map(tx => ({ ...tx, category: categoriesById[tx.category_id] || fallbackCategory })) || []);
             setGoals(goalsData || []);
             setDebts(debtsData || []);
@@ -149,204 +152,312 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         } finally {
             setLoading(false);
         }
-    }, [user, categoriesById, handleError]);
+    }, [user, categoriesById, handleError, fallbackCategory]);
 
     useEffect(() => {
         fetchData();
     }, [fetchData]);
 
+    // --- FUNÇÕES DE CRUD (COM UI OTIMISTA) ---
 
-    // --- LÓGICA DE MUTATION ---
-    const performMutation = async <T, R>(
-        operation: () => Promise<{ data?: T[] | null; error: any }>,
-        { id, successMessage }: { id?: string | string[], successMessage: string },
-        returnData: boolean = false
-    ): Promise<{ success: boolean; data?: T | null }> => {
-        setIsMutating(true);
-        if(id) {
-            const idsToAdd = Array.isArray(id) ? id : [id];
-            setMutatingIds(prev => new Set([...prev, ...idsToAdd]));
+    // Transações
+    const addTransaction = useCallback(async (tx: Omit<Transaction, 'id' | 'category'>): Promise<boolean> => {
+        const tempId = `temp-${Date.now()}`;
+        const newTx: Transaction = { ...tx, id: tempId, category: categoriesById[tx.categoryId] || fallbackCategory };
+
+        setTransactions(prev => [newTx, ...prev].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+        
+        const { data, error } = await supabase.from('transactions').insert({ ...tx, category_id: tx.categoryId, user_id: user!.id }).select().single();
+
+        if (error) {
+            handleError(error, 'addTransaction');
+            setTransactions(prev => prev.filter(t => t.id !== tempId));
+            return false;
         }
         
-        const { data: opData, error: opError } = await operation();
+        showToast('Transação adicionada!', { type: 'success' });
+        setTransactions(prev => prev.map(t => t.id === tempId ? { ...data, category: categoriesById[data.category_id] || fallbackCategory } : t));
+        return true;
+    }, [user, categoriesById, fallbackCategory, handleError, showToast]);
         
-        if (opError) {
-            handleError(opError, 'performMutation');
-            setIsMutating(false);
-            if (id) setMutatingIds(prev => {
-                const newSet = new Set(prev);
-                const idsToRemove = Array.isArray(id) ? id : [id];
-                idsToRemove.forEach(i => newSet.delete(i));
-                return newSet;
-            });
-            return { success: false };
-        } else {
-            showToast(successMessage, { type: 'success' });
-            await fetchData(); // Re-fetch all data to ensure consistency
-            setIsMutating(false);
-            if (id) setMutatingIds(new Set());
-            return { success: true, data: returnData && opData ? opData[0] : null };
+    const updateTransaction = useCallback(async (tx: Omit<Transaction, 'category'>): Promise<boolean> => {
+        const originalTransactions = [...transactions];
+        const updatedTx: Transaction = { ...tx, category: categoriesById[tx.categoryId] || fallbackCategory };
+
+        setTransactions(prev => prev.map(t => t.id === tx.id ? updatedTx : t));
+        const { error } = await supabase.from('transactions').update({ ...tx, category_id: tx.categoryId }).eq('id', tx.id);
+
+        if (error) {
+            handleError(error, 'updateTransaction');
+            setTransactions(originalTransactions);
+            return false;
         }
-    };
 
+        showToast('Transação atualizada!', { type: 'success' });
+        return true;
+    }, [transactions, categoriesById, fallbackCategory, handleError, showToast]);
 
-    // Funções de CRUD
-    const addTransaction = (tx: Omit<Transaction, 'id' | 'category'>) => {
-        const { categoryId, ...rest } = tx;
-        return performMutation(
-            () => supabase.from('transactions').insert({ ...rest, category_id: categoryId, user_id: user!.id }),
-            { successMessage: 'Transação adicionada com sucesso!' }
-        ).then(res => res.success);
-    }
+    const deleteTransaction = useCallback(async (id: string): Promise<boolean> => {
+        const originalTransactions = [...transactions];
         
-    const updateTransaction = (tx: Omit<Transaction, 'category'>) => {
-        const { categoryId, ...rest } = tx;
-        return performMutation(
-            () => supabase.from('transactions').update({ ...rest, category_id: categoryId }).eq('id', tx.id),
-            { id: tx.id, successMessage: 'Transação atualizada!' }
-        ).then(res => res.success);
-    }
+        setTransactions(prev => prev.filter(t => t.id !== id));
+        const { error } = await supabase.from('transactions').delete().eq('id', id);
 
-    const deleteTransaction = (id: string) =>
-        performMutation(
-            () => supabase.from('transactions').delete().eq('id', id),
-            { id, successMessage: 'Transação excluída.' }
-        ).then(res => res.success);
+        if (error) {
+            handleError(error, 'deleteTransaction');
+            setTransactions(originalTransactions);
+            return false;
+        }
 
-    const updateTransactionsCategory = (ids: string[], categoryId: string) =>
-        performMutation(
-            () => supabase.from('transactions').update({ category_id: categoryId }).in('id', ids),
-            { id: ids, successMessage: `${ids.length} transações atualizadas!` }
-        ).then(res => res.success);
+        showToast('Transação excluída.', { type: 'success' });
+        return true;
+    }, [transactions, handleError, showToast]);
 
-    const addGoal = async (goal: Omit<Goal, 'id' | 'currentAmount' | 'status'>): Promise<Goal | null> => {
-        const { success, data } = await performMutation<Goal, Goal>(
-            () => supabase.from('goals').insert({ 
-                ...goal, 
-                user_id: user!.id,
-                currentAmount: 0,
-                status: GoalStatus.EM_ANDAMENTO,
-             }).select().single(),
-            { successMessage: 'Meta criada com sucesso!' },
-            true
-        );
-        return success ? data : null;
-    }
+    const updateTransactionsCategory = useCallback(async (ids: string[], categoryId: string): Promise<boolean> => {
+        const originalTransactions = [...transactions];
+        const updatedCategory = categoriesById[categoryId] || fallbackCategory;
         
-    const updateGoalValue = async (id: string, valueToAdd: number) => {
+        setTransactions(prev => prev.map(tx => ids.includes(tx.id) ? { ...tx, categoryId, category: updatedCategory } : tx));
+        const { error } = await supabase.from('transactions').update({ category_id: categoryId }).in('id', ids);
+
+        if (error) {
+            handleError(error, 'updateTransactionsCategory');
+            setTransactions(originalTransactions);
+            return false;
+        }
+        showToast(`${ids.length} transações atualizadas!`, { type: 'success' });
+        return true;
+    }, [transactions, categoriesById, fallbackCategory, handleError, showToast]);
+
+    // Metas
+    const addGoal = useCallback(async (goal: Omit<Goal, 'id' | 'currentAmount' | 'status'>): Promise<Goal | null> => {
+        const tempId = `temp-goal-${Date.now()}`;
+        const newGoal: Goal = { ...goal, id: tempId, currentAmount: 0, status: GoalStatus.EM_ANDAMENTO };
+        
+        setGoals(prev => [newGoal, ...prev]);
+
+        const { data, error } = await supabase.from('goals').insert({ ...goal, user_id: user!.id, currentAmount: 0, status: GoalStatus.EM_ANDAMENTO }).select().single();
+        
+        if (error) {
+            handleError(error, 'addGoal');
+            setGoals(prev => prev.filter(g => g.id !== tempId));
+            return null;
+        }
+
+        showToast('Meta criada com sucesso!', { type: 'success' });
+        await fetchData(); // Refetch to sync real ID
+        return data;
+    }, [user, handleError, showToast, fetchData]);
+
+    const updateGoalValue = useCallback(async (id: string, valueToAdd: number): Promise<boolean> => {
         const goal = goals.find(g => g.id === id);
         if (!goal) return false;
 
+        // ATOMICITY FIX: A transação DEVE ser confirmada no DB antes de atualizar a meta.
+        const txSuccess = await addTransaction({
+            description: `Contribuição para a meta: ${goal.name}`, amount: -Math.abs(valueToAdd),
+            type: TransactionType.DESPESA, date: new Date().toISOString(),
+            categoryId: 'cat_contribuicao_meta', goalContributionId: id,
+        });
+
+        if (!txSuccess) {
+            handleError(new Error('A meta não foi atualizada porque o registro da transação falhou.'), 'updateGoalValue-tx-failure', 'Falha ao registrar a transação. A meta não foi alterada.');
+            return false;
+        }
+        
+        // Optimistic UI update for the goal
+        const originalGoals = [...goals];
         const newAmount = goal.currentAmount + valueToAdd;
         const newStatus = newAmount >= goal.targetAmount ? GoalStatus.CONCLUIDO : goal.status;
+        setGoals(prev => prev.map(g => g.id === id ? { ...g, currentAmount: newAmount, status: newStatus } : g));
 
-        const { success } = await performMutation(
-            () => supabase.from('goals').update({ currentAmount: newAmount, status: newStatus }).eq('id', id),
-            { id, successMessage: `Valor adicionado à meta ${goal.name}!` }
-        );
+        const { error } = await supabase.from('goals').update({ currentAmount: newAmount, status: newStatus }).eq('id', id);
+
+        if (error) {
+            handleError(error, 'updateGoalValue-goal-update-failure', 'A transação foi salva, mas a atualização da meta falhou. Sincronizando...');
+            setGoals(originalGoals); // Revert UI
+            await fetchData(); // Full sync to ensure consistency
+            return false;
+        }
+
+        showToast(`Valor adicionado à meta ${goal.name}!`, { type: 'success' });
+        return true;
+    }, [goals, addTransaction, handleError, showToast, fetchData]);
+
+    const deleteGoal = useCallback(async (id: string): Promise<boolean> => {
+        const originalGoals = [...goals];
+        const originalTransactions = [...transactions];
         
-        if (success) {
-            const txSuccess = await addTransaction({
-                description: `Contribuição para a meta: ${goal.name}`,
-                amount: -Math.abs(valueToAdd),
-                type: TransactionType.DESPESA,
-                date: new Date().toISOString(),
-                categoryId: 'cat_contribuicao_meta',
-                goalContributionId: id,
-            });
+        // Optimistic UI update
+        setGoals(prev => prev.filter(g => g.id !== id));
+        setTransactions(prev => prev.filter(tx => tx.goalContributionId !== id));
 
-            if (!txSuccess) {
-                handleError(
-                    new Error('A meta foi atualizada, mas a transação de contrapartida falhou ao ser registrada.'),
-                    'updateGoalValue-tx-failure'
-                );
+        const linkedTxIds = originalTransactions.filter(tx => tx.goalContributionId === id).map(tx => tx.id);
+        if (linkedTxIds.length > 0) {
+            const { error: txError } = await supabase.from('transactions').delete().in('id', linkedTxIds);
+            if (txError) {
+                handleError(txError, 'deleteGoal-tx-deletion');
+                setGoals(originalGoals);
+                setTransactions(originalTransactions);
                 return false;
             }
         }
-        return success;
-    };
-    
-    const deleteGoal = (id: string) => performMutation(async () => {
-        const linkedTxIds = transactions.filter(tx => tx.goalContributionId === id).map(tx => tx.id);
-        if (linkedTxIds.length > 0) {
-            const { error: txError } = await supabase.from('transactions').delete().in('id', linkedTxIds);
-            if (txError) return { error: txError };
+        
+        const { error: goalError } = await supabase.from('goals').delete().eq('id', id);
+
+        if (goalError) {
+            handleError(goalError, 'deleteGoal-goal-deletion');
+            setGoals(originalGoals);
+            setTransactions(originalTransactions);
+            await fetchData();
+            return false;
         }
-        return supabase.from('goals').delete().eq('id', id);
-    }, { id, successMessage: 'Meta e contribuições associadas foram excluídas!' }).then(res => res.success);
 
+        showToast('Meta e contribuições excluídas!', { type: 'success' });
+        return true;
+    }, [transactions, goals, handleError, showToast, fetchData]);
 
-    const addDebt = async (debt: Omit<Debt, 'id' | 'paidAmount' | 'status'>): Promise<Debt | null> => {
-        const { success, data } = await performMutation<Debt, Debt>(
-            () => supabase.from('debts').insert({ 
-                ...debt, 
-                user_id: user!.id,
-                paidAmount: 0,
-                status: DebtStatus.ATIVA,
-            }).select().single(),
-            { successMessage: 'Dívida registrada.' },
-            true
-        );
-        return success ? data : null;
-    }
-    
-    const addPaymentToDebt = async (id: string, paymentAmount: number) => {
+    // Dívidas
+    const addDebt = useCallback(async (debt: Omit<Debt, 'id' | 'paidAmount' | 'status'>): Promise<Debt | null> => {
+        const tempId = `temp-debt-${Date.now()}`;
+        const newDebt: Debt = { ...debt, id: tempId, paidAmount: 0, status: DebtStatus.ATIVA };
+
+        setDebts(prev => [newDebt, ...prev]);
+
+        const { data, error } = await supabase.from('debts').insert({ ...debt, user_id: user!.id, paidAmount: 0, status: DebtStatus.ATIVA }).select().single();
+        if (error) {
+            handleError(error, 'addDebt');
+            setDebts(prev => prev.filter(d => d.id !== tempId));
+            return null;
+        }
+        
+        showToast('Dívida registrada.', { type: 'success' });
+        await fetchData(); // Sync real ID
+        return data;
+    }, [user, handleError, showToast, fetchData]);
+
+    const addPaymentToDebt = useCallback(async (id: string, paymentAmount: number): Promise<boolean> => {
         const debt = debts.find(d => d.id === id);
         if (!debt) return false;
-        
+
+        const txSuccess = await addTransaction({
+            description: `Pagamento da dívida: ${debt.name}`, amount: -Math.abs(paymentAmount),
+            type: TransactionType.DESPESA, date: new Date().toISOString(),
+            categoryId: 'cat_pagamento_divida', debtPaymentId: id
+        });
+
+        if (!txSuccess) {
+            handleError(new Error('A dívida não foi atualizada porque o registro da transação falhou.'), 'addPaymentToDebt-tx-failure', 'Falha ao registrar a transação. A dívida não foi alterada.');
+            return false;
+        }
+
+        const originalDebts = [...debts];
         const newPaidAmount = debt.paidAmount + paymentAmount;
         const newStatus = newPaidAmount >= debt.totalAmount ? DebtStatus.PAGA : debt.status;
+        setDebts(prev => prev.map(d => d.id === id ? { ...d, paidAmount: newPaidAmount, status: newStatus } : d));
 
-        const { success } = await performMutation(
-            () => supabase.from('debts').update({ paidAmount: newPaidAmount, status: newStatus }).eq('id', id),
-            { id, successMessage: `Pagamento para ${debt.name} registrado!` }
-        );
+        const { error } = await supabase.from('debts').update({ paidAmount: newPaidAmount, status: newStatus }).eq('id', id);
 
-        if (success) {
-            const txSuccess = await addTransaction({
-                description: `Pagamento da dívida: ${debt.name}`,
-                amount: -Math.abs(paymentAmount),
-                type: TransactionType.DESPESA,
-                date: new Date().toISOString(),
-                categoryId: 'cat_pagamento_divida',
-                debtPaymentId: id
-            });
-            
-            if (!txSuccess) {
-                handleError(
-                    new Error('A dívida foi atualizada, mas a transação de pagamento falhou ao ser registrada.'),
-                    'addPaymentToDebt-tx-failure'
-                );
+        if (error) {
+            handleError(error, 'addPaymentToDebt-debt-update-failure', 'A transação foi salva, mas a atualização da dívida falhou. Sincronizando...');
+            setDebts(originalDebts);
+            await fetchData();
+            return false;
+        }
+
+        showToast(`Pagamento para ${debt.name} registrado!`, { type: 'success' });
+        return true;
+    }, [debts, addTransaction, handleError, showToast, fetchData]);
+
+    const deleteDebt = useCallback(async (id: string): Promise<boolean> => {
+        const originalDebts = [...debts];
+        const originalTransactions = [...transactions];
+
+        setDebts(prev => prev.filter(d => d.id !== id));
+        setTransactions(prev => prev.filter(tx => tx.debtPaymentId !== id));
+        
+        const linkedTxIds = originalTransactions.filter(tx => tx.debtPaymentId === id).map(tx => tx.id);
+        if (linkedTxIds.length > 0) {
+            const { error: txError } = await supabase.from('transactions').delete().in('id', linkedTxIds);
+            if (txError) {
+                handleError(txError, 'deleteDebt-tx-deletion');
+                setDebts(originalDebts);
+                setTransactions(originalTransactions);
                 return false;
             }
         }
-        return success;
-    };
-    
-    const deleteDebt = (id: string) => performMutation(async () => {
-        const linkedTxIds = transactions.filter(tx => tx.debtPaymentId === id).map(tx => tx.id);
-        if (linkedTxIds.length > 0) {
-            const { error: txError } = await supabase.from('transactions').delete().in('id', linkedTxIds);
-            if (txError) return { error: txError };
+
+        const { error: debtError } = await supabase.from('debts').delete().eq('id', id);
+        if (debtError) {
+            handleError(debtError, 'deleteDebt-debt-deletion');
+            setDebts(originalDebts);
+            setTransactions(originalTransactions);
+            await fetchData();
+            return false;
         }
-        return supabase.from('debts').delete().eq('id', id);
-    }, { id, successMessage: 'Dívida e pagamentos associados foram excluídos!' }).then(res => res.success);
+        
+        showToast('Dívida e pagamentos excluídos!', { type: 'success' });
+        return true;
+    }, [transactions, debts, handleError, showToast, fetchData]);
 
-
-    const addScheduledTransaction = (tx: Omit<ScheduledTransaction, 'id' | 'category' | 'nextDueDate'>) => {
-        const nextDueDate = new Date(tx.startDate);
+    // Agendamentos
+    const addScheduledTransaction = useCallback(async (tx: Omit<ScheduledTransaction, 'id' | 'category' | 'nextDueDate'>): Promise<boolean> => {
         const { categoryId, ...rest } = tx;
-        return performMutation(
-            () => supabase.from('scheduled_transactions').insert({
-                ...rest,
-                category_id: categoryId,
-                user_id: user!.id,
-                nextDueDate: nextDueDate.toISOString(),
-            }),
-            { successMessage: 'Agendamento criado!' }
-        ).then(res => res.success);
-    };
+        const tempId = `temp-sch-${Date.now()}`;
+        const newScheduledTx: ScheduledTransaction = { 
+            ...tx, 
+            id: tempId, 
+            category: categoriesById[categoryId] || fallbackCategory,
+            nextDueDate: new Date(tx.startDate).toISOString()
+        };
 
+        setScheduledTransactions(prev => [newScheduledTx, ...prev]);
+
+        const { error } = await supabase.from('scheduled_transactions').insert({ ...rest, category_id: categoryId, user_id: user!.id, nextDueDate: newScheduledTx.nextDueDate });
+        if (error) {
+            handleError(error, 'addScheduledTransaction');
+            setScheduledTransactions(prev => prev.filter(t => t.id !== tempId));
+            return false;
+        }
+        
+        showToast('Agendamento criado!', { type: 'success' });
+        await fetchData(); // Sync to get real ID and correct sorting
+        return true;
+    }, [user, categoriesById, fallbackCategory, handleError, showToast, fetchData]);
+
+    const updateScheduledTransaction = useCallback(async (tx: Omit<ScheduledTransaction, 'category'>): Promise<boolean> => {
+        const originalScheduled = [...scheduledTransactions];
+        const updatedTx: ScheduledTransaction = { ...tx, category: categoriesById[tx.categoryId] || fallbackCategory };
+        
+        setScheduledTransactions(prev => prev.map(item => item.id === tx.id ? updatedTx : item));
+
+        const { categoryId, ...rest } = tx;
+        const { error } = await supabase.from('scheduled_transactions').update({ ...rest, category_id: categoryId }).eq('id', tx.id);
+        
+        if(error) {
+            handleError(error, 'updateScheduledTransaction');
+            setScheduledTransactions(originalScheduled);
+            return false;
+        }
+        
+        showToast('Agendamento atualizado!', { type: 'success' });
+        return true;
+    }, [scheduledTransactions, categoriesById, fallbackCategory, handleError, showToast]);
+
+    const deleteScheduledTransaction = useCallback(async (id: string): Promise<boolean> => {
+        const originalScheduled = [...scheduledTransactions];
+        setScheduledTransactions(prev => prev.filter(item => item.id !== id));
+        const { error } = await supabase.from('scheduled_transactions').delete().eq('id', id);
+
+        if (error) {
+            handleError(error, 'deleteScheduledTransaction');
+            setScheduledTransactions(originalScheduled);
+            return false;
+        }
+
+        showToast('Agendamento excluído.', { type: 'success' });
+        return true;
+    }, [scheduledTransactions, handleError, showToast]);
 
     // --- DADOS DERIVADOS (SUMMARY, CHARTS, GAMIFICATION) ---
     const summary: SummaryData = useMemo(() => {
@@ -425,33 +536,20 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         return { level, xp, xpToNextLevel: requiredForLevelUp, rank };
     }, [transactions, goals, debts, loading]);
     
-    const contextValue: DashboardDataContextType = {
-        transactions,
-        goals,
-        debts,
-        scheduledTransactions,
-        categories,
-        summary,
-        monthlyChartData,
-        userLevel,
-        achievements,
-        loading,
-        isMutating,
-        mutatingIds,
-        error,
-        addTransaction,
-        updateTransaction,
-        deleteTransaction,
-        updateTransactionsCategory,
-        addGoal,
-        updateGoalValue,
-        deleteGoal,
-        addDebt,
-        addPaymentToDebt,
-        deleteDebt,
-        addScheduledTransaction,
+    const contextValue: DashboardDataContextType = useMemo(() => ({
+        transactions, goals, debts, scheduledTransactions, categories, summary, monthlyChartData,
+        userLevel, achievements, loading, isMutating, mutatingIds, error,
         clearError: () => setError(null),
-    };
+        addTransaction, updateTransaction, deleteTransaction, updateTransactionsCategory,
+        addGoal, updateGoalValue, deleteGoal, addDebt, addPaymentToDebt, deleteDebt,
+        addScheduledTransaction, updateScheduledTransaction, deleteScheduledTransaction,
+    }), [
+        transactions, goals, debts, scheduledTransactions, categories, summary, monthlyChartData,
+        userLevel, achievements, loading, isMutating, mutatingIds, error,
+        addTransaction, updateTransaction, deleteTransaction, updateTransactionsCategory,
+        addGoal, updateGoalValue, deleteGoal, addDebt, addPaymentToDebt, deleteDebt,
+        addScheduledTransaction, updateScheduledTransaction, deleteScheduledTransaction
+    ]);
 
     return React.createElement(DashboardDataContext.Provider, { value: contextValue }, children);
 };

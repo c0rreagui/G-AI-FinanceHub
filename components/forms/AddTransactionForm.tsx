@@ -28,6 +28,7 @@ const QuickValueChip: React.FC<{ value: number; onSelect: (value: number) => voi
           onSelect(value);
         }}
         className="px-3 py-1.5 text-sm font-semibold rounded-full bg-white/5 hover:bg-white/10 text-gray-300 transition-colors"
+        aria-label={`Selecionar valor rápido de ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)}`}
     >
         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)}
     </button>
@@ -65,20 +66,13 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
     setCategoryId(null);
     setDate(new Date().toISOString().split('T')[0]);
   };
-  
-  useEffect(() => {
-    if (!isOpen) {
-        setTimeout(resetForm, 200); // Reset after modal closes
-    }
-  }, [isOpen])
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!description || !amount || !categoryId || isSubmitting) return;
+    const numericAmount = parseFloat(amount);
+    if (!description || !amount || !categoryId || isNaN(numericAmount) || isSubmitting) return;
 
     setIsSubmitting(true);
-    const numericAmount = parseFloat(amount);
     const finalAmount = type === TransactionType.DESPESA ? -Math.abs(numericAmount) : Math.abs(numericAmount);
 
     let success = false;
@@ -188,11 +182,12 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
     <AnimatePresence>
         {isOpen && (
             <motion.div
-                className="fixed inset-0 z-50 flex flex-col bg-[oklch(var(--background-oklch))]"
+                className="fixed inset-0 z-50 flex flex-col bg-[oklch(var(--card-oklch))]"
                 initial={{ y: '100%' }}
                 animate={{ y: '0%' }}
                 exit={{ y: '100%' }}
                 transition={{ type: 'spring', stiffness: 400, damping: 40 }}
+                onAnimationComplete={() => { if (!isOpen) resetForm(); }}
             >
                 {/* Header Fixo */}
                 <div className="flex items-center justify-between p-4 border-b border-[oklch(var(--border-oklch))] flex-shrink-0">
@@ -208,7 +203,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                 </div>
 
                 {/* Rodapé Fixo */}
-                <div className="flex justify-end gap-2 p-4 border-t border-[oklch(var(--border-oklch))] flex-shrink-0 bg-[oklch(var(--background-oklch))]">
+                <div className="flex justify-end gap-2 p-4 border-t border-[oklch(var(--border-oklch))] flex-shrink-0 bg-[oklch(var(--card-oklch))]">
                   <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
                     Cancelar
                   </Button>

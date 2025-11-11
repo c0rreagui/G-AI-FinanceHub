@@ -12,13 +12,13 @@ import { useDialog } from '../../hooks/useDialog';
 import { EmptyState } from '../ui/EmptyState';
 import { GenericViewSkeleton } from './skeletons/GenericViewSkeleton';
 import { motion } from 'framer-motion';
+import { AnimatedCurrency } from '../ui/AnimatedCurrency';
 
 const DebtCard: React.FC<{ debt: Debt }> = ({ debt }) => {
     const { openDialog } = useDialog();
     const { deleteDebt, mutatingIds } = useDashboardData();
     const progress = (debt.paidAmount / debt.totalAmount) * 100;
     const isPaid = debt.status === DebtStatus.PAGA;
-    const remainingAmount = debt.totalAmount - debt.paidAmount;
     const isMutating = mutatingIds.has(debt.id);
 
     const handleDelete = () => {
@@ -46,15 +46,17 @@ const DebtCard: React.FC<{ debt: Debt }> = ({ debt }) => {
                         {isPaid ? 'Paga' : 'Ativa'}
                     </Badge>
                 </div>
-                <p className="text-sm text-gray-400 mt-1">
-                    Juros: {debt.interestRate}% a.a. | Categoria: {debt.category}
-                </p>
+                <div className="text-sm text-gray-400 mt-1 space-y-0.5">
+                    <p>Juros: <span className="font-medium text-gray-300">{debt.interestRate}% a.a.</span></p>
+                    <p>Categoria: <span className="font-medium text-gray-300">{debt.category}</span></p>
+                </div>
+
                 <div className="mt-4">
                     <div className="flex justify-between text-sm text-white mb-1">
-                        <span>
-                            {isPaid ? 'Quitado!' : <>Restam <span className="font-bold">{formatCurrencyBRL(remainingAmount)}</span></>}
+                        <span className="truncate">
+                            Pago <span className="font-bold"><AnimatedCurrency value={debt.paidAmount} /></span> de {formatCurrencyBRL(debt.totalAmount)}
                         </span>
-                        <span className="text-gray-400">{`${progress.toFixed(0)}%`}</span>
+                        <span className="text-gray-300 font-medium">{`${progress.toFixed(0)}%`}</span>
                     </div>
                     <ProgressBar percentage={progress} color={isPaid ? 'success' : 'danger'} />
                 </div>
@@ -69,7 +71,7 @@ const DebtCard: React.FC<{ debt: Debt }> = ({ debt }) => {
                     <TrashIcon className="w-5 h-5"/>
                 </button>
                 {!isPaid && (
-                    <Button onClick={() => openDialog('add-payment-to-debt', { debt })} size="sm" variant="secondary" disabled={isMutating}>
+                    <Button variant="primary" onClick={() => openDialog('add-payment-to-debt', { debt })} size="sm" disabled={isMutating}>
                         Realizar Pagamento
                     </Button>
                 )}

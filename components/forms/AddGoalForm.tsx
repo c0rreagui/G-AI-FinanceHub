@@ -32,13 +32,19 @@ export const AddGoalForm: React.FC<AddGoalFormProps> = ({ isOpen, onClose }) => 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !targetAmount || !deadline || isSubmitting) return;
+    const parsedAmount = parseFloat(targetAmount);
+    if (!name || !targetAmount || !deadline || isNaN(parsedAmount) || isSubmitting) return;
 
     setIsSubmitting(true);
+
+    // Constrói a data em UTC para evitar problemas de fuso horário.
+    const [year, month, day] = deadline.split('-').map(Number);
+    const utcDeadline = new Date(Date.UTC(year, month - 1, day));
+    
     const goalData: Omit<Goal, 'id' | 'currentAmount' | 'status'> = {
         name,
-        targetAmount: parseFloat(targetAmount),
-        deadline: new Date(deadline).toISOString(),
+        targetAmount: parsedAmount,
+        deadline: utcDeadline.toISOString(),
     };
 
     const newGoal = await addGoal(goalData);
@@ -110,6 +116,7 @@ export const AddGoalForm: React.FC<AddGoalFormProps> = ({ isOpen, onClose }) => 
           animate={{ y: '0%' }}
           exit={{ y: '100%' }}
           transition={{ type: 'spring', stiffness: 400, damping: 40 }}
+          onAnimationComplete={() => { if (!isOpen) resetForm(); }}
         >
           <div className="flex items-center justify-between p-4 border-b border-[oklch(var(--border-oklch))] flex-shrink-0">
             <h2 className="text-xl font-semibold text-white">Nova Meta</h2>

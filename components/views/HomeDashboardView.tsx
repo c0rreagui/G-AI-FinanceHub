@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { PageHeader } from '../layout/PageHeader';
-import { HomeIcon } from '../Icons';
+import { HomeIcon, PlusCircle, Target } from '../Icons';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { QuickActions } from '../ui/QuickActions';
 import { GoalStatus, ViewType } from '../../types';
@@ -14,10 +14,28 @@ import { AnimatedSummaryCard } from '../ui/AnimatedSummaryCard';
 import { ProactiveInsightCard } from '../ui/ProactiveInsightCard';
 import { formatCurrencyBRL } from '../../utils/formatters';
 import { ProgressBar } from '../ui/ProgressBar';
+import { Button } from '../ui/Button';
+import { useDialog } from '../../hooks/useDialog';
 
 interface HomeDashboardViewProps {
     setCurrentView: (view: ViewType) => void;
 }
+
+const NoGoalCTA: React.FC = () => {
+    const { openDialog } = useDialog();
+    return (
+        <div className="card text-center bg-cyan-900/20 border-cyan-500/30">
+            <Target className="w-10 h-10 text-cyan-300 mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-white">Defina seu Primeiro Objetivo</h3>
+            <p className="mt-2 text-sm text-gray-300 max-w-xs mx-auto">Metas são o primeiro passo para realizar seus sonhos. Que tal começar agora?</p>
+            <Button onClick={() => openDialog('add-goal')} className="mt-6 mx-auto">
+                <PlusCircle className="w-4 h-4 mr-2" />
+                Criar Nova Meta
+            </Button>
+        </div>
+    );
+};
+
 
 export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrentView }) => {
     const { summary, goals, monthlyChartData, loading } = useDashboardData();
@@ -48,7 +66,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
         );
     }
     
-    const firstGoal = goals.find(g => g.status === GoalStatus.EM_ANDAMENTO);
+    const firstGoal = useMemo(() => goals.find(g => g.status === GoalStatus.EM_ANDAMENTO), [goals]);
 
     return (
         <>
@@ -79,15 +97,19 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                     <MonthlySummaryChart data={monthlyChartData} />
                 </motion.div>
 
-                {firstGoal && (
-                    <motion.div variants={itemVariants} className="card">
-                        <h2 className="text-xl font-semibold text-white mb-4">Meta Principal: {firstGoal.name}</h2>
-                        <p className="text-sm text-gray-400 mt-2">
-                            {formatCurrencyBRL(firstGoal.currentAmount)} de {formatCurrencyBRL(firstGoal.targetAmount)}
-                        </p>
-                        <ProgressBar percentage={(firstGoal.currentAmount / firstGoal.targetAmount) * 100} color="primary" />
-                    </motion.div>
-                )}
+                <motion.div variants={itemVariants}>
+                    {firstGoal ? (
+                        <div className="card">
+                            <h2 className="text-xl font-semibold text-white mb-4">Meta Principal: {firstGoal.name}</h2>
+                            <p className="text-sm text-gray-400 mt-2">
+                                {formatCurrencyBRL(firstGoal.currentAmount)} de {formatCurrencyBRL(firstGoal.targetAmount)}
+                            </p>
+                            <ProgressBar percentage={(firstGoal.currentAmount / firstGoal.targetAmount) * 100} color="primary" />
+                        </div>
+                    ) : (
+                        <NoGoalCTA />
+                    )}
+                </motion.div>
                 
                 <motion.div variants={itemVariants}><AchievementsList /></motion.div>
             </motion.div>

@@ -9,6 +9,8 @@ import { LoadingSpinner } from '../LoadingSpinner';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { motion, AnimatePresence } from 'framer-motion';
 import { XIcon } from '../Icons';
+import { useDialog } from '../../hooks/useDialog';
+import { triggerHapticFeedback } from '../../utils/haptics';
 
 interface AddPaymentToDebtFormProps {
   isOpen: boolean;
@@ -16,34 +18,58 @@ interface AddPaymentToDebtFormProps {
   debt: Debt;
 }
 
+const QuickValueChip: React.FC<{ value: number; onSelect: (value: number) => void }> = ({ value, onSelect }) => (
+    <button
+        type="button"
+        onClick={() => {
+          triggerHapticFeedback();
+          onSelect(value);
+        }}
+        className="px-3 py-1.5 text-sm font-semibold rounded-full bg-white/5 hover:bg-white/10 text-gray-300 transition-colors"
+    >
+        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)}
+    </button>
+);
+
 export const AddPaymentToDebtForm: React.FC<AddPaymentToDebtFormProps> = ({ isOpen, onClose, debt }) => {
   const { addPaymentToDebt } = useDashboardData();
+  const { openDialog } = useDialog();
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const [amount, setAmount] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const quickValues = [50, 100, 250, 500];
 
   const remainingAmount = debt.totalAmount - debt.paidAmount;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const valueToAdd = parseFloat(amount);
-    if (!valueToAdd || valueToAdd <= 0 || isSubmitting) {
-      return;
-    }
-    if (valueToAdd > remainingAmount) {
-        if (!window.confirm(`O valor do pagamento (${formatCurrencyBRL(valueToAdd)}) é maior que o saldo restante (${formatCurrencyBRL(remainingAmount)}). Deseja continuar?`)) {
-            return;
-        }
-    }
-    
+  const continueSubmission = async (paymentValue: number) => {
     setIsSubmitting(true);
-    const success = await addPaymentToDebt(debt.id, valueToAdd);
+    const success = await addPaymentToDebt(debt.id, paymentValue);
 
     if (success) {
       setAmount('');
       onClose();
     }
     setIsSubmitting(false);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const valueToAdd = parseFloat(amount);
+    if (isNaN(valueToAdd) || valueToAdd <= 0 || isSubmitting) {
+      return;
+    }
+    
+    if (valueToAdd > remainingAmount) {
+        openDialog('confirmation', {
+            title: 'Pagamento Excedente',
+            message: `O valor do pagamento (${formatCurrencyBRL(valueToAdd)}) é maior que o saldo restante (${formatCurrencyBRL(remainingAmount)}). Deseja continuar? O valor final pago excederá o total da dívida.`,
+            confirmText: 'Sim, Continuar',
+            confirmVariant: 'destructive',
+            onConfirm: () => continueSubmission(valueToAdd),
+        });
+    } else {
+        continueSubmission(valueToAdd);
+    }
   };
   
   const FormFields = (
@@ -60,9 +86,18 @@ export const AddPaymentToDebtForm: React.FC<AddPaymentToDebtFormProps> = ({ isOp
         placeholder="250.00"
         step="0.01"
         required
-        autoFocus
         disabled={isSubmitting}
       />
+      <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+                Valores Rápidos
+            </label>
+            <div className="flex items-center gap-2 flex-wrap">
+                {quickValues.map(val => (
+                    <QuickValueChip key={val} value={val} onSelect={(v) => setAmount(String(v))} />
+                ))}
+            </div>
+        </div>
     </>
   );
 

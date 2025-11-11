@@ -34,13 +34,15 @@ export const AddDebtForm: React.FC<AddDebtFormProps> = ({ isOpen, onClose }) => 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !totalAmount || !interestRate || isSubmitting) return;
+    const parsedAmount = parseFloat(totalAmount);
+    const parsedRate = parseFloat(interestRate);
+    if (!name || !totalAmount || !interestRate || isNaN(parsedAmount) || isNaN(parsedRate) || isSubmitting) return;
 
     setIsSubmitting(true);
     const debtData: Omit<Debt, 'id' | 'paidAmount' | 'status'> = {
         name,
-        totalAmount: parseFloat(totalAmount),
-        interestRate: parseFloat(interestRate),
+        totalAmount: parsedAmount,
+        interestRate: parsedRate,
         category: category || 'Outros',
     };
     

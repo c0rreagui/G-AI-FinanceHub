@@ -131,18 +131,14 @@ export interface DashboardDataContextType {
   updateTransaction: (tx: Omit<Transaction, 'category'>) => Promise<boolean>;
   deleteTransaction: (id: string) => Promise<boolean>;
   updateTransactionsCategory: (ids: string[], categoryId: string) => Promise<boolean>;
-  // FIX: The return type of addGoal was changed from Promise<boolean> to Promise<Goal | null>
-  // to match the implementation, which returns the newly created goal object.
-  // This is required by the AddGoalForm to open the subsequent "add value" modal.
   addGoal: (goal: Omit<Goal, 'id' | 'currentAmount' | 'status'>) => Promise<Goal | null>;
   updateGoalValue: (id: string, valueToAdd: number) => Promise<boolean>;
   deleteGoal: (id: string) => Promise<boolean>;
-  // FIX: The return type of addDebt was changed from Promise<boolean> to Promise<Debt | null>
-  // to match the implementation, which returns the newly created debt object.
-  // This is required by the AddDebtForm to open the subsequent "add payment" modal.
   addDebt: (debt: Omit<Debt, 'id' | 'paidAmount' | 'status'>) => Promise<Debt | null>;
   addPaymentToDebt: (id: string, paymentAmount: number) => Promise<boolean>;
   deleteDebt: (id: string) => Promise<boolean>;
   addScheduledTransaction: (tx: Omit<ScheduledTransaction, 'id' | 'category' | 'nextDueDate'>) => Promise<boolean>;
+  updateScheduledTransaction: (tx: Omit<ScheduledTransaction, 'category'>) => Promise<boolean>;
+  deleteScheduledTransaction: (id: string) => Promise<boolean>;
   clearError: () => void;
 }

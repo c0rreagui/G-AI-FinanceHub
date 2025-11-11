@@ -3,6 +3,7 @@ import { supabase } from '../../services/supabaseClient';
 import { Button } from '../ui/Button';
 import { LoadingSpinner } from '../LoadingSpinner';
 import { motion } from 'framer-motion';
+import { Input } from '../ui/Input';
 
 export const AuthView: React.FC = () => {
     const [loading, setLoading] = useState(false);
@@ -62,41 +63,27 @@ export const AuthView: React.FC = () => {
                 </div>
                 <div className="bg-[oklch(var(--card-oklch))] border border-[oklch(var(--border-oklch))] rounded-2xl shadow-2xl shadow-black/40 p-8">
                     <form className="space-y-6" onSubmit={handleAuthAction}>
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-300">
-                                Endereço de e-mail
-                            </label>
-                            <div className="mt-1">
-                                <input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    autoComplete="email"
-                                    required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    className="block w-full appearance-none rounded-lg border border-[oklch(var(--border-oklch))] bg-[oklch(var(--background-oklch))] px-4 py-3 text-white placeholder-gray-500 shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 sm:text-sm transition"
-                                />
-                            </div>
-                        </div>
+                        <Input
+                            id="email"
+                            label="Endereço de e-mail"
+                            name="email"
+                            type="email"
+                            autoComplete="email"
+                            required
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
 
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-300">
-                                Senha
-                            </label>
-                            <div className="mt-1">
-                                <input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    autoComplete="current-password"
-                                    required
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="block w-full appearance-none rounded-lg border border-[oklch(var(--border-oklch))] bg-[oklch(var(--background-oklch))] px-4 py-3 text-white placeholder-gray-500 shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 sm:text-sm transition"
-                                />
-                            </div>
-                        </div>
+                        <Input
+                            id="password"
+                            label="Senha"
+                            name="password"
+                            type="password"
+                            autoComplete="current-password"
+                            required
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
 
                         {error && <p className="text-sm text-red-400">{error}</p>}
                         {message && <p className="text-sm text-green-400">{message}</p>}

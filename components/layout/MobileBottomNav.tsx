@@ -27,19 +27,21 @@ interface MobileBottomNavProps {
 
 interface NavItemProps {
     name: string;
-    view: ViewType;
+    view?: ViewType;
     icon: React.ElementType;
     isActive: boolean;
-    onClick: (view: ViewType) => void;
+    onClick: (view?: ViewType) => void;
 }
 
 const NavItem: React.FC<NavItemProps> = ({ name, view, icon: Icon, isActive, onClick }) => (
     <button
-      onClick={() => onClick(view)}
+      onClick={() => view && onClick(view)}
       className="relative flex flex-col items-center justify-center gap-1 text-xs font-medium w-full"
+      aria-label={name}
+      aria-current={isActive ? 'page' : undefined}
     >
-      <Icon className={`w-6 h-6 ${isActive ? 'text-cyan-400' : 'text-gray-400'}`} />
-      <span className={isActive ? 'text-white' : 'text-gray-400'}>{name}</span>
+      <Icon className={`w-6 h-6 transition-colors ${isActive ? 'text-cyan-400' : 'text-gray-400'}`} />
+      <span className={`transition-colors ${isActive ? 'text-white' : 'text-gray-400'}`}>{name}</span>
       {isActive && (
         <motion.div
           layoutId="mobile-active-nav"
@@ -58,7 +60,6 @@ const mainNavItems: { name: string; view: ViewType; icon: React.ElementType }[] 
 const moreNavItems: { name: string; view: ViewType; icon: React.ElementType }[] = [
     { name: 'Dívidas', view: 'debts', icon: TrendingDown },
     { name: 'Agendamentos', view: 'scheduling', icon: Calendar },
-    // FIX: Lightbulb icon was not found, it is now imported correctly.
     { name: 'Insights', view: 'insights', icon: Lightbulb },
     { name: 'Ferramentas', view: 'tools', icon: Wrench },
     { name: 'Ajustes', view: 'settings', icon: Settings },
@@ -80,9 +81,9 @@ const SpeedDial: React.FC = () => {
     };
     
     const actions = [
-        { icon: Target, label: 'Meta', onClick: () => handleAction(() => openDialog('add-goal')) },
-        { icon: ArrowUpRight, label: 'Receita', onClick: () => handleAction(() => openDialog('add-transaction', { prefill: { type: TransactionType.RECEITA } })) },
-        { icon: ArrowDownLeft, label: 'Despesa', onClick: () => handleAction(() => openDialog('add-transaction', { prefill: { type: TransactionType.DESPESA } })) },
+        { icon: Target, label: 'Meta', ariaLabel: 'Adicionar nova meta', onClick: () => handleAction(() => openDialog('add-goal')) },
+        { icon: ArrowUpRight, label: 'Receita', ariaLabel: 'Adicionar nova receita', onClick: () => handleAction(() => openDialog('add-transaction', { prefill: { type: TransactionType.RECEITA } })) },
+        { icon: ArrowDownLeft, label: 'Despesa', ariaLabel: 'Adicionar nova despesa', onClick: () => handleAction(() => openDialog('add-transaction', { prefill: { type: TransactionType.DESPESA } })) },
     ];
 
     return (
@@ -107,7 +108,11 @@ const SpeedDial: React.FC = () => {
                                     className="flex items-center gap-3"
                                 >
                                     <span className="bg-black/50 text-white text-xs font-semibold px-2 py-1 rounded-md">{action.label}</span>
-                                    <button onClick={action.onClick} className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center shadow-lg">
+                                    <button 
+                                      onClick={action.onClick} 
+                                      className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center shadow-lg"
+                                      aria-label={action.ariaLabel}
+                                    >
                                         <action.icon className="w-6 h-6" />
                                     </button>
                                 </motion.div>
@@ -121,6 +126,8 @@ const SpeedDial: React.FC = () => {
                 className="relative z-50 flex items-center justify-center w-14 h-14 bg-gradient-to-r from-cyan-500 to-green-500 rounded-full text-white shadow-lg -translate-y-4"
                 whileTap={{ scale: 0.9 }}
                 animate={isOpen ? "open" : "closed"}
+                aria-label={isOpen ? "Fechar ações rápidas" : "Abrir ações rápidas"}
+                aria-expanded={isOpen}
             >
                 <motion.div variants={{ open: { rotate: 45 }, closed: { rotate: 0 } }}>
                     <PlusCircle className="w-8 h-8" />
@@ -137,6 +144,8 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ currentView, s
     setCurrentView(view);
     setIsMoreMenuOpen(false);
   }
+  
+  const isMoreActive = moreNavItems.some(item => item.view === currentView);
 
   return (
     <>
@@ -160,13 +169,12 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ currentView, s
                 isActive={currentView === mainNavItems[2].view}
                 onClick={setCurrentView}
             />
-            <button
+            <NavItem
+                name="Mais"
+                icon={MoreHorizontal}
+                isActive={isMoreActive}
                 onClick={() => setIsMoreMenuOpen(true)}
-                className="relative flex flex-col items-center justify-center gap-1 text-xs font-medium w-full text-gray-400"
-            >
-                <MoreHorizontal className="w-6 h-6" />
-                <span>Mais</span>
-            </button>
+            />
         </div>
       </div>
       

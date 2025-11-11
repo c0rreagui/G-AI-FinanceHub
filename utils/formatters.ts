@@ -7,6 +7,9 @@ export const formatCurrencyBRL = (amount: number): string => {
       currency: 'BRL',
     }).format(0);
   }
+  if (!isFinite(amount)) {
+    return amount > 0 ? 'Ilimitado' : '-Ilimitado';
+  }
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
@@ -61,6 +64,9 @@ export const formatDaysUntil = (dateString: string): { text: string; color: 'red
   return { text: `Vence em ${diffDays} dias`, color: 'gray' };
 };
 
+// PERFORMANCE NOTE: A criação de `new Date()` dentro de um loop (`forEach`) pode ser
+// um gargalo de performance para datasets extremamente grandes (dezenas de milhares de transações).
+// Para a escala deste app, esta abordagem é perfeitamente aceitável e mais legível.
 export const groupTransactionsByDate = (transactions: Transaction[]): { [key: string]: Transaction[] } => {
   const groups: { [key: string]: Transaction[] } = {};
   const today = new Date();

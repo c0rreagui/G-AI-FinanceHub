@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { DashboardDataProvider } from './hooks/useDashboardData';
-// FIX: `useDialog` is a custom hook and should be imported from the hooks directory, not from the context file.
 import { DialogProvider } from './contexts/DialogContext';
 import { useDialog } from './hooks/useDialog';
 import { ToastProvider } from './contexts/ToastContext';
@@ -20,7 +19,7 @@ import { HomeDashboardView } from './components/views/HomeDashboardView';
 import { AnimatePresence, motion, Transition } from 'framer-motion';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ToastContainer } from './components/ui/ToastContainer';
-import { APP_VERSION } from './config';
+import { APP_VERSION, APP_CODENAME } from './config';
 import { OnboardingView } from './components/views/OnboardingView';
 import { logger } from './services/loggingService';
 
@@ -65,24 +64,8 @@ const AppContent: React.FC = () => {
     }
   };
 
-
-  if (loading) {
-    return (
-      <div className="flex h-screen w-screen items-center justify-center bg-oklch-background">
-        <LoadingSpinner />
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <AuthView />;
-  }
-  
-  if (!onboardingComplete) {
-      return <OnboardingView onComplete={handleOnboardingComplete} />;
-  }
-
-  const renderView = () => {
+  // FIX: Moved `useCallback` before conditional returns to adhere to the Rules of Hooks.
+  const renderView = useCallback(() => {
     const pageVariants = {
       initial: { opacity: 0, y: 20 },
       in: { opacity: 1, y: 0 },
@@ -100,7 +83,7 @@ const AppContent: React.FC = () => {
         viewComponent = <HomeDashboardView setCurrentView={setCurrentView} />;
         break;
       case 'transactions':
-        viewComponent = <TransactionsView />;
+        viewComponent = <TransactionsView setCurrentView={setCurrentView} />;
         break;
       case 'insights':
         viewComponent = <InsightsView />;
@@ -115,7 +98,7 @@ const AppContent: React.FC = () => {
         viewComponent = <SchedulingView />;
         break;
       case 'tools':
-        viewComponent = <ToolsView />;
+        viewComponent = <ToolsView setCurrentView={setCurrentView} />;
         break;
       case 'settings':
         viewComponent = <SettingsView />;
@@ -138,18 +121,34 @@ const AppContent: React.FC = () => {
         {viewComponent}
       </motion.div>
     );
-  };
+  }, [currentView]);
+
+
+  if (loading) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center bg-oklch-background">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <AuthView />;
+  }
+  
+  if (!onboardingComplete) {
+      return <OnboardingView onComplete={handleOnboardingComplete} />;
+  }
 
   return (
     <>
       <AppLayout currentView={currentView} setCurrentView={setCurrentView}>
         <AnimatePresence mode="wait">
           {renderView()}
-        {/* FIX: Corrected typo in the AnimatePresence closing tag. */}
         </AnimatePresence>
       </AppLayout>
       <div className="fixed bottom-1 right-2 text-xs text-white/20 pointer-events-none select-none">
-        v{APP_VERSION}
+        v{APP_VERSION} ({APP_CODENAME})
       </div>
     </>
   );

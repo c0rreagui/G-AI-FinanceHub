@@ -1,9 +1,9 @@
 // components/views/TransactionsView.tsx
 import React, { useState, useMemo } from 'react';
 import { PageHeader } from '../layout/PageHeader';
-import { ArrowLeftRight, PlusCircle, FolderSync, PencilIcon, TrashIcon, LinkIcon } from '../Icons';
+import { ArrowLeftRight, PlusCircle, FolderSync, PencilIcon, TrashIcon, LinkIcon, LockClosed } from '../Icons';
 import { useDashboardData } from '../../hooks/useDashboardData';
-import { Transaction, TransactionType } from '../../types';
+import { Transaction, TransactionType, ViewType } from '../../types';
 import { formatCurrencyBRL, groupTransactionsByDate } from '../../utils/formatters';
 import { Button } from '../ui/Button';
 import { useDialog } from '../../hooks/useDialog';
@@ -50,7 +50,8 @@ const TransactionItem: React.FC<{
     onSelect: (id: string) => void;
     onEdit: (transaction: Transaction) => void;
     onDelete: (transactionId: string) => void;
-}> = ({ transaction, isSelected, isMutating, isInSelectionMode, onSelect, onEdit, onDelete }) => {
+    setCurrentView: (view: ViewType) => void;
+}> = React.memo(({ transaction, isSelected, isMutating, isInSelectionMode, onSelect, onEdit, onDelete, setCurrentView }) => {
     const isExpense = transaction.type === TransactionType.DESPESA;
     const isDesktop = useMediaQuery('(min-width: 1024px)');
     const [isDragging, setIsDragging] = useState(false);
@@ -58,19 +59,20 @@ const TransactionItem: React.FC<{
     const actionButtonsWidth = 160; // 2 buttons * 80px width
     const isSystemTransaction = !!transaction.goalContributionId || !!transaction.debtPaymentId;
     
-    // Estilo de "brilho de impacto" para mobile
-    const glowStyle = useMemo(() => {
-        if (isDesktop) return {};
-        const intensity = Math.min(Math.abs(transaction.amount) / 500, 1); // Normaliza até R$500
-        if (intensity < 0.1) return {};
-        
-        const colorVar = isExpense ? '--danger-oklch' : '--success-oklch';
-        return {
-            boxShadow: `0 0 15px -2px oklch(var(${colorVar}) / ${intensity * 0.3})`,
-            borderColor: `oklch(var(${colorVar}) / ${intensity * 0.5})`
-        };
-    }, [transaction.amount, transaction.type, isDesktop]);
-
+    const handleLinkClick = (e: React.MouseEvent) => {
+        e.stopPropagation(); // Previne que o clique selecione a linha
+        if (transaction.goalContributionId) {
+            setCurrentView('goals');
+        } else if (transaction.debtPaymentId) {
+            setCurrentView('debts');
+        }
+    };
+    
+    const handleContainerClick = () => {
+        if (!isDragging && !isSystemTransaction) {
+            onSelect(transaction.id);
+        }
+    }
 
     const desktopHoverActions = (
         <AnimatePresence>
@@ -107,6 +109,7 @@ const TransactionItem: React.FC<{
                 onClick={() => onEdit(transaction)}
                 disabled={isMutating || isSystemTransaction}
                 className="flex flex-col items-center justify-center h-full w-20 bg-indigo-600/90 text-white hover:bg-indigo-600 transition-colors disabled:bg-gray-700/80 disabled:cursor-not-allowed"
+                title={isSystemTransaction ? "Transações do sistema não podem ser editadas." : "Editar"}
             >
                 <PencilIcon className="w-5 h-5" />
                 <span className="text-xs mt-1">Editar</span>
@@ -115,6 +118,7 @@ const TransactionItem: React.FC<{
                 onClick={() => onDelete(transaction.id)}
                 disabled={isMutating || isSystemTransaction}
                 className="flex flex-col items-center justify-center h-full w-20 bg-red-600/90 text-white hover:bg-red-600 transition-colors disabled:bg-gray-700/80 disabled:cursor-not-allowed"
+                title={isSystemTransaction ? "Transações do sistema não podem ser excluídas." : "Excluir"}
             >
                 <TrashIcon className="w-5 h-5" />
                 <span className="text-xs mt-1">Excluir</span>
@@ -136,28 +140,20 @@ const TransactionItem: React.FC<{
                 className="relative z-10 w-full"
                 drag={!isDesktop && !isSystemTransaction && !isInSelectionMode ? "x" : false}
                 dragConstraints={{ left: -actionButtonsWidth, right: 0 }}
-                dragElastic={{ left: 0.1, right: 0.8 }}
+                dragElastic={0.2}
                 onDragStart={() => setIsDragging(true)}
-                onDragEnd={() => setTimeout(() => setIsDragging(false), 100)}
+                onDragEnd={() => setTimeout(() => setIsDragging(false), 150)}
             >
                 <div 
                   className={`group flex items-center justify-between p-4 bg-white/5 border rounded-2xl backdrop-blur-xl transition-all duration-300 ${isSystemTransaction && isInSelectionMode ? 'opacity-60' : ''} ${isSelected ? 'border-cyan-500/80 shadow-lg' : 'border-white/10 hover:border-white/20 hover:bg-white/10'}`}
-                  style={isSelected ? {} : glowStyle}
-                  onClick={() => !isDragging && !isSystemTransaction && onSelect(transaction.id)}
+                  onClick={handleContainerClick}
                   title={isSystemTransaction && isInSelectionMode ? 'Transações do sistema não podem ser selecionadas.' : ''}
                 >
-                    {/* Swipe Hint for Mobile */}
-                    {!isDesktop && !isInSelectionMode && !isSystemTransaction && (
-                        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-1 items-center opacity-20 group-hover:opacity-50 transition-opacity">
-                            <div className="w-1 h-1 rounded-full bg-gray-400"></div>
-                            <div className="w-1 h-1 rounded-full bg-gray-400"></div>
-                            <div className="w-1 h-1 rounded-full bg-gray-400"></div>
-                        </div>
-                    )}
                     <div className="flex items-center gap-4 flex-1 cursor-pointer">
                         <input
                             type="checkbox"
-                            className="h-5 w-5 rounded border-gray-600 text-cyan-400 focus:ring-cyan-500 bg-transparent pointer-events-none flex-shrink-0 disabled:opacity-50 disabled:border-gray-700"
+                            aria-hidden={!isInSelectionMode}
+                            className={`h-5 w-5 rounded border-gray-600 text-cyan-400 focus:ring-cyan-500 bg-transparent pointer-events-none flex-shrink-0 disabled:opacity-50 disabled:border-gray-700 transition-opacity ${isInSelectionMode ? 'opacity-100' : 'opacity-0'}`}
                             checked={isSelected}
                             disabled={isSystemTransaction}
                             readOnly
@@ -168,7 +164,14 @@ const TransactionItem: React.FC<{
                         <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
                                 <p className="text-sm font-semibold text-white truncate">{transaction.description}</p>
-                                {isSystemTransaction && <span title="Transação automática vinculada a uma meta ou dívida."><LinkIcon className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" /></span>}
+                                {isSystemTransaction && (
+                                    <div className="flex items-center gap-1.5 flex-shrink-0" title="Transação de sistema não pode ser editada.">
+                                        <LockClosed className="w-3 h-3 text-gray-500"/>
+                                        <button onClick={handleLinkClick} title="Ir para a meta/dívida vinculada" className="transition-transform hover:scale-110">
+                                            <LinkIcon className="w-3.5 h-3.5 text-gray-500 hover:text-cyan-400" />
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                             <p className="text-xs text-gray-400">{transaction.category.name}</p>
                         </div>
@@ -183,16 +186,20 @@ const TransactionItem: React.FC<{
             {isDesktop && !isInSelectionMode && desktopHoverActions}
         </motion.li>
     );
-};
+});
 
 const DateHeader: React.FC<{ date: string }> = ({ date }) => (
-    <div className="sticky top-0 bg-oklch-background/95 backdrop-blur-sm z-20 py-1.5 px-2">
+    <div className="sticky top-0 bg-oklch-background/90 backdrop-blur-lg z-20 py-1.5 px-2 -mx-2">
       <h3 className="text-sm font-semibold text-gray-300">{date}</h3>
     </div>
 );
 
-export const TransactionsView: React.FC = () => {
-    const { transactions, loading, deleteTransaction, mutatingIds } = useDashboardData();
+interface TransactionsViewProps {
+    setCurrentView: (view: ViewType) => void;
+}
+
+export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentView }) => {
+    const { transactions, loading, deleteTransaction, mutatingIds, updateTransaction } = useDashboardData();
     const { openDialog } = useDialog();
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
@@ -215,7 +222,7 @@ export const TransactionsView: React.FC = () => {
     };
 
     const handleEdit = (transaction: Transaction) => {
-        openDialog('add-transaction', { transactionToEdit: transaction });
+        openDialog('add-transaction', { transactionToEdit: transaction, onSaveSuccess: () => updateTransaction(transaction) });
     };
 
     const handleDelete = (transactionId: string) => {
@@ -283,6 +290,7 @@ export const TransactionsView: React.FC = () => {
                                                     onSelect={handleSelect}
                                                     onEdit={handleEdit}
                                                     onDelete={handleDelete}
+                                                    setCurrentView={setCurrentView}
                                                 />
                                             ))}
                                         </AnimatePresence>

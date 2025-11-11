@@ -1,8 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-// FIX: Changed props interface to extend framer-motion's component props to resolve type conflicts.
-// Omitted 'variant' to avoid conflict with the custom styling variant prop.
 interface ButtonProps extends Omit<React.ComponentProps<typeof motion.button>, 'variant'> {
     children: React.ReactNode;
     variant?: 'primary' | 'secondary' | 'destructive';

@@ -28,7 +28,7 @@ export const ReceiptScanner: React.FC = () => {
   };
 
   const handleScan = async () => {
-    if (!imageFile) {
+    if (!imageFile || !imagePreview) {
       setError("Por favor, selecione uma imagem primeiro.");
       return;
     }
@@ -40,7 +40,10 @@ export const ReceiptScanner: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const base64Image = imagePreview!.split(',')[1];
+      const base64Image = imagePreview.split(',')[1];
+      if (!base64Image) {
+        throw new Error("Não foi possível processar a imagem. Formato inválido.");
+      }
       // Chama o serviço de OCR com a apiKey
       const ocrResult = await scanReceipt(base64Image, imageFile.type, apiKey);
       
@@ -49,7 +52,7 @@ export const ReceiptScanner: React.FC = () => {
         prefill: {
           description: ocrResult.description || 'Recibo Scaneado',
           amount: ocrResult.amount || 0,
-          type: (ocrResult.amount || 0) < 0 ? TransactionType.DESPESA : TransactionType.RECEITA,
+          type: ocrResult.type || TransactionType.DESPESA,
           date: new Date().toISOString().split('T')[0]
         },
         onSaveSuccess: () => {

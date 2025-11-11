@@ -12,6 +12,7 @@ import { useDialog } from '../../hooks/useDialog';
 import { EmptyState } from '../ui/EmptyState';
 import { GenericViewSkeleton } from './skeletons/GenericViewSkeleton';
 import { motion } from 'framer-motion';
+import { AnimatedCurrency } from '../ui/AnimatedCurrency';
 
 const GoalCard: React.FC<{ goal: Goal }> = ({ goal }) => {
     const { openDialog } = useDialog();
@@ -20,7 +21,7 @@ const GoalCard: React.FC<{ goal: Goal }> = ({ goal }) => {
     const isCompleted = goal.status === GoalStatus.CONCLUIDO;
     const isMutating = mutatingIds.has(goal.id);
     const daysUntil = formatDaysUntil(goal.deadline);
-    const remainingAmount = goal.targetAmount - goal.currentAmount;
+    const remainingAmount = Math.max(0, goal.targetAmount - goal.currentAmount);
 
 
     const handleDelete = () => {
@@ -54,7 +55,7 @@ const GoalCard: React.FC<{ goal: Goal }> = ({ goal }) => {
                 <div className="mt-4">
                     <div className="flex justify-between text-sm text-white mb-1">
                         <span>
-                            {isCompleted ? 'Concluído!' : <>Faltam <span className="font-bold">{formatCurrencyBRL(remainingAmount)}</span></>}
+                            {isCompleted ? 'Concluído!' : <>Faltam <span className="font-bold"><AnimatedCurrency value={remainingAmount} /></span></>}
                         </span>
                         <span className="text-gray-400">{`${progress.toFixed(0)}%`}</span>
                     </div>

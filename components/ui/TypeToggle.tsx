@@ -16,7 +16,7 @@ export const TypeToggle: React.FC<TypeToggleProps> = ({ selectedType, onTypeChan
     };
 
     return (
-        <div>
+        <div role="radiogroup" aria-label="Tipo de transação">
             <label className="block text-sm font-medium text-gray-300 mb-2">
                 Tipo
             </label>
@@ -30,22 +30,24 @@ export const TypeToggle: React.FC<TypeToggleProps> = ({ selectedType, onTypeChan
 
                 <button
                     type="button"
+                    role="radio"
                     onClick={() => handleTypeChange(TransactionType.DESPESA)}
                     className={`relative w-1/2 flex items-center justify-center gap-2 rounded-md py-2.5 text-sm font-semibold transition-colors ${
                         selectedType === TransactionType.DESPESA ? 'text-white' : 'text-gray-400 hover:text-white'
                     }`}
-                    aria-pressed={selectedType === TransactionType.DESPESA}
+                    aria-checked={selectedType === TransactionType.DESPESA}
                 >
                     <ArrowDownLeft className="w-4 h-4" />
                     Despesa
                 </button>
                 <button
                     type="button"
+                    role="radio"
                     onClick={() => handleTypeChange(TransactionType.RECEITA)}
                     className={`relative w-1/2 flex items-center justify-center gap-2 rounded-md py-2.5 text-sm font-semibold transition-colors ${
                         selectedType === TransactionType.RECEITA ? 'text-white' : 'text-gray-400 hover:text-white'
                     }`}
-                    aria-pressed={selectedType === TransactionType.RECEITA}
+                    aria-checked={selectedType === TransactionType.RECEITA}
                 >
                     <ArrowUpRight className="w-4 h-4" />
                     Receita

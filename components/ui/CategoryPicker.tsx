@@ -24,6 +24,8 @@ const CategoryGridItem: React.FC<CategoryGridItemProps> = ({ category, isSelecte
                 isSelected ? 'border-cyan-500/80 bg-cyan-500/20' : 'border-transparent bg-white/5 hover:bg-white/10'
             }`}
             title={category.name}
+            aria-label={`Selecionar categoria: ${category.name}`}
+            aria-pressed={isSelected}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
         >

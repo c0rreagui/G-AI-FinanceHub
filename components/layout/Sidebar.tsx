@@ -38,7 +38,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
   return (
     <aside className="flex flex-col gap-y-5 overflow-y-auto bg-[oklch(var(--card-oklch)_/_0.5)] px-6 w-64 border-r border-[oklch(var(--border-oklch))] flex-shrink-0">
       <div className="flex h-20 shrink-0 items-center gap-2">
-        <h1 className="text-3xl font-black bg-gradient-to-r from-cyan-400 to-green-400 bg-clip-text text-transparent drop-shadow-lg">
+        <h1 className="text-3xl font-black bg-gradient-to-r from-cyan-300 to-green-300 bg-clip-text text-transparent">
             FinanceHub
         </h1>
         {isMutating && (

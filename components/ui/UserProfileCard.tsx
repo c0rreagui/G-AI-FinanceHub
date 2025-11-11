@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { ProgressBar } from './ProgressBar';
 import { Badge } from './Badge';
 import { UserRank } from '../../types';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const getRankColor = (rank: UserRank): 'yellow' | 'gray' | 'blue' | 'green' | 'red' => {
     switch (rank) {
@@ -17,6 +18,27 @@ const getRankColor = (rank: UserRank): 'yellow' | 'gray' | 'blue' | 'green' | 'r
 
 export const UserProfileCard: React.FC = () => {
     const { userLevel, loading } = useDashboardData();
+    const [isInfoVisible, setIsInfoVisible] = useState(false);
+    const infoRef = useRef<HTMLDivElement>(null);
+
+    // Efeito para fechar o tooltip ao clicar fora
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (infoRef.current && !infoRef.current.contains(event.target as Node)) {
+                setIsInfoVisible(false);
+            }
+        };
+
+        if (isInfoVisible) {
+            document.addEventListener('mousedown', handleClickOutside);
+        } else {
+            document.removeEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isInfoVisible]);
 
     if (loading || !userLevel) {
         return (
@@ -44,17 +66,33 @@ export const UserProfileCard: React.FC = () => {
     return (
         <div className="card">
             <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 group relative">
+                <div className="relative flex items-center gap-2" ref={infoRef}>
                     <h2 className="text-xl font-semibold text-white">Seu Perfil de Gamificação</h2>
-                    <div className="w-4 h-4 rounded-full border border-dashed border-gray-500 text-xs flex items-center justify-center text-gray-500 cursor-help">?</div>
-                    <div className="absolute bottom-full left-0 mb-2 w-64 p-3 bg-black/80 border border-white/20 rounded-lg text-sm text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none backdrop-blur-md">
-                        <p className="font-bold mb-1 text-white">Como ganhar XP?</p>
-                        <ul className="list-disc list-inside text-xs space-y-1">
-                            <li><span className="font-semibold text-green-400">+10 XP</span> por transação adicionada.</li>
-                            <li><span className="font-semibold text-cyan-400">+50 XP</span> por meta criada.</li>
-                            <li><span className="font-semibold text-yellow-400">+100 XP</span> por dívida quitada.</li>
-                        </ul>
-                    </div>
+                    <button 
+                      onClick={() => setIsInfoVisible(!isInfoVisible)}
+                      className="p-2 -m-2 rounded-full text-gray-500 hover:bg-white/10"
+                      aria-label="Exibir informações sobre como ganhar pontos de experiência (XP)"
+                      aria-expanded={isInfoVisible}
+                    >
+                      <span className="w-5 h-5 rounded-full border border-dashed border-gray-500 text-xs flex items-center justify-center cursor-help">?</span>
+                    </button>
+                    <AnimatePresence>
+                        {isInfoVisible && (
+                             <motion.div 
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 10 }}
+                                className="absolute top-full left-0 mt-2 w-64 p-3 bg-black/80 border border-white/20 rounded-lg text-sm text-gray-300 shadow-lg backdrop-blur-md z-10"
+                             >
+                                <p className="font-bold mb-1 text-white">Como ganhar XP?</p>
+                                <ul className="list-disc list-inside text-xs space-y-1">
+                                    <li><span className="font-semibold text-green-400">+10 XP</span> por transação adicionada.</li>
+                                    <li><span className="font-semibold text-cyan-400">+50 XP</span> por meta criada.</li>
+                                    <li><span className="font-semibold text-yellow-400">+100 XP</span> por dívida quitada.</li>
+                                </ul>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
                 <Badge color={getRankColor(userLevel.rank)}>{userLevel.rank}</Badge>
             </div>

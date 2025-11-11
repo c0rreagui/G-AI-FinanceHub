@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useMemo } from 'react';
 import { supabase } from '../services/supabaseClient';
 import { Session, User } from '@supabase/supabase-js';
 import { AuthContext, AuthContextType } from '../contexts/AuthContext';
@@ -10,14 +10,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [apiKey, setApiKeyState] = useState<string | null>(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('gemini_api_key');
+      try {
+        return localStorage.getItem('gemini_api_key');
+      } catch (e) {
+        return null;
+      }
     }
     return null;
   });
 
   const setApiKey = (key: string) => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('gemini_api_key', key);
+      try {
+        localStorage.setItem('gemini_api_key', key);
+      } catch (e) {
+        console.error("Failed to set API key in localStorage", e);
+      }
     }
     setApiKeyState(key);
   };
@@ -48,15 +56,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
 
-  const value: AuthContextType = {
+  const value: AuthContextType = useMemo(() => ({
     session,
     user,
     loading,
     apiKey,
     setApiKey,
-  };
+  }), [session, user, loading, apiKey]);
 
-  // FIX: Replaced JSX with React.createElement to resolve parsing errors in .ts file.
   return React.createElement(AuthContext.Provider, { value: value }, children);
 };
 
