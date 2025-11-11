@@ -52,7 +52,15 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
     if (dataToSet && isOpen) {
         setDescription(dataToSet.description || '');
         setAmount(dataToSet.amount ? String(Math.abs(dataToSet.amount)) : '');
-        setType(dataToSet.type || TransactionType.DESPESA);
+        
+        // FIX: Validação robusta do tipo da transação para evitar constraint violation.
+        // Se o tipo não for explicitamente 'receita', ele será 'despesa' por padrão.
+        // Isso protege contra valores inválidos como "Despesa", null, ou undefined.
+        const sanitizedType = dataToSet.type === TransactionType.RECEITA 
+            ? TransactionType.RECEITA 
+            : TransactionType.DESPESA;
+        setType(sanitizedType);
+        
         setCategoryId(dataToSet.categoryId || null);
         setDate(dataToSet.date ? dataToSet.date.split('T')[0] : new Date().toISOString().split('T')[0]);
     }
