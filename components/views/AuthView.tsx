@@ -162,24 +162,12 @@ export const AuthView: React.FC = () => {
         <div className="flex min-h-screen items-center justify-center bg-transparent p-4">
             <div className="w-full max-w-sm">
                 <div className="text-center mb-8 relative">
-                     <div className="group absolute -top-2 right-0">
-                        <button 
-                            onClick={togglePinInput} 
-                            className="p-2 text-gray-400 hover:text-yellow-400 transition-colors"
-                            aria-label="Entrar como desenvolvedor"
-                        >
-                            <Zap className="w-5 h-5" />
-                        </button>
-                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-black/80 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                            Acesso de Desenvolvedor
-                        </div>
-                    </div>
                     <h1 className="text-5xl font-black bg-gradient-to-r from-cyan-400 to-green-400 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(34,211,238,0.2)]">
                         FinanceHub
                     </h1>
                     <p className="mt-2 text-gray-400">Seu copiloto financeiro inteligente.</p>
                 </div>
-                <div className="card p-8 min-h-[380px]">
+                <div className="card p-8 min-h-[440px]">
                     <AnimatePresence mode="wait">
                         {showPinInput ? (
                             <motion.div
@@ -192,6 +180,11 @@ export const AuthView: React.FC = () => {
                                 <h3 className="text-lg font-semibold text-white mb-4">Acesso de Desenvolvedor</h3>
                                 <PinInput pin={pin} onPinChange={setPin} hasError={pinError} />
                                 {loading && <LoadingSpinner />}
+                                 <div className="mt-6 text-center">
+                                    <button onClick={() => { togglePinInput(); }} className="text-sm text-cyan-400 hover:underline">
+                                        Voltar para Login
+                                    </button>
+                                </div>
                             </motion.div>
                         ) : (
                             <motion.div
@@ -220,6 +213,12 @@ export const AuthView: React.FC = () => {
                                 <div className="mt-4 text-center">
                                      <Button onClick={enterGuestMode} variant="secondary" size="sm" disabled={loading} className="w-full">
                                         Continuar como Visitante
+                                    </Button>
+                                </div>
+                                <div className="mt-4 text-center">
+                                     <Button onClick={togglePinInput} variant="secondary" size="sm" disabled={loading} className="w-full">
+                                        <Zap className="w-4 h-4 mr-2" />
+                                        Login de Desenvolvedor
                                     </Button>
                                 </div>
                             </motion.div>
