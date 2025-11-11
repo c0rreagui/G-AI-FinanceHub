@@ -199,7 +199,7 @@ interface TransactionsViewProps {
 }
 
 export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentView }) => {
-    const { transactions, loading, deleteTransaction, mutatingIds, updateTransaction } = useDashboardData();
+    const { transactions, loading, deleteTransaction, mutatingIds } = useDashboardData();
     const { openDialog } = useDialog();
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
@@ -222,7 +222,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
     };
 
     const handleEdit = (transaction: Transaction) => {
-        openDialog('add-transaction', { transactionToEdit: transaction, onSaveSuccess: () => updateTransaction(transaction) });
+        openDialog('add-transaction', { transactionToEdit: transaction });
     };
 
     const handleDelete = (transactionId: string) => {

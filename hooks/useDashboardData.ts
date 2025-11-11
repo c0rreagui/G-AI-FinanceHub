@@ -134,10 +134,22 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             if (scheduledError) throw scheduledError;
             if (achievementsError) throw achievementsError;
             
-            setTransactions(transactionsData?.map(tx => ({ ...tx, category: categoriesById[tx.category_id] || fallbackCategory })) || []);
+            // Mapeia o snake_case `category_id` do DB para o camelCase `categoryId` para consistência no estado da aplicação.
+            const mappedTransactions = transactionsData?.map(tx => {
+                const { category_id, ...rest } = tx;
+                return { ...rest, categoryId: category_id, category: categoriesById[category_id] || fallbackCategory };
+            }) || [];
+            setTransactions(mappedTransactions);
+
             setGoals(goalsData || []);
             setDebts(debtsData || []);
-            setScheduledTransactions(scheduledData?.map(stx => ({ ...stx, category: categoriesById[stx.category_id] || fallbackCategory })) || []);
+
+            // Mapeia o snake_case `category_id` para transações agendadas também.
+            const mappedScheduled = scheduledData?.map(stx => {
+                const { category_id, ...rest } = stx;
+                return { ...rest, categoryId: category_id, category: categoriesById[category_id] || fallbackCategory };
+            }) || [];
+            setScheduledTransactions(mappedScheduled);
 
             const unlockedAchievements = achievementsData?.map(a => a.achievement_id) || [];
             const processedAchievements = initialAchievements.map(ach => ({
@@ -167,7 +179,18 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
         setTransactions(prev => [newTx, ...prev].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
         
-        const { data, error } = await supabase.from('transactions').insert({ ...tx, category_id: tx.categoryId, user_id: user!.id }).select().single();
+        // FIX: Constrói um payload explícito para garantir que apenas os campos corretos sejam enviados.
+        const payload = {
+            description: tx.description,
+            amount: tx.amount,
+            type: tx.type,
+            date: tx.date,
+            category_id: tx.categoryId,
+            goalContributionId: tx.goalContributionId,
+            debtPaymentId: tx.debtPaymentId,
+            user_id: user!.id,
+        };
+        const { data, error } = await supabase.from('transactions').insert(payload).select().single();
 
         if (error) {
             handleError(error, 'addTransaction');
@@ -176,7 +199,16 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         }
         
         showToast('Transação adicionada!', { type: 'success' });
-        setTransactions(prev => prev.map(t => t.id === tempId ? { ...data, category: categoriesById[data.category_id] || fallbackCategory } : t));
+        
+        if (data) {
+            const { category_id, ...rest } = data;
+            const finalTx: Transaction = {
+                ...rest,
+                categoryId: category_id,
+                category: categoriesById[category_id] || fallbackCategory
+            };
+            setTransactions(prev => prev.map(t => t.id === tempId ? finalTx : t));
+        }
         return true;
     }, [user, categoriesById, fallbackCategory, handleError, showToast]);
         
@@ -185,7 +217,18 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         const updatedTx: Transaction = { ...tx, category: categoriesById[tx.categoryId] || fallbackCategory };
 
         setTransactions(prev => prev.map(t => t.id === tx.id ? updatedTx : t));
-        const { error } = await supabase.from('transactions').update({ ...tx, category_id: tx.categoryId }).eq('id', tx.id);
+        
+        // FIX: Constrói um payload explícito, removendo 'category' e mapeando 'categoryId' para 'category_id'.
+        const payload = {
+            description: tx.description,
+            amount: tx.amount,
+            type: tx.type,
+            date: tx.date,
+            category_id: tx.categoryId,
+            goalContributionId: tx.goalContributionId,
+            debtPaymentId: tx.debtPaymentId,
+        };
+        const { error } = await supabase.from('transactions').update(payload).eq('id', tx.id);
 
         if (error) {
             handleError(error, 'updateTransaction');
@@ -402,18 +445,29 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // Agendamentos
     const addScheduledTransaction = useCallback(async (tx: Omit<ScheduledTransaction, 'id' | 'category' | 'nextDueDate'>): Promise<boolean> => {
-        const { categoryId, ...rest } = tx;
         const tempId = `temp-sch-${Date.now()}`;
         const newScheduledTx: ScheduledTransaction = { 
             ...tx, 
             id: tempId, 
-            category: categoriesById[categoryId] || fallbackCategory,
+            category: categoriesById[tx.categoryId] || fallbackCategory,
             nextDueDate: new Date(tx.startDate).toISOString()
         };
 
         setScheduledTransactions(prev => [newScheduledTx, ...prev]);
 
-        const { error } = await supabase.from('scheduled_transactions').insert({ ...rest, category_id: categoryId, user_id: user!.id, nextDueDate: newScheduledTx.nextDueDate });
+        // FIX: Constrói um payload explícito para a inserção.
+        const payload = {
+            description: tx.description,
+            amount: tx.amount,
+            type: tx.type,
+            category_id: tx.categoryId,
+            startDate: tx.startDate,
+            frequency: tx.frequency,
+            nextDueDate: newScheduledTx.nextDueDate,
+            user_id: user!.id
+        };
+        const { error } = await supabase.from('scheduled_transactions').insert(payload);
+
         if (error) {
             handleError(error, 'addScheduledTransaction');
             setScheduledTransactions(prev => prev.filter(t => t.id !== tempId));
@@ -431,8 +485,17 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         
         setScheduledTransactions(prev => prev.map(item => item.id === tx.id ? updatedTx : item));
 
-        const { categoryId, ...rest } = tx;
-        const { error } = await supabase.from('scheduled_transactions').update({ ...rest, category_id: categoryId }).eq('id', tx.id);
+        // FIX: Constrói um payload explícito para a atualização.
+        const payload = {
+            description: tx.description,
+            amount: tx.amount,
+            type: tx.type,
+            category_id: tx.categoryId,
+            startDate: tx.startDate,
+            frequency: tx.frequency,
+            nextDueDate: tx.nextDueDate,
+        };
+        const { error } = await supabase.from('scheduled_transactions').update(payload).eq('id', tx.id);
         
         if(error) {
             handleError(error, 'updateScheduledTransaction');

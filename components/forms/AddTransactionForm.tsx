@@ -17,7 +17,6 @@ interface AddTransactionFormProps {
   onClose: () => void;
   prefill?: Partial<Omit<Transaction, 'id' | 'category'>>;
   transactionToEdit?: Transaction;
-  onSaveSuccess?: () => void;
 }
 
 const QuickValueChip: React.FC<{ value: number; onSelect: (value: number) => void }> = ({ value, onSelect }) => (
@@ -34,7 +33,7 @@ const QuickValueChip: React.FC<{ value: number; onSelect: (value: number) => voi
     </button>
 );
 
-export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, onClose, prefill, transactionToEdit, onSaveSuccess }) => {
+export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, onClose, prefill, transactionToEdit }) => {
   const { addTransaction, updateTransaction, categories } = useDashboardData();
   const isDesktop = useMediaQuery('(min-width: 768px)');
 
@@ -77,13 +76,15 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
 
     let success = false;
     if (isEditing) {
-        const txData: Omit<Transaction, 'category'> & { id: string } = {
+        const txData: Omit<Transaction, 'category'> = {
             id: transactionToEdit.id,
             description,
             amount: finalAmount,
             type,
             categoryId,
             date: new Date(date).toISOString(),
+            goalContributionId: transactionToEdit.goalContributionId, // FIX: Preserva o ID da meta
+            debtPaymentId: transactionToEdit.debtPaymentId, // FIX: Preserva o ID da dívida
         };
         success = await updateTransaction(txData);
 
@@ -101,7 +102,6 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
     setIsSubmitting(false);
 
     if (success) {
-      onSaveSuccess?.();
       onClose();
     }
   };
