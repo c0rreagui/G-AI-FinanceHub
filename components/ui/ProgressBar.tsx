@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { motion } from 'framer-motion';
 
 interface ProgressBarProps {
     percentage: number;
@@ -14,12 +15,15 @@ const colorClasses = {
 };
 
 export const ProgressBar: React.FC<ProgressBarProps> = ({ percentage, color = 'primary' }) => {
+    const safePercentage = Math.max(0, Math.min(100, percentage));
     return (
         <div className="w-full bg-gray-700 rounded-full h-2">
-            <div
-                className={`${colorClasses[color]} h-2 rounded-full transition-all duration-500 ease-out`}
-                style={{ width: `${percentage}%` }}
-            ></div>
+            <motion.div
+                className={`${colorClasses[color]} h-2 rounded-full`}
+                initial={{ width: 0 }}
+                animate={{ width: `${safePercentage}%` }}
+                transition={{ duration: 0.8, ease: 'easeOut' }}
+            />
         </div>
     );
 };

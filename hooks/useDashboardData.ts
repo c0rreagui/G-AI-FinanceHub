@@ -157,17 +157,18 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
 
     // --- LÓGICA DE MUTATION ---
-    const performMutation = async <T,>(
-        operation: () => Promise<{ error: any }>,
-        { id, successMessage }: { id?: string | string[], successMessage: string }
-    ) => {
+    const performMutation = async <T, R>(
+        operation: () => Promise<{ data?: T[] | null; error: any }>,
+        { id, successMessage }: { id?: string | string[], successMessage: string },
+        returnData: boolean = false
+    ): Promise<{ success: boolean; data?: T | null }> => {
         setIsMutating(true);
         if(id) {
             const idsToAdd = Array.isArray(id) ? id : [id];
             setMutatingIds(prev => new Set([...prev, ...idsToAdd]));
         }
         
-        const { error: opError } = await operation();
+        const { data: opData, error: opError } = await operation();
         
         if (opError) {
             handleError(opError, 'performMutation');
@@ -178,13 +179,13 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
                 idsToRemove.forEach(i => newSet.delete(i));
                 return newSet;
             });
-            return false;
+            return { success: false };
         } else {
             showToast(successMessage, { type: 'success' });
             await fetchData(); // Re-fetch all data to ensure consistency
             setIsMutating(false);
             if (id) setMutatingIds(new Set());
-            return true;
+            return { success: true, data: returnData && opData ? opData[0] : null };
         }
     };
 
@@ -195,7 +196,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         return performMutation(
             () => supabase.from('transactions').insert({ ...rest, category_id: categoryId, user_id: user!.id }),
             { successMessage: 'Transação adicionada com sucesso!' }
-        );
+        ).then(res => res.success);
     }
         
     const updateTransaction = (tx: Omit<Transaction, 'category'>) => {
@@ -203,31 +204,34 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         return performMutation(
             () => supabase.from('transactions').update({ ...rest, category_id: categoryId }).eq('id', tx.id),
             { id: tx.id, successMessage: 'Transação atualizada!' }
-        );
+        ).then(res => res.success);
     }
 
     const deleteTransaction = (id: string) =>
         performMutation(
             () => supabase.from('transactions').delete().eq('id', id),
             { id, successMessage: 'Transação excluída.' }
-        );
+        ).then(res => res.success);
 
     const updateTransactionsCategory = (ids: string[], categoryId: string) =>
         performMutation(
             () => supabase.from('transactions').update({ category_id: categoryId }).in('id', ids),
             { id: ids, successMessage: `${ids.length} transações atualizadas!` }
-        );
+        ).then(res => res.success);
 
-    const addGoal = (goal: Omit<Goal, 'id' | 'currentAmount' | 'status'>) =>
-        performMutation(
+    const addGoal = async (goal: Omit<Goal, 'id' | 'currentAmount' | 'status'>): Promise<Goal | null> => {
+        const { success, data } = await performMutation<Goal, Goal>(
             () => supabase.from('goals').insert({ 
                 ...goal, 
                 user_id: user!.id,
                 currentAmount: 0,
                 status: GoalStatus.EM_ANDAMENTO,
-             }),
-            { successMessage: 'Meta criada com sucesso!' }
+             }).select().single(),
+            { successMessage: 'Meta criada com sucesso!' },
+            true
         );
+        return success ? data : null;
+    }
         
     const updateGoalValue = async (id: string, valueToAdd: number) => {
         const goal = goals.find(g => g.id === id);
@@ -236,7 +240,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         const newAmount = goal.currentAmount + valueToAdd;
         const newStatus = newAmount >= goal.targetAmount ? GoalStatus.CONCLUIDO : goal.status;
 
-        const success = await performMutation(
+        const { success } = await performMutation(
             () => supabase.from('goals').update({ currentAmount: newAmount, status: newStatus }).eq('id', id),
             { id, successMessage: `Valor adicionado à meta ${goal.name}!` }
         );
@@ -244,7 +248,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         if (success) {
             const txSuccess = await addTransaction({
                 description: `Contribuição para a meta: ${goal.name}`,
-                amount: -Math.abs(valueToAdd), // CRITICAL FIX: Contribuições são despesas e devem ser negativas.
+                amount: -Math.abs(valueToAdd),
                 type: TransactionType.DESPESA,
                 date: new Date().toISOString(),
                 categoryId: 'cat_contribuicao_meta',
@@ -252,43 +256,39 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             });
 
             if (!txSuccess) {
-                // Se a transação falhar, lançamos um erro para o usuário.
                 handleError(
                     new Error('A meta foi atualizada, mas a transação de contrapartida falhou ao ser registrada.'),
                     'updateGoalValue-tx-failure'
                 );
-                return false; // Indica que a operação completa falhou.
+                return false;
             }
         }
         return success;
     };
     
     const deleteGoal = (id: string) => performMutation(async () => {
-        // 1. Encontrar e deletar transações de contribuição associadas
-        const linkedTxIds = transactions
-            .filter(tx => tx.goalContributionId === id)
-            .map(tx => tx.id);
-
+        const linkedTxIds = transactions.filter(tx => tx.goalContributionId === id).map(tx => tx.id);
         if (linkedTxIds.length > 0) {
             const { error: txError } = await supabase.from('transactions').delete().in('id', linkedTxIds);
             if (txError) return { error: txError };
         }
-        
-        // 2. Deletar a meta
         return supabase.from('goals').delete().eq('id', id);
-    }, { id, successMessage: 'Meta e contribuições associadas foram excluídas!' });
+    }, { id, successMessage: 'Meta e contribuições associadas foram excluídas!' }).then(res => res.success);
 
 
-    const addDebt = (debt: Omit<Debt, 'id' | 'paidAmount' | 'status'>) =>
-        performMutation(
+    const addDebt = async (debt: Omit<Debt, 'id' | 'paidAmount' | 'status'>): Promise<Debt | null> => {
+        const { success, data } = await performMutation<Debt, Debt>(
             () => supabase.from('debts').insert({ 
                 ...debt, 
                 user_id: user!.id,
                 paidAmount: 0,
                 status: DebtStatus.ATIVA,
-            }),
-            { successMessage: 'Dívida registrada.' }
+            }).select().single(),
+            { successMessage: 'Dívida registrada.' },
+            true
         );
+        return success ? data : null;
+    }
     
     const addPaymentToDebt = async (id: string, paymentAmount: number) => {
         const debt = debts.find(d => d.id === id);
@@ -297,7 +297,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         const newPaidAmount = debt.paidAmount + paymentAmount;
         const newStatus = newPaidAmount >= debt.totalAmount ? DebtStatus.PAGA : debt.status;
 
-        const success = await performMutation(
+        const { success } = await performMutation(
             () => supabase.from('debts').update({ paidAmount: newPaidAmount, status: newStatus }).eq('id', id),
             { id, successMessage: `Pagamento para ${debt.name} registrado!` }
         );
@@ -305,7 +305,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         if (success) {
             const txSuccess = await addTransaction({
                 description: `Pagamento da dívida: ${debt.name}`,
-                amount: -Math.abs(paymentAmount), // CRITICAL FIX: Pagamentos são despesas e devem ser negativos.
+                amount: -Math.abs(paymentAmount),
                 type: TransactionType.DESPESA,
                 date: new Date().toISOString(),
                 categoryId: 'cat_pagamento_divida',
@@ -324,19 +324,13 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     };
     
     const deleteDebt = (id: string) => performMutation(async () => {
-        // 1. Encontrar e deletar transações de pagamento associadas
-        const linkedTxIds = transactions
-            .filter(tx => tx.debtPaymentId === id)
-            .map(tx => tx.id);
-
+        const linkedTxIds = transactions.filter(tx => tx.debtPaymentId === id).map(tx => tx.id);
         if (linkedTxIds.length > 0) {
             const { error: txError } = await supabase.from('transactions').delete().in('id', linkedTxIds);
             if (txError) return { error: txError };
         }
-
-        // 2. Deletar a dívida
         return supabase.from('debts').delete().eq('id', id);
-    }, { id, successMessage: 'Dívida e pagamentos associados foram excluídos!' });
+    }, { id, successMessage: 'Dívida e pagamentos associados foram excluídos!' }).then(res => res.success);
 
 
     const addScheduledTransaction = (tx: Omit<ScheduledTransaction, 'id' | 'category' | 'nextDueDate'>) => {
@@ -350,7 +344,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
                 nextDueDate: nextDueDate.toISOString(),
             }),
             { successMessage: 'Agendamento criado!' }
-        );
+        ).then(res => res.success);
     };
 
 
@@ -368,9 +362,6 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             .filter(t => t.type === TransactionType.DESPESA && new Date(t.date).getMonth() === currentMonth && new Date(t.date).getFullYear() === currentYear)
             .reduce((sum, t) => sum + t.amount, 0);
 
-        // CRITICAL BUG FIX: O cálculo anterior estava `t.type === RECEITA ? t.amount : -t.amount`,
-        // o que causava uma negação dupla em despesas (que já são negativas), efetivamente somando-as ao saldo.
-        // A lógica correta é simplesmente somar todos os valores, pois eles já têm o sinal correto.
         const totalBalance = transactions.reduce((sum, t) => sum + t.amount, 0);
 
         return { totalBalance, monthlyIncome, monthlyExpenses };
@@ -412,7 +403,6 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     const userLevel: UserLevel | null = useMemo(() => {
         if (loading) return null;
         
-        // BUG FIX: Filtra transações automáticas para não contar XP em dobro.
         const manualTransactions = transactions.filter(tx => !tx.goalContributionId && !tx.debtPaymentId);
         
         const xp = manualTransactions.length * 10 + goals.length * 50 + debts.filter(d => d.status === DebtStatus.PAGA).length * 100;
@@ -434,9 +424,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
         return { level, xp, xpToNextLevel: requiredForLevelUp, rank };
     }, [transactions, goals, debts, loading]);
-
-    // FIX: Replaced JSX with React.createElement to resolve parsing errors in .ts file.
-    // The component was incorrectly trying to render JSX syntax in a .ts file.
+    
     const contextValue: DashboardDataContextType = {
         transactions,
         goals,

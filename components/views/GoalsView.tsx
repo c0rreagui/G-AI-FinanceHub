@@ -20,6 +20,7 @@ const GoalCard: React.FC<{ goal: Goal }> = ({ goal }) => {
     const isCompleted = goal.status === GoalStatus.CONCLUIDO;
     const isMutating = mutatingIds.has(goal.id);
     const daysUntil = formatDaysUntil(goal.deadline);
+    const remainingAmount = goal.targetAmount - goal.currentAmount;
 
 
     const handleDelete = () => {
@@ -52,8 +53,10 @@ const GoalCard: React.FC<{ goal: Goal }> = ({ goal }) => {
                 </p>
                 <div className="mt-4">
                     <div className="flex justify-between text-sm text-white mb-1">
-                        <span>{formatCurrencyBRL(goal.currentAmount)}</span>
-                        <span className="text-gray-400">{formatCurrencyBRL(goal.targetAmount)}</span>
+                        <span>
+                            {isCompleted ? 'Concluído!' : <>Faltam <span className="font-bold">{formatCurrencyBRL(remainingAmount)}</span></>}
+                        </span>
+                        <span className="text-gray-400">{`${progress.toFixed(0)}%`}</span>
                     </div>
                     <ProgressBar percentage={progress} color={isCompleted ? 'success' : 'primary'} />
                     {!isCompleted && (

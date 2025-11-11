@@ -44,7 +44,18 @@ export const UserProfileCard: React.FC = () => {
     return (
         <div className="card">
             <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-white">Seu Perfil de Gamificação</h2>
+                <div className="flex items-center gap-2 group relative">
+                    <h2 className="text-xl font-semibold text-white">Seu Perfil de Gamificação</h2>
+                    <div className="w-4 h-4 rounded-full border border-dashed border-gray-500 text-xs flex items-center justify-center text-gray-500 cursor-help">?</div>
+                    <div className="absolute bottom-full left-0 mb-2 w-64 p-3 bg-black/80 border border-white/20 rounded-lg text-sm text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none backdrop-blur-md">
+                        <p className="font-bold mb-1 text-white">Como ganhar XP?</p>
+                        <ul className="list-disc list-inside text-xs space-y-1">
+                            <li><span className="font-semibold text-green-400">+10 XP</span> por transação adicionada.</li>
+                            <li><span className="font-semibold text-cyan-400">+50 XP</span> por meta criada.</li>
+                            <li><span className="font-semibold text-yellow-400">+100 XP</span> por dívida quitada.</li>
+                        </ul>
+                    </div>
+                </div>
                 <Badge color={getRankColor(userLevel.rank)}>{userLevel.rank}</Badge>
             </div>
             <div className="mt-4">

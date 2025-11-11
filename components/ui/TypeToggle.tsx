@@ -2,6 +2,7 @@ import React from 'react';
 import { TransactionType } from '../../types';
 import { ArrowDownLeft, ArrowUpRight } from '../Icons';
 import { motion } from 'framer-motion';
+import { triggerHapticFeedback } from '../../utils/haptics';
 
 interface TypeToggleProps {
   selectedType: TransactionType;
@@ -9,6 +10,11 @@ interface TypeToggleProps {
 }
 
 export const TypeToggle: React.FC<TypeToggleProps> = ({ selectedType, onTypeChange }) => {
+    const handleTypeChange = (type: TransactionType) => {
+        triggerHapticFeedback();
+        onTypeChange(type);
+    };
+
     return (
         <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -24,7 +30,7 @@ export const TypeToggle: React.FC<TypeToggleProps> = ({ selectedType, onTypeChan
 
                 <button
                     type="button"
-                    onClick={() => onTypeChange(TransactionType.DESPESA)}
+                    onClick={() => handleTypeChange(TransactionType.DESPESA)}
                     className={`relative w-1/2 flex items-center justify-center gap-2 rounded-md py-2.5 text-sm font-semibold transition-colors ${
                         selectedType === TransactionType.DESPESA ? 'text-white' : 'text-gray-400 hover:text-white'
                     }`}
@@ -35,7 +41,7 @@ export const TypeToggle: React.FC<TypeToggleProps> = ({ selectedType, onTypeChan
                 </button>
                 <button
                     type="button"
-                    onClick={() => onTypeChange(TransactionType.RECEITA)}
+                    onClick={() => handleTypeChange(TransactionType.RECEITA)}
                     className={`relative w-1/2 flex items-center justify-center gap-2 rounded-md py-2.5 text-sm font-semibold transition-colors ${
                         selectedType === TransactionType.RECEITA ? 'text-white' : 'text-gray-400 hover:text-white'
                     }`}

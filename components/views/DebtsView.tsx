@@ -51,8 +51,10 @@ const DebtCard: React.FC<{ debt: Debt }> = ({ debt }) => {
                 </p>
                 <div className="mt-4">
                     <div className="flex justify-between text-sm text-white mb-1">
-                        <span>Restante: {formatCurrencyBRL(remainingAmount > 0 ? remainingAmount : 0)}</span>
-                        <span className="text-gray-400">{formatCurrencyBRL(debt.totalAmount)}</span>
+                        <span>
+                            {isPaid ? 'Quitado!' : <>Restam <span className="font-bold">{formatCurrencyBRL(remainingAmount)}</span></>}
+                        </span>
+                        <span className="text-gray-400">{`${progress.toFixed(0)}%`}</span>
                     </div>
                     <ProgressBar percentage={progress} color={isPaid ? 'success' : 'danger'} />
                 </div>

@@ -10,6 +10,7 @@ import { LoadingSpinner } from '../LoadingSpinner';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { motion, AnimatePresence } from 'framer-motion';
 import { XIcon } from '../Icons';
+import { triggerHapticFeedback } from '../../utils/haptics';
 
 interface AddTransactionFormProps {
   isOpen: boolean;
@@ -22,7 +23,10 @@ interface AddTransactionFormProps {
 const QuickValueChip: React.FC<{ value: number; onSelect: (value: number) => void }> = ({ value, onSelect }) => (
     <button
         type="button"
-        onClick={() => onSelect(value)}
+        onClick={() => {
+          triggerHapticFeedback();
+          onSelect(value);
+        }}
         className="px-3 py-1.5 text-sm font-semibold rounded-full bg-white/5 hover:bg-white/10 text-gray-300 transition-colors"
     >
         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)}
@@ -204,7 +208,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                 </div>
 
                 {/* Rodapé Fixo */}
-                <div className="flex justify-end gap-2 p-4 border-t border-[oklch(var(--border-oklch))] flex-shrink-0">
+                <div className="flex justify-end gap-2 p-4 border-t border-[oklch(var(--border-oklch))] flex-shrink-0 bg-[oklch(var(--background-oklch))]">
                   <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
                     Cancelar
                   </Button>

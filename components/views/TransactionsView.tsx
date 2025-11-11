@@ -57,6 +57,19 @@ const TransactionItem: React.FC<{
     const amountColor = isExpense ? 'text-red-400' : 'text-green-400';
     const actionButtonsWidth = 160; // 2 buttons * 80px width
     const isSystemTransaction = !!transaction.goalContributionId || !!transaction.debtPaymentId;
+    
+    // Estilo de "brilho de impacto" para mobile
+    const glowStyle = useMemo(() => {
+        if (isDesktop) return {};
+        const intensity = Math.min(Math.abs(transaction.amount) / 500, 1); // Normaliza até R$500
+        if (intensity < 0.1) return {};
+        
+        const colorVar = isExpense ? '--danger-oklch' : '--success-oklch';
+        return {
+            boxShadow: `0 0 15px -2px oklch(var(${colorVar}) / ${intensity * 0.3})`,
+            borderColor: `oklch(var(${colorVar}) / ${intensity * 0.5})`
+        };
+    }, [transaction.amount, transaction.type, isDesktop]);
 
 
     const desktopHoverActions = (
@@ -128,7 +141,8 @@ const TransactionItem: React.FC<{
                 onDragEnd={() => setTimeout(() => setIsDragging(false), 100)}
             >
                 <div 
-                  className={`group flex items-center justify-between p-4 bg-white/5 border rounded-2xl shadow-lg backdrop-blur-xl transition-all duration-300 ${isSystemTransaction && isInSelectionMode ? 'opacity-60' : ''} ${isSelected ? 'border-cyan-500/80' : 'border-white/10 hover:border-white/20 hover:bg-white/10'}`}
+                  className={`group flex items-center justify-between p-4 bg-white/5 border rounded-2xl backdrop-blur-xl transition-all duration-300 ${isSystemTransaction && isInSelectionMode ? 'opacity-60' : ''} ${isSelected ? 'border-cyan-500/80 shadow-lg' : 'border-white/10 hover:border-white/20 hover:bg-white/10'}`}
+                  style={isSelected ? {} : glowStyle}
                   onClick={() => !isDragging && !isSystemTransaction && onSelect(transaction.id)}
                   title={isSystemTransaction && isInSelectionMode ? 'Transações do sistema não podem ser selecionadas.' : ''}
                 >
