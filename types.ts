@@ -165,6 +165,10 @@ export interface DashboardDataContextType {
     
     // Dev Tools
     addMockData: () => Promise<void>;
-    // FIX: Aligned the return type with the implementation in useDashboardData.ts, which now returns void.
     clearAllUserData: () => Promise<void>;
+    addMockTransactions: (count: number) => Promise<void>;
+    addMockGoals: (count: number) => Promise<void>;
+    addMockDebts: (count: number) => Promise<void>;
+    clearTable: (tableName: 'transactions' | 'goals' | 'debts' | 'scheduled_transactions') => Promise<void>;
+    forceError: () => Promise<void>;
 }

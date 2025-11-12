@@ -76,3 +76,5 @@ export const Film = React.memo((props: React.SVGProps<SVGSVGElement>) => <Compou
 export const TrashIcon = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M3 6h18", "M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2", "M10 11v6", "M14 11v6"]} {...props} />);
 export const LinkIcon = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72", "M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"]} {...props} />);
 export const ChevronDown = React.memo((props: React.SVGProps<SVGSVGElement>) => <Icon d="m6 9 6 6 6-6" {...props} />);
+export const AlertTriangle = React.memo((props: React.SVGProps<SVGSVGElement>) => <Icon d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" {...props} /> );
+export const Bell = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9", "M10.3 21a1.94 1.94 0 0 0 3.4 0"]} {...props} /> );

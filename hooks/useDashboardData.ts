@@ -42,8 +42,8 @@ const getDefaultCategories = (userId: string | 'guest'): Omit<Category, 'id'>[] 
 
 const generateMockData = (userId: string, categories: Category[]) => {
     const now = new Date();
-    const goals: Goal[] = [];
-    const debts: Debt[] = [];
+    const goals: Omit<Goal, 'id'>[] = [];
+    const debts: Omit<Debt, 'id'>[] = [];
     const transactions: Omit<Transaction, 'category' | 'id'>[] = [];
     const scheduledTransactions: Omit<ScheduledTransaction, 'category' | 'id'>[] = [];
 
@@ -55,8 +55,7 @@ const generateMockData = (userId: string, categories: Category[]) => {
     };
 
     // 1. Metas
-    const goal1: Goal = {
-        id: crypto.randomUUID(),
+    const goal1: Omit<Goal, 'id'> = {
         user_id: userId,
         name: 'Viagem para o Japão',
         target_amount: 25000,
@@ -65,6 +64,10 @@ const generateMockData = (userId: string, categories: Category[]) => {
         status: GoalStatus.EM_ANDAMENTO,
     };
     goals.push(goal1);
+    
+    // As contribuições de meta/dívida são criadas como transações normais
+    // A lógica no backend ou frontend deve associá-las
+    // Para simplificar o mock, vamos criar uma transação que *representa* a contribuição
     transactions.push({
         description: 'Contribuição para a meta: Viagem para o Japão',
         amount: -7500,
@@ -72,12 +75,12 @@ const generateMockData = (userId: string, categories: Category[]) => {
         date: new Date(now.getFullYear(), now.getMonth() - 2, 15).toISOString(),
         category_id: catMap.get('Investimentos')!,
         user_id: userId,
-        goal_contribution_id: goal1.id,
+        goal_contribution_id: 'mock_goal_1', // Placeholder ID
     });
 
+
     // 2. Dívidas
-    const debt1: Debt = {
-        id: crypto.randomUUID(),
+    const debt1: Omit<Debt, 'id'> = {
         user_id: userId,
         name: 'Financiamento do Carro',
         total_amount: 60000,
@@ -94,7 +97,7 @@ const generateMockData = (userId: string, categories: Category[]) => {
         date: new Date(now.getFullYear(), now.getMonth() - 1, 5).toISOString(),
         category_id: catMap.get('Transporte')!,
         user_id: userId,
-        debt_payment_id: debt1.id,
+        debt_payment_id: 'mock_debt_1', // Placeholder ID
     });
 
     // 3. Transações Recorrentes
@@ -239,6 +242,18 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
                 .eq('user_id', user.id);
 
             if (categoriesError) throw categoriesError;
+
+            // Se o usuário não tiver categorias, crie as padrão para ele.
+            if (!categoriesData || categoriesData.length === 0) {
+                const defaultCategories = getDefaultCategories(user.id);
+                const { data: newCategories, error: insertError } = await supabase
+                    .from('categories')
+                    .insert(defaultCategories)
+                    .select();
+                if (insertError) throw insertError;
+                categoriesData = newCategories;
+            }
+
 
             const populatedCategories: Category[] = categoriesData.map(c => ({...c, icon: getIconByName(c.icon) }));
             setCategories(populatedCategories);
@@ -684,47 +699,171 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     const addMockData = () => withMutation(async () => {
-        // 1. Limpa os dados existentes para evitar duplicação.
         if (isGuest) {
             localStorage.removeItem(GUEST_DATA_KEY);
-        } else if (user) {
-            const tables = ['transactions', 'goals', 'debts', 'scheduled_transactions'];
-            await Promise.all(tables.map(table => supabase.from(table).delete().eq('user_id', user.id)));
-        }
+            const userId = 'guest';
+            const mockCategories = getDefaultCategories(userId).map(c => ({...c, id: crypto.randomUUID()}));
+            const mockData = generateMockData(userId, mockCategories);
+            
+            const goalIdMap = new Map<string, string>();
+            const debtIdMap = new Map<string, string>();
+            
+            const finalGoals = mockData.goals.map((g, i) => {
+                const newId = crypto.randomUUID();
+                goalIdMap.set(`mock_goal_${i+1}`, newId);
+                return { ...g, id: newId };
+            });
+            const finalDebts = mockData.debts.map((d, i) => {
+                const newId = crypto.randomUUID();
+                debtIdMap.set(`mock_debt_${i+1}`, newId);
+                return { ...d, id: newId };
+            });
+            
+            const finalTransactions = mockData.transactions.map(t => ({
+                ...t,
+                id: crypto.randomUUID(),
+                goal_contribution_id: t.goal_contribution_id ? goalIdMap.get(t.goal_contribution_id) : null,
+                debt_payment_id: t.debt_payment_id ? debtIdMap.get(t.debt_payment_id) : null,
+            }));
 
-        const userId = isGuest ? 'guest' : user!.id;
-        const mockCategories = getDefaultCategories(userId).map(c => ({...c, id: crypto.randomUUID()}));
-        const mockData = generateMockData(userId, mockCategories);
-
-        if (isGuest) {
             const guestData = {
                 categories: mockCategories,
-                transactions: mockData.transactions.map(t => ({ ...t, id: crypto.randomUUID() })),
-                goals: mockData.goals,
-                debts: mockData.debts,
+                transactions: finalTransactions,
+                goals: finalGoals,
+                debts: finalDebts,
                 scheduledTransactions: mockData.scheduledTransactions.map(st => ({ ...st, id: crypto.randomUUID() })),
             };
             setGuestData(guestData);
-        } else if (user) {
-            const { error: catError } = await supabase.from('categories').upsert(mockCategories.map(({id, ...c}) => c), { onConflict: 'user_id, name' });
-            if(catError) throw catError;
-            
-            // Refetch categories to get correct IDs
-            let { data: newCategories } = await supabase.from('categories').select('*').eq('user_id', user.id);
-            if (!newCategories) throw new Error("Falha ao buscar categorias após inserção.");
 
-            const updatedMockData = generateMockData(user.id, newCategories as Category[]);
+        } else if (user) {
+            const tablesToClear = ['transactions', 'goals', 'debts', 'scheduled_transactions', 'categories'];
+            for (const table of tablesToClear) {
+                const { error: deleteError } = await supabase.from(table).delete().eq('user_id', user.id);
+                if (deleteError) throw deleteError;
+            }
+
+            const newMockCategories = getDefaultCategories(user.id);
+            const { error: catInsertError } = await supabase.from('categories').insert(newMockCategories);
+            if (catInsertError) throw catInsertError;
+
+            let { data: fetchedCategories, error: fetchError } = await supabase.from('categories').select('*').eq('user_id', user.id);
+            if (fetchError || !fetchedCategories) throw fetchError || new Error("Falha ao buscar categorias após inserção.");
+
+            const mockData = generateMockData(user.id, fetchedCategories as Category[]);
+
+            const { data: insertedGoals, error: goalsError } = await supabase.from('goals').insert(mockData.goals).select();
+            if (goalsError) throw goalsError;
+
+            const { data: insertedDebts, error: debtsError } = await supabase.from('debts').insert(mockData.debts).select();
+            if (debtsError) throw debtsError;
+            
+            const finalTransactions = mockData.transactions.map(t => ({
+                ...t,
+                goal_contribution_id: t.goal_contribution_id ? insertedGoals?.[0].id : null,
+                debt_payment_id: t.debt_payment_id ? insertedDebts?.[0].id : null,
+            }));
 
             await Promise.all([
-                supabase.from('goals').insert(updatedMockData.goals),
-                supabase.from('debts').insert(updatedMockData.debts),
-                supabase.from('transactions').insert(updatedMockData.transactions),
-                supabase.from('scheduled_transactions').insert(updatedMockData.scheduledTransactions),
+                supabase.from('transactions').insert(finalTransactions),
+                supabase.from('scheduled_transactions').insert(mockData.scheduledTransactions),
             ]);
         }
         
         await fetchData();
         showToast('Dados Fictícios Adicionados!', { type: 'success' });
+    });
+
+    // --- DEV TOOLS ---
+    const addMockTransactions = (count: number) => withMutation(async () => {
+        const userId = isGuest ? 'guest' : user!.id;
+        if (!userId || categories.length === 0) return;
+
+        const despesaCats = categories.filter(c => ['Alimentação', 'Compras', 'Transporte', 'Moradia', 'Lazer'].includes(c.name)).map(c => c.id);
+        const getRandomCatId = () => despesaCats[Math.floor(Math.random() * despesaCats.length)] || categories[0].id;
+        const now = new Date();
+        const newTransactions = Array.from({ length: count }, () => ({
+            user_id: userId,
+            description: `Mock Transaction #${Math.floor(Math.random() * 1000)}`,
+            amount: -(Math.random() * 150 + 5),
+            type: TransactionType.DESPESA,
+            date: new Date(now.getFullYear(), now.getMonth(), Math.floor(Math.random() * 28) + 1).toISOString(),
+            category_id: getRandomCatId(),
+        }));
+
+        if (isGuest) {
+            const data = getGuestData();
+            data.transactions.push(...newTransactions.map(t => ({...t, id: crypto.randomUUID() })));
+            setGuestData(data);
+        } else {
+            const { error } = await supabase.from('transactions').insert(newTransactions);
+            if (error) throw error;
+        }
+        await fetchData();
+        showToast(`${count} transações fictícias adicionadas!`, { type: 'success' });
+    });
+    
+    const addMockGoals = (count: number) => withMutation(async () => {
+        const userId = isGuest ? 'guest' : user!.id;
+        const now = new Date();
+        const newGoals = Array.from({ length: count }, (_, i) => ({
+            user_id: userId,
+            name: `Meta de Teste ${i + 1}`,
+            target_amount: Math.floor(Math.random() * 10000) + 1000,
+            current_amount: 0,
+            deadline: new Date(now.getFullYear() + 1, Math.floor(Math.random() * 12), 1).toISOString(),
+            status: GoalStatus.EM_ANDAMENTO,
+        }));
+         if (isGuest) {
+            const data = getGuestData();
+            data.goals.push(...newGoals.map(g => ({...g, id: crypto.randomUUID() })));
+            setGuestData(data);
+        } else {
+            const { error } = await supabase.from('goals').insert(newGoals);
+            if (error) throw error;
+        }
+        await fetchData();
+        showToast(`${count} metas fictícias adicionadas!`, { type: 'success' });
+    });
+
+    const addMockDebts = (count: number) => withMutation(async () => {
+         const userId = isGuest ? 'guest' : user!.id;
+         const newDebts = Array.from({ length: count }, (_, i) => ({
+             user_id: userId,
+             name: `Dívida de Teste ${i+1}`,
+             total_amount: Math.floor(Math.random() * 5000) + 500,
+             paid_amount: 0,
+             interest_rate: parseFloat((Math.random() * 20 + 5).toFixed(2)),
+             category: 'Teste',
+             status: DebtStatus.ATIVA,
+         }));
+          if (isGuest) {
+            const data = getGuestData();
+            data.debts.push(...newDebts.map(d => ({...d, id: crypto.randomUUID() })));
+            setGuestData(data);
+        } else {
+            const { error } = await supabase.from('debts').insert(newDebts);
+            if (error) throw error;
+        }
+        await fetchData();
+        showToast(`${count} dívidas fictícias adicionadas!`, { type: 'success' });
+    });
+
+    const clearTable = (tableName: 'transactions' | 'goals' | 'debts' | 'scheduled_transactions') => withMutation(async () => {
+        if (isGuest) {
+            const data = getGuestData();
+            data[tableName] = [];
+            setGuestData(data);
+        } else {
+             if (!user) return;
+             const { error } = await supabase.from(tableName).delete().eq('user_id', user.id);
+             if (error) throw error;
+        }
+        await fetchData();
+        showToast(`Tabela "${tableName}" foi limpa!`, { type: 'info' });
+    });
+
+    const forceError = () => withMutation(async () => {
+        throw new Error("Erro de teste acionado pelas DevTools.");
     });
 
 
@@ -758,6 +897,11 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         deleteScheduledTransaction,
         addMockData,
         clearAllUserData,
+        addMockTransactions,
+        addMockGoals,
+        addMockDebts,
+        clearTable,
+        forceError,
     }), [
         transactions, goals, debts, scheduledTransactions, categories, summary, monthlyChartData, userLevel, achievements, 
         loading, isMutating, mutatingIds, error, user, isGuest
