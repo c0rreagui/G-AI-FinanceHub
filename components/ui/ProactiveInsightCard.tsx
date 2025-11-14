@@ -1,3 +1,4 @@
+
 import React, { useMemo } from 'react';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { Lightbulb, Target, TrendingUp, Wallet } from '../Icons';
@@ -126,17 +127,19 @@ export const ProactiveInsightCard: React.FC<ProactiveInsightCardProps> = ({ setC
     const { title, message, actionText, actionView, icon: Icon, iconColor, glowColor } = proactiveInsight;
 
     return (
-        <div className="card flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-cyan-900/20 border-cyan-500/30">
-            <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 bg-cyan-500/20 shadow-lg ${glowColor}`}>
-                <Icon className={`w-6 h-6 ${iconColor}`} />
+        <div className="animated-border">
+            <div className="card animated-border-content flex flex-col sm:flex-row items-start sm:items-center gap-4 !p-5 rounded-[15px]">
+                <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 bg-cyan-500/10 shadow-lg ${glowColor}`}>
+                    <Icon className={`w-6 h-6 ${iconColor}`} />
+                </div>
+                <div className="flex-grow">
+                    <h3 className="font-semibold text-white">{title}</h3>
+                    <p className="text-sm text-gray-300 mt-1">{message}</p>
+                </div>
+                <Button variant="secondary" size="sm" onClick={() => setCurrentView(actionView)}>
+                    {actionText}
+                </Button>
             </div>
-            <div className="flex-grow">
-                <h3 className="font-semibold text-white">{title}</h3>
-                <p className="text-sm text-gray-300 mt-1">{message}</p>
-            </div>
-            <Button variant="secondary" size="sm" onClick={() => setCurrentView(actionView)}>
-                {actionText}
-            </Button>
         </div>
     );
 };

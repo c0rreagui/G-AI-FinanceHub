@@ -1,7 +1,8 @@
 
+
 import React from 'react';
 
-interface BadgeProps {
+interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
     children: React.ReactNode;
     color?: 'green' | 'red' | 'blue' | 'yellow' | 'gray';
 }
@@ -15,9 +16,9 @@ const colorClasses = {
     gray: 'bg-gray-500/10 text-gray-400 ring-gray-500/20',
 };
 
-export const Badge: React.FC<BadgeProps> = ({ children, color = 'gray' }) => {
+export const Badge: React.FC<BadgeProps> = ({ children, color = 'gray', className, ...props }) => {
     return (
-        <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${colorClasses[color]}`}>
+        <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${colorClasses[color]} ${className || ''}`} {...props}>
             {children}
         </span>
     );

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 // FIX: Corrected import path.
@@ -34,7 +35,7 @@ const GuestModeBanner: React.FC = () => {
     const { logout } = useAuth();
     return (
         <div className="bg-yellow-500/20 text-yellow-200 text-center text-sm py-2 px-4 border-b border-yellow-500/30 flex items-center justify-center gap-1 sm:gap-2 flex-wrap relative">
-            <div className="absolute inset-0 border-b border-yellow-400 animate-pulse-border"></div>
+            <div className="absolute inset-x-0 bottom-0 h-px bg-yellow-400 animate-pulse-border"></div>
             <span>Você está no modo visitante. Seus dados são salvos localmente.</span>
             <button onClick={logout} className="font-bold underline hover:text-white">
                 Crie uma conta
@@ -91,13 +92,13 @@ const AppContent: React.FC = () => {
   // FIX: Moved `useCallback` before conditional returns to adhere to the Rules of Hooks.
   const renderView = useCallback(() => {
     const pageVariants = {
-      initial: { opacity: 0, y: 20 },
+      initial: { opacity: 0, y: 15 },
       in: { opacity: 1, y: 0 },
-      out: { opacity: 0, y: -20 },
+      out: { opacity: 0, y: -15 },
     };
     const pageTransition: Transition = {
       type: 'tween',
-      ease: 'anticipate',
+      ease: [0.4, 0, 0.2, 1], // Curva de ease customizada para suavidade
       duration: 0.4,
     };
     

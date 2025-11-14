@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { ProgressBar } from './ProgressBar';
@@ -62,6 +63,7 @@ export const UserProfileCard: React.FC = () => {
     }
     
     const progress = (userLevel.xp / userLevel.xpToNextLevel) * 100;
+    const isHighRank = [UserRank.OURO, UserRank.PLATINA, UserRank.DIAMANTE].includes(userLevel.rank);
 
     return (
         <div className="card">
@@ -94,7 +96,12 @@ export const UserProfileCard: React.FC = () => {
                         )}
                     </AnimatePresence>
                 </div>
-                <Badge color={getRankColor(userLevel.rank)}>{userLevel.rank}</Badge>
+                <Badge 
+                    color={getRankColor(userLevel.rank)} 
+                    className={isHighRank ? 'shimmer-badge' : ''}
+                >
+                    {userLevel.rank}
+                </Badge>
             </div>
             <div className="mt-4">
                 <p className="text-3xl font-bold text-white">Nível {userLevel.level}</p>
