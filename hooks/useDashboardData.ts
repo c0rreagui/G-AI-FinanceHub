@@ -311,10 +311,10 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         const monthlyExpenses = transactions
             .filter(t => t.type === TransactionType.DESPESA && new Date(t.date).getMonth() === currentMonth && new Date(t.date).getFullYear() === currentYear)
             .reduce((sum, t) => sum + t.amount, 0);
-
-        const totalBalance = transactions.reduce((sum, t) => {
-            return t.type === TransactionType.RECEITA ? sum + t.amount : sum - Math.abs(t.amount)
-        }, 0);
+        
+        // FIX: Simplificado o cálculo do saldo total para somar diretamente os valores,
+        // garantindo que os valores de despesa sejam negativos.
+        const totalBalance = transactions.reduce((sum, t) => sum + t.amount, 0);
 
         return { totalBalance, monthlyIncome, monthlyExpenses };
     }, [transactions]);
@@ -485,7 +485,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
         const tx: Omit<Transaction, 'id' | 'category'|'user_id'|'category_id'> & {categoryId: string} = {
             description: `Contribuição para a meta: ${goal.name}`,
-            amount: amount,
+            amount: -Math.abs(amount), // FIX: Garante que a contribuição seja uma despesa com valor negativo.
             type: TransactionType.DESPESA,
             date: new Date().toISOString(),
             categoryId: categories.find(c => c.name === 'Investimentos')?.id || categories[0].id,
@@ -498,7 +498,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             data.transactions.push(newTx);
             const goalIndex = data.goals.findIndex((g: Goal) => g.id === goalId);
             if (goalIndex > -1) {
-                data.goals[goalIndex].current_amount += Math.abs(newTx.amount);
+                data.goals[goalIndex].current_amount += Math.abs(amount);
                 if (data.goals[goalIndex].current_amount >= data.goals[goalIndex].target_amount) {
                     data.goals[goalIndex].status = GoalStatus.CONCLUIDO;
                 }
@@ -569,7 +569,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
         const tx: Omit<Transaction, 'id' | 'category'|'user_id'|'category_id'> & {categoryId: string} = {
             description: `Pagamento da dívida: ${debt.name}`,
-            amount: amount,
+            amount: -Math.abs(amount), // FIX: Garante que o pagamento seja uma despesa com valor negativo.
             type: TransactionType.DESPESA,
             date: new Date().toISOString(),
             categoryId: categories.find(c => c.name === 'Outros')?.id || categories[0].id,
@@ -582,7 +582,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             data.transactions.push(newTx);
             const debtIndex = data.debts.findIndex((d: Debt) => d.id === debtId);
             if (debtIndex > -1) {
-                data.debts[debtIndex].paid_amount += Math.abs(newTx.amount);
+                data.debts[debtIndex].paid_amount += Math.abs(amount);
                 if (data.debts[debtIndex].paid_amount >= data.debts[debtIndex].total_amount) {
                     data.debts[debtIndex].status = DebtStatus.PAGA;
                 }
