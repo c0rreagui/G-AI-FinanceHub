@@ -392,7 +392,9 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             showToast('Transação Adicionada!', { type: 'success' });
             return true;
         }
-        const { error } = await supabase.from('transactions').insert({ ...tx, category_id: tx.categoryId, user_id: user!.id });
+        // FIX: Destructure categoryId to avoid sending it to Supabase, which expects category_id.
+        const { categoryId, ...txData } = tx;
+        const { error } = await supabase.from('transactions').insert({ ...txData, category_id: categoryId, user_id: user!.id });
         if (error) throw error;
         await fetchData();
         showToast('Transação Adicionada!', { type: 'success' });
@@ -411,7 +413,9 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             showToast('Transação Atualizada!', { type: 'success' });
             return true;
         }
-        const { error } = await supabase.from('transactions').update({ ...tx, category_id: tx.categoryId }).eq('id', tx.id);
+        // FIX: Destructure categoryId to avoid sending it to Supabase, which expects category_id.
+        const { categoryId, ...txData } = tx;
+        const { error } = await supabase.from('transactions').update({ ...txData, category_id: categoryId }).eq('id', tx.id);
         if (error) throw error;
         await fetchData();
         showToast('Transação Atualizada!', { type: 'success' });
@@ -505,7 +509,9 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             }
             setGuestData(data);
         } else {
-            const { error } = await supabase.from('transactions').insert({ ...tx, category_id: tx.categoryId, user_id: user!.id });
+            // FIX: Destructure categoryId to avoid sending it to Supabase, which expects category_id.
+            const { categoryId, ...txData } = tx;
+            const { error } = await supabase.from('transactions').insert({ ...txData, category_id: categoryId, user_id: user!.id });
             if (error) throw error;
         }
         
@@ -589,7 +595,9 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             }
             setGuestData(data);
         } else {
-            const { error } = await supabase.from('transactions').insert({ ...tx, category_id: tx.categoryId, user_id: user!.id });
+            // FIX: Destructure categoryId to avoid sending it to Supabase, which expects category_id.
+            const { categoryId, ...txData } = tx;
+            const { error } = await supabase.from('transactions').insert({ ...txData, category_id: categoryId, user_id: user!.id });
             if (error) throw error;
         }
 

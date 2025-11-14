@@ -1,5 +1,4 @@
 // components/ErrorBoundary.tsx
-// FIX: Changed the class to extend `React.Component` directly to resolve a TypeScript type resolution issue where `this.props` was not recognized on the component instance.
 import React, { ErrorInfo, ReactNode } from 'react';
 import { logger } from '../services/loggingService';
 import { Button } from './ui/Button';
@@ -15,10 +14,15 @@ interface ErrorBoundaryState {
 }
 
 export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  state: ErrorBoundaryState = {
-    hasError: false,
-    error: null,
-  };
+  // FIX: Refactored to use a constructor for state initialization.
+  // This can resolve subtle type inference issues with `this.props` in some build configurations.
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = {
+      hasError: false,
+      error: null,
+    };
+  }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
