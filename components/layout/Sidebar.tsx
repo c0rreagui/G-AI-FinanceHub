@@ -172,7 +172,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
                       >
                          {isActive && (
                           <motion.span 
-                            layoutId="sidebar-active-indicator-secondary"
+                            layoutId="sidebar-active-indicator"
                             className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 bg-cyan-400 rounded-r-full"
                           />
                         )}

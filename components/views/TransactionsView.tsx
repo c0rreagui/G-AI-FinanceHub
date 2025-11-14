@@ -79,9 +79,9 @@ const TransactionItem: React.FC<{
 
     const desktopHoverActions = (
         <AnimatePresence>
-            {isDesktop && !isInSelectionMode && (
+            {!isInSelectionMode && (
                 <motion.div 
-                    className="absolute inset-y-0 right-6 flex items-center z-20 gap-2 opacity-20 group-hover:opacity-100 transition-opacity"
+                    className="absolute inset-y-0 right-6 flex items-center z-20 gap-2 opacity-0 group-hover:opacity-100 transition-opacity"
                 >
                     <button
                         onClick={() => onEdit(transaction)}
@@ -186,7 +186,7 @@ const TransactionItem: React.FC<{
                     </div>
                 </div>
             </motion.div>
-            {isDesktop && !isInSelectionMode && desktopHoverActions}
+            {isDesktop && desktopHoverActions}
         </motion.li>
     );
 });
