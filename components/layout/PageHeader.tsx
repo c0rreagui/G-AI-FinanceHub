@@ -10,7 +10,11 @@ interface PageHeaderProps {
 
 export const PageHeader: React.FC<PageHeaderProps> = ({ icon: Icon, title, breadcrumbs, actions }) => {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[oklch(var(--border-oklch))] pb-5 mb-6 flex-shrink-0">
+    <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[oklch(var(--border-oklch))] pb-5 mb-6 flex-shrink-0">
+      <div 
+        className="absolute bottom-[-1px] left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-400 to-transparent"
+        style={{ animation: 'pulse-border 3s ease-in-out infinite' }}
+      />
       <div>
         <div className="flex items-center gap-3">
           <Icon className="w-8 h-8 text-cyan-300" />

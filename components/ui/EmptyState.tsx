@@ -1,4 +1,5 @@
 
+
 // components/ui/EmptyState.tsx
 import React from 'react';
 import { motion } from 'framer-motion';
@@ -12,7 +13,7 @@ interface EmptyStateProps {
 
 export const EmptyState: React.FC<EmptyStateProps> = ({ icon: Icon, title, description, children }) => {
   return (
-    <div className="flex flex-col items-center justify-center text-center text-gray-400 py-16 h-full">
+    <div className="flex flex-col items-center justify-center text-center text-gray-400 py-16 h-full rounded-2xl bg-gradient-to-t from-black/10 via-transparent to-transparent">
       <motion.div
         animate={{ y: [0, -8, 0] }}
         transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}

@@ -11,7 +11,7 @@ interface MonthlySummaryChartProps {
 const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-gray-900/60 border border-white/20 backdrop-blur-xl p-3 rounded-lg text-sm shadow-lg">
+        <div className="bg-black/50 border border-white/20 backdrop-blur-md p-3 rounded-lg text-sm shadow-lg">
           <p className="label font-semibold text-white">{`${label}`}</p>
           <p className="text-green-400">{`Receita: ${formatCurrencyBRL(payload[0].value)}`}</p>
           <p className="text-red-400">{`Despesa: ${formatCurrencyBRL(payload[1].value)}`}</p>

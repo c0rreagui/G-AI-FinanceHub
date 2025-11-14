@@ -97,7 +97,7 @@ const SpeedDial: React.FC = () => {
                                 <motion.div
                                     key={action.label}
                                     initial={{ opacity: 0, y: 50 }}
-                                    animate={{ opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 20, delay: index * 0.05 } }}
+                                    animate={{ opacity: 1, y: 0, transition: { type: 'spring', stiffness: 380, damping: 20, delay: index * 0.06 } }}
                                     exit={{ opacity: 0, y: 50, transition: { duration: 0.15 } }}
                                     className="flex items-center gap-3 w-40 justify-end"
                                 >
@@ -123,7 +123,7 @@ const SpeedDial: React.FC = () => {
                 aria-label={isOpen ? "Fechar ações rápidas" : "Abrir ações rápidas"}
                 aria-expanded={isOpen}
             >
-                <motion.div variants={{ open: { rotate: 45 }, closed: { rotate: 0 } }} transition={{ type: 'spring', stiffness: 400, damping: 15 }}>
+                <motion.div variants={{ open: { rotate: 45 }, closed: { rotate: 0 } }} transition={{ type: 'spring', stiffness: 400, damping: 17 }}>
                     <PlusCircle className="w-8 h-8" />
                 </motion.div>
             </motion.button>

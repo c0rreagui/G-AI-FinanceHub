@@ -49,10 +49,10 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }
           {/* Container do conteúdo do modal */}
           <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
+              initial={{ opacity: 0, y: -30, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 30, scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
               className="w-full max-w-lg rounded-2xl bg-[oklch(var(--card-oklch))] border border-[oklch(var(--border-oklch))] p-6 shadow-2xl shadow-black/40"
               // Impede que o clique no painel do modal feche-o (propagação)
               onClick={(e) => e.stopPropagation()}

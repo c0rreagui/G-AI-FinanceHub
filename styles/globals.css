@@ -1,4 +1,3 @@
-
 :root {
   /* 
     New Design System: "Aurora Boreal"
@@ -79,9 +78,9 @@
     @apply bg-[oklch(var(--card-oklch))] border border-[oklch(var(--border-oklch))] rounded-2xl p-6 shadow-lg transition-all;
   }
   .card:hover {
-    transform: translateY(-2px);
-    border-color: oklch(var(--card-hover-border-oklch) / 0.5);
-    box-shadow: 0 0 20px 0 oklch(var(--card-hover-border-oklch) / 0.1);
+    transform: translateY(-2px) scale(1.01);
+    border-color: oklch(var(--card-hover-border-oklch) / 0.6);
+    box-shadow: 0 0 25px -5px oklch(var(--primary-oklch) / 0.2);
   }
   
   .card-completed {
@@ -96,6 +95,11 @@
   }
   .animated-border-content {
     @apply bg-[oklch(var(--card-oklch))];
+  }
+
+  /* Zebra striping for transaction lists */
+  .transaction-list > li:nth-child(odd) > div > div {
+    @apply bg-white/[0.03];
   }
 }
 
@@ -222,4 +226,40 @@
 }
 @keyframes animated-gradient-border {
   to { --a: 360deg; }
+}
+
+/* New Ripple Effect for Buttons */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  animation: ripple-effect 600ms linear;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+@keyframes ripple-effect {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* New Custom Logo Spinner */
+@keyframes logo-spinner-animation {
+  0% {
+    stroke-dashoffset: 200;
+    transform: rotate(0deg);
+  }
+  50% {
+    stroke-dashoffset: 50;
+    transform: rotate(180deg);
+  }
+  100% {
+    stroke-dashoffset: 200;
+    transform: rotate(360deg);
+  }
+}
+.logo-spinner {
+  animation: logo-spinner-animation 2s ease-in-out infinite;
+  transform-origin: center;
 }

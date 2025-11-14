@@ -148,7 +148,7 @@ const TransactionItem: React.FC<{
                 onDragEnd={() => setTimeout(() => setIsDragging(false), 150)}
             >
                 <div 
-                  className={`group flex items-center justify-between p-4 bg-white/5 border rounded-2xl backdrop-blur-xl transition-all duration-300 ${isSystemTransaction && isInSelectionMode ? 'opacity-60' : ''} ${isSelected ? 'border-cyan-500/80 shadow-lg' : 'border-white/10 hover:border-white/25 hover:bg-white/10'}`}
+                  className={`group flex items-center justify-between p-4 border rounded-2xl backdrop-blur-xl transition-all duration-300 ${isSystemTransaction && !isInSelectionMode ? 'bg-white/[0.03]' : ''} ${isSystemTransaction && isInSelectionMode ? 'opacity-60' : ''} ${isSelected ? 'border-cyan-500/80 shadow-lg !bg-cyan-500/10' : 'border-white/10 hover:!border-cyan-500/50'}`}
                   onClick={handleContainerClick}
                   title={isSystemTransaction && isInSelectionMode ? 'Transações do sistema não podem ser selecionadas.' : ''}
                 >
@@ -282,7 +282,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                             {Object.entries(groupedTransactions).map(([date, txs]: [string, Transaction[]]) => (
                                 <div key={date}>
                                     <DateHeader date={date} />
-                                    <ul className="space-y-2 py-2">
+                                    <ul className="space-y-2 py-2 transaction-list">
                                         <AnimatePresence>
                                             {txs.map(tx => (
                                                 <TransactionItem 

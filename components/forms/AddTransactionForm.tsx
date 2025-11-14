@@ -33,6 +33,28 @@ const QuickValueChip: React.FC<{ value: number; onSelect: (value: number) => voi
     </button>
 );
 
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.06,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 15 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: 'spring',
+      stiffness: 300,
+      damping: 25,
+    },
+  },
+};
+
 export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, onClose, prefill, transactionToEdit }) => {
   const { addTransaction, updateTransaction, categories } = useDashboardData();
   const isDesktop = useMediaQuery('(min-width: 768px)');
@@ -116,16 +138,20 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
   
   const FormFields = (
     <>
-        <TypeToggle selectedType={type} onTypeChange={setType} />
-        <Input
-          id="tx-description"
-          label="Descrição"
-          type="text"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          required
-        />
-        <div className="grid grid-cols-2 gap-4">
+        <motion.div variants={itemVariants}>
+          <TypeToggle selectedType={type} onTypeChange={setType} />
+        </motion.div>
+        <motion.div variants={itemVariants}>
+          <Input
+            id="tx-description"
+            label="Descrição"
+            type="text"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
+          />
+        </motion.div>
+        <motion.div variants={itemVariants} className="grid grid-cols-2 gap-4">
             <Input
               id="tx-amount"
               label="Valor (R$)"
@@ -144,8 +170,8 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
               onChange={(e) => setDate(e.target.value)}
               required
             />
-        </div>
-        <div>
+        </motion.div>
+        <motion.div variants={itemVariants}>
             <label className="block text-sm font-medium text-gray-300 mb-2">
                 Valores Rápidos
             </label>
@@ -154,8 +180,8 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                     <QuickValueChip key={val} value={val} onSelect={(v) => setAmount(String(v))} />
                 ))}
             </div>
-        </div>
-        <div>
+        </motion.div>
+        <motion.div variants={itemVariants}>
             <label className="block text-sm font-medium text-gray-300">
                 Categoria
             </label>
@@ -164,14 +190,20 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                 selectedCategoryId={categoryId}
                 onSelectCategory={setCategoryId}
             />
-        </div>
+        </motion.div>
     </>
   );
 
   if (isDesktop) {
       return (
           <Modal isOpen={isOpen} onClose={onClose} title={isEditing ? "Editar Transação" : "Nova Transação"}>
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <motion.form 
+                  onSubmit={handleSubmit} 
+                  className="space-y-4"
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+              >
                   {FormFields}
                   <div className="flex justify-end gap-2 pt-4">
                     <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
@@ -181,7 +213,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                       {isSubmitting ? <><LoadingSpinner /> Salvando...</> : (isEditing ? 'Salvar Alterações' : 'Salvar Transação')}
                     </Button>
                   </div>
-              </form>
+              </motion.form>
           </Modal>
       )
   }
@@ -205,9 +237,16 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                 
                 {/* Conteúdo Rolável */}
                 <div className="flex-grow p-4 overflow-y-auto">
-                    <form id="mobile-tx-form" onSubmit={handleSubmit} className="space-y-6">
+                    <motion.form 
+                        id="mobile-tx-form" 
+                        onSubmit={handleSubmit} 
+                        className="space-y-6"
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate="visible"
+                    >
                         {FormFields}
-                    </form>
+                    </motion.form>
                 </div>
 
                 {/* Rodapé Fixo */}
