@@ -148,7 +148,7 @@ const TransactionItem: React.FC<{
                 onDragEnd={() => setTimeout(() => setIsDragging(false), 150)}
             >
                 <div 
-                  className={`group flex items-center justify-between p-4 bg-white/5 border rounded-2xl backdrop-blur-xl transition-all duration-300 ${isSystemTransaction && isInSelectionMode ? 'opacity-60' : ''} ${isSelected ? 'border-cyan-500/80 shadow-lg' : 'border-white/10 hover:border-white/20 hover:bg-white/10'}`}
+                  className={`group flex items-center justify-between p-4 bg-white/5 border rounded-2xl backdrop-blur-xl transition-all duration-300 ${isSystemTransaction && isInSelectionMode ? 'opacity-60' : ''} ${isSelected ? 'border-cyan-500/80 shadow-lg' : 'border-white/10 hover:border-white/25 hover:bg-white/10'}`}
                   onClick={handleContainerClick}
                   title={isSystemTransaction && isInSelectionMode ? 'Transações do sistema não podem ser selecionadas.' : ''}
                 >

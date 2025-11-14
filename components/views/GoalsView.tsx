@@ -1,7 +1,7 @@
 // components/views/GoalsView.tsx
 import React from 'react';
 import { PageHeader } from '../layout/PageHeader';
-import { Target, PlusCircle, TrashIcon } from '../Icons';
+import { Target, PlusCircle, TrashIcon, Trophy } from '../Icons';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { Goal, GoalStatus } from '../../types';
 import { formatCurrencyBRL, formatDate, formatDaysUntil } from '../../utils/formatters';
@@ -38,7 +38,7 @@ const GoalCard: React.FC<{ goal: Goal }> = ({ goal }) => {
 
     return (
         <motion.div 
-            className={`card flex flex-col justify-between transition-opacity ${isMutating ? 'opacity-50' : ''}`}
+            className={`card flex flex-col justify-between transition-opacity ${isMutating ? 'opacity-50' : ''} ${isCompleted ? 'card-completed' : ''}`}
             layout
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -47,8 +47,8 @@ const GoalCard: React.FC<{ goal: Goal }> = ({ goal }) => {
             <div>
                 <div className="flex justify-between items-start">
                     <h3 className="text-lg font-semibold text-white">{goal.name}</h3>
-                    <Badge color={isCompleted ? 'green' : 'blue'}>
-                        {isCompleted ? 'Concluído' : 'Em Andamento'}
+                     <Badge color={isCompleted ? 'green' : 'blue'}>
+                       {isCompleted ? <div className="flex items-center gap-1.5"><Trophy className="w-3.5 h-3.5" /> Concluído</div> : 'Em Andamento'}
                     </Badge>
                 </div>
                 <p className="text-sm text-gray-400 mt-1">

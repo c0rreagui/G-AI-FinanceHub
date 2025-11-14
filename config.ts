@@ -1,2 +1,2 @@
-export const APP_VERSION = '1.4.4';
-export const APP_CODENAME = 'Pulsar';
+export const APP_VERSION = '1.5.0';
+export const APP_CODENAME = 'Stardust';

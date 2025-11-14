@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { PageHeader } from '../layout/PageHeader';
-import { HomeIcon, PlusCircle, Target } from '../Icons';
+import { HomeIcon, PlusCircle, Target, Wallet, ArrowUpRight, ArrowDownLeft } from '../Icons';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { QuickActions } from '../ui/QuickActions';
 import { GoalStatus, ViewType } from '../../types';
@@ -86,9 +86,9 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                 <motion.div variants={itemVariants}><QuickActions /></motion.div>
                 
                 <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <AnimatedSummaryCard title="Saldo Total" amount={summary.totalBalance} />
-                    <AnimatedSummaryCard title="Receitas do Mês" amount={summary.monthlyIncome} />
-                    <AnimatedSummaryCard title="Despesas do Mês" amount={Math.abs(summary.monthlyExpenses)} />
+                    <AnimatedSummaryCard title="Saldo Total" amount={summary.totalBalance} icon={Wallet} />
+                    <AnimatedSummaryCard title="Receitas do Mês" amount={summary.monthlyIncome} icon={ArrowUpRight} />
+                    <AnimatedSummaryCard title="Despesas do Mês" amount={Math.abs(summary.monthlyExpenses)} icon={ArrowDownLeft} />
                 </motion.div>
                 
                 <motion.div variants={itemVariants}><UserProfileCard /></motion.div>

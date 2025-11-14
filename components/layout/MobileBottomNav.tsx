@@ -75,9 +75,9 @@ const SpeedDial: React.FC = () => {
     };
     
     const actions = [
-        { icon: Target, label: 'Meta', ariaLabel: 'Adicionar nova meta', onClick: () => handleAction(() => openDialog('add-goal')) },
-        { icon: ArrowUpRight, label: 'Receita', ariaLabel: 'Adicionar nova receita', onClick: () => handleAction(() => openDialog('add-transaction', { prefill: { type: TransactionType.RECEITA } })) },
         { icon: ArrowDownLeft, label: 'Despesa', ariaLabel: 'Adicionar nova despesa', onClick: () => handleAction(() => openDialog('add-transaction', { prefill: { type: TransactionType.DESPESA } })) },
+        { icon: ArrowUpRight, label: 'Receita', ariaLabel: 'Adicionar nova receita', onClick: () => handleAction(() => openDialog('add-transaction', { prefill: { type: TransactionType.RECEITA } })) },
+        { icon: Target, label: 'Meta', ariaLabel: 'Adicionar nova meta', onClick: () => handleAction(() => openDialog('add-goal')) },
     ];
 
     return (
@@ -89,7 +89,7 @@ const SpeedDial: React.FC = () => {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
-                          className="fixed inset-0 bg-black/50 z-40" 
+                          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40" 
                           onClick={toggleOpen}
                         />
                         <div className="absolute bottom-24 flex flex-col items-center gap-4 z-50">
@@ -97,11 +97,11 @@ const SpeedDial: React.FC = () => {
                                 <motion.div
                                     key={action.label}
                                     initial={{ opacity: 0, y: 50 }}
-                                    animate={{ opacity: 1, y: 0, transition: { delay: index * 0.05 } }}
-                                    exit={{ opacity: 0, y: 50 }}
-                                    className="flex items-center gap-3"
+                                    animate={{ opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 20, delay: index * 0.05 } }}
+                                    exit={{ opacity: 0, y: 50, transition: { duration: 0.15 } }}
+                                    className="flex items-center gap-3 w-40 justify-end"
                                 >
-                                    <span className="bg-black/50 text-white text-xs font-semibold px-2 py-1 rounded-md">{action.label}</span>
+                                    <span className="bg-[oklch(var(--card-oklch))] text-white text-xs font-semibold px-2 py-1 rounded-md shadow-lg">{action.label}</span>
                                     <button 
                                       onClick={action.onClick} 
                                       className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center shadow-lg"
@@ -123,7 +123,7 @@ const SpeedDial: React.FC = () => {
                 aria-label={isOpen ? "Fechar ações rápidas" : "Abrir ações rápidas"}
                 aria-expanded={isOpen}
             >
-                <motion.div variants={{ open: { rotate: 45 }, closed: { rotate: 0 } }}>
+                <motion.div variants={{ open: { rotate: 45 }, closed: { rotate: 0 } }} transition={{ type: 'spring', stiffness: 400, damping: 15 }}>
                     <PlusCircle className="w-8 h-8" />
                 </motion.div>
             </motion.button>

@@ -24,6 +24,7 @@ interface Insight {
     actionView: ViewType;
     icon: React.ElementType;
     iconColor: string;
+    glowColor: string;
 }
 
 export const ProactiveInsightCard: React.FC<ProactiveInsightCardProps> = ({ setCurrentView }) => {
@@ -43,7 +44,8 @@ export const ProactiveInsightCard: React.FC<ProactiveInsightCardProps> = ({ setC
                 actionText: 'Adicionar Transação',
                 actionView: 'transactions',
                 icon: Wallet,
-                iconColor: 'text-cyan-300'
+                iconColor: 'text-cyan-300',
+                glowColor: 'shadow-cyan-500/30'
             };
         }
 
@@ -62,7 +64,8 @@ export const ProactiveInsightCard: React.FC<ProactiveInsightCardProps> = ({ setC
                 actionText: 'Ver Metas',
                 actionView: 'goals',
                 icon: Target,
-                iconColor: 'text-yellow-300'
+                iconColor: 'text-yellow-300',
+                glowColor: 'shadow-yellow-500/30'
             };
         }
 
@@ -78,7 +81,8 @@ export const ProactiveInsightCard: React.FC<ProactiveInsightCardProps> = ({ setC
                     actionText: 'Ver Insights',
                     actionView: 'insights',
                     icon: TrendingUp,
-                    iconColor: 'text-green-400'
+                    iconColor: 'text-green-400',
+                    glowColor: 'shadow-green-500/30'
                 };
             }
         }
@@ -106,7 +110,8 @@ export const ProactiveInsightCard: React.FC<ProactiveInsightCardProps> = ({ setC
                 actionText: 'Analisar Gastos',
                 actionView: 'insights',
                 icon: Lightbulb,
-                iconColor: 'text-cyan-300'
+                iconColor: 'text-cyan-300',
+                glowColor: 'shadow-cyan-500/30'
             };
         }
 
@@ -118,11 +123,11 @@ export const ProactiveInsightCard: React.FC<ProactiveInsightCardProps> = ({ setC
         return null;
     }
 
-    const { title, message, actionText, actionView, icon: Icon, iconColor } = proactiveInsight;
+    const { title, message, actionText, actionView, icon: Icon, iconColor, glowColor } = proactiveInsight;
 
     return (
         <div className="card flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-cyan-900/20 border-cyan-500/30">
-            <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 bg-cyan-500/20`}>
+            <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 bg-cyan-500/20 shadow-lg ${glowColor}`}>
                 <Icon className={`w-6 h-6 ${iconColor}`} />
             </div>
             <div className="flex-grow">

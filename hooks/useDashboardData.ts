@@ -484,12 +484,14 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     });
     
     const updateGoalValue = (goalId: string, amount: number) => withMutation(async () => {
+        // Encontra a meta no estado atual para obter os valores
         const goal = (isGuest ? getGuestData().goals : goals).find((g: Goal) => g.id === goalId);
         if (!goal) throw new Error("Meta não encontrada.");
 
+        // Cria a transação de contribuição
         const tx: Omit<Transaction, 'id' | 'category'|'user_id'|'category_id'> & {categoryId: string} = {
             description: `Contribuição para a meta: ${goal.name}`,
-            amount: -Math.abs(amount), // FIX: Garante que a contribuição seja uma despesa com valor negativo.
+            amount: -Math.abs(amount),
             type: TransactionType.DESPESA,
             date: new Date().toISOString(),
             categoryId: categories.find(c => c.name === 'Investimentos')?.id || categories[0].id,
@@ -498,8 +500,10 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
         if (isGuest) {
             const data = getGuestData();
+            // Adiciona a transação
             const newTx = { ...tx, id: crypto.randomUUID(), user_id: 'guest', category_id: tx.categoryId, created_at: new Date().toISOString() };
             data.transactions.push(newTx);
+            // Atualiza a meta
             const goalIndex = data.goals.findIndex((g: Goal) => g.id === goalId);
             if (goalIndex > -1) {
                 data.goals[goalIndex].current_amount += Math.abs(amount);
@@ -509,17 +513,28 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             }
             setGuestData(data);
         } else {
-            // FIX: Destructure categoryId to avoid sending it to Supabase, which expects category_id.
+            // Insere a transação no Supabase
             const { categoryId, ...txData } = tx;
-            const { error } = await supabase.from('transactions').insert({ ...txData, category_id: categoryId, user_id: user!.id });
-            if (error) throw error;
+            const { error: txError } = await supabase.from('transactions').insert({ ...txData, category_id: categoryId, user_id: user!.id });
+            if (txError) throw txError;
+            
+            // **FIX**: Atualiza a meta no Supabase
+            const newAmount = goal.current_amount + Math.abs(amount);
+            const newStatus = newAmount >= goal.target_amount ? GoalStatus.CONCLUIDO : GoalStatus.EM_ANDAMENTO;
+            const { error: goalUpdateError } = await supabase
+                .from('goals')
+                .update({ current_amount: newAmount, status: newStatus })
+                .eq('id', goalId);
+
+            if (goalUpdateError) throw goalUpdateError;
         }
         
         await fetchData();
         showToast('Valor Adicionado à Meta!', { type: 'success' });
         
-        const updatedGoal = (isGuest ? getGuestData().goals : goals).find((g: Goal) => g.id === goalId);
-        if (updatedGoal && updatedGoal.status === GoalStatus.CONCLUIDO) {
+        // A busca de dados (fetchData) já trará a meta atualizada
+        const updatedGoal = goals.find((g: Goal) => g.id === goalId);
+        if (updatedGoal?.status === GoalStatus.CONCLUIDO && goal.status !== GoalStatus.CONCLUIDO) {
             showToast('Parabéns!', { description: `Meta "${goal.name}" concluída!`, type: 'success' });
         }
         return true;
@@ -575,7 +590,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
         const tx: Omit<Transaction, 'id' | 'category'|'user_id'|'category_id'> & {categoryId: string} = {
             description: `Pagamento da dívida: ${debt.name}`,
-            amount: -Math.abs(amount), // FIX: Garante que o pagamento seja uma despesa com valor negativo.
+            amount: -Math.abs(amount),
             type: TransactionType.DESPESA,
             date: new Date().toISOString(),
             categoryId: categories.find(c => c.name === 'Outros')?.id || categories[0].id,
@@ -595,17 +610,26 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             }
             setGuestData(data);
         } else {
-            // FIX: Destructure categoryId to avoid sending it to Supabase, which expects category_id.
             const { categoryId, ...txData } = tx;
-            const { error } = await supabase.from('transactions').insert({ ...txData, category_id: categoryId, user_id: user!.id });
-            if (error) throw error;
+            const { error: txError } = await supabase.from('transactions').insert({ ...txData, category_id: categoryId, user_id: user!.id });
+            if (txError) throw txError;
+
+            // **FIX**: Atualiza a dívida no Supabase
+            const newPaidAmount = debt.paid_amount + Math.abs(amount);
+            const newStatus = newPaidAmount >= debt.total_amount ? DebtStatus.PAGA : DebtStatus.ATIVA;
+            const { error: debtUpdateError } = await supabase
+                .from('debts')
+                .update({ paid_amount: newPaidAmount, status: newStatus })
+                .eq('id', debtId);
+
+            if (debtUpdateError) throw debtUpdateError;
         }
 
         await fetchData();
         showToast('Pagamento Realizado!', { type: 'success' });
         
-        const updatedDebt = (isGuest ? getGuestData().debts : debts).find((d: Debt) => d.id === debtId);
-        if(updatedDebt && updatedDebt.status === DebtStatus.PAGA) {
+        const updatedDebt = debts.find((d: Debt) => d.id === debtId);
+        if(updatedDebt?.status === DebtStatus.PAGA && debt.status !== DebtStatus.PAGA) {
             showToast('Dívida Quitada!', { description: `Parabéns por quitar "${debt.name}"!`, type: 'success' });
         }
         return true;
@@ -643,14 +667,16 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const addScheduledTransaction = (item: Omit<ScheduledTransaction, 'id'|'category'|'next_due_date'|'user_id'|'category_id'|'start_date'> & {categoryId: string; startDate: string}) => withMutation(async () => {
         const nextDueDate = calculateNextDueDate(item.startDate, item.frequency);
-        const newItem = { ...item, category_id: item.categoryId, start_date: item.startDate, next_due_date: nextDueDate, user_id: isGuest ? 'guest' : user!.id, id: crypto.randomUUID(), created_at: new Date().toISOString() };
-        
+        const { categoryId, startDate, ...rest } = item;
+        const newItem = { ...rest, category_id: categoryId, start_date: startDate, next_due_date: nextDueDate, user_id: isGuest ? 'guest' : user!.id };
+
         if (isGuest) {
+            const guestItem = { ...newItem, id: crypto.randomUUID(), created_at: new Date().toISOString() };
             const data = getGuestData();
-            data.scheduledTransactions.push(newItem);
+            data.scheduledTransactions.push(guestItem);
             setGuestData(data);
         } else {
-            const { error } = await supabase.from('scheduled_transactions').insert({ ...item, category_id: item.categoryId, start_date: item.startDate, next_due_date: nextDueDate, user_id: user!.id });
+            const { error } = await supabase.from('scheduled_transactions').insert(newItem);
             if (error) throw error;
         }
         await fetchData();
@@ -659,15 +685,18 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     const updateScheduledTransaction = (item: Omit<ScheduledTransaction, 'category'|'user_id'|'category_id'|'start_date'> & {categoryId: string; startDate: string}) => withMutation(async () => {
+        const { categoryId, startDate, ...rest } = item;
+        const updatedItem = { ...rest, category_id: categoryId, start_date: startDate };
+        
         if (isGuest) {
             const data = getGuestData();
             const index = data.scheduledTransactions.findIndex((st: ScheduledTransaction) => st.id === item.id);
             if (index > -1) {
-                data.scheduledTransactions[index] = { ...data.scheduledTransactions[index], ...item, category_id: item.categoryId, start_date: item.startDate };
+                data.scheduledTransactions[index] = { ...data.scheduledTransactions[index], ...updatedItem };
                 setGuestData(data);
             }
         } else {
-            const { error } = await supabase.from('scheduled_transactions').update({ ...item, category_id: item.categoryId, start_date: item.startDate }).eq('id', item.id);
+            const { error } = await supabase.from('scheduled_transactions').update(updatedItem).eq('id', item.id);
             if (error) throw error;
         }
         await fetchData();

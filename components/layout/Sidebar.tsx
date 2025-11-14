@@ -86,12 +86,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
                             className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 bg-cyan-400 rounded-r-full"
                           />
                       )}
-                      <item.icon
-                        className={`h-6 w-6 shrink-0 
-                          ${isActive ? 'text-cyan-300' : 'text-gray-500 group-hover:text-white'}
-                        `}
-                        aria-hidden="true"
-                      />
+                      <motion.div transition={{ type: 'spring', stiffness: 400, damping: 15 }} className="group-hover:scale-110">
+                        <item.icon
+                          className={`h-6 w-6 shrink-0 
+                            ${isActive ? 'text-cyan-300' : 'text-gray-500 group-hover:text-white'}
+                          `}
+                          aria-hidden="true"
+                        />
+                      </motion.div>
                       {item.name}
                     </a>
                   </li>
@@ -128,12 +130,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
                                         className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 bg-yellow-400 rounded-r-full"
                                     />
                                 )}
-                                <item.icon
-                                    className={`h-6 w-6 shrink-0 
-                                    ${isActive ? 'text-yellow-400' : 'text-gray-500 group-hover:text-white'}
-                                    `}
-                                    aria-hidden="true"
-                                />
+                                <motion.div transition={{ type: 'spring', stiffness: 400, damping: 15 }} className="group-hover:scale-110">
+                                  <item.icon
+                                      className={`h-6 w-6 shrink-0 
+                                      ${isActive ? 'text-yellow-400' : 'text-gray-500 group-hover:text-white'}
+                                      `}
+                                      aria-hidden="true"
+                                  />
+                                </motion.div>
                                 {item.name}
                                 </a>
                             </li>
@@ -172,12 +176,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
                             className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 bg-cyan-400 rounded-r-full"
                           />
                         )}
-                        <item.icon
-                            className={`h-6 w-6 shrink-0
-                              ${isActive ? 'text-cyan-300' : 'text-gray-500 group-hover:text-white'}
-                            `}
-                            aria-hidden="true"
-                        />
+                        <motion.div transition={{ type: 'spring', stiffness: 400, damping: 15 }} className="group-hover:scale-110">
+                          <item.icon
+                              className={`h-6 w-6 shrink-0
+                                ${isActive ? 'text-cyan-300' : 'text-gray-500 group-hover:text-white'}
+                              `}
+                              aria-hidden="true"
+                          />
+                        </motion.div>
                         {item.name}
                       </a>
                   </li>

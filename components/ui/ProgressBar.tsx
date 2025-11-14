@@ -7,11 +7,11 @@ interface ProgressBarProps {
     color?: 'primary' | 'success' | 'danger';
 }
 
-// Updated to use the new Design System semantic colors.
+// Updated to use the new Design System semantic colors with gradients.
 const colorClasses = {
-    primary: 'bg-[oklch(var(--primary-oklch))]',
-    success: 'bg-[oklch(var(--success-oklch))]',
-    danger: 'bg-[oklch(var(--danger-oklch))]',
+    primary: 'bg-gradient-to-r from-cyan-400 to-blue-500',
+    success: 'bg-gradient-to-r from-green-400 to-emerald-500',
+    danger: 'bg-gradient-to-r from-red-500 to-orange-500',
 };
 
 export const ProgressBar: React.FC<ProgressBarProps> = ({ percentage, color = 'primary' }) => {

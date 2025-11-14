@@ -5,9 +5,10 @@ import { formatCurrencyBRL } from '../../utils/formatters';
 interface AnimatedSummaryCardProps {
     title: string;
     amount: number;
+    icon: React.ElementType;
 }
 
-export const AnimatedSummaryCard: React.FC<AnimatedSummaryCardProps> = ({ title, amount }) => {
+export const AnimatedSummaryCard: React.FC<AnimatedSummaryCardProps> = ({ title, amount, icon: Icon }) => {
     const count = useMotionValue(0);
     const rounded = useTransform(count, latest => Math.round(latest));
 
@@ -23,11 +24,12 @@ export const AnimatedSummaryCard: React.FC<AnimatedSummaryCardProps> = ({ title,
 
     return (
         <div className="card">
-            <p className="text-gray-300">{title}</p>
+            <div className="flex items-center justify-between text-gray-300">
+                <span>{title}</span>
+                <Icon className="w-5 h-5"/>
+            </div>
             <motion.p
                 className="text-3xl font-bold text-white mt-2"
-                // Adicionando uma chave que muda com o título garante que a animação reinicie
-                // se o componente for reutilizado para um tipo de dado diferente.
                 key={`${title}-amount`}
             >
                 {formattedAmount}

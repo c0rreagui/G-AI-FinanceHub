@@ -33,7 +33,8 @@ import { DevToolsView } from './components/views/DevToolsView';
 const GuestModeBanner: React.FC = () => {
     const { logout } = useAuth();
     return (
-        <div className="bg-yellow-500/20 text-yellow-200 text-center text-sm py-2 px-4 border-b border-yellow-500/30 flex items-center justify-center gap-1 sm:gap-2 flex-wrap">
+        <div className="bg-yellow-500/20 text-yellow-200 text-center text-sm py-2 px-4 border-b border-yellow-500/30 flex items-center justify-center gap-1 sm:gap-2 flex-wrap relative">
+            <div className="absolute inset-0 border-b border-yellow-400 animate-pulse-border"></div>
             <span>Você está no modo visitante. Seus dados são salvos localmente.</span>
             <button onClick={logout} className="font-bold underline hover:text-white">
                 Crie uma conta

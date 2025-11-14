@@ -1,7 +1,7 @@
 // components/views/DebtsView.tsx
 import React from 'react';
 import { PageHeader } from '../layout/PageHeader';
-import { TrendingDown, PlusCircle, TrashIcon } from '../Icons';
+import { TrendingDown, PlusCircle, TrashIcon, Trophy } from '../Icons';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { Debt, DebtStatus } from '../../types';
 import { formatCurrencyBRL } from '../../utils/formatters';
@@ -34,7 +34,7 @@ const DebtCard: React.FC<{ debt: Debt }> = ({ debt }) => {
 
     return (
         <motion.div 
-            className={`card flex flex-col justify-between transition-opacity ${isMutating ? 'opacity-50' : ''}`}
+            className={`card flex flex-col justify-between transition-opacity ${isMutating ? 'opacity-50' : ''} ${isPaid ? 'card-completed' : ''}`}
             layout
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -44,7 +44,7 @@ const DebtCard: React.FC<{ debt: Debt }> = ({ debt }) => {
                 <div className="flex justify-between items-start">
                     <h3 className="text-lg font-semibold text-white">{debt.name}</h3>
                     <Badge color={isPaid ? 'green' : 'red'}>
-                        {isPaid ? 'Paga' : 'Ativa'}
+                        {isPaid ? <div className="flex items-center gap-1.5"><Trophy className="w-3.5 h-3.5" /> Paga</div> : 'Ativa'}
                     </Badge>
                 </div>
                 <div className="text-sm text-gray-400 mt-1 space-y-0.5">

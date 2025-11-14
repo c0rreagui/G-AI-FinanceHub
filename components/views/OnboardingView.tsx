@@ -83,15 +83,17 @@ export const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) =>
               <p className="mt-2 text-gray-400">Isso nos ajuda a personalizar sua experiência.</p>
               <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {goals.map(goal => (
-                  <button 
+                  <motion.button 
                     key={goal.id} 
                     onClick={() => setSelectedGoal(goal.id)}
                     className={`p-6 rounded-2xl text-left border-2 transition-all duration-200 ${selectedGoal === goal.id ? 'border-cyan-500 bg-cyan-500/10' : 'border-[oklch(var(--border-oklch))] bg-[oklch(var(--card-oklch))] hover:bg-[oklch(var(--border-oklch))]'}`}
+                    whileHover={{ y: -4 }}
+                    animate={selectedGoal === goal.id ? { scale: 1.05, y: -5 } : { scale: 1, y: 0 }}
                   >
                     <goal.icon className="w-8 h-8 text-cyan-300 mb-2" />
                     <h3 className="font-semibold text-white">{goal.title}</h3>
                     <p className="text-sm text-gray-400 mt-1">{goal.description}</p>
-                  </button>
+                  </motion.button>
                 ))}
               </div>
               <Button onClick={handleNext} disabled={!selectedGoal} className="mt-8">
