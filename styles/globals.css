@@ -167,3 +167,7 @@
   animation: logo-spinner-animation 2s ease-in-out infinite;
   transform-origin: center;
 }
+
+.text-muted-foreground {
+    color: oklch(0.75 0.02 240); /* Um cinza mais claro e legível que o padrão */
+}
