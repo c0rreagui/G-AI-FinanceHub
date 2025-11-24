@@ -8,7 +8,7 @@ export interface OcrResult {
   type: TransactionType | null;
 }
 
-const OCR_MODEL = 'gemini-2.5-flash';
+const OCR_MODEL = 'gemini-1.5-pro';
 
 /**
  * Analisa uma imagem de recibo usando a API Gemini para extrair detalhes da transação.

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
@@ -8,7 +9,8 @@ import { TypeToggle } from '../ui/TypeToggle';
 import { CategoryPicker } from '../ui/CategoryPicker';
 import { LoadingSpinner } from '../LoadingSpinner';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
-import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import type { Variants } from 'framer-motion';
 import { XIcon } from '../Icons';
 import { triggerHapticFeedback } from '../../utils/haptics';
 

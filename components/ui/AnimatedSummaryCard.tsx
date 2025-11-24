@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 import { formatCurrencyBRL } from '../../utils/formatters';
@@ -10,7 +11,7 @@ interface AnimatedSummaryCardProps {
 
 export const AnimatedSummaryCard: React.FC<AnimatedSummaryCardProps> = ({ title, amount, icon: Icon }) => {
     const count = useMotionValue(0);
-    const rounded = useTransform(count, latest => Math.round(latest));
+    const rounded = useTransform(count, (latest: number) => Math.round(latest));
 
     useEffect(() => {
         const controls = animate(count, amount, {
@@ -20,7 +21,7 @@ export const AnimatedSummaryCard: React.FC<AnimatedSummaryCardProps> = ({ title,
         return controls.stop;
     }, [amount]);
 
-    const formattedAmount = useTransform(rounded, latest => formatCurrencyBRL(latest));
+    const formattedAmount = useTransform(rounded, (latest: number) => formatCurrencyBRL(latest));
 
     return (
         <div className="card">

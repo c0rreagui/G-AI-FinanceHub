@@ -77,6 +77,23 @@
   .transaction-list > li:nth-child(odd) > div > div {
     @apply bg-white/[0.03];
   }
+  
+  /* Utilitário para contraste aprimorado */
+  .text-muted {
+    @apply text-gray-300;
+  }
+}
+
+@layer utilities {
+    /* Esconde a scrollbar para Chrome, Safari e Opera */
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    /* Esconde a scrollbar para IE, Edge e Firefox */
+    .no-scrollbar {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+    }
 }
 
 @property --a {

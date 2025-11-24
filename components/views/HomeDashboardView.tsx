@@ -58,8 +58,16 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
 
     // Calcula o total de investimentos para o funil
     const investmentAmount = useMemo(() => {
+        // Palavras-chave para identificar investimentos
+        const investmentKeywords = ['investimento', 'bolsa', 'cripto', 'poupança', 'aporte', 'tesouro', 'cdb', 'ações'];
+        
         return Math.abs(transactions
-            .filter(t => t.category.name === 'Investimentos' && t.type === TransactionType.DESPESA)
+            .filter(t => {
+                if (t.type !== TransactionType.DESPESA) return false;
+                const catName = t.category.name.toLowerCase();
+                // Verifica se o nome da categoria contém alguma das palavras-chave
+                return investmentKeywords.some(keyword => catName.includes(keyword));
+            })
             .reduce((acc, t) => acc + t.amount, 0));
     }, [transactions]);
 

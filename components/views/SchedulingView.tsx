@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { PageHeader } from '../layout/PageHeader';
-import { Calendar, PlusCircle, PencilIcon, TrashIcon, LayoutGrid, List } from '../Icons';
+import { Calendar, PlusCircle, PencilIcon, TrashIcon, LayoutGrid, List, ChevronDown } from '../Icons';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { ScheduledTransaction, TransactionType } from '../../types';
 import { formatCurrencyBRL, formatDate } from '../../utils/formatters';
@@ -137,6 +137,17 @@ export const SchedulingView: React.FC = () => {
     const { scheduledTransactions, loading } = useDashboardData();
     const { openDialog } = useDialog();
     const [viewMode, setViewMode] = useState<ViewMode>('list');
+    const [currentDate, setCurrentDate] = useState(new Date());
+
+    const nextMonth = () => {
+        setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+    };
+
+    const prevMonth = () => {
+        setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+    };
+
+    const currentMonthName = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(currentDate);
 
     return (
         <div className="flex flex-col h-full">
@@ -186,10 +197,20 @@ export const SchedulingView: React.FC = () => {
                                 <motion.div 
                                     initial={{ opacity: 0, y: 20 }} 
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="h-full"
+                                    className="h-full flex flex-col"
                                 >
-                                    <h3 className="text-lg font-semibold text-white mb-4">Visão Mensal</h3>
-                                    <CalendarGrid items={scheduledTransactions} />
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h3 className="text-lg font-semibold text-white capitalize">{currentMonthName}</h3>
+                                        <div className="flex gap-2">
+                                            <Button onClick={prevMonth} size="sm" variant="secondary" className="px-2">
+                                                <ChevronDown className="w-5 h-5 rotate-90" />
+                                            </Button>
+                                            <Button onClick={nextMonth} size="sm" variant="secondary" className="px-2">
+                                                <ChevronDown className="w-5 h-5 -rotate-90" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                    <CalendarGrid items={scheduledTransactions} currentDate={currentDate} />
                                 </motion.div>
                             )}
                         </>

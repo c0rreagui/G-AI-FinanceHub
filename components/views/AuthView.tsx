@@ -217,7 +217,6 @@ export const AuthView: React.FC = () => {
                                 </div>
                                 <div className="mt-4 text-center">
                                      <Button onClick={togglePinInput} variant="secondary" size="sm" disabled={loading} className="w-full">
-                                        <Zap className="w-4 h-4 mr-2" />
                                         Login de Desenvolvedor
                                     </Button>
                                 </div>

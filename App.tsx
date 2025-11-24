@@ -21,7 +21,8 @@ import { ToolsView } from './components/views/ToolsView';
 import { SettingsView } from './components/views/SettingsView';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { HomeDashboardView } from './components/views/HomeDashboardView';
-import { AnimatePresence, motion, Transition } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import type { Transition } from 'framer-motion';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ToastContainer } from './components/ui/ToastContainer';
 // FIX: Corrected import path.

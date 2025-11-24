@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 import { formatCurrencyBRL } from '../../utils/formatters';
@@ -11,7 +12,7 @@ export const AnimatedCurrency: React.FC<AnimatedCurrencyProps> = ({ value, class
     // Usamos o valor anterior como ponto de partida para a animação,
     // ou 0 se for a primeira renderização.
     const count = useMotionValue(0);
-    const rounded = useTransform(count, latest => Math.round(latest * 100) / 100); 
+    const rounded = useTransform(count, (latest: number) => Math.round(latest * 100) / 100); 
 
     useEffect(() => {
         const controls = animate(count, value, {
@@ -23,7 +24,7 @@ export const AnimatedCurrency: React.FC<AnimatedCurrencyProps> = ({ value, class
         return controls.stop;
     }, [value]);
 
-    const formattedValue = useTransform(rounded, latest => formatCurrencyBRL(latest));
+    const formattedValue = useTransform(rounded, (latest: number) => formatCurrencyBRL(latest));
 
     return <motion.span className={className}>{formattedValue}</motion.span>;
 };
