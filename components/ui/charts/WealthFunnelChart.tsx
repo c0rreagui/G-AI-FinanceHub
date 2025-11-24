@@ -27,42 +27,42 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 export const WealthFunnelChart: React.FC<WealthFunnelChartProps> = ({ income, expenses, investments }) => {
-    // Garante que não haja divisão por zero
+    // Garante que não haja divisão por zero e define a renda como base
     const safeIncome = income > 0 ? income : 1;
 
-    // Prepara os dados:
-    // 1. O valor visual (value) é normalizado para garantir o formato de funil (sempre decrescente ou proporcional).
-    // 2. O valor real (realValue) é preservado para o tooltip.
+    // Lógica de Normalização Visual:
+    // 1. Renda é sempre 100 (topo do funil).
+    // 2. Despesas e Investimentos são proporcionais à renda.
+    // 3. Math.max(5, ...) garante que mesmo valores pequenos tenham uma barra mínima visível (5%).
+    // 4. Math.min(100, ...) garante que a barra não ultrapasse 100% visualmente (mesmo que a dívida seja maior que a renda).
+
     const data = [
         { 
             name: 'Renda Total', 
-            value: 100, // Sempre 100% de largura visual
+            value: 100, 
             realValue: income,
             percentage: 100,
             fill: 'oklch(var(--primary-oklch))' 
         },
         { 
             name: 'Despesas', 
-            value: Math.min(90, Math.max(10, (expenses / safeIncome) * 100)), // Escala visual entre 10% e 90%
+            value: Math.min(100, Math.max(5, (expenses / safeIncome) * 100)),
             realValue: expenses,
             percentage: ((expenses / safeIncome) * 100).toFixed(1),
             fill: 'oklch(var(--danger-oklch))' 
         },
         { 
             name: 'Investimentos', 
-            value: Math.min(80, Math.max(5, (investments / safeIncome) * 100)), // Escala visual entre 5% e 80%
+            value: Math.min(100, Math.max(5, (investments / safeIncome) * 100)),
             realValue: investments,
             percentage: ((investments / safeIncome) * 100).toFixed(1),
             fill: 'oklch(var(--success-oklch))' 
         }
     ];
 
-    // Ordena visualmente para garantir o formato de funil (V), mas mantém a lógica de cores
-    // Na verdade, para um funil de fluxo, queremos a ordem: Renda -> Despesa -> Investimento
-    // O Recharts desenha de cima para baixo.
-
+    // Se não houver dados relevantes, mostra estado vazio
     if (income === 0 && expenses === 0) return (
-         <div className="card h-full flex flex-col items-center justify-center text-gray-500 border-dashed">
+         <div className="card h-full flex flex-col items-center justify-center text-gray-500 border border-dashed border-gray-700 bg-transparent">
             <span className="text-sm">Sem dados suficientes</span>
          </div>
     );
@@ -73,7 +73,7 @@ export const WealthFunnelChart: React.FC<WealthFunnelChartProps> = ({ income, ex
                 <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_10px_#22d3ee]"></span>
                 Fluxo de Riqueza
             </h3>
-            <div className="flex-grow min-h-[250px] -ml-4"> {/* Margem negativa para compensar padding do chart */}
+            <div className="flex-grow min-h-[250px] -ml-4 relative">
                 <ResponsiveContainer width="100%" height="100%">
                     <FunnelChart>
                         <Tooltip content={<CustomTooltip />} cursor={{ fill: 'transparent' }} />
@@ -82,12 +82,10 @@ export const WealthFunnelChart: React.FC<WealthFunnelChartProps> = ({ income, ex
                             data={data} 
                             isAnimationActive 
                             lastShapeType="rectangle"
-                            neckWidth="10%" /* Afunila visualmente no final */
-                            gap={2}
                         >
                             <LabelList position="right" fill="#fff" stroke="none" dataKey="name" />
                             {data.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={entry.fill} fillOpacity={0.8} stroke="none" />
+                                <Cell key={`cell-${index}`} fill={entry.fill} fillOpacity={0.85} stroke="none" />
                             ))}
                         </Funnel>
                     </FunnelChart>

@@ -171,3 +171,17 @@
 .text-muted-foreground {
     color: oklch(0.75 0.02 240); /* Um cinza mais claro e legível que o padrão */
 }
+
+/* Utilitários de Legibilidade Neon */
+.text-muted {
+    @apply text-slate-400; /* Mais legível que o gray-500 no fundo preto */
+}
+
+.text-label {
+    @apply text-slate-300 font-medium;
+}
+
+/* Ajuste global para inputs desabilitados */
+input:disabled {
+    @apply opacity-50 cursor-not-allowed bg-white/5 text-gray-500;
+}
