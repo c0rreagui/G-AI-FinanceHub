@@ -8,7 +8,7 @@ import { TypeToggle } from '../ui/TypeToggle';
 import { CategoryPicker } from '../ui/CategoryPicker';
 import { LoadingSpinner } from '../LoadingSpinner';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { XIcon } from '../Icons';
 import { triggerHapticFeedback } from '../../utils/haptics';
 
@@ -33,7 +33,7 @@ const QuickValueChip: React.FC<{ value: number; onSelect: (value: number) => voi
     </button>
 );
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: {},
   visible: {
     transition: {
@@ -42,7 +42,7 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 15 },
   visible: {
     opacity: 1,

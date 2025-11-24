@@ -3,7 +3,7 @@ import { PageHeader } from '../layout/PageHeader';
 import { HomeIcon, PlusCircle, Target, Wallet, ArrowUpRight, ArrowDownLeft } from '../Icons';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { QuickActions } from '../ui/QuickActions';
-import { GoalStatus, ViewType } from '../../types';
+import { GoalStatus, TransactionType, ViewType } from '../../types';
 import { UpcomingPayments } from '../ui/UpcomingPayments';
 import { HomeDashboardSkeleton } from './skeletons/HomeDashboardSkeleton';
 import { UserProfileCard } from '../ui/UserProfileCard';
@@ -16,6 +16,7 @@ import { formatCurrencyBRL } from '../../utils/formatters';
 import { ProgressBar } from '../ui/ProgressBar';
 import { Button } from '../ui/Button';
 import { useDialog } from '../../hooks/useDialog';
+import { WealthFunnelChart } from '../ui/charts/WealthFunnelChart';
 
 interface HomeDashboardViewProps {
     setCurrentView: (view: ViewType) => void;
@@ -38,7 +39,7 @@ const NoGoalCTA: React.FC = () => {
 
 
 export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrentView }) => {
-    const { summary, goals, monthlyChartData, loading } = useDashboardData();
+    const { summary, goals, monthlyChartData, loading, transactions } = useDashboardData();
 
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -53,6 +54,15 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
         visible: { y: 0, opacity: 1 }
       };
 
+    const firstGoal = useMemo(() => goals.find(g => g.status === GoalStatus.EM_ANDAMENTO), [goals]);
+
+    // Calcula o total de investimentos para o funil
+    const investmentAmount = useMemo(() => {
+        return Math.abs(transactions
+            .filter(t => t.category.name === 'Investimentos' && t.type === TransactionType.DESPESA)
+            .reduce((acc, t) => acc + t.amount, 0));
+    }, [transactions]);
+
     if (loading) {
         return (
             <>
@@ -66,8 +76,6 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
         );
     }
     
-    const firstGoal = useMemo(() => goals.find(g => g.status === GoalStatus.EM_ANDAMENTO), [goals]);
-
     return (
         <>
             <PageHeader
@@ -93,8 +101,18 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                 
                 <motion.div variants={itemVariants}><UserProfileCard /></motion.div>
 
-                <motion.div variants={itemVariants}>
-                    <MonthlySummaryChart data={monthlyChartData} />
+                {/* Nova Grid de Visualização de Dados */}
+                <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+                    <div className="lg:col-span-2 min-h-[300px]">
+                        <MonthlySummaryChart data={monthlyChartData} />
+                    </div>
+                    <div className="lg:col-span-1 min-h-[300px]">
+                        <WealthFunnelChart 
+                            income={summary.monthlyIncome} 
+                            expenses={Math.abs(summary.monthlyExpenses)} 
+                            investments={investmentAmount} 
+                        />
+                    </div>
                 </motion.div>
 
                 <motion.div variants={itemVariants}>

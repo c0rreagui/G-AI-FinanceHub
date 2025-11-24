@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { PageHeader } from '../layout/PageHeader';
-import { Calendar, PlusCircle, PencilIcon, TrashIcon } from '../Icons';
+import { Calendar, PlusCircle, PencilIcon, TrashIcon, LayoutGrid, List } from '../Icons';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { ScheduledTransaction, TransactionType } from '../../types';
 import { formatCurrencyBRL, formatDate } from '../../utils/formatters';
@@ -11,6 +11,7 @@ import { EmptyState } from '../ui/EmptyState';
 import { Skeleton } from '../ui/skeletons/Skeleton';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { CalendarGrid } from '../ui/CalendarGrid';
 
 const ScheduledTransactionCard: React.FC<{ item: ScheduledTransaction }> = ({ item }) => {
     const { deleteScheduledTransaction, mutatingIds } = useDashboardData();
@@ -130,31 +131,68 @@ const SchedulingViewSkeleton: React.FC = () => (
     </div>
 );
 
+type ViewMode = 'list' | 'calendar';
 
 export const SchedulingView: React.FC = () => {
     const { scheduledTransactions, loading } = useDashboardData();
     const { openDialog } = useDialog();
+    const [viewMode, setViewMode] = useState<ViewMode>('list');
 
     return (
-        <>
+        <div className="flex flex-col h-full">
             <PageHeader
                 icon={Calendar}
                 title="Agendamentos"
                 breadcrumbs={['FinanceHub', 'Agendamentos']}
-                actions={<Button onClick={() => openDialog('add-scheduling')}><PlusCircle className="w-4 h-4"/> Novo Agendamento</Button>}
+                actions={
+                    <div className="flex items-center gap-2">
+                        <div className="bg-[oklch(var(--card-oklch))] rounded-lg p-1 flex items-center border border-[oklch(var(--border-oklch))]">
+                            <button
+                                onClick={() => setViewMode('list')}
+                                className={`p-1.5 rounded-md transition-all ${viewMode === 'list' ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400 hover:text-white'}`}
+                                aria-label="Visualização em Lista"
+                            >
+                                <List className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={() => setViewMode('calendar')}
+                                className={`p-1.5 rounded-md transition-all ${viewMode === 'calendar' ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400 hover:text-white'}`}
+                                aria-label="Visualização em Grade"
+                            >
+                                <LayoutGrid className="w-4 h-4" />
+                            </button>
+                        </div>
+                        <Button onClick={() => openDialog('add-scheduling')}>
+                            <PlusCircle className="w-4 h-4"/> <span className="hidden sm:inline">Novo Agendamento</span><span className="sm:hidden">Novo</span>
+                        </Button>
+                    </div>
+                }
             />
             {loading ? (
                 <SchedulingViewSkeleton />
             ) : (
                 <div className="mt-6 flex-grow overflow-y-auto pr-2">
                     {scheduledTransactions.length > 0 ? (
-                        <div className="space-y-4">
-                            <AnimatePresence>
-                                {scheduledTransactions.map(item => (
-                                    <ScheduledTransactionCard key={item.id} item={item} />
-                                ))}
-                            </AnimatePresence>
-                        </div>
+                        <>
+                            {viewMode === 'list' ? (
+                                <div className="space-y-4">
+                                    <AnimatePresence>
+                                        {scheduledTransactions.map(item => (
+                                            <ScheduledTransactionCard key={item.id} item={item} />
+                                        ))}
+                                    </AnimatePresence>
+                                </div>
+                            ) : (
+                                <motion.div 
+                                    initial={{ opacity: 0, y: 20 }} 
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="h-full"
+                                >
+                                    <h3 className="text-lg font-semibold text-white mb-4">Visão Mensal</h3>
+                                    <CalendarGrid items={scheduledTransactions} />
+                                </motion.div>
+                            )}
+                        </>
                     ) : (
                         <EmptyState
                             icon={Calendar}
@@ -168,6 +206,6 @@ export const SchedulingView: React.FC = () => {
                     )}
                 </div>
             )}
-        </>
+        </div>
     );
 };
