@@ -3,61 +3,71 @@
 @tailwind utilities;
 
 :root {
-  /* Tema: Cyberpunk Executivo (Deep Space & Neon) */
-  --background-oklch: 0.12 0.01 240;
-  --foreground-oklch: 0.98 0.00 0;
-  --card-oklch: 0.16 0.02 240;
-  --border-oklch: 0.25 0.02 240;
+  /* Base Palette - Deep Space */
+  --background-oklch: 0.14 0.02 260;    /* Azul muito escuro, quase preto */
+  --card-oklch: 0.18 0.03 260;          /* Um tom acima do fundo */
+  --border-oklch: 0.25 0.05 260;        /* Bordas sutis */
+  --foreground-oklch: 0.98 0.01 260;    /* Branco gelo */
   
-  /* Paleta Neon Vibrante */
-  --primary-oklch: 0.75 0.20 230;       /* Cyan */
-  --success-oklch: 0.70 0.25 145;       /* Green */
-  --danger-oklch: 0.65 0.25 25;         /* Red */
-  --warning-oklch: 0.85 0.20 90;        /* Yellow */
-  --info-oklch: 0.70 0.20 280;          /* Purple */
+  /* Neon Accents (Mais vibrantes, mas usados com parcimônia) */
+  --primary-oklch: 0.70 0.18 200;       /* Cyan Elétrico */
+  --success-oklch: 0.75 0.20 150;       /* Verde Neon */
+  --danger-oklch: 0.65 0.22 25;         /* Vermelho Laser */
+  --warning-oklch: 0.85 0.18 85;        /* Amarelo Ouro */
 }
 
 @layer base {
   body {
     background-color: oklch(var(--background-oklch));
-    /* Fundo com leve ruído/gradiente para evitar banding */
-    background-image: radial-gradient(circle at 50% 0%, oklch(var(--primary-oklch) / 0.05), transparent 40%);
+    /* Noise Texture para acabamento premium */
+    background-image: 
+        radial-gradient(circle at 50% 0%, oklch(var(--primary-oklch) / 0.08), transparent 60%),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
     color: oklch(var(--foreground-oklch));
     font-family: 'Inter', sans-serif;
     overflow: hidden;
   }
-  
-  h1, .h1, h2, .h2, h3, .h3 {
-    @apply tracking-tight font-bold;
-  }
 }
 
 @layer components {
-  /* Card Premium: Vidro Fosco + Borda Sutil */
+  /* Card Premium: Vidro + Borda Brilhante + Sombra Colorida */
   .card {
-    @apply bg-[oklch(var(--card-oklch)_/_0.7)] backdrop-blur-xl border border-white/5 rounded-3xl p-5 transition-all duration-300 relative overflow-hidden;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    @apply bg-[oklch(var(--card-oklch)_/_0.6)] backdrop-blur-2xl border border-white/5 rounded-3xl p-6 relative overflow-hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 1.5rem;
+    padding: 1px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
   .card:hover {
-    @apply border-white/10;
-    box-shadow: 0 8px 30px -5px oklch(var(--primary-oklch) / 0.1);
-    transform: translateY(-2px);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px -10px oklch(var(--primary-oklch) / 0.15);
+    border-color: rgba(255,255,255,0.1);
   }
 
-  .card-completed {
-    @apply border-[oklch(var(--success-oklch)_/_0.3)] shadow-[0_0_15px_0_oklch(var(--success-oklch)_/_0.1)];
+  /* Tipografia Hierárquica */
+  .text-balance-lg {
+    @apply text-3xl lg:text-4xl font-bold tracking-tight tabular-nums;
+    text-shadow: 0 0 20px oklch(var(--primary-oklch) / 0.3);
   }
-
-  /* Utilitários de Texto */
-  .text-muted { @apply text-slate-400; }
-  .text-label { @apply text-slate-500 text-xs font-semibold uppercase tracking-wider; }
+  
+  .text-label {
+    @apply text-[11px] font-bold uppercase tracking-widest text-slate-400;
+  }
 }
 
 @layer utilities {
-    /* Scrollbar personalizada fina */
-    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { @apply bg-white/10 rounded-full; }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover { @apply bg-white/20; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 }

@@ -1,2 +1,2 @@
-export const APP_VERSION = '3.0.0';
-export const APP_CODENAME = 'Neon Genesis (Bento Edition)';
+export const APP_VERSION = '4.0.0';
+export const APP_CODENAME = 'Neon Genesis (Ultimate Edition)';
