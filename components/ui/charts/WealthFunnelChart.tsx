@@ -12,7 +12,7 @@ const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
         const data = payload[0].payload;
         return (
-            <div className="bg-black/90 border border-cyan-500/30 backdrop-blur-xl p-3 rounded-xl shadow-[0_0_15px_rgba(34,211,238,0.2)]">
+            <div className="bg-black/90 border border-cyan-500/30 backdrop-blur-xl p-3 rounded-xl shadow-lg">
                 <p className="font-bold text-white mb-1">{data.name}</p>
                 <p className="text-cyan-300 font-mono text-lg">
                     {formatCurrencyBRL(data.realValue)}
@@ -27,18 +27,12 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 export const WealthFunnelChart: React.FC<WealthFunnelChartProps> = ({ income, expenses, investments }) => {
-    // Garante que não haja divisão por zero e define a renda como base
     const safeIncome = income > 0 ? income : 1;
 
-    // Lógica de Normalização Visual:
-    // 1. Renda é sempre 100 (topo do funil).
-    // 2. Despesas e Investimentos são proporcionais à renda.
-    // 3. Math.max(5, ...) garante que mesmo valores pequenos tenham uma barra mínima visível (5%).
-    // 4. Math.min(100, ...) garante que a barra não ultrapasse 100% visualmente (mesmo que a dívida seja maior que a renda).
-
+    // Lógica: Visualmente normalizado (Renda = 100), Valor Real preservado.
     const data = [
         { 
-            name: 'Renda Total', 
+            name: 'Renda', 
             value: 100, 
             realValue: income,
             percentage: 100,
@@ -46,34 +40,33 @@ export const WealthFunnelChart: React.FC<WealthFunnelChartProps> = ({ income, ex
         },
         { 
             name: 'Despesas', 
-            value: Math.min(100, Math.max(5, (expenses / safeIncome) * 100)),
+            value: Math.min(95, Math.max(10, (expenses / safeIncome) * 100)), // Normaliza visual entre 10% e 95%
             realValue: expenses,
             percentage: ((expenses / safeIncome) * 100).toFixed(1),
             fill: 'oklch(var(--danger-oklch))' 
         },
         { 
-            name: 'Investimentos', 
-            value: Math.min(100, Math.max(5, (investments / safeIncome) * 100)),
+            name: 'Sobra/Inv.', 
+            value: Math.min(80, Math.max(5, (investments / safeIncome) * 100)), // Normaliza visual entre 5% e 80%
             realValue: investments,
             percentage: ((investments / safeIncome) * 100).toFixed(1),
             fill: 'oklch(var(--success-oklch))' 
         }
     ];
 
-    // Se não houver dados relevantes, mostra estado vazio
     if (income === 0 && expenses === 0) return (
-         <div className="card h-full flex flex-col items-center justify-center text-gray-500 border border-dashed border-gray-700 bg-transparent">
-            <span className="text-sm">Sem dados suficientes</span>
+         <div className="card h-full flex items-center justify-center text-slate-500 border-dashed bg-transparent">
+            <span className="text-xs">Sem dados de fluxo</span>
          </div>
     );
 
     return (
-        <div className="card h-full flex flex-col">
-            <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_10px_#22d3ee]"></span>
-                Fluxo de Riqueza
+        <div className="card h-full flex flex-col min-h-[280px]">
+            <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                <span className="w-1 h-5 bg-cyan-400 rounded-full shadow-[0_0_10px_#22d3ee]"></span>
+                Eficiência
             </h3>
-            <div className="flex-grow min-h-[250px] -ml-4 relative">
+            <div className="flex-grow -ml-4 relative">
                 <ResponsiveContainer width="100%" height="100%">
                     <FunnelChart>
                         <Tooltip content={<CustomTooltip />} cursor={{ fill: 'transparent' }} />
@@ -82,8 +75,9 @@ export const WealthFunnelChart: React.FC<WealthFunnelChartProps> = ({ income, ex
                             data={data} 
                             isAnimationActive 
                             lastShapeType="rectangle"
+                            gap={2}
                         >
-                            <LabelList position="right" fill="#fff" stroke="none" dataKey="name" />
+                            <LabelList position="right" fill="#cbd5e1" stroke="none" dataKey="name" fontSize={11} />
                             {data.map((entry, index) => (
                                 <Cell key={`cell-${index}`} fill={entry.fill} fillOpacity={0.85} stroke="none" />
                             ))}

@@ -4,184 +4,60 @@
 
 :root {
   /* Tema: Cyberpunk Executivo (Deep Space & Neon) */
-  --background-oklch: 0.12 0.01 240;    /* Preto profundo azulado */
-  --foreground-oklch: 0.98 0.00 0;      /* Branco puro */
-  --card-oklch: 0.16 0.02 240;          /* Cinza escuro azulado */
-  --border-oklch: 0.25 0.02 240;        /* Bordas sutis */
+  --background-oklch: 0.12 0.01 240;
+  --foreground-oklch: 0.98 0.00 0;
+  --card-oklch: 0.16 0.02 240;
+  --border-oklch: 0.25 0.02 240;
   
   /* Paleta Neon Vibrante */
-  --primary-oklch: 0.75 0.20 230;       /* Cyan Elétrico */
-  --success-oklch: 0.70 0.25 145;       /* Verde Matrix */
-  --danger-oklch: 0.65 0.25 25;         /* Vermelho Laser */
-  --warning-oklch: 0.85 0.20 90;        /* Amarelo Ouro */
-  --info-oklch: 0.70 0.20 280;          /* Roxo Neon */
+  --primary-oklch: 0.75 0.20 230;       /* Cyan */
+  --success-oklch: 0.70 0.25 145;       /* Green */
+  --danger-oklch: 0.65 0.25 25;         /* Red */
+  --warning-oklch: 0.85 0.20 90;        /* Yellow */
+  --info-oklch: 0.70 0.20 280;          /* Purple */
 }
 
 @layer base {
   body {
     background-color: oklch(var(--background-oklch));
-    /* Gradiente de fundo sutil para profundidade */
-    background-image: 
-        radial-gradient(circle at 15% 50%, oklch(var(--primary-oklch) / 0.08), transparent 25%),
-        radial-gradient(circle at 85% 30%, oklch(var(--info-oklch) / 0.08), transparent 25%);
+    /* Fundo com leve ruído/gradiente para evitar banding */
+    background-image: radial-gradient(circle at 50% 0%, oklch(var(--primary-oklch) / 0.05), transparent 40%);
     color: oklch(var(--foreground-oklch));
     font-family: 'Inter', sans-serif;
     overflow: hidden;
   }
   
-  /* Melhoria na tipografia dos títulos */
-  h1, .h1, h2, .h2 {
-    @apply tracking-tight;
-    text-shadow: 0 0 20px rgba(0,0,0,0.5);
+  h1, .h1, h2, .h2, h3, .h3 {
+    @apply tracking-tight font-bold;
   }
-
-  /* Custom scrollbar for a modern look */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { @apply bg-white/10 rounded-full hover:bg-white/20; }
 }
 
 @layer components {
-  /* Card com efeito Glassmorphism e Borda Brilhante ao Hover */
+  /* Card Premium: Vidro Fosco + Borda Sutil */
   .card {
-    @apply bg-[oklch(var(--card-oklch)_/_0.6)] backdrop-blur-xl border border-white/5 rounded-2xl p-6 transition-all duration-300 relative overflow-hidden;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    @apply bg-[oklch(var(--card-oklch)_/_0.7)] backdrop-blur-xl border border-white/5 rounded-3xl p-5 transition-all duration-300 relative overflow-hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   }
   
   .card:hover {
     @apply border-white/10;
-    box-shadow: 0 0 25px -5px oklch(var(--primary-oklch) / 0.2);
+    box-shadow: 0 8px 30px -5px oklch(var(--primary-oklch) / 0.1);
     transform: translateY(-2px);
   }
 
   .card-completed {
-    @apply border-[oklch(var(--success-oklch)_/_0.4)] shadow-[0_0_20px_0_oklch(var(--success-oklch)_/_0.15)];
+    @apply border-[oklch(var(--success-oklch)_/_0.3)] shadow-[0_0_15px_0_oklch(var(--success-oklch)_/_0.1)];
   }
 
-  /* Utilitários de Texto Neon */
-  .text-neon-cyan { text-shadow: 0 0 10px oklch(var(--primary-oklch) / 0.6); }
-  .text-neon-green { text-shadow: 0 0 10px oklch(var(--success-oklch) / 0.6); }
-  .text-neon-red { text-shadow: 0 0 10px oklch(var(--danger-oklch) / 0.6); }
-
-  /* Animated Border for special cards */
-  .animated-border {
-    @apply relative p-px rounded-2xl;
-    background-image: repeating-conic-gradient(from var(--a), oklch(var(--primary-oklch)) 0%, oklch(var(--success-oklch)) 10%, transparent 20%);
-    animation: animated-gradient-border 6s linear infinite;
-  }
-  .animated-border-content {
-    @apply bg-[oklch(var(--card-oklch))];
-  }
-
-  /* Zebra striping for transaction lists */
-  .transaction-list > li:nth-child(odd) > div > div {
-    @apply bg-white/[0.03];
-  }
-  
-  /* Utilitário para contraste aprimorado */
-  .text-muted {
-    @apply text-gray-300;
-  }
+  /* Utilitários de Texto */
+  .text-muted { @apply text-slate-400; }
+  .text-label { @apply text-slate-500 text-xs font-semibold uppercase tracking-wider; }
 }
 
 @layer utilities {
-    /* Esconde a scrollbar para Chrome, Safari e Opera */
-    .no-scrollbar::-webkit-scrollbar {
-        display: none;
-    }
-    /* Esconde a scrollbar para IE, Edge e Firefox */
-    .no-scrollbar {
-        -ms-overflow-style: none;  /* IE and Edge */
-        scrollbar-width: none;  /* Firefox */
-    }
-}
-
-@property --a {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
-}
-
-@keyframes animated-gradient-border {
-  to { --a: 360deg; }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-.shimmer-badge {
-  background: linear-gradient(110deg, transparent 40%, rgba(255, 255, 255, 0.3) 50%, transparent 60%);
-  background-size: 200% 100%;
-  animation: shimmer 2s linear infinite;
-}
-
-/* New Ripple Effect for Buttons */
-.ripple {
-  position: absolute;
-  border-radius: 50%;
-  transform: scale(0);
-  animation: ripple-effect 600ms linear;
-  background-color: rgba(255, 255, 255, 0.5);
-}
-
-@keyframes ripple-effect {
-  to {
-    transform: scale(4);
-    opacity: 0;
-  }
-}
-
-@keyframes pulse-border {
-    0%, 100% {
-        transform: scaleX(1);
-        opacity: 0.6;
-    }
-    50% {
-        transform: scaleX(1.05);
-        opacity: 1;
-    }
-}
-
-.animate-pulse-border {
-    animation: pulse-border 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* New Custom Logo Spinner */
-@keyframes logo-spinner-animation {
-  0% {
-    stroke-dashoffset: 200;
-    transform: rotate(0deg);
-  }
-  50% {
-    stroke-dashoffset: 50;
-    transform: rotate(180deg);
-  }
-  100% {
-    stroke-dashoffset: 200;
-    transform: rotate(360deg);
-  }
-}
-.logo-spinner {
-  animation: logo-spinner-animation 2s ease-in-out infinite;
-  transform-origin: center;
-}
-
-.text-muted-foreground {
-    color: oklch(0.75 0.02 240); /* Um cinza mais claro e legível que o padrão */
-}
-
-/* Utilitários de Legibilidade Neon */
-.text-muted {
-    @apply text-slate-400; /* Mais legível que o gray-500 no fundo preto */
-}
-
-.text-label {
-    @apply text-slate-300 font-medium;
-}
-
-/* Ajuste global para inputs desabilitados */
-input:disabled {
-    @apply opacity-50 cursor-not-allowed bg-white/5 text-gray-500;
+    /* Scrollbar personalizada fina */
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { @apply bg-white/10 rounded-full; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { @apply bg-white/20; }
 }
