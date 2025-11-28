@@ -45,20 +45,6 @@ import { ToolsView } from './components/views/ToolsView';
 import { SettingsView } from './components/views/SettingsView';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { HomeDashboardView } from './components/views/HomeDashboardView';
-import { AnimatePresence, motion } from 'framer-motion';
-import type { Transition } from 'framer-motion';
-import { ErrorBoundary } from './components/ErrorBoundary';
-import { ToastContainer } from './components/ui/ToastContainer';
-import { DesignSystemView } from './components/views/DesignSystemView';
-
-const AppContent: React.FC = () => {
-  const { showToast } = useToast();
-  const [currentView, setCurrentView] = useState<ViewType>('home');
-  const [onboardingComplete, setOnboardingComplete] = useState<boolean>(() => {
-    try {
-      if (sessionStorage.getItem('guest_mode') === 'true') return true; // Guests skip onboarding
-      return localStorage.getItem('financehub_onboarded') === 'true';
-    } catch (error) {
       logger.warn("Não foi possível acessar o localStorage para o status de onboarding.", { error });
       return false;
     }
