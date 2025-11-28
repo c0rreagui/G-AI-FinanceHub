@@ -23,6 +23,7 @@ import { GettingStartedChecklist } from '../dashboard/GettingStartedChecklist';
 import { PrivacyToggle, PrivacyMask } from '../ui/PrivacyMask';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
 import { Info } from 'lucide-react';
+import { UserLevelBar } from '../dashboard/UserLevelBar';
 
 interface HomeDashboardViewProps {
     setCurrentView: (view: ViewType) => void;
@@ -51,6 +52,29 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
     const { summary, goals, monthlyChartData, loading, transactions } = useDashboardData();
     const { openDialog } = useDialog();
     const [showTour, setShowTour] = useState(false);
+    const scrollRef = React.useRef<HTMLDivElement>(null);
+    const [scrollDirection, setScrollDirection] = useState<'up' | 'down'>('up');
+    const [lastScrollTop, setLastScrollTop] = useState(0);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (!scrollRef.current) return;
+            const scrollTop = scrollRef.current.scrollTop;
+            // Only update if difference is significant to avoid jitter
+            if (Math.abs(scrollTop - lastScrollTop) < 5) return;
+            
+            if (scrollTop > lastScrollTop && scrollTop > 50) {
+                setScrollDirection('down');
+            } else {
+                setScrollDirection('up');
+            }
+            setLastScrollTop(scrollTop);
+        };
+
+        const element = scrollRef.current;
+        element?.addEventListener('scroll', handleScroll);
+        return () => element?.removeEventListener('scroll', handleScroll);
+    }, [lastScrollTop]);
 
     // Greeting Logic
     const greeting = useMemo(() => {
@@ -123,8 +147,9 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
 
     return (
         <motion.div 
+            ref={scrollRef}
             initial="hidden" animate="visible" variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
-            className="flex flex-col h-full overflow-y-auto no-scrollbar pb-24 space-y-6"
+            {...({ className: "flex flex-col h-full overflow-y-auto no-scrollbar pb-24 space-y-6 relative" } as any)}
         >
             <TourGuide 
                 steps={tourSteps} 
@@ -133,57 +158,40 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                 onComplete={handleTourComplete} 
             />
 
-            {/* Header com Saudação Dinâmica e Clima */}
-            <Flex justify="between" align="end" className="px-1">
-                <Box>
-                    <Flex align="center" gap="sm" className="mb-1">
-                        <Text size="sm" weight="medium" variant="muted">{greeting}</Text>
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    <financialWeather.icon className={`w-4 h-4 ${financialWeather.color}`} />
-                                </TooltipTrigger>
-                                <TooltipContent>Clima Financeiro: {financialWeather.label}</TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
+            {/* Header com Saudação Dinâmica e Clima - Sticky Smart */}
+            <div className={`sticky top-0 z-20 transition-transform duration-300 ${scrollDirection === 'down' ? '-translate-y-full' : 'translate-y-0'}`}>
+                <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-transparent h-32 pointer-events-none" />
+                <Flex justify="between" align="end" className="px-1 relative z-10 pt-2">
+                    <Box>
+                        <Flex align="center" gap="sm" className="mb-1">
+                            <Text size="sm" weight="medium" variant="muted">{greeting}</Text>
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <financialWeather.icon className={`w-4 h-4 ${financialWeather.color}`} />
+                                    </TooltipTrigger>
+                                    <TooltipContent>Clima Financeiro: {financialWeather.label}</TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        </Flex>
+                        <Flex align="center" gap="md">
+                            <Heading size="h2">Visão Geral</Heading>
+                            <PrivacyToggle />
+                            <div className="hidden md:block w-48">
+                                <UserLevelBar />
+                            </div>
+                        </Flex>
+                    </Box>
+                    <Flex align="center" gap="md">
+                        <div className="hidden lg:block w-64">
+                            <SalaryCountdown />
+                        </div>
+                        <Button onClick={() => openDialog('add-transaction')} className="shadow-cyan-500/20">
+                            <Zap className="w-4 h-4 mr-2" /> Novo Lançamento
+                        </Button>
                     </Flex>
-                    <Flex align="center" gap="xs">
-                        <Heading size="h2">Visão Geral</Heading>
-                        <PrivacyToggle />
-                    </Flex>
-                </Box>
-                <Flex gap="sm">
-                     {/* Salary Countdown (Simple version: 5th business day) */}
-                    <Card className="hidden md:flex flex-col justify-center px-4 py-1 bg-primary/5 border-primary/20">
-                        <Text size="xs" variant="muted" className="text-center">Próximo Pagamento</Text>
-                        <Text weight="bold" align="center" className="text-primary">
-                            {(() => {
-                                const today = new Date();
-                                const currentMonth = today.getMonth();
-                                const currentYear = today.getFullYear();
-                                let targetDate = new Date(currentYear, currentMonth, 5);
-                                
-                                // Adjust to business day (simple approximation: if Sat/Sun, move to Mon)
-                                if (targetDate.getDay() === 0) targetDate.setDate(6); // Sunday -> Monday
-                                if (targetDate.getDay() === 6) targetDate.setDate(7); // Saturday -> Monday
-
-                                if (today > targetDate) {
-                                    targetDate = new Date(currentYear, currentMonth + 1, 5);
-                                    if (targetDate.getDay() === 0) targetDate.setDate(6);
-                                    if (targetDate.getDay() === 6) targetDate.setDate(7);
-                                }
-                                
-                                const diffTime = Math.abs(targetDate.getTime() - today.getTime());
-                                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                                return `${diffDays} dias`;
-                            })()}
-                        </Text>
-                    </Card>
-                    <Button onClick={() => openDialog('add-transaction')} className="shadow-cyan-500/20">
-                        <Zap className="w-4 h-4 mr-2" /> Novo Lançamento
-                    </Button>
                 </Flex>
-            </Flex>
+            </div>
 
             {/* Checklist de Início */}
             <GettingStartedChecklist />
@@ -192,6 +200,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
             <Grid cols={1} className="md:grid-cols-4 gap-4">
                 
                 {/* BLOCO 1: KPIs (Coluna Esquerda) */}
+                {/* @ts-ignore */}
                 <motion.div variants={variants} className="md:col-span-2 lg:col-span-1 grid grid-cols-1 gap-4">
                     <div id="balance-card">
                         <BalanceCard balance={summary.totalBalance} />
@@ -224,11 +233,13 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                 </motion.div>
 
                 {/* BLOCO 2: Gráfico Principal (Centro Expandido) */}
+                {/* @ts-ignore */}
                 <motion.div variants={variants} className="md:col-span-2 lg:col-span-2 h-[320px] md:h-auto" id="monthly-chart">
                     <MonthlySummaryChart data={monthlyChartData} />
                 </motion.div>
 
                 {/* BLOCO 3: Funil (Direita) */}
+                {/* @ts-ignore */}
                 <motion.div variants={variants} className="md:col-span-4 lg:col-span-1 h-[320px] md:h-auto">
                     <WealthFunnelChart 
                         income={summary.monthlyIncome} 
@@ -242,6 +253,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
             <Grid cols={1} className="lg:grid-cols-3 gap-4">
                 
                 {/* Ações Rápidas & Metas */}
+                {/* @ts-ignore */}
                 <motion.div variants={variants} className="space-y-4">
                     <div id="quick-actions">
                         <QuickActions />
@@ -277,6 +289,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                 </motion.div>
 
                 {/* Transações Recentes */}
+                {/* @ts-ignore */}
                 <motion.div variants={variants} className="lg:col-span-2">
                     <Card className="h-full">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">

@@ -33,5 +33,23 @@ const iconMap: { [key: string]: React.ElementType } = {
  * @returns Um componente React de ícone.
  */
 export const getIconByName = (name: string): React.ElementType => {
-    return iconMap[name] || Gift;
+    if (iconMap[name]) {
+        return iconMap[name];
+    }
+    
+    // Suporte para Emojis: Se não estiver no mapa e for curto, assumimos que é um emoji
+    if (name && name.length <= 5) {
+        return (props: any) => (
+            <span 
+                className={props.className} 
+                style={{ fontSize: '1.2em', lineHeight: '1', display: 'inline-block', fontStyle: 'normal' }}
+                role="img" 
+                aria-label="category icon"
+            >
+                {name}
+            </span>
+        );
+    }
+
+    return Gift;
 };

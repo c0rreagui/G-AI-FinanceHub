@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { Eye, EyeOff, ShieldAlert } from 'lucide-react';
 import { Button } from './Button';
 import { cn } from '../../utils/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './Tooltip';
@@ -7,6 +7,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './Tool
 interface PrivacyContextType {
   isPrivacyMode: boolean;
   togglePrivacyMode: () => void;
+  isPanicMode: boolean;
+  togglePanicMode: () => void;
+  playSound: (type: 'success' | 'error' | 'click') => void;
 }
 
 const PrivacyContext = createContext<PrivacyContextType | undefined>(undefined);
@@ -23,6 +26,7 @@ export const PrivacyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [isPrivacyMode, setIsPrivacyMode] = useState(() => {
     return localStorage.getItem('financehub_privacy_mode') === 'true';
   });
+  const [isPanicMode, setIsPanicMode] = useState(false);
 
   const togglePrivacyMode = () => {
     setIsPrivacyMode(prev => {
@@ -32,9 +36,50 @@ export const PrivacyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     });
   };
 
+  const togglePanicMode = useCallback(() => {
+      setIsPanicMode(prev => !prev);
+  }, []);
+
+  // Panic Button Listener (Double Escape)
+  useEffect(() => {
+      let lastPress = 0;
+      const handleKeyDown = (e: KeyboardEvent) => {
+          if (e.key === 'Escape') {
+              const now = Date.now();
+              if (now - lastPress < 300) {
+                  togglePanicMode();
+              }
+              lastPress = now;
+          }
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [togglePanicMode]);
+
+  // Sound Feedback
+  const playSound = useCallback((type: 'success' | 'error' | 'click') => {
+      // Placeholder for sound implementation
+      // In a real app, we would use Audio() here
+      // const audio = new Audio(`/sounds/${type}.mp3`);
+      // audio.play().catch(() => {});
+      if (type === 'success') {
+          // Simulate success sound (e.g. console log or visual feedback for now)
+          console.log('🎵 Ding! Success!');
+      }
+  }, []);
+
   return (
-    <PrivacyContext.Provider value={{ isPrivacyMode, togglePrivacyMode }}>
-      {children}
+    <PrivacyContext.Provider value={{ isPrivacyMode, togglePrivacyMode, isPanicMode, togglePanicMode, playSound }}>
+      {isPanicMode ? (
+          <div className="fixed inset-0 z-[9999] bg-black flex items-center justify-center cursor-pointer" onClick={togglePanicMode}>
+              <div className="text-center">
+                  <ShieldAlert className="w-16 h-16 text-gray-800 mx-auto mb-4" />
+                  <p className="text-gray-900 font-mono text-xs">System Locked. Double Esc to unlock.</p>
+              </div>
+          </div>
+      ) : (
+          children
+      )}
     </PrivacyContext.Provider>
   );
 };
