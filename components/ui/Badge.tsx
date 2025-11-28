@@ -1,25 +1,37 @@
-
-
 import React from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '../../utils/utils';
 
-interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-    children: React.ReactNode;
-    color?: 'green' | 'red' | 'blue' | 'yellow' | 'gray';
+const badgeVariants = cva(
+  'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+  {
+    variants: {
+      variant: {
+        default:
+          'border-transparent bg-primary text-primary-foreground hover:bg-primary/80',
+        secondary:
+          'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        destructive:
+          'border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80',
+        outline: 'text-foreground',
+        success: 'border-transparent bg-success text-success-foreground hover:bg-success/80',
+        warning: 'border-transparent bg-warning text-warning-foreground hover:bg-warning/80',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+    },
+  }
+);
+
+export interface BadgeProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof badgeVariants> {}
+
+function Badge({ className, variant, ...props }: BadgeProps) {
+  return (
+    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+  );
 }
 
-// Updated to use the new Design System semantic colors for consistency.
-const colorClasses = {
-    green: 'bg-[oklch(var(--success-oklch)_/_0.1)] text-[oklch(var(--success-oklch))] ring-[oklch(var(--success-oklch)_/_0.2)]',
-    red: 'bg-[oklch(var(--danger-oklch)_/_0.1)] text-[oklch(var(--danger-oklch))] ring-[oklch(var(--danger-oklch)_/_0.2)]',
-    blue: 'bg-[oklch(var(--info-oklch)_/_0.1)] text-[oklch(var(--info-oklch))] ring-[oklch(var(--info-oklch)_/_0.2)]',
-    yellow: 'bg-[oklch(var(--warning-oklch)_/_0.1)] text-[oklch(var(--warning-oklch))] ring-[oklch(var(--warning-oklch)_/_0.2)]',
-    gray: 'bg-gray-500/10 text-gray-400 ring-gray-500/20',
-};
-
-export const Badge: React.FC<BadgeProps> = ({ children, color = 'gray', className, ...props }) => {
-    return (
-        <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${colorClasses[color]} ${className || ''}`} {...props}>
-            {children}
-        </span>
-    );
-};
+export { Badge, badgeVariants };
