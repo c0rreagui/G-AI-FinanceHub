@@ -1,38 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Base Colors - Dark Mode Default for FinanceHub */
+    --background: 220 30% 6%; /* #0B0E14 */
     --foreground: 210 40% 98%;
 
-    --card: 222 30% 18%;
-    /* Surface 1 */
+    /* Surface 1 (Card) - rgba(30, 41, 59, 0.4) -> HSL approx */
+    --card: 222 30% 18%; 
     --card-foreground: 210 40% 98%;
 
-    --popover: 222 30% 18%;
-    /* Surface 2 */
+    /* Surface 2 (Popover/Modal) - rgba(30, 41, 59, 0.7) */
+    --popover: 222 30% 18%; 
     --popover-foreground: 210 40% 98%;
 
-    /* Primary - Cyan Electric Gradient Base */
-    --primary: 180 100% 50%;
-    /* #00F0FF */
+    /* Primary - Cyan Gradient Base (using solid fallback for variables) */
+    /* #00F0FF -> 183 100% 50% */
+    --primary: 183 100% 50%;
     --primary-foreground: 222.2 47.4% 11.2%;
 
-    /* Secondary - Slate Blue */
+    /* Secondary - Slate Blue #1E293B -> 217 33% 17% */
     --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
 
+    /* Muted - Surface 3 */
     --muted: 217 33% 17%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    /* Accent - Electric Violet */
+    /* Accent - Electric Violet #7C3AED -> 262 83% 58% */
     --accent: 262 83% 58%;
     --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 84% 60%;
+    /* Status Colors */
+    /* Danger - Rose #EF4444 -> 348 83% 60% */
+    --destructive: 348 83% 60%;
     --destructive-foreground: 210 40% 98%;
+
+    /* Success - Emerald #10B981 -> 151 84% 39% */
+    --success: 151 84% 39%;
+    --success-foreground: 210 40% 98%;
+
+    /* Warning - Amber #F59E0B -> 37 91% 50% */
+    --warning: 37 91% 50%;
+    --warning-foreground: 210 40% 98%;
 
     --border: 217 33% 17%;
     --input: 217 33% 17%;
-    --ring: 180 100% 50%;
+    --ring: 183 100% 50%;
 
-    --radius: 1.25rem;
-    /* 20px */
+    --radius: 1.25rem; /* 20px */
 
     /* Charts */
     --chart-1: 220 70% 50%;
@@ -43,7 +61,7 @@
   }
 
   .dark {
-    --background: 222 30% 6%;
+    --background: 220 30% 6%;
     --foreground: 210 40% 98%;
   }
 }

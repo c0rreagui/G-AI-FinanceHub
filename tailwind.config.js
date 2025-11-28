@@ -16,7 +16,7 @@ export default {
                 background: "hsl(var(--background))",
                 foreground: "hsl(var(--foreground))",
                 primary: {
-                    DEFAULT: "hsl(var(--primary))",
+                    DEFAULT: "hsl(var(--primary))", // Note: This might need to be handled carefully if it's a gradient in CSS
                     foreground: "hsl(var(--primary-foreground))",
                 },
                 secondary: {
@@ -43,6 +43,14 @@ export default {
                     DEFAULT: "hsl(var(--card))",
                     foreground: "hsl(var(--card-foreground))",
                 },
+                success: {
+                    DEFAULT: "hsl(var(--success))",
+                    foreground: "hsl(var(--success-foreground))",
+                },
+                warning: {
+                    DEFAULT: "hsl(var(--warning))",
+                    foreground: "hsl(var(--warning-foreground))",
+                },
                 chart: {
                     "1": "hsl(var(--chart-1))",
                     "2": "hsl(var(--chart-2))",
@@ -59,6 +67,7 @@ export default {
             fontFamily: {
                 sans: ["Inter", "sans-serif"],
                 heading: ["Outfit", "sans-serif"],
+                mono: ["JetBrains Mono", "monospace"],
             },
         },
     },
