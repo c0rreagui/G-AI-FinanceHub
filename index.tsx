@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import { logger } from './services/loggingService';
+import './styles/globals.css';
 
 // Manipulador global para exceções não capturadas
 window.onerror = (message, source, lineno, colno, error) => {
