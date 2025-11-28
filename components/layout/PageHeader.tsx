@@ -4,13 +4,14 @@ import { ChevronDown } from '../Icons'; // Usaremos o Chevron para a direita
 interface PageHeaderProps {
   icon: React.ElementType;
   title: string;
-  breadcrumbs: string[];
+  subtitle?: string;
+  breadcrumbs?: string[];
   actions?: React.ReactNode;
 }
 
 import { PrivacyToggle } from '../ui/PrivacyMask';
 
-export const PageHeader: React.FC<PageHeaderProps> = ({ icon: Icon, title, breadcrumbs, actions }) => {
+export const PageHeader: React.FC<PageHeaderProps> = ({ icon: Icon, title, breadcrumbs = [], actions }) => {
   return (
     <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[oklch(var(--border-oklch))] pb-5 mb-6 flex-shrink-0">
       <div 
