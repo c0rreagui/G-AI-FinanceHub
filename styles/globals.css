@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Base Palette - Deep Space Refined */
+    --background: 222 30% 6%;
+    /* #0B0E14 */
+    --foreground: 210 40% 98%;
+
+    --card: 222 30% 18%;
+    /* Surface 1 */
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 30% 18%;
+    /* Surface 2 */
+    --popover-foreground: 210 40% 98%;
+
+    /* Primary - Cyan Electric Gradient Base */
+    --primary: 180 100% 50%;
+    /* #00F0FF */
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    /* Secondary - Slate Blue */
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    /* Accent - Electric Violet */
+    --accent: 262 83% 58%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 180 100% 50%;
+
+    --radius: 1.25rem;
+    /* 20px */
+
+    /* Charts */
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+
+  .dark {
+    --background: 222 30% 6%;
+    --foreground: 210 40% 98%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased selection:bg-primary/30 selection:text-primary-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading tracking-tight;
+  }
+
+  /* Finance Data - Tabular Nums */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+/* Premium Effects */
+.glass-card {
+  @apply bg-card/60 backdrop-blur-xl border border-white/10 shadow-xl;
+}
+
+.text-balance-lg {
+  @apply text-3xl lg:text-4xl font-bold tracking-tight tabular-nums;
+  text-shadow: 0 0 20px rgba(var(--primary), 0.3);
+}

@@ -1,0 +1,268 @@
+# Design System do FinanceHub (Flex-First)
+
+## 🎨 Tokens Globais (Premium)
+
+### Cores (Paleta "Deep Space" Refinada)
+Focada em profundidade e contraste para interfaces financeiras dark-mode.
+
+**Cores Semânticas**
+*   **Background**: `--background` (`#0B0E14`) - Azul quase preto, evita o cansaço do preto absoluto.
+*   **Primary**: `--primary` (`#00F0FF` → `#00D1FF`) - **Gradiente Cyan**. Usado em botões e CTAs. Passa energia e tecnologia.
+*   **Secondary**: `--secondary` (`#1E293B`) - Azul ardósia para elementos de apoio.
+*   **Accent**: `--accent` (`#7C3AED`) - **Violeta Elétrico**. Usado para recursos de IA ou "Premium".
+
+**Superfícies (Profundidade)**
+*   **Surface-1 (Card)**: `--card` (`rgba(30, 41, 59, 0.4)`) - Vidro fosco base.
+*   **Surface-2 (Modal)**: `--popover` (`rgba(30, 41, 59, 0.7)`) - Mais opaco, flutua sobre a base.
+*   **Surface-3 (Highlight)**: `--muted` (`rgba(255, 255, 255, 0.05)`) - Para hover e estados ativos.
+
+**Status (Funcional)**
+*   **Success**: `#10B981` (Emerald) - Para receitas e metas atingidas.
+*   **Danger**: `#EF4444` (Rose) - Para despesas e erros.
+*   **Warning**: `#F59E0B` (Amber) - Para alertas de orçamento.
+
+### Tipografia (Par Moderno)
+Combinação de legibilidade técnica com personalidade.
+
+**Famílias**
+*   **Headings (Títulos)**: `Outfit` ou `Space Grotesk`. Fontes geométricas modernas que dão cara de "Fintech".
+*   **Body (Corpo)**: `Inter` ou `Geist Sans`. Padrão ouro de legibilidade em UI.
+*   **Mono (Dados)**: `JetBrains Mono` ou `Geist Mono`. Para códigos e chaves PIX.
+
+**Detalhes de Refinamento**
+*   **Tabular Nums**: `font-variant-numeric: tabular-nums`. **Obrigatório** para tabelas financeiras (alinha os dígitos verticalmente).
+*   **Tracking**:
+    *   Headings: `-0.02em` (Levemente apertado para parecer mais sólido).
+    *   Small Caps: `+0.05em` (Levemente espaçado para leitura em tamanho pequeno).
+
+---
+
+## 📱 Estratégia Flex-First (Por Dispositivo)
+
+Esta seção define qual componente ou comportamento usar dependendo do contexto do usuário.
+
+### 1. Mobile (Touch-First & Unidirecional)
+Foco em uso com uma mão (polegar) e navegação linear.
+
+**Navegação & Estrutura**
+1.  **BottomNav**: Barra de navegação inferior fixa para as 4-5 seções principais.
+2.  **Header Mínimo**: Apenas título e ação primária (ex: Filtro ou Perfil).
+3.  **List View**: Layout preferencial para dados (vertical).
+
+**Componentes Específicos**
+4.  **Drawer (Gaveta)**: Substitui Modais. Abre de baixo para cima. Mais fácil de alcançar.
+5.  **PullToRefresh**: Gesto para atualizar dados.
+6.  **SwipeActions**: Ações de deslizar em itens de lista (Editar/Excluir).
+7.  **TouchButton**: Altura mínima de 48px para precisão.
+8.  **BottomSheet**: Para menus de contexto e filtros rápidos.
+
+### 2. Tablet (Híbrido & Conteúdo Rico)
+Combina a facilidade do toque com maior área de tela.
+
+**Navegação & Estrutura**
+9.  **NavigationRail**: Barra lateral fina (ícones) à esquerda. Economiza altura vertical.
+10. **SplitView**: Lista à esquerda, detalhes à direita (Master-Detail).
+11. **Grid View**: Layout preferencial para cards e dashboards.
+
+**Componentes Específicos**
+12.  **Popovers**: Menus flutuantes próximos ao toque (evita viagens longas do dedo).
+13.  **MasonryGrid**: Layout de cards que se ajusta à orientação (Retrato/Paisagem).
+14.  **FloatingActionButton (FAB)**: Ação principal flutuante no canto inferior.
+
+### 3. Desktop (Mouse & Teclado)
+Foco em produtividade, densidade de dados e atalhos.
+
+**Navegação & Estrutura**
+15. **Sidebar Expansível**: Barra lateral completa com submenus e labels.
+16. **TopBar Rica**: Barra superior com busca global, notificações e perfil.
+17. **Dashboard Grid**: Layout complexo de múltiplas colunas redimensionáveis.
+
+**Componentes Específicos**
+18. **Dialog (Modal)**: Janelas centralizadas com backdrop.
+19. **HoverCard**: Informação extra ao passar o mouse.
+20. **Tooltip**: Dicas de ferramenta instantâneas ou com delay.
+21. **ContextMenu**: Menu de clique direito customizado.
+22. **DataTable**: Tabelas densas com ordenação, filtro e paginação avançada.
+23. **KeyboardShortcuts**: Atalhos (ex: `Ctrl+K` para comando, `Esc` para fechar).
+24. **Sheet (Lateral)**: Painéis que deslizam da direita para editar detalhes sem perder o contexto.
+
+---
+
+## 🧠 Comportamento e UX (Sugestões Avançadas)
+
+### Motion & Animação (Coreografia)
+Definimos como as coisas se movem para criar uma sensação de "peso" e qualidade.
+
+145. **Entrada de Página**:
+    *   **Mobile**: Slide da direita para a esquerda (sensação de avançar).
+    *   **Desktop**: Fade-in sutil com leve deslocamento vertical (Y: 10px -> 0).
+146. **Micro-interações**:
+    *   **Botões**: Scale down (0.98) ao clicar/tocar.
+    *   **Toggles**: Efeito elástico (spring) ao mudar de estado.
+147. **Listas**: "Stagger" (efeito cascata) ao carregar itens. Cada item aparece 50ms depois do anterior.
+
+### Feedback Háptico (Tátil)
+Uso estratégico de vibração em dispositivos móveis para confirmar ações físicas.
+
+148. **Sucesso**: Vibração leve e curta (Light Impact) ao completar uma tarefa (ex: Salvar Transação).
+149. **Erro**: Vibração dupla ou mais pesada (Heavy Impact) ao falhar validação.
+150. **Seleção**: Vibração muito sutil (Selection) ao rolar pickers de data ou sliders.
+
+### Estratégia de Carregamento (Percepção de Velocidade)
+Como lidamos com a espera do usuário.
+
+151. **Skeleton Screens**: Usado para o carregamento inicial de estruturas (ex: Dashboard). Mantém o layout estável.
+152. **Spinners**: Usado APENAS para ações do usuário (ex: Clicou em "Salvar" -> Spinner no botão).
+153. **Optimistic UI**: A interface atualiza *antes* da resposta do servidor. Se der erro, reverte e avisa. (Essencial para sensação de instantaneidade).
+154. **Background Sync**: Dados atualizam silenciosamente sem bloquear a UI.
+
+### Inputs Inteligentes
+Facilitando a entrada de dados em cada contexto.
+
+155. **Teclados Mobile**:
+    *   Campo de Valor: `inputmode="decimal"` (Teclado numérico com vírgula).
+    *   Email: `inputmode="email"` (Com @ e .com acessíveis).
+    *   Busca: `enterkeyhint="search"` (Botão azul de "Buscar").
+156. **Autofocus Desktop**: Ao abrir um Modal ou Página, o primeiro campo deve ganhar foco automaticamente.
+
+---
+
+## 🧩 Biblioteca de Componentes (Lista Vertical)
+
+### Primitivos e Layout
+25. **Box**: Wrapper genérico (`div`) com propriedades de estilo atômicas.
+26. **Flex**: Container Flexbox para alinhamento unidirecional.
+27. **Stack**: Pilha vertical ou horizontal com espaçamento automático (`gap`).
+28. **Grid**: Container CSS Grid para layouts bidimensionais.
+29. **Container**: Wrapper centralizado que define a largura máxima do conteúdo.
+30. **Section**: Elemento semântico para separar seções da página.
+31. **AspectRatio**: Container que força uma proporção específica (ex: 16:9) para mídia.
+32. **Separator**: Linha divisória horizontal ou vertical para agrupar conteúdo.
+33. **Spacer**: Elemento flexível vazio para empurrar conteúdo.
+34. **ScrollArea**: Área de rolagem customizada que esconde a barra nativa.
+35. **Resizable**: Painéis que podem ser redimensionados pelo usuário.
+36. **Portal**: Transporta o componente para o final do `body` (útil para overlays).
+37. **Slot**: Repassa as propriedades para o componente filho (Radix pattern).
+38. **VisuallyHidden**: Esconde conteúdo visualmente mas mantém acessível para leitores de tela.
+39. **Center**: Utilitário flex para centralizar conteúdo vertical e horizontalmente.
+
+### Tipografia
+40. **Heading**: Títulos (`h1`-`h6`) com kerning e peso otimizados.
+41. **Text**: Texto de corpo padrão com variantes de cor e peso.
+42. **Paragraph**: Bloco de texto com altura de linha (leading) para leitura.
+43. **Lead**: Texto de introdução, maior e mais leve que o corpo.
+44. **Large**: Texto destacado, levemente maior que o padrão.
+45. **Small**: Texto pequeno para legendas e avisos legais.
+46. **Muted**: Texto com cor rebaixada (cinza) para menor hierarquia.
+47. **Blockquote**: Citação em bloco com borda lateral decorativa.
+48. **Code**: Texto monoespaçado com fundo sutil para trechos de código.
+49. **Kbd**: Representação visual de teclas de atalho (ex: `⌘ + C`).
+
+### Formulários e Inputs
+50. **Button**: Botão interativo com variantes (Solid, Outline, Ghost).
+51. **Input**: Campo de texto de linha única.
+52. **Label**: Rótulo acessível associado a um input.
+53. **Checkbox**: Caixa de seleção para opções binárias (múltipla escolha).
+54. **RadioGroup**: Conjunto de opções onde apenas uma pode ser selecionada.
+55. **Select**: Menu suspenso nativo ou customizado para seleção.
+56. **Switch**: Interruptor estilo "alavanca" para ligar/desligar imediato.
+57. **Slider**: Barra deslizante para selecionar valores em um intervalo.
+58. **Textarea**: Campo de texto multilinhas redimensionável.
+59. **Form**: Contexto que gerencia estado e validação de formulários.
+60. **FormControl**: Wrapper que conecta o input ao estado do formulário.
+61. **FormDescription**: Texto de apoio abaixo do campo.
+62. **FormMessage**: Mensagem de erro de validação (vermelha).
+63. **Toggle**: Botão que alterna entre estado pressionado/não pressionado.
+64. **ToggleGroup**: Grupo de botões de alternância exclusivos ou múltiplos.
+65. **DatePicker**: Calendário para seleção de data única.
+66. **DateRangePicker**: Calendário duplo para selecionar período (início/fim).
+67. **TimePicker**: Inputs para seleção de horas e minutos.
+68. **Upload**: Área de arrastar e soltar (dropzone) para arquivos.
+69. **PasswordInput**: Input de senha com botão de "olho" para revelar.
+70. **OTPInput**: Campos segmentados para código de verificação (2FA).
+71. **SearchInput**: Input otimizado para busca (ícone, limpar).
+72. **Combobox**: Select com campo de busca integrado para muitas opções.
+73. **Command**: Paleta de comandos global (estilo Spotlight/Alfred).
+74. **Rating**: Componente de avaliação (estrelas/corações).
+
+### Feedback e Status
+75. **Alert**: Caixa de mensagem persistente para avisos importantes.
+76. **AlertDestructive**: Variante de erro do Alert (vermelho).
+77. **Toast**: Notificação temporária que aparece no canto da tela.
+78. **Toaster**: Gerenciador que empilha e exibe os Toasts.
+79. **Progress**: Barra de progresso horizontal linear.
+80. **CircularProgress**: Indicador de progresso circular (anel).
+81. **Spinner**: Animação de carregamento infinito (giratório).
+82. **Skeleton**: Formas pulsantes que simulam o layout enquanto carrega.
+83. **Badge**: Etiqueta pequena (pílula) para status ou contagem.
+84. **HoverCard**: Cartão que exibe detalhes ao passar o mouse (preview).
+85. **Tooltip**: Pequeno rótulo de texto ao passar o mouse sobre um ícone.
+86. **Popover**: Conteúdo flutuante acionado por clique (mais rico que tooltip).
+87. **StatusDot**: Ponto colorido simples indicando estado (Online, Busy).
+88. **EmptyState**: Ilustração e texto para quando não há dados a exibir.
+89. **Pulse**: Wrapper que adiciona animação de pulso a qualquer elemento.
+
+### Overlays (Modais)
+90. **Dialog**: Janela modal clássica que bloqueia o fundo.
+91. **Sheet**: Painel que desliza da lateral (off-canvas).
+92. **Drawer**: Painel que desliza de baixo (padrão mobile).
+93. **AlertDialog**: Modal de confirmação que exige ação do usuário.
+94. **ContextMenu**: Menu acionado pelo clique direito do mouse.
+95. **DropdownMenu**: Menu suspenso acionado por botão.
+96. **Menubar**: Barra de menus estilo desktop (Arquivo, Editar...).
+97. **Overlay**: Camada escura semitransparente atrás de modais.
+
+### Navegação
+98.  **NavigationMenu**: Menu de navegação principal com submenus ricos.
+99.  **Tabs**: Abas para alternar visualizações no mesmo contexto.
+100. **Breadcrumb**: Caminho de navegação hierárquica (Home > Setor > Item).
+101. **Pagination**: Controles para navegar entre páginas de dados.
+102. **Stepper**: Indicador de progresso passo-a-passo.
+103. **Sidebar**: Barra de navegação lateral vertical.
+104. **Link**: Estilo de link de texto padrão.
+105. **Anchor**: Link para rolagem suave até uma seção da página.
+106. **BottomNav**: Barra de navegação inferior (padrão mobile).
+107. **Tree**: Estrutura de árvore para diretórios ou categorias aninhadas.
+
+### Exibição de Dados
+108. **Avatar**: Imagem de perfil circular com fallback para iniciais.
+109. **AvatarGroup**: Conjunto de avatares sobrepostos.
+110. **Table**: Tabela HTML padrão estilizada.
+111. **DataTable**: Tabela avançada com recursos de dados (sort, filter).
+112. **Card**: Container versátil com cabeçalho, corpo e rodapé.
+113. **Carousel**: Slider para rotacionar conteúdo ou imagens.
+114. **Accordion**: Lista de itens que expandem/colapsam verticalmente.
+115. **Collapsible**: Elemento único que pode ser expandido ou oculto.
+116. **List**: Lista não ordenada (`ul`) com marcadores customizados.
+117. **ListItem**: Item individual de lista (`li`) estilizado.
+118. **Timeline**: Linha do tempo vertical para eventos históricos.
+119. **Calendar**: Visualização de mês/ano em grade.
+
+### Específicos de Finanças
+120. **CurrencyDisplay**: Formatador de valores monetários com símbolo e cor.
+121. **BalanceCard**: Card de destaque para saldo total com indicador de tendência.
+122. **TransactionRow**: Linha de transação com ícone, detalhes e valor.
+123. **CreditCardVisual**: Representação visual (CSS) de um cartão físico.
+124. **SpendingBar**: Barra de progresso segmentada por categorias de gasto.
+125. **BudgetRing**: Gráfico de rosca indicando consumo do orçamento.
+126. **StockTicker**: Faixa de cotações em rolagem contínua.
+127. **CryptoBadge**: Ícone de criptomoeda com ticker e variação.
+128. **TrendIndicator**: Seta e cor indicando alta ou baixa percentual.
+129. **StatCard**: Card simples para métrica única (ex: ROI, Lucro).
+130. **BillCalendar**: Calendário focado em datas de vencimento.
+131. **GoalThermometer**: Termômetro visual para metas de economia.
+132. **CategoryIcon**: Ícone de categoria com fundo colorido temático.
+133. **MerchantLogo**: Componente que busca logo da marca ou gera fallback.
+134. **ReceiptViewer**: Visualizador de comprovantes (imagem/PDF) em modal.
+
+### Gráficos (Data Viz)
+135. **AreaChart**: Gráfico de área para tendências ao longo do tempo.
+136. **BarChart**: Gráfico de barras para comparações categóricas.
+137. **LineChart**: Gráfico de linha para dados contínuos precisos.
+138. **PieChart**: Gráfico de pizza para distribuição de partes do todo.
+139. **RadarChart**: Gráfico de radar para comparação multivariável.
+140. **RadialBarChart**: Barras em disposição circular.
+141. **ScatterChart**: Gráfico de dispersão para correlações.
+142. **TooltipChart**: Tooltip flutuante especializada para dados de gráficos.
+143. **LegendChart**: Legenda interativa para filtrar séries do gráfico.
+144. **AxisChart**: Eixos X e Y estilizados e formatados.
