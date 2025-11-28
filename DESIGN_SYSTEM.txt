@@ -266,3 +266,14 @@ Facilitando a entrada de dados em cada contexto.
 142. **TooltipChart**: Tooltip flutuante especializada para dados de gráficos.
 143. **LegendChart**: Legenda interativa para filtrar séries do gráfico.
 144. **AxisChart**: Eixos X e Y estilizados e formatados.
+
+### Componentes Planejados (UX Improvements)
+145. **TourGuide**: Overlay interativo para guiar novos usuários pelas funcionalidades.
+146. **PrivacyMask**: Toggle global para ocultar/borrar valores sensíveis na tela.
+147. **Confetti**: Animação de partículas para celebrar conquistas (metas atingidas).
+148. **FeedbackWidget**: Botão flutuante ou modal para coleta de feedback do usuário.
+149. **MicrophoneButton**: Botão com estado de gravação para input de voz.
+150. **ScannerOverlay**: Interface de câmera com moldura para digitalizar recibos.
+151. **DragHandle**: Ícone indicador de área arrastável para reordenação.
+152. **SwipeAction**: Container que revela ações ao deslizar (mobile).
+153. **VirtualKeyboard**: Teclado numérico customizado na tela para inputs financeiros rápidos.

@@ -80,3 +80,4 @@ export const AlertTriangle = React.memo((props: React.SVGProps<SVGSVGElement>) =
 export const Bell = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9", "M10.3 21a1.94 1.94 0 0 0 3.4 0"]} {...props} /> );
 export const LayoutGrid = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M10 3H3v7h7V3z", "M21 3h-7v7h7V3z", "M10 14H3v7h7v-7z", "M21 14h-7v7h7v-7z"]} {...props} />);
 export const List = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M8 6h13", "M8 12h13", "M8 18h13", "M3 6h.01", "M3 12h.01", "M3 18h.01"]} {...props} />);
+export const Search = React.memo((props: React.SVGProps<SVGSVGElement>) => <Icon d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" {...props} />);

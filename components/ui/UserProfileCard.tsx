@@ -6,14 +6,14 @@ import { Badge } from './Badge';
 import { UserRank } from '../../types';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const getRankColor = (rank: UserRank): 'yellow' | 'gray' | 'blue' | 'green' | 'red' => {
+const getRankVariant = (rank: UserRank): "default" | "secondary" | "destructive" | "outline" | "success" | "warning" => {
     switch (rank) {
-        case UserRank.BRONZE: return 'red';
-        case UserRank.PRATA: return 'gray';
-        case UserRank.OURO: return 'yellow';
-        case UserRank.PLATINA: return 'blue';
-        case UserRank.DIAMANTE: return 'blue';
-        default: return 'gray';
+        case UserRank.BRONZE: return 'destructive';
+        case UserRank.PRATA: return 'secondary';
+        case UserRank.OURO: return 'warning';
+        case UserRank.PLATINA: return 'default';
+        case UserRank.DIAMANTE: return 'default';
+        default: return 'secondary';
     }
 }
 
@@ -80,12 +80,12 @@ export const UserProfileCard: React.FC = () => {
                     </button>
                     <AnimatePresence>
                         {isInfoVisible && (
-                             <motion.div 
+                            <motion.div 
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: 10 }}
                                 className="absolute top-full left-0 mt-2 w-64 p-3 bg-black/80 border border-white/20 rounded-lg text-sm text-gray-300 shadow-lg backdrop-blur-md z-10"
-                             >
+                            >
                                 <p className="font-bold mb-1 text-white">Como ganhar XP?</p>
                                 <ul className="list-disc list-inside text-xs space-y-1">
                                     <li><span className="font-semibold text-green-400">+10 XP</span> por transação adicionada.</li>
@@ -97,7 +97,7 @@ export const UserProfileCard: React.FC = () => {
                     </AnimatePresence>
                 </div>
                 <Badge 
-                    color={getRankColor(userLevel.rank)} 
+                    variant={getRankVariant(userLevel.rank)} 
                     className={isHighRank ? 'shimmer-badge' : ''}
                 >
                     {userLevel.rank}

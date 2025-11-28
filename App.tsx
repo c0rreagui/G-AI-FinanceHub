@@ -23,7 +23,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { ToastContainer } from './components/ui/ToastContainer';
 import { DesignSystemView } from './components/views/DesignSystemView';
 import { OnboardingView } from './components/views/OnboardingView';
-import { GuestModeBanner } from './components/GuestModeBanner';
+import { GuestModeBanner } from '@/components/GuestModeBanner';
 import { logger } from './services/loggingService';
 import { APP_VERSION, APP_CODENAME } from './config';
 import { DevToolsView } from './components/views/DevToolsView';

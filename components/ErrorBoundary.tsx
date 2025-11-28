@@ -1,5 +1,6 @@
 // components/ErrorBoundary.tsx
-import React, { ErrorInfo, ReactNode } from 'react';
+import * as React from 'react';
+import { ErrorInfo, ReactNode } from 'react';
 import { logger } from '../services/loggingService';
 import { Button } from './ui/Button';
 import { Zap } from './Icons';
@@ -14,13 +15,16 @@ interface ErrorBoundaryState {
 }
 
 export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  public state: ErrorBoundaryState = {
+    hasError: false,
+    error: null,
+  };
+  public props: ErrorBoundaryProps;
+
   // FIX: Initialized state in the constructor to ensure `this.props` is correctly typed and accessible.
   constructor(props: ErrorBoundaryProps) {
     super(props);
-    this.state = {
-      hasError: false,
-      error: null,
-    };
+    this.props = props;
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {

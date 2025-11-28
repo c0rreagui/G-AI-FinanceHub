@@ -49,13 +49,13 @@ interface DevToolsViewProps {
 }
 
 export const DevToolsView: React.FC<DevToolsViewProps> = (props) => {
-    const { seedData, clearAllData } = useDashboardData();
+    const { addMockData, clearAllUserData } = useDashboardData();
     const { openDialog } = useDialog();
     const { showToast } = useToast();
     const [confirmDelete, setConfirmDelete] = useState(false);
 
     const handleSeed = () => {
-        seedData();
+        addMockData();
         showToast('Dados de exemplo carregados!', { type: 'success' });
     };
 
@@ -65,7 +65,7 @@ export const DevToolsView: React.FC<DevToolsViewProps> = (props) => {
             setTimeout(() => setConfirmDelete(false), 3000);
             return;
         }
-        clearAllData();
+        clearAllUserData();
         setConfirmDelete(false);
         showToast('Todos os dados foram apagados.', { type: 'error' });
     };
