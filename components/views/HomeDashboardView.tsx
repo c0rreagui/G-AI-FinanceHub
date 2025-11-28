@@ -210,23 +210,27 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                          <Card className="flex flex-col justify-center">
                             <CardContent className="p-4">
                                 <div className="text-success mb-1"><ArrowUpRight className="w-5 h-5"/></div>
-                                <Text size="xs" weight="bold" variant="muted" className="uppercase">Entradas</Text>
-                                <Text size="lg" weight="bold">
-                                    <PrivacyMask>
-                                        <AnimatedCurrency value={summary.monthlyIncome}/>
-                                    </PrivacyMask>
-                                </Text>
+                                <Text size="xs" weight="bold" variant="muted" className="uppercase mb-1">Entradas</Text>
+                                <div className="truncate" title={formatCurrencyBRL(summary.monthlyIncome)}>
+                                    <Text size="lg" weight="bold" className="truncate">
+                                        <PrivacyMask>
+                                            <AnimatedCurrency value={summary.monthlyIncome}/>
+                                        </PrivacyMask>
+                                    </Text>
+                                </div>
                             </CardContent>
                          </Card>
                          <Card className="flex flex-col justify-center">
                             <CardContent className="p-4">
                                 <div className="text-destructive mb-1"><ArrowDownLeft className="w-5 h-5"/></div>
-                                <Text size="xs" weight="bold" variant="muted" className="uppercase">Saídas</Text>
-                                <Text size="lg" weight="bold">
-                                    <PrivacyMask>
-                                        <AnimatedCurrency value={Math.abs(summary.monthlyExpenses)}/>
-                                    </PrivacyMask>
-                                </Text>
+                                <Text size="xs" weight="bold" variant="muted" className="uppercase mb-1">Saídas</Text>
+                                <div className="truncate" title={formatCurrencyBRL(Math.abs(summary.monthlyExpenses))}>
+                                    <Text size="lg" weight="bold" className="truncate">
+                                        <PrivacyMask>
+                                            <AnimatedCurrency value={Math.abs(summary.monthlyExpenses)}/>
+                                        </PrivacyMask>
+                                    </Text>
+                                </div>
                             </CardContent>
                          </Card>
                     </Grid>

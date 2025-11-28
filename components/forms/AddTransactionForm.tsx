@@ -138,12 +138,59 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
     }
   };
   
+  // Smart Input: Auto-categorization
+  useEffect(() => {
+    if (isEditing || !description || categoryId) return; // Don't override if editing or already selected
+
+    const lowerDesc = description.toLowerCase();
+    const keywords: { [key: string]: string[] } = {
+        'Alimentação': ['ifood', 'restaurante', 'mercado', 'lanche', 'pizza', 'burger', 'açaí', 'padaria'],
+        'Transporte': ['uber', '99', 'taxi', 'ônibus', 'metrô', 'combustível', 'posto', 'gasolina'],
+        'Lazer': ['cinema', 'netflix', 'spotify', 'jogo', 'steam', 'ingressos'],
+        'Saúde': ['farmácia', 'drogaria', 'médico', 'dentista', 'exame'],
+        'Moradia': ['aluguel', 'condomínio', 'luz', 'água', 'internet'],
+        'Salário': ['salário', 'pagamento', 'freela', 'pix recebido'],
+    };
+
+    for (const [catName, terms] of Object.entries(keywords)) {
+        if (terms.some(term => lowerDesc.includes(term))) {
+            const cat = categories.find(c => c.name.toLowerCase() === catName.toLowerCase());
+            if (cat) {
+                setCategoryId(cat.id);
+                // Optional: visual feedback or toast could go here
+            }
+            break;
+        }
+    }
+  }, [description, categories, isEditing, categoryId]);
+
+  // Calculator Logic
+  const handleAmountBlur = () => {
+      try {
+          // Allow numbers, +, -, *, /, ., , (replace comma with dot)
+          const sanitized = amount.replace(/,/g, '.').replace(/[^0-9+\-*/.]/g, '');
+          if (!sanitized) return;
+          
+          // Safe evaluation using Function constructor with strict limitations is better than eval, 
+          // but for simple math, we can just check if it matches a math regex.
+          if (/^[\d.+\-*/\s]+$/.test(sanitized)) {
+              // eslint-disable-next-line no-new-func
+              const result = new Function('return ' + sanitized)();
+              if (isFinite(result)) {
+                  setAmount(String(result.toFixed(2)));
+              }
+          }
+      } catch (e) {
+          // Ignore invalid expressions
+      }
+  };
+
   const FormFields = (
     <>
-        <motion.div variants={itemVariants}>
+        <motion.div variants={itemVariants} {...({} as any)}>
           <TypeToggle selectedType={type} onTypeChange={setType} />
         </motion.div>
-        <motion.div variants={itemVariants}>
+        <motion.div variants={itemVariants} {...({} as any)}>
           <Input
             id="tx-description"
             label="Descrição"
@@ -153,15 +200,16 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
             required
           />
         </motion.div>
-        <motion.div variants={itemVariants} className="grid grid-cols-2 gap-4">
+        <motion.div variants={itemVariants} className="grid grid-cols-2 gap-4" {...({} as any)}>
             <Input
               id="tx-amount"
               label="Valor (R$)"
-              type="number"
+              type="text" 
+              inputMode="decimal"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              placeholder="50.00"
-              step="0.01"
+              onBlur={handleAmountBlur}
+              placeholder="0.00 ou 10+5"
               required
             />
             <Input
@@ -173,7 +221,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
               required
             />
         </motion.div>
-        <motion.div variants={itemVariants}>
+        <motion.div variants={itemVariants} {...({} as any)}>
             <label className="block text-sm font-medium text-gray-300 mb-2">
                 Valores Rápidos
             </label>
@@ -183,7 +231,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                 ))}
             </div>
         </motion.div>
-        <motion.div variants={itemVariants}>
+        <motion.div variants={itemVariants} {...({} as any)}>
             <label className="block text-sm font-medium text-gray-300">
                 Categoria
             </label>
@@ -201,7 +249,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
           <Modal isOpen={isOpen} onClose={onClose} title={isEditing ? "Editar Transação" : "Nova Transação"}>
               <motion.form 
                   onSubmit={handleSubmit} 
-                  className="space-y-4"
+                  {...({ className: "space-y-4" } as any)}
                   variants={containerVariants}
                   initial="hidden"
                   animate="visible"
@@ -224,7 +272,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
     <AnimatePresence>
         {isOpen && (
             <motion.div
-                className="fixed inset-0 z-50 flex flex-col bg-[oklch(var(--card-oklch))]"
+                {...({ className: "fixed inset-0 z-50 flex flex-col bg-[oklch(var(--card-oklch))]" } as any)}
                 initial={{ y: '100%' }}
                 animate={{ y: '0%' }}
                 exit={{ y: '100%' }}
@@ -242,7 +290,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                     <motion.form 
                         id="mobile-tx-form" 
                         onSubmit={handleSubmit} 
-                        className="space-y-6"
+                        {...({ className: "space-y-6" } as any)}
                         variants={containerVariants}
                         initial="hidden"
                         animate="visible"

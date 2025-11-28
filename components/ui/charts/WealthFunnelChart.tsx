@@ -33,21 +33,21 @@ export const WealthFunnelChart: React.FC<WealthFunnelChartProps> = ({ income, ex
             value: 100, 
             realValue: income,
             percentage: 100,
-            fill: 'oklch(var(--primary-oklch))' 
+            fill: '#22d3ee' // cyan-400
         },
         { 
             name: 'Saídas', 
             value: Math.min(90, Math.max(20, (expenses / safeIncome) * 100)), 
             realValue: expenses,
             percentage: ((expenses / safeIncome) * 100).toFixed(1),
-            fill: 'oklch(var(--danger-oklch))' 
+            fill: '#f87171' // red-400
         },
         { 
             name: 'Retenção', 
             value: Math.min(80, Math.max(10, (investments / safeIncome) * 100)), 
             realValue: investments,
             percentage: ((investments / safeIncome) * 100).toFixed(1),
-            fill: 'oklch(var(--success-oklch))' 
+            fill: '#4ade80' // green-400
         }
     ];
 
@@ -74,7 +74,7 @@ export const WealthFunnelChart: React.FC<WealthFunnelChartProps> = ({ income, ex
                             data={data} 
                             isAnimationActive 
                             lastShapeType="rectangle"
-                            gap={4}
+                            lastShapeType="rectangle"
                         >
                             <LabelList position="right" fill="#94a3b8" stroke="none" dataKey="name" fontSize={10} fontWeight={600} />
                             {data.map((entry, index) => (

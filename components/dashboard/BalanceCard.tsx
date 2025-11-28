@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { AnimatedCurrency } from '../ui/AnimatedCurrency';
 import { Heading, Text } from '../ui/typography';
 import { cn } from '../../utils/utils';
+import { formatCurrencyBRL } from '../../utils/formatters';
 
 interface BalanceCardProps {
   balance: number;
@@ -17,7 +18,7 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({ balance, className }) 
         <CardTitle className="text-sm font-medium text-cyan-200 uppercase tracking-wider">Saldo Total</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="text-4xl font-bold text-white tracking-tight tabular-nums">
+        <div className="text-3xl md:text-4xl font-bold text-white tracking-tight tabular-nums truncate" title={formatCurrencyBRL(balance)}>
           <AnimatedCurrency value={balance} />
         </div>
       </CardContent>

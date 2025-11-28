@@ -41,13 +41,25 @@ export const Toast: React.FC<ToastProps> = ({ toast, onRemove }) => {
       initial="initial"
       animate="animate"
       exit="exit"
-      className={`relative w-full max-w-sm p-4 overflow-hidden rounded-xl shadow-lg border ${classes.bg} ${classes.border} backdrop-blur-lg`}
+      {...({ className: `relative w-full max-w-sm p-4 overflow-hidden rounded-xl shadow-lg border ${classes.bg} ${classes.border} backdrop-blur-lg` } as any)}
     >
       <div className="flex items-start">
         <div className="flex-1">
           <p className="text-sm font-semibold text-white">{toast.message}</p>
           {toast.description && (
             <p className={`mt-1 text-sm ${classes.text}`}>{toast.description}</p>
+          )}
+          {toast.action && (
+              <button 
+                  onClick={(e) => {
+                      e.stopPropagation();
+                      toast.action?.onClick();
+                      onRemove(toast.id);
+                  }}
+                  className="mt-2 text-xs font-bold underline hover:no-underline"
+              >
+                  {toast.action.label}
+              </button>
           )}
         </div>
         <button

@@ -423,18 +423,47 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     }, tx.id);
 
     const deleteTransaction = (id: string) => withMutation(async () => {
+        const txToDelete = transactions.find(t => t.id === id);
+        if (!txToDelete) return false;
+
         if (isGuest) {
             const data = getGuestData();
             data.transactions = data.transactions.filter((t: Transaction) => t.id !== id);
             setGuestData(data);
             await fetchData();
-            showToast('Transação Excluída!', { type: 'success' });
-            return true;
+        } else {
+            const { error } = await supabase.from('transactions').delete().eq('id', id);
+            if (error) throw error;
+            await fetchData();
         }
-        const { error } = await supabase.from('transactions').delete().eq('id', id);
-        if (error) throw error;
-        await fetchData();
-        showToast('Transação Excluída!', { type: 'success' });
+
+        showToast('Transação Excluída!', { 
+            type: 'success',
+            action: {
+                label: 'Desfazer',
+                onClick: async () => {
+                    if (isGuest) {
+                        const data = getGuestData();
+                        data.transactions.push(txToDelete);
+                        setGuestData(data);
+                    } else {
+                        // Restore to Supabase
+                        // Omit ID to generate a new one, or keep it? Let's omit to be safe with PK constraints if any.
+                        // Actually, if it was deleted, the ID is free. But let's let DB handle it or use the old one.
+                        // We need to strip the 'category' object and ensure 'category_id' is present.
+                        const { id: oldId, category, ...rest } = txToDelete;
+                        const txToRestore = { 
+                            ...rest, 
+                            category_id: category.id, 
+                            user_id: user!.id 
+                        };
+                        await supabase.from('transactions').insert(txToRestore);
+                    }
+                    await fetchData();
+                    showToast('Transação Restaurada!', { type: 'success' });
+                }
+            }
+        });
         return true;
     }, id);
     

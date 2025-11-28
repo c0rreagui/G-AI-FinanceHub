@@ -6,11 +6,15 @@ export interface ToastMessage {
   message: string;
   description?: string;
   type: 'success' | 'error' | 'info';
+  action?: {
+      label: string;
+      onClick: () => void;
+  };
 }
 
 interface ToastContextType {
   toasts: ToastMessage[];
-  showToast: (message: string, options?: { description?: string; type?: 'success' | 'error' | 'info' }) => void;
+  showToast: (message: string, options?: { description?: string; type?: 'success' | 'error' | 'info'; action?: { label: string; onClick: () => void } }) => void;
   removeToast: (id: number) => void;
 }
 
@@ -23,13 +27,14 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== id));
   };
 
-  const showToast = useCallback((message: string, options: { description?: string; type?: 'success' | 'error' | 'info' } = {}) => {
-    const { description, type = 'info' } = options;
+  const showToast = useCallback((message: string, options: { description?: string; type?: 'success' | 'error' | 'info'; action?: { label: string; onClick: () => void } } = {}) => {
+    const { description, type = 'info', action } = options;
     const newToast: ToastMessage = {
       id: Date.now(),
       message,
       description,
       type,
+      action,
     };
     setToasts((prevToasts) => [...prevToasts, newToast]);
   }, []);
