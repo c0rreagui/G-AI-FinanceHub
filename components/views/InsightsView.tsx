@@ -118,8 +118,8 @@ export const InsightsView: React.FC = () => {
                                         iconType="circle"
                                         formatter={(value) => <span className="text-gray-300 capitalize">{value}</span>}
                                     />
-                                    <Bar dataKey="receita" name="Receita" fill="oklch(var(--success-oklch))" radius={4} />
-                                    <Bar dataKey="despesa" name="Despesa" fill="oklch(var(--danger-oklch))" radius={4} />
+                                    <Bar dataKey="receita" name="Receita" fill="hsl(var(--success))" radius={4} />
+                                    <Bar dataKey="despesa" name="Despesa" fill="hsl(var(--destructive))" radius={4} />
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>

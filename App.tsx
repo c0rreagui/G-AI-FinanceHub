@@ -1,10 +1,4 @@
 import React, { useState, useCallback } from 'react';
-import { AuthProvider, useAuth } from './hooks/useAuth';
-import { DashboardDataProvider } from './hooks/useDashboardData';
-import { DialogProvider } from './contexts/DialogContext';
-import { useDialog } from './hooks/useDialog';
-import { ToastProvider } from './contexts/ToastContext';
-import { useToast } from './hooks/useToast';
 import { AuthView } from './components/views/AuthView';
 import { AppLayout } from './components/layout/AppLayout';
 import { ViewType } from './types';
@@ -27,6 +21,13 @@ import { GuestModeBanner } from '@/components/GuestModeBanner';
 import { logger } from './services/loggingService';
 import { APP_VERSION, APP_CODENAME } from './config';
 import { DevToolsView } from './components/views/DevToolsView';
+import { PrivacyProvider } from './contexts/PrivacyContext';
+import { useAuth, AuthProvider } from './hooks/useAuth';
+import { useDialog } from './hooks/useDialog';
+import { useToast } from './hooks/useToast';
+import { DashboardDataProvider } from './hooks/useDashboardData';
+import { DialogProvider } from './contexts/DialogContext';
+import { ToastProvider } from './contexts/ToastContext';
 
 const AppContent: React.FC = () => {
   const { user, loading, isGuest } = useAuth();
@@ -182,12 +183,14 @@ const App: React.FC = () => {
     <AuthProvider>
       <ToastProvider>
         <DashboardDataProvider>
-          <ErrorBoundary>
-            <AppWithDialog />
-          </ErrorBoundary>
-        </DashboardDataProvider >
-      </ToastProvider >
-    </AuthProvider >
+          <PrivacyProvider>
+            <ErrorBoundary>
+              <AppWithDialog />
+            </ErrorBoundary>
+          </PrivacyProvider>
+        </DashboardDataProvider>
+      </ToastProvider>
+    </AuthProvider>
   );
 };
 

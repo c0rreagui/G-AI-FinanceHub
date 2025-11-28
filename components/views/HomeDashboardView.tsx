@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Target, ArrowUpRight, ArrowDownLeft, Zap } from '../Icons';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { QuickActions } from '../ui/QuickActions';
@@ -16,7 +16,11 @@ import { Grid, Flex, Box } from '../ui/layout';
 import { Heading, Text } from '../ui/typography';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { BalanceCard } from '../dashboard/BalanceCard';
-import { Avatar, AvatarFallback } from '../ui/Avatar';
+import { TourGuide, TourStep } from '../ui/TourGuide';
+import { GettingStartedChecklist } from '../dashboard/GettingStartedChecklist';
+import { PrivacyToggle, PrivacyMask } from '../ui/PrivacyMask';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
+import { Info } from 'lucide-react';
 
 interface HomeDashboardViewProps {
     setCurrentView: (view: ViewType) => void;
@@ -34,7 +38,9 @@ const TransactionRow: React.FC<{ tx: any }> = ({ tx }) => (
             </Box>
         </Flex>
         <span className={`text-sm font-mono font-bold ${tx.type === 'despesa' ? 'text-destructive' : 'text-success'}`}>
-            {tx.type === 'despesa' ? '-' : '+'} {formatCurrencyBRL(Math.abs(tx.amount))}
+            <PrivacyMask>
+                {tx.type === 'despesa' ? '-' : '+'} {formatCurrencyBRL(Math.abs(tx.amount))}
+            </PrivacyMask>
         </span>
     </Flex>
 );
@@ -42,10 +48,54 @@ const TransactionRow: React.FC<{ tx: any }> = ({ tx }) => (
 export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrentView }) => {
     const { summary, goals, monthlyChartData, loading, transactions } = useDashboardData();
     const { openDialog } = useDialog();
+    const [showTour, setShowTour] = useState(false);
+
+    // Greeting Logic
+    const greeting = useMemo(() => {
+        const hour = new Date().getHours();
+        if (hour < 12) return 'Bom dia, Família!';
+        if (hour < 18) return 'Boa tarde, Família!';
+        return 'Boa noite, Família!';
+    }, []);
+
+    // Check for first visit
+    useEffect(() => {
+        const hasSeenTour = localStorage.getItem('financehub_tour_seen');
+        if (!hasSeenTour) {
+            setShowTour(true);
+        }
+    }, []);
+
+    const handleTourComplete = () => {
+        setShowTour(false);
+        localStorage.setItem('financehub_tour_seen', 'true');
+    };
+
+    const tourSteps: TourStep[] = [
+        {
+            targetId: 'balance-card',
+            title: 'Saldo Total',
+            content: 'Aqui você vê o saldo acumulado de todas as suas contas. É o seu termômetro financeiro!',
+        },
+        {
+            targetId: 'quick-actions',
+            title: 'Ações Rápidas',
+            content: 'Botões práticos para adicionar transações, metas ou dívidas rapidamente.',
+        },
+        {
+            targetId: 'monthly-chart',
+            title: 'Resumo Mensal',
+            content: 'Acompanhe a evolução das suas receitas e despesas ao longo do mês neste gráfico.',
+        },
+        {
+            targetId: 'goals-section',
+            title: 'Foco Principal',
+            content: 'Sua meta mais importante aparece aqui para manter você motivado!',
+        }
+    ];
 
     const firstGoal = useMemo(() => goals.find(g => g.status === GoalStatus.EM_ANDAMENTO), [goals]);
 
-    // Lógica de Investimentos Robusta (Keywords)
     const investmentAmount = useMemo(() => {
         const keywords = ['investimento', 'bolsa', 'cripto', 'b3', 'cdb', 'tesouro', 'selic', 'corretora', 'binance', 'nuinvest'];
         return Math.abs(transactions
@@ -65,44 +115,114 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
             initial="hidden" animate="visible" variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
             className="flex flex-col h-full overflow-y-auto no-scrollbar pb-24 space-y-6"
         >
+            <TourGuide 
+                steps={tourSteps} 
+                isOpen={showTour} 
+                onClose={() => setShowTour(false)} 
+                onComplete={handleTourComplete} 
+            />
+
             {/* Header com Saudação Dinâmica */}
             <Flex justify="between" align="end" className="px-1">
                 <Box>
-                    <Text size="sm" weight="medium" variant="muted">Bem-vindo de volta</Text>
-                    <Heading size="h2">Visão Geral</Heading>
+                    <Flex align="center" gap="sm">
+                        <Text size="sm" weight="medium" variant="muted">{greeting}</Text>
+                        {/* Financial Weather */}
+                        {summary.monthlyIncome > 0 && (
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        {summary.monthlyIncome >= Math.abs(summary.monthlyExpenses) ? (
+                                            <span className="text-yellow-500">☀️</span>
+                                        ) : (
+                                            <span className="text-blue-400">🌧️</span>
+                                        )}
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>{summary.monthlyIncome >= Math.abs(summary.monthlyExpenses) ? 'Clima Financeiro: Ensolarado (Superávit)' : 'Clima Financeiro: Chuvoso (Déficit)'}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        )}
+                    </Flex>
+                    <Flex align="center" gap="xs">
+                        <Heading size="h2">Visão Geral</Heading>
+                        <PrivacyToggle />
+                    </Flex>
                 </Box>
-                <Button onClick={() => openDialog('add-transaction')} className="shadow-cyan-500/20">
-                    <Zap className="w-4 h-4 mr-2" /> Novo Lançamento
-                </Button>
+                <Flex gap="sm">
+                     {/* Salary Countdown (Simple version: 5th business day) */}
+                    <Card className="hidden md:flex flex-col justify-center px-4 py-1 bg-primary/5 border-primary/20">
+                        <Text size="xs" variant="muted" className="text-center">Próximo Pagamento</Text>
+                        <Text weight="bold" align="center" className="text-primary">
+                            {(() => {
+                                const today = new Date();
+                                const currentMonth = today.getMonth();
+                                const currentYear = today.getFullYear();
+                                let targetDate = new Date(currentYear, currentMonth, 5);
+                                
+                                // Adjust to business day (simple approximation: if Sat/Sun, move to Mon)
+                                if (targetDate.getDay() === 0) targetDate.setDate(6); // Sunday -> Monday
+                                if (targetDate.getDay() === 6) targetDate.setDate(7); // Saturday -> Monday
+
+                                if (today > targetDate) {
+                                    targetDate = new Date(currentYear, currentMonth + 1, 5);
+                                    if (targetDate.getDay() === 0) targetDate.setDate(6);
+                                    if (targetDate.getDay() === 6) targetDate.setDate(7);
+                                }
+                                
+                                const diffTime = Math.abs(targetDate.getTime() - today.getTime());
+                                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                                return `${diffDays} dias`;
+                            })()}
+                        </Text>
+                    </Card>
+                    <Button onClick={() => openDialog('add-transaction')} className="shadow-cyan-500/20">
+                        <Zap className="w-4 h-4 mr-2" /> Novo Lançamento
+                    </Button>
+                </Flex>
             </Flex>
+
+            {/* Checklist de Início */}
+            <GettingStartedChecklist />
 
             {/* BENTO GRID PRINCIPAL */}
             <Grid cols={1} className="md:grid-cols-4 gap-4">
                 
                 {/* BLOCO 1: KPIs (Coluna Esquerda) */}
                 <motion.div variants={variants} className="md:col-span-2 lg:col-span-1 grid grid-cols-1 gap-4">
-                    <BalanceCard balance={summary.totalBalance} />
+                    <div id="balance-card">
+                        <BalanceCard balance={summary.totalBalance} />
+                    </div>
                     
                     <Grid cols={2} gap="md">
                          <Card className="flex flex-col justify-center">
                             <CardContent className="p-4">
                                 <div className="text-success mb-1"><ArrowUpRight className="w-5 h-5"/></div>
                                 <Text size="xs" weight="bold" variant="muted" className="uppercase">Entradas</Text>
-                                <Text size="lg" weight="bold"><AnimatedCurrency value={summary.monthlyIncome}/></Text>
+                                <Text size="lg" weight="bold">
+                                    <PrivacyMask>
+                                        <AnimatedCurrency value={summary.monthlyIncome}/>
+                                    </PrivacyMask>
+                                </Text>
                             </CardContent>
                          </Card>
                          <Card className="flex flex-col justify-center">
                             <CardContent className="p-4">
                                 <div className="text-destructive mb-1"><ArrowDownLeft className="w-5 h-5"/></div>
                                 <Text size="xs" weight="bold" variant="muted" className="uppercase">Saídas</Text>
-                                <Text size="lg" weight="bold"><AnimatedCurrency value={Math.abs(summary.monthlyExpenses)}/></Text>
+                                <Text size="lg" weight="bold">
+                                    <PrivacyMask>
+                                        <AnimatedCurrency value={Math.abs(summary.monthlyExpenses)}/>
+                                    </PrivacyMask>
+                                </Text>
                             </CardContent>
                          </Card>
                     </Grid>
                 </motion.div>
 
                 {/* BLOCO 2: Gráfico Principal (Centro Expandido) */}
-                <motion.div variants={variants} className="md:col-span-2 lg:col-span-2 h-[320px] md:h-auto">
+                <motion.div variants={variants} className="md:col-span-2 lg:col-span-2 h-[320px] md:h-auto" id="monthly-chart">
                     <MonthlySummaryChart data={monthlyChartData} />
                 </motion.div>
 
@@ -121,29 +241,37 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                 
                 {/* Ações Rápidas & Metas */}
                 <motion.div variants={variants} className="space-y-4">
-                    <QuickActions />
-                    {firstGoal ? (
-                        <Card className="relative overflow-hidden group cursor-pointer border-none bg-card" onClick={() => setCurrentView('goals')}>
-                            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <CardContent className="p-5">
-                                <Flex justify="between" align="center" className="mb-3">
-                                    <Text size="sm" className="text-purple-300 font-medium">Foco Principal</Text>
-                                    <Target className="w-4 h-4 text-purple-400" />
-                                </Flex>
-                                <Heading size="h4" className="mb-4">{firstGoal.name}</Heading>
-                                <ProgressBar percentage={(firstGoal.current_amount / firstGoal.target_amount) * 100} color="primary" />
-                                <Flex justify="between" className="mt-2">
-                                    <Text size="xs" variant="muted">{formatCurrencyBRL(firstGoal.current_amount)}</Text>
-                                    <Text size="xs" variant="muted">{formatCurrencyBRL(firstGoal.target_amount)}</Text>
-                                </Flex>
-                            </CardContent>
-                        </Card>
-                    ) : (
-                        <Card className="border-dashed border-muted-foreground/20 flex flex-col items-center justify-center py-8 bg-transparent">
-                            <Text size="sm" variant="muted" className="mb-3">Nenhuma meta definida</Text>
-                            <Button size="sm" variant="secondary" onClick={() => openDialog('add-goal')}>Criar Meta</Button>
-                        </Card>
-                    )}
+                    <div id="quick-actions">
+                        <QuickActions />
+                    </div>
+                    <div id="goals-section">
+                        {firstGoal ? (
+                            <Card className="relative overflow-hidden group cursor-pointer border-none bg-card" onClick={() => setCurrentView('goals')}>
+                                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                <CardContent className="p-5">
+                                    <Flex justify="between" align="center" className="mb-3">
+                                        <Text size="sm" className="text-purple-300 font-medium">Foco Principal</Text>
+                                        <Target className="w-4 h-4 text-purple-400" />
+                                    </Flex>
+                                    <Heading size="h4" className="mb-4">{firstGoal.name}</Heading>
+                                    <ProgressBar percentage={(firstGoal.current_amount / firstGoal.target_amount) * 100} color="primary" />
+                                    <Flex justify="between" className="mt-2">
+                                        <PrivacyMask>
+                                            <Text size="xs" variant="muted">{formatCurrencyBRL(firstGoal.current_amount)}</Text>
+                                        </PrivacyMask>
+                                        <PrivacyMask>
+                                            <Text size="xs" variant="muted">{formatCurrencyBRL(firstGoal.target_amount)}</Text>
+                                        </PrivacyMask>
+                                    </Flex>
+                                </CardContent>
+                            </Card>
+                        ) : (
+                            <Card className="border-dashed border-muted-foreground/20 flex flex-col items-center justify-center py-8 bg-transparent">
+                                <Text size="sm" variant="muted" className="mb-3">Nenhuma meta definida</Text>
+                                <Button size="sm" variant="secondary" onClick={() => openDialog('add-goal')}>Criar Meta</Button>
+                            </Card>
+                        )}
+                    </div>
                 </motion.div>
 
                 {/* Transações Recentes */}

@@ -106,7 +106,7 @@ const ScheduledTransactionCard: React.FC<{ item: ScheduledTransaction }> = ({ it
                     <div className="flex-grow">
                         <div className="flex justify-between items-center">
                             <h3 className="text-base font-semibold text-white">{item.description}</h3>
-                            <span className={`font-semibold text-lg ${item.amount < 0 ? 'text-[oklch(var(--danger-oklch))]' : 'text-[oklch(var(--success-oklch))]'}`}>
+                            <span className={`font-semibold text-lg ${item.amount < 0 ? 'text-destructive' : 'text-success'}`}>
                                 {item.amount < 0 ? '' : '+'} {formatCurrencyBRL(item.amount)}
                             </span>
                         </div>
@@ -157,7 +157,7 @@ export const SchedulingView: React.FC = () => {
                 breadcrumbs={['FinanceHub', 'Agendamentos']}
                 actions={
                     <div className="flex items-center gap-2">
-                        <div className="bg-[oklch(var(--card-oklch))] rounded-lg p-1 flex items-center border border-[oklch(var(--border-oklch))]">
+                        <div className="bg-card rounded-lg p-1 flex items-center border border-border">
                             <button
                                 onClick={() => setViewMode('list')}
                                 className={`p-1.5 rounded-md transition-all ${viewMode === 'list' ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400 hover:text-white'}`}

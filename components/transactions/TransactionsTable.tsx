@@ -15,6 +15,7 @@ import { PencilIcon, TrashIcon, LockClosed, LinkIcon } from '../Icons';
 import { Flex, Box } from '../ui/layout';
 import { Text } from '../ui/typography';
 import { Checkbox } from '../ui/Checkbox';
+import { PrivacyMask } from '../ui/PrivacyMask';
 
 interface TransactionsTableProps {
   transactions: Transaction[];
@@ -101,8 +102,13 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                     </Text>
                 </TableCell>
                 <TableCell className="text-right">
+import { PrivacyMask } from '../ui/PrivacyMask';
+
+// ... (inside component)
                     <Text weight="bold" className={isExpense ? 'text-destructive' : 'text-success'}>
-                        {isExpense ? '-' : '+'} {formatCurrencyBRL(Math.abs(tx.amount))}
+                        <PrivacyMask>
+                            {isExpense ? '-' : '+'} {formatCurrencyBRL(Math.abs(tx.amount))}
+                        </PrivacyMask>
                     </Text>
                 </TableCell>
                 <TableCell>

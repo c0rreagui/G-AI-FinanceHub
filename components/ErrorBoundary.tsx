@@ -1,6 +1,5 @@
 // components/ErrorBoundary.tsx
-import * as React from 'react';
-import { ErrorInfo, ReactNode } from 'react';
+import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { logger } from '../services/loggingService';
 import { Button } from './ui/Button';
 import { Zap } from './Icons';
@@ -14,24 +13,24 @@ interface ErrorBoundaryState {
   error: Error | null;
 }
 
-export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  public readonly props: Readonly<ErrorBoundaryProps>;
+
   public state: ErrorBoundaryState = {
     hasError: false,
     error: null,
   };
-  public props: ErrorBoundaryProps;
 
-  // FIX: Initialized state in the constructor to ensure `this.props` is correctly typed and accessible.
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.props = props;
   }
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+  public static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     logger.error('Erro de renderização capturado pelo ErrorBoundary', {
       error: {
         message: error.message,
@@ -41,7 +40,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
     });
   }
 
-  render() {
+  public render() {
     if (this.state.hasError) {
       return (
         <div className="flex h-screen w-screen items-center justify-center bg-oklch-background p-4 text-center">

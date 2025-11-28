@@ -15,6 +15,7 @@ import { AnimatedCurrency } from '../ui/AnimatedCurrency';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/Card';
 import { Flex, Box, Grid } from '../ui/layout';
 import { Text, Heading } from '../ui/typography';
+import { triggerConfetti } from '../ui/Confetti';
 
 const GoalCard: React.FC<{ goal: Goal }> = ({ goal }) => {
     const { openDialog } = useDialog();
@@ -34,6 +35,16 @@ const GoalCard: React.FC<{ goal: Goal }> = ({ goal }) => {
             onConfirm: () => deleteGoal(goal.id),
         });
     };
+
+    React.useEffect(() => {
+        if (isCompleted) {
+            const hasCelebrated = sessionStorage.getItem(`celebrated_goal_${goal.id}`);
+            if (!hasCelebrated) {
+                triggerConfetti();
+                sessionStorage.setItem(`celebrated_goal_${goal.id}`, 'true');
+            }
+        }
+    }, [isCompleted, goal.id]);
 
     return (
         <motion.div 

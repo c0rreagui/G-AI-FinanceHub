@@ -3,6 +3,7 @@ import { PageHeader } from '../layout/PageHeader';
 import { Settings } from '../Icons';
 import { ApiKeySettings } from '../ui/ApiKeySettings';
 import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
 import { motion } from 'framer-motion';
 import { APP_VERSION } from '../../config';
 import { useAuth } from '../../hooks/useAuth';
@@ -39,13 +40,13 @@ export const SettingsView: React.FC = () => {
             >
                 <motion.div variants={itemVariants}><ApiKeySettings /></motion.div>
 
-                 <motion.div variants={itemVariants} className="card">
+                 <Card className="p-6">
                     <h2 className="text-xl font-semibold text-white mb-2">Sobre</h2>
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm text-muted-foreground">
                         FinanceHub é seu assistente financeiro pessoal com tecnologia de IA.
                     </p>
-                    <p className="text-xs text-gray-500 mt-4">Versão {APP_VERSION}</p>
-                </motion.div>
+                    <p className="text-xs text-muted-foreground mt-4">Versão {APP_VERSION}</p>
+                </Card>
             </motion.div>
         </>
     );

@@ -8,39 +8,40 @@ import { useDialog } from '../../hooks/useDialog';
 import { useToast } from '../../hooks/useToast';
 import { Input } from '../ui/Input';
 import { ViewType } from '../../types';
+import { Card, CardContent } from '../ui/Card';
 
 const StateInspector: React.FC = () => {
     const { transactions, goals, debts, scheduledTransactions, summary, userLevel } = useDashboardData();
     const dataToShow = { summary, userLevel };
 
     return (
-        <div className="card">
+        <Card className="p-4">
             <h2 className="text-lg font-semibold text-white mb-3">Live State Inspector</h2>
             <ul className="space-y-2 text-sm">
                 <li className="flex justify-between items-center">
-                    <span className="text-gray-400">Transações:</span>
+                    <span className="text-muted-foreground">Transações:</span>
                     <span className="font-mono font-semibold text-white">{transactions.length}</span>
                 </li>
                 <li className="flex justify-between items-center">
-                    <span className="text-gray-400">Metas:</span>
+                    <span className="text-muted-foreground">Metas:</span>
                     <span className="font-mono font-semibold text-white">{goals.length}</span>
                 </li>
                 <li className="flex justify-between items-center">
-                    <span className="text-gray-400">Dívidas:</span>
+                    <span className="text-muted-foreground">Dívidas:</span>
                     <span className="font-mono font-semibold text-white">{debts.length}</span>
                 </li>
                 <li className="flex justify-between items-center">
-                    <span className="text-gray-400">Agendamentos:</span>
+                    <span className="text-muted-foreground">Agendamentos:</span>
                     <span className="font-mono font-semibold text-white">{scheduledTransactions.length}</span>
                 </li>
             </ul>
             <details className="mt-4">
-                <summary className="cursor-pointer text-xs text-gray-500 hover:text-white">Ver dados computados (JSON)</summary>
+                <summary className="cursor-pointer text-xs text-muted-foreground hover:text-white">Ver dados computados (JSON)</summary>
                 <pre className="mt-2 bg-black/30 p-2 rounded-md text-xs whitespace-pre-wrap font-mono text-cyan-200/80">
                     <code>{JSON.stringify(dataToShow, null, 2)}</code>
                 </pre>
             </details>
-        </div>
+        </Card>
     );
 };
 
@@ -80,7 +81,7 @@ export const DevToolsView: React.FC<DevToolsViewProps> = (props) => {
 
             <div className="grid gap-6 md:grid-cols-2">
                 <div className="space-y-6">
-                    <section className="card space-y-4">
+                    <Card className="space-y-4 p-4">
                         <h2 className="text-lg font-semibold text-white flex items-center gap-2">
                             <Zap className="w-5 h-5 text-yellow-400" />
                             Ações Rápidas
@@ -99,9 +100,9 @@ export const DevToolsView: React.FC<DevToolsViewProps> = (props) => {
                                 {confirmDelete ? 'Confirmar Limpeza Total?' : 'Limpar Todos os Dados'}
                             </Button>
                         </div>
-                    </section>
+                    </Card>
 
-                    <section className="card space-y-4">
+                    <Card className="space-y-4 p-4">
                         <h2 className="text-lg font-semibold text-white flex items-center gap-2">
                             <Target className="w-5 h-5 text-cyan-400" />
                             Testar Modais
@@ -120,26 +121,26 @@ export const DevToolsView: React.FC<DevToolsViewProps> = (props) => {
                                 Editar Perfil
                             </Button>
                         </div>
-                    </section>
+                    </Card>
 
-                    <section className="card space-y-4">
+                    <Card className="space-y-4 p-4">
                          <h2 className="text-lg font-semibold text-white flex items-center gap-2">
                             <Target className="w-5 h-5 text-pink-400" />
                             Design System
                         </h2>
-                        <p className="text-sm text-gray-400">
+                        <p className="text-sm text-muted-foreground">
                             Visualize e teste os componentes do novo Design System.
                         </p>
                         <Button onClick={() => props.setCurrentView('design-system')} className="w-full bg-gradient-to-r from-pink-500 to-violet-500 border-0">
                             <Target className="w-4 h-4 mr-2" /> Abrir Design System Showcase
                         </Button>
-                    </section>
+                    </Card>
                 </div>
 
                 <div className="space-y-6">
                     <StateInspector />
                     
-                    <section className="card space-y-4">
+                    <Card className="space-y-4 p-4">
                         <h2 className="text-lg font-semibold text-white flex items-center gap-2">
                             <Bell className="w-5 h-5 text-blue-400" />
                             Testar Toasts
@@ -158,7 +159,7 @@ export const DevToolsView: React.FC<DevToolsViewProps> = (props) => {
                                 Info
                             </Button>
                         </div>
-                    </section>
+                    </Card>
                 </div>
             </div>
         </div>
