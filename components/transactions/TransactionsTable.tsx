@@ -102,9 +102,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                     </Text>
                 </TableCell>
                 <TableCell className="text-right">
-import { PrivacyMask } from '../ui/PrivacyMask';
 
-// ... (inside component)
                     <Text weight="bold" className={isExpense ? 'text-destructive' : 'text-success'}>
                         <PrivacyMask>
                             {isExpense ? '-' : '+'} {formatCurrencyBRL(Math.abs(tx.amount))}
