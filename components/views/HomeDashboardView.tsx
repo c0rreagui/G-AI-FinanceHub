@@ -24,6 +24,7 @@ import { PrivacyToggle, PrivacyMask } from '../ui/PrivacyMask';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
 import { Info } from 'lucide-react';
 import { UserLevelBar } from '../dashboard/UserLevelBar';
+import { DailyTipCard } from '../dashboard/DailyTipCard';
 
 interface HomeDashboardViewProps {
     setCurrentView: (view: ViewType) => void;
@@ -197,6 +198,12 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
             <GettingStartedChecklist />
 
             {/* BENTO GRID PRINCIPAL */}
+            {/* Daily Tip */}
+            {/* @ts-ignore */}
+            <motion.div variants={variants}>
+                <DailyTipCard />
+            </motion.div>
+
             <Grid cols={1} className="md:grid-cols-4 gap-4">
                 
                 {/* BLOCO 1: KPIs (Coluna Esquerda) */}
@@ -210,7 +217,19 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                          <Card className="flex flex-col justify-center">
                             <CardContent className="p-4">
                                 <div className="text-success mb-1"><ArrowUpRight className="w-5 h-5"/></div>
-                                <Text size="xs" weight="bold" variant="muted" className="uppercase mb-1">Entradas</Text>
+                                <div className="flex items-center gap-1 mb-1">
+                                    <Text size="xs" weight="bold" variant="muted" className="uppercase">Entradas</Text>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger>
+                                                <Info className="w-3 h-3 text-gray-500 hover:text-gray-300" />
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Soma de todas as suas receitas no mês atual.</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
                                 <div className="truncate" title={formatCurrencyBRL(summary.monthlyIncome)}>
                                     <Text size="lg" weight="bold" className="truncate">
                                         <PrivacyMask>
@@ -223,7 +242,19 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                          <Card className="flex flex-col justify-center">
                             <CardContent className="p-4">
                                 <div className="text-destructive mb-1"><ArrowDownLeft className="w-5 h-5"/></div>
-                                <Text size="xs" weight="bold" variant="muted" className="uppercase mb-1">Saídas</Text>
+                                <div className="flex items-center gap-1 mb-1">
+                                    <Text size="xs" weight="bold" variant="muted" className="uppercase">Saídas</Text>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger>
+                                                <Info className="w-3 h-3 text-gray-500 hover:text-gray-300" />
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Soma de todas as suas despesas no mês atual.</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
                                 <div className="truncate" title={formatCurrencyBRL(Math.abs(summary.monthlyExpenses))}>
                                     <Text size="lg" weight="bold" className="truncate">
                                         <PrivacyMask>
