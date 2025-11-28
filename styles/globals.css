@@ -1,3 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Base Colors - Dark Mode Default for FinanceHub */
+    --background: 220 30% 6%; /* #0B0E14 */
     --foreground: 210 40% 98%;
 
     /* Surface 1 (Card) - rgba(30, 41, 59, 0.4) -> HSL approx */
