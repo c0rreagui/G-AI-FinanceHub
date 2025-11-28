@@ -17,6 +17,8 @@ import { Heading, Text } from '../ui/typography';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { BalanceCard } from '../dashboard/BalanceCard';
 import { TourGuide, TourStep } from '../ui/TourGuide';
+import { SalaryCountdown } from '../dashboard/SalaryCountdown';
+import { Sun, CloudRain, Cloud } from 'lucide-react';
 import { GettingStartedChecklist } from '../dashboard/GettingStartedChecklist';
 import { PrivacyToggle, PrivacyMask } from '../ui/PrivacyMask';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
@@ -57,6 +59,15 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
         if (hour < 18) return 'Boa tarde, Família!';
         return 'Boa noite, Família!';
     }, []);
+
+    // Financial Weather Logic
+    const financialWeather = useMemo(() => {
+        if (summary.monthlyIncome === 0 && summary.monthlyExpenses === 0) return { icon: Cloud, color: 'text-gray-400', label: 'Neutro' };
+        const ratio = Math.abs(summary.monthlyExpenses) / (summary.monthlyIncome || 1);
+        if (ratio < 0.7) return { icon: Sun, color: 'text-yellow-400', label: 'Ensolarado' }; // Spending < 70% of income
+        if (ratio < 0.9) return { icon: Cloud, color: 'text-gray-300', label: 'Nublado' }; // Spending < 90%
+        return { icon: CloudRain, color: 'text-blue-400', label: 'Chuvoso' }; // Spending > 90%
+    }, [summary]);
 
     // Check for first visit
     useEffect(() => {
@@ -122,28 +133,19 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                 onComplete={handleTourComplete} 
             />
 
-            {/* Header com Saudação Dinâmica */}
+            {/* Header com Saudação Dinâmica e Clima */}
             <Flex justify="between" align="end" className="px-1">
                 <Box>
-                    <Flex align="center" gap="sm">
+                    <Flex align="center" gap="sm" className="mb-1">
                         <Text size="sm" weight="medium" variant="muted">{greeting}</Text>
-                        {/* Financial Weather */}
-                        {summary.monthlyIncome > 0 && (
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        {summary.monthlyIncome >= Math.abs(summary.monthlyExpenses) ? (
-                                            <span className="text-yellow-500">☀️</span>
-                                        ) : (
-                                            <span className="text-blue-400">🌧️</span>
-                                        )}
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>{summary.monthlyIncome >= Math.abs(summary.monthlyExpenses) ? 'Clima Financeiro: Ensolarado (Superávit)' : 'Clima Financeiro: Chuvoso (Déficit)'}</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-                        )}
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <financialWeather.icon className={`w-4 h-4 ${financialWeather.color}`} />
+                                </TooltipTrigger>
+                                <TooltipContent>Clima Financeiro: {financialWeather.label}</TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     </Flex>
                     <Flex align="center" gap="xs">
                         <Heading size="h2">Visão Geral</Heading>
