@@ -3,6 +3,15 @@ import { Button } from '../ui/Button';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter, CardDescription } from '../ui/Card';
 import { Input } from '../ui/Input';
 import { Label } from '../ui/Label';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/Dialog"
 
 export const DesignSystemView: React.FC = () => {
     return (
@@ -96,6 +105,39 @@ export const DesignSystemView: React.FC = () => {
                             <p>This card uses a custom gradient background.</p>
                         </CardContent>
                     </Card>
+                </div>
+            </section>
+            {/* Dialogs Section */}
+            <section className="space-y-6">
+                <h2 className="text-2xl font-heading font-semibold text-primary border-b border-border pb-2">Dialogs (Modals)</h2>
+                <div className="flex flex-wrap gap-4">
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button variant="premium">Open Premium Dialog</Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Edit Profile</DialogTitle>
+                                <DialogDescription>
+                                    Make changes to your profile here. Click save when you're done.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-4">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="name">Name</Label>
+                                    <Input id="name" defaultValue="Guilherme Corrêa" />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="username">Username</Label>
+                                    <Input id="username" defaultValue="@c0rreagui" />
+                                </div>
+                            </div>
+                            <DialogFooter>
+                                <Button variant="outline">Cancel</Button>
+                                <Button variant="premium">Save Changes</Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
                 </div>
             </section>
         </div>
