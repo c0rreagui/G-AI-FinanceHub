@@ -1,17 +1,24 @@
 import React from 'react';
 import { ChevronDown } from '../Icons'; // Usaremos o Chevron para a direita
+import { PrivacyToggle } from '../ui/PrivacyMask';
 
 interface PageHeaderProps {
-  icon: React.ElementType;
+  icon: React.ElementType | React.ReactNode;
   title: string;
   subtitle?: string;
   breadcrumbs?: string[];
   actions?: React.ReactNode;
 }
 
-import { PrivacyToggle } from '../ui/PrivacyMask';
+export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs = [], actions }) => {
+  const renderIcon = () => {
+    if (React.isValidElement(icon)) {
+      return icon;
+    }
+    const Icon = icon as React.ElementType;
+    return <Icon className="w-8 h-8 text-cyan-300" />;
+  };
 
-export const PageHeader: React.FC<PageHeaderProps> = ({ icon: Icon, title, breadcrumbs = [], actions }) => {
   return (
     <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[oklch(var(--border-oklch))] pb-5 mb-6 flex-shrink-0">
       <div 
@@ -20,7 +27,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ icon: Icon, title, bread
       />
       <div>
         <div className="flex items-center gap-3">
-          <Icon className="w-8 h-8 text-cyan-300" />
+          {renderIcon()}
           <h1 className="text-3xl font-bold tracking-tight text-white">{title}</h1>
         </div>
         <div className="mt-2 flex items-center gap-x-2 text-sm text-gray-400">
