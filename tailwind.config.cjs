@@ -1,7 +1,7 @@
-import tailwindAnimate from "tailwindcss-animate";
+const tailwindAnimate = require("tailwindcss-animate");
 
 /** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
     darkMode: ["class"],
     content: [
         "./index.html",
