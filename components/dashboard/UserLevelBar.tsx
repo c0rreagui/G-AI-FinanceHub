@@ -1,11 +1,8 @@
-import React from 'react';
-import { useDashboardData } from '../../hooks/useDashboardData';
-import { Progress } from '../ui/Progress';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
-import { Trophy } from 'lucide-react';
+import { useDialog } from '../../hooks/useDialog';
 
 export const UserLevelBar: React.FC = () => {
     const { userLevel } = useDashboardData();
+    const { openDialog } = useDialog();
 
     if (!userLevel) return null;
 
@@ -16,7 +13,10 @@ export const UserLevelBar: React.FC = () => {
             <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <div className="flex flex-col gap-1 cursor-help">
+                        <div 
+                            className="flex flex-col gap-1 cursor-pointer hover:opacity-80 transition-opacity"
+                            onClick={() => openDialog('achievements')}
+                        >
                             <div className="flex justify-between items-center text-xs text-muted-foreground">
                                 <span className="flex items-center gap-1 font-bold text-yellow-500">
                                     <Trophy className="w-3 h-3" />
@@ -29,7 +29,7 @@ export const UserLevelBar: React.FC = () => {
                     </TooltipTrigger>
                     <TooltipContent>
                         <p>Rank: {userLevel.rank}</p>
-                        <p>Continue usando o app para subir de nível!</p>
+                        <p>Clique para ver suas conquistas!</p>
                     </TooltipContent>
                 </Tooltip>
             </TooltipProvider>

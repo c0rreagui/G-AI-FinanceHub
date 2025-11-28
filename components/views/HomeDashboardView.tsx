@@ -25,6 +25,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/
 import { Info } from 'lucide-react';
 import { UserLevelBar } from '../dashboard/UserLevelBar';
 import { DailyTipCard } from '../dashboard/DailyTipCard';
+import { MonthlyChallengesCard } from '../dashboard/MonthlyChallengesCard';
 
 interface HomeDashboardViewProps {
     setCurrentView: (view: ViewType) => void;
@@ -323,9 +324,15 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                     </div>
                 </motion.div>
 
+                {/* Desafios Mensais */}
+                {/* @ts-ignore */}
+                <motion.div variants={variants}>
+                    <MonthlyChallengesCard />
+                </motion.div>
+
                 {/* Transações Recentes */}
                 {/* @ts-ignore */}
-                <motion.div variants={variants} className="lg:col-span-2">
+                <motion.div variants={variants} className="lg:col-span-1">
                     <Card className="h-full">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle>Últimas Atividades</CardTitle>

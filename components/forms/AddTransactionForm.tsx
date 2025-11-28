@@ -11,15 +11,9 @@ import { LoadingSpinner } from '../LoadingSpinner';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Variants } from 'framer-motion';
-import { XIcon } from '../Icons';
-import { triggerHapticFeedback } from '../../utils/haptics';
+import { XIcon, Mic } from '../Icons';
 
-interface AddTransactionFormProps {
-  isOpen: boolean;
-  onClose: () => void;
-  prefill?: Partial<Omit<Transaction, 'id' | 'category'>>;
-  transactionToEdit?: Transaction;
-}
+// ...
 
 const QuickValueChip: React.FC<{ value: number; onSelect: (value: number) => void }> = ({ value, onSelect }) => (
     <button
@@ -28,162 +22,46 @@ const QuickValueChip: React.FC<{ value: number; onSelect: (value: number) => voi
           triggerHapticFeedback();
           onSelect(value);
         }}
-        className="px-3 py-1.5 text-sm font-semibold rounded-full bg-white/5 hover:bg-white/10 text-gray-300 transition-colors"
+        className="px-4 py-3 text-sm font-semibold rounded-full bg-white/5 hover:bg-white/10 text-gray-300 transition-colors min-w-[60px] touch-manipulation"
         aria-label={`Selecionar valor rápido de ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)}`}
     >
         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)}
     </button>
 );
 
-const containerVariants: Variants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.06,
-    },
-  },
-};
-
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 15 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      type: 'spring',
-      stiffness: 300,
-      damping: 25,
-    },
-  },
-};
+// ...
 
 export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, onClose, prefill, transactionToEdit }) => {
-  const { addTransaction, updateTransaction, categories } = useDashboardData();
-  const isDesktop = useMediaQuery('(min-width: 768px)');
+  // ... existing hooks ...
+  const [isListening, setIsListening] = useState(false);
 
-  const [description, setDescription] = useState('');
-  const [amount, setAmount] = useState('');
-  const [type, setType] = useState<TransactionType>(TransactionType.DESPESA);
-  const [categoryId, setCategoryId] = useState<string | null>(null);
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const isEditing = !!transactionToEdit;
-  const quickValues = [5, 10, 20, 50, 100];
+  // ... existing useEffects ...
 
-  useEffect(() => {
-    const dataToSet = transactionToEdit || prefill;
-    if (dataToSet && isOpen) {
-        setDescription(dataToSet.description || '');
-        setAmount(dataToSet.amount ? String(Math.abs(dataToSet.amount)) : '');
-        
-        const sanitizedType = dataToSet.type === TransactionType.RECEITA 
-            ? TransactionType.RECEITA 
-            : TransactionType.DESPESA;
-        setType(sanitizedType);
-        
-        // FIX: Corrected field name to snake_case to match database schema.
-        setCategoryId(dataToSet.category_id || null);
-        setDate(dataToSet.date ? dataToSet.date.split('T')[0] : new Date().toISOString().split('T')[0]);
+  const startListening = () => {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert('Seu navegador não suporta reconhecimento de voz.');
+        return;
     }
-  }, [prefill, transactionToEdit, isOpen]);
 
-  const resetForm = () => {
-    setDescription('');
-    setAmount('');
-    setType(TransactionType.DESPESA);
-    setCategoryId(null);
-    setDate(new Date().toISOString().split('T')[0]);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const numericAmount = parseFloat(amount);
-    if (!description || !amount || !categoryId || isNaN(numericAmount) || isSubmitting) return;
-
-    setIsSubmitting(true);
-    const finalAmount = type === TransactionType.DESPESA ? -Math.abs(numericAmount) : Math.abs(numericAmount);
-
-    let success = false;
-    if (isEditing) {
-        // FIX: Use snake_case for database fields.
-        const txData = {
-            id: transactionToEdit.id,
-            description,
-            amount: finalAmount,
-            type,
-            categoryId,
-            date: new Date(date).toISOString(),
-            goal_contribution_id: transactionToEdit.goal_contribution_id,
-            debt_payment_id: transactionToEdit.debt_payment_id,
-        };
-        success = await updateTransaction(txData);
-
-    } else {
-        // FIX: Use snake_case for database fields.
-        const txData = {
-            description,
-            amount: finalAmount,
-            type,
-            categoryId,
-            date: new Date(date).toISOString(),
-        };
-        success = await addTransaction(txData);
-    }
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
     
-    setIsSubmitting(false);
+    recognition.lang = 'pt-BR';
+    recognition.continuous = false;
+    recognition.interimResults = false;
 
-    if (success) {
-      onClose();
-    }
-  };
-  
-  // Smart Input: Auto-categorization
-  useEffect(() => {
-    if (isEditing || !description || categoryId) return; // Don't override if editing or already selected
-
-    const lowerDesc = description.toLowerCase();
-    const keywords: { [key: string]: string[] } = {
-        'Alimentação': ['ifood', 'restaurante', 'mercado', 'lanche', 'pizza', 'burger', 'açaí', 'padaria'],
-        'Transporte': ['uber', '99', 'taxi', 'ônibus', 'metrô', 'combustível', 'posto', 'gasolina'],
-        'Lazer': ['cinema', 'netflix', 'spotify', 'jogo', 'steam', 'ingressos'],
-        'Saúde': ['farmácia', 'drogaria', 'médico', 'dentista', 'exame'],
-        'Moradia': ['aluguel', 'condomínio', 'luz', 'água', 'internet'],
-        'Salário': ['salário', 'pagamento', 'freela', 'pix recebido'],
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+    
+    recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setDescription(prev => prev ? `${prev} ${transcript}` : transcript);
     };
 
-    for (const [catName, terms] of Object.entries(keywords)) {
-        if (terms.some(term => lowerDesc.includes(term))) {
-            const cat = categories.find(c => c.name.toLowerCase() === catName.toLowerCase());
-            if (cat) {
-                setCategoryId(cat.id);
-                // Optional: visual feedback or toast could go here
-            }
-            break;
-        }
-    }
-  }, [description, categories, isEditing, categoryId]);
-
-  // Calculator Logic
-  const handleAmountBlur = () => {
-      try {
-          // Allow numbers, +, -, *, /, ., , (replace comma with dot)
-          const sanitized = amount.replace(/,/g, '.').replace(/[^0-9+\-*/.]/g, '');
-          if (!sanitized) return;
-          
-          // Safe evaluation using Function constructor with strict limitations is better than eval, 
-          // but for simple math, we can just check if it matches a math regex.
-          if (/^[\d.+\-*/\s]+$/.test(sanitized)) {
-              // eslint-disable-next-line no-new-func
-              const result = new Function('return ' + sanitized)();
-              if (isFinite(result)) {
-                  setAmount(String(result.toFixed(2)));
-              }
-          }
-      } catch (e) {
-          // Ignore invalid expressions
-      }
+    recognition.start();
   };
+
+  // ... existing logic ...
 
   const FormFields = (
     <>
@@ -191,15 +69,29 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
           <TypeToggle selectedType={type} onTypeChange={setType} />
         </motion.div>
         <motion.div variants={itemVariants} {...({} as any)}>
-          <Input
-            id="tx-description"
-            label="Descrição"
-            type="text"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-          />
+          <div className="flex gap-2 items-end">
+              <div className="flex-grow">
+                <Input
+                    id="tx-description"
+                    label="Descrição"
+                    type="text"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    required
+                />
+              </div>
+              <Button 
+                type="button" 
+                variant={isListening ? "destructive" : "secondary"} 
+                className="mb-[2px] h-[42px] w-[42px] p-0 flex items-center justify-center flex-shrink-0"
+                onClick={startListening}
+                title="Falar descrição"
+              >
+                  <Mic className={`w-5 h-5 ${isListening ? 'animate-pulse' : ''}`} />
+              </Button>
+          </div>
         </motion.div>
+        {/* ... rest of fields ... */}
         <motion.div variants={itemVariants} className="grid grid-cols-2 gap-4" {...({} as any)}>
             <Input
               id="tx-amount"

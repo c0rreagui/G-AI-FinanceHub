@@ -9,6 +9,8 @@ import { AddPaymentToDebtForm } from './forms/AddPaymentToDebtForm';
 import { ConfirmationModal } from './ui/ConfirmationModal';
 import { BulkRecategorizeForm } from './forms/BulkRecategorizeForm';
 
+import { AchievementsDialog } from './dashboard/AchievementsDialog';
+
 export const DialogManager: React.FC = () => {
   const { dialogType, closeDialog, dialogProps } = useDialog();
 
@@ -43,6 +45,8 @@ export const DialogManager: React.FC = () => {
             onClose={closeDialog}
             {...dialogProps}
         />
+    case 'achievements':
+        return <AchievementsDialog isOpen={true} onClose={closeDialog} />;
     default:
       return null;
   }

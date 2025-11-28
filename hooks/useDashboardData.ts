@@ -24,6 +24,7 @@ import { DashboardDataContext } from '../contexts/DashboardDataContext';
 import { getIconByName } from '../utils/categoryIcons';
 import { useToast } from './useToast';
 import { logger } from '../services/loggingService';
+import { triggerConfetti } from '../components/ui/Confetti';
 
 const GUEST_DATA_KEY = 'financehub_guest_data';
 
@@ -562,9 +563,25 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         showToast('Valor Adicionado à Meta!', { type: 'success' });
         
         // A busca de dados (fetchData) já trará a meta atualizada
+        // A busca de dados (fetchData) já trará a meta atualizada
         const updatedGoal = goals.find((g: Goal) => g.id === goalId);
-        if (updatedGoal?.status === GoalStatus.CONCLUIDO && goal.status !== GoalStatus.CONCLUIDO) {
-            showToast('Parabéns!', { description: `Meta "${goal.name}" concluída!`, type: 'success' });
+        
+        if (updatedGoal) {
+            const oldProgress = (goal.current_amount / goal.target_amount) * 100;
+            const newProgress = (updatedGoal.current_amount / updatedGoal.target_amount) * 100;
+
+            if (updatedGoal.status === GoalStatus.CONCLUIDO && goal.status !== GoalStatus.CONCLUIDO) {
+                triggerConfetti();
+                showToast('Parabéns!', { description: `Meta "${goal.name}" concluída! 🎉`, type: 'success' });
+            } else if (newProgress >= 75 && oldProgress < 75) {
+                triggerConfetti();
+                showToast('Quase lá!', { description: `Você já atingiu 75% da meta "${goal.name}"! 🚀`, type: 'success' });
+            } else if (newProgress >= 50 && oldProgress < 50) {
+                triggerConfetti();
+                showToast('Metade do caminho!', { description: `Você já atingiu 50% da meta "${goal.name}"! 💪`, type: 'success' });
+            } else if (newProgress >= 25 && oldProgress < 25) {
+                showToast('Bom começo!', { description: `Você já atingiu 25% da meta "${goal.name}"! 🌱`, type: 'success' });
+            }
         }
         return true;
     }, goalId);

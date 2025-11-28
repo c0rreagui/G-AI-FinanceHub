@@ -12,32 +12,44 @@ interface ToolsViewProps {
   setCurrentView: (view: ViewType) => void;
 }
 
+import { CompoundInterestCalculator } from '../tools/CompoundInterestCalculator';
+import { RateComparator } from '../tools/RateComparator';
+
 export const ToolsView: React.FC<ToolsViewProps> = ({ setCurrentView }) => {
   const { apiKey } = useAuth();
 
   return (
-    <>
+    <div className="flex flex-col h-full">
       <PageHeader icon={Wrench} title="Ferramentas" breadcrumbs={['FinanceHub', 'Ferramentas']} />
-      <div className="mt-6 flex-grow overflow-y-auto pr-2">
-        {apiKey ? (
-          <ReceiptScanner />
-        ) : (
-          <Card className="text-center text-muted-foreground p-6">
-            <h3 className="text-lg font-semibold text-foreground">Funcionalidade Indisponível</h3>
-            <p className="mt-2">A ferramenta de Scanner (OCR) usa a API do Google AI.</p>
-            <p className="mt-1">
-              Por favor, configure sua chave de API na tela de 'Ajustes' para usar esta funcionalidade.
-            </p>
-             <p className="text-xs text-muted-foreground mt-2 italic">
-              Nota: O uso da API pode estar sujeito a custos.
-            </p>
-            <Button onClick={() => setCurrentView('settings')} className="mt-6 mx-auto">
-              <Settings className="w-4 h-4 mr-2" />
-              Configurar Chave de API
-            </Button>
-          </Card>
-        )}
+      <div className="mt-6 flex-grow overflow-y-auto pr-2 pb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Calculadora de Juros Compostos - Full Width on Mobile, Half on Desktop */}
+            <div className="lg:col-span-2">
+                <CompoundInterestCalculator />
+            </div>
+
+            {/* Comparador de Taxas */}
+            <div>
+                <RateComparator />
+            </div>
+
+            {/* Scanner de Recibos */}
+            <div>
+                {apiKey ? (
+                <ReceiptScanner />
+                ) : (
+                <Card className="text-center text-muted-foreground p-6 h-full flex flex-col justify-center items-center">
+                    <h3 className="text-lg font-semibold text-foreground">Scanner de Recibos (IA)</h3>
+                    <p className="mt-2 text-sm">Configure sua chave de API para usar o reconhecimento de recibos.</p>
+                    <Button onClick={() => setCurrentView('settings')} className="mt-4" variant="outline">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Configurar API
+                    </Button>
+                </Card>
+                )}
+            </div>
+        </div>
       </div>
-    </>
+    </div>
   );
 };
