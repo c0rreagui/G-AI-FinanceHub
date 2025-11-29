@@ -787,10 +787,10 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     }, id);
 
     const clearAllUserData = () => withMutation(async () => {
-        if (isGuest) {
+        if (isGuest || isDeveloper) {
             localStorage.removeItem(GUEST_DATA_KEY);
             await fetchData();
-            showToast('Todos os dados de visitante foram apagados!', { type: 'info' });
+            showToast(isDeveloper ? 'Dados de desenvolvedor resetados!' : 'Todos os dados de visitante foram apagados!', { type: 'info' });
             return;
         }
         if (!user) return;
