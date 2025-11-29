@@ -824,9 +824,9 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     const addMockData = () => withMutation(async () => {
-        if (isGuest) {
+        if (isGuest || isDeveloper) {
             localStorage.removeItem(GUEST_DATA_KEY);
-            const userId = 'guest';
+            const userId = isDeveloper ? 'developer' : 'guest';
             const mockCategories = getDefaultCategories(userId).map(c => ({...c, id: crypto.randomUUID()}));
             const mockData = generateMockData(userId, mockCategories);
             
@@ -900,7 +900,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // --- DEV TOOLS ---
     const addMockTransactions = (count: number) => withMutation(async () => {
-        const userId = isGuest ? 'guest' : user!.id;
+        const userId = isGuest || isDeveloper ? (isDeveloper ? 'developer' : 'guest') : user!.id;
         if (!userId || categories.length === 0) return;
 
         const despesaCats = categories.filter(c => ['Alimentação', 'Compras', 'Transporte', 'Moradia', 'Lazer'].includes(c.name)).map(c => c.id);
@@ -915,7 +915,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             category_id: getRandomCatId(),
         }));
 
-        if (isGuest) {
+        if (isGuest || isDeveloper) {
             const data = getGuestData();
             data.transactions.push(...newTransactions.map(t => ({...t, id: crypto.randomUUID() })));
             setGuestData(data);
@@ -928,7 +928,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     });
     
     const addMockGoals = (count: number) => withMutation(async () => {
-        const userId = isGuest ? 'guest' : user!.id;
+        const userId = isGuest || isDeveloper ? (isDeveloper ? 'developer' : 'guest') : user!.id;
         const now = new Date();
         const newGoals = Array.from({ length: count }, (_, i) => ({
             user_id: userId,
@@ -938,7 +938,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             deadline: new Date(now.getFullYear() + 1, Math.floor(Math.random() * 12), 1).toISOString(),
             status: GoalStatus.EM_ANDAMENTO,
         }));
-         if (isGuest) {
+         if (isGuest || isDeveloper) {
             const data = getGuestData();
             data.goals.push(...newGoals.map(g => ({...g, id: crypto.randomUUID() })));
             setGuestData(data);
@@ -951,7 +951,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     const addMockDebts = (count: number) => withMutation(async () => {
-         const userId = isGuest ? 'guest' : user!.id;
+         const userId = isGuest || isDeveloper ? (isDeveloper ? 'developer' : 'guest') : user!.id;
          const newDebts = Array.from({ length: count }, (_, i) => ({
              user_id: userId,
              name: `Dívida de Teste ${i+1}`,
@@ -961,7 +961,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
              category: 'Teste',
              status: DebtStatus.ATIVA,
          }));
-          if (isGuest) {
+          if (isGuest || isDeveloper) {
             const data = getGuestData();
             data.debts.push(...newDebts.map(d => ({...d, id: crypto.randomUUID() })));
             setGuestData(data);
@@ -974,7 +974,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     const clearTable = (tableName: 'transactions' | 'goals' | 'debts' | 'scheduled_transactions') => withMutation(async () => {
-        if (isGuest) {
+        if (isGuest || isDeveloper) {
             const data = getGuestData();
             data[tableName] = [];
             setGuestData(data);
