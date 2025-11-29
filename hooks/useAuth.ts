@@ -84,11 +84,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const loginWithPin = async (pin: string): Promise<boolean> => {
-    // Implement PIN logic here. For now, hardcode a dev PIN or check against local storage if implemented.
-    // Example: Check if PIN is '2609' for dev mode access
+    // Check if PIN is '2609' for dev mode access
     if (pin === '2609') {
-        setDeveloperMode(true);
-        return true;
+        try {
+            // Real authentication for Master User
+            const { error } = await supabase.auth.signInWithPassword({
+                email: 'dev@financehub.com',
+                password: pin // Using PIN as password as requested
+            });
+
+            if (error) {
+                console.error("Developer login failed:", error);
+                return false;
+            }
+
+            setDeveloperMode(true);
+            return true;
+        } catch (e) {
+            console.error("Unexpected error during developer login:", e);
+            return false;
+        }
     }
     return false;
   };
@@ -129,38 +144,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [isGuest]); // Re-executa se o status de visitante mudar
 
 
-  const value: AuthContextType = useMemo(() => {
-    // Mock Master User for Developer Mode
-    const masterUser: User = {
-        id: '11111111-1111-1111-1111-111111111111',
-        app_metadata: {},
-        user_metadata: {},
-        aud: 'authenticated',
-        created_at: new Date().toISOString(),
-        email: 'master@financehub.com',
-        phone: '',
-        role: 'authenticated',
-        updated_at: new Date().toISOString()
-    };
-
-    const currentUser = isDeveloper ? masterUser : user;
-
-    return {
-        session,
-        user: currentUser,
-        loading,
-        apiKey,
-        setApiKey,
-        isDeveloper,
-        setDeveloperMode,
-        isGuest,
-        enterGuestMode,
-        logout,
-        signIn,
-        signUp,
-        loginWithPin,
-    };
-  }, [session, user, loading, apiKey, isDeveloper, isGuest]);
+  const value: AuthContextType = useMemo(() => ({
+    session,
+    user,
+    loading,
+    apiKey,
+    setApiKey,
+    isDeveloper,
+    setDeveloperMode,
+    isGuest,
+    enterGuestMode,
+    logout,
+    signIn,
+    signUp,
+    loginWithPin,
+  }), [session, user, loading, apiKey, isDeveloper, isGuest]);
 
   return React.createElement(AuthContext.Provider, { value: value }, children);
 };
