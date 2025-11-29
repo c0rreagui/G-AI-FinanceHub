@@ -3,7 +3,9 @@ import { useAuth } from '../hooks/useAuth';
 import { Button } from './ui/Button';
 
 export const GuestModeBanner: React.FC = () => {
-  const { logout } = useAuth();
+  const { logout, isDeveloper } = useAuth();
+
+  if (isDeveloper) return null;
 
   return (
     <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 flex items-center justify-between shadow-md relative z-50">
