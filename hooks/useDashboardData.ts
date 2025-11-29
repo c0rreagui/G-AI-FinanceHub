@@ -788,8 +788,28 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const clearAllUserData = () => withMutation(async () => {
         if (isGuest || isDeveloper) {
-            localStorage.removeItem(GUEST_DATA_KEY);
-            await fetchData();
+            // Instead of removing the key (which triggers auto-seeding in fetchData),
+            // we explicitly set a "clean" state with default categories but no transactions.
+            const userId = isDeveloper ? 'developer' : 'guest';
+            const defaultCategories = getDefaultCategories(userId).map(cat => ({ ...cat, id: crypto.randomUUID() }));
+            
+            const cleanData = {
+                transactions: [],
+                goals: [],
+                debts: [],
+                scheduledTransactions: [],
+                categories: defaultCategories
+            };
+            
+            setGuestData(cleanData);
+            
+            // We need to update the state immediately
+            setCategories(defaultCategories);
+            setTransactions([]);
+            setGoals([]);
+            setDebts([]);
+            setScheduledTransactions([]);
+            
             showToast(isDeveloper ? 'Dados de desenvolvedor resetados!' : 'Todos os dados de visitante foram apagados!', { type: 'info' });
             return;
         }
