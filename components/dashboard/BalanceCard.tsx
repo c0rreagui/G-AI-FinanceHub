@@ -1,10 +1,10 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { AnimatedCurrency } from '../ui/AnimatedCurrency';
-import { PrivacyMask } from '../ui/PrivacyMask';
 import { Heading, Text } from '../ui/typography';
 import { cn } from '../../utils/utils';
 import { formatCurrencyBRL } from '../../utils/formatters';
+import { usePrivacy } from '../../contexts/PrivacyContext';
 
 interface BalanceCardProps {
   balance: number;
@@ -12,6 +12,8 @@ interface BalanceCardProps {
 }
 
 export const BalanceCard: React.FC<BalanceCardProps> = ({ balance, className }) => {
+  const { isPrivacyMode } = usePrivacy();
+
   return (
     <Card className={cn("bg-gradient-to-br from-cyan-900/40 to-blue-900/20 !border-cyan-500/30 relative overflow-hidden", className)}>
       <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/20 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
@@ -19,10 +21,14 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({ balance, className }) 
         <CardTitle className="text-sm font-medium text-cyan-200 uppercase tracking-wider">Saldo Total</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="text-3xl md:text-4xl font-bold text-white tracking-tight tabular-nums truncate" title={formatCurrencyBRL(balance)}>
-          <PrivacyMask>
-            <AnimatedCurrency value={balance} />
-          </PrivacyMask>
+        <div 
+            className={cn(
+                "text-3xl md:text-4xl font-bold text-white tracking-tight tabular-nums truncate transition-all duration-300", 
+                isPrivacyMode && "blur-md select-none"
+            )} 
+            title={isPrivacyMode ? undefined : formatCurrencyBRL(balance)}
+        >
+          <AnimatedCurrency value={balance} />
         </div>
       </CardContent>
     </Card>
