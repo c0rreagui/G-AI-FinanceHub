@@ -21,7 +21,7 @@ import { GuestModeBanner } from '@/components/GuestModeBanner';
 import { logger } from './services/loggingService';
 import { APP_VERSION, APP_CODENAME } from './config';
 import { DevToolsView } from './components/views/DevToolsView';
-import { PrivacyProvider } from './components/ui/PrivacyMask';
+import { PrivacyProvider } from './contexts/PrivacyContext';
 import { useAuth, AuthProvider } from './hooks/useAuth';
 import { useDialog } from './hooks/useDialog';
 import { useToast } from './hooks/useToast';
