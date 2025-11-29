@@ -30,7 +30,7 @@ import { DialogProvider } from './contexts/DialogContext';
 import { ToastProvider } from './contexts/ToastContext';
 
 const AppContent: React.FC = () => {
-  const { user, loading, isGuest } = useAuth();
+  const { user, loading, isGuest, isDeveloper } = useAuth();
   const { openDialog } = useDialog();
   const { showToast } = useToast();
   const [currentView, setCurrentView] = useState<ViewType>('home');
@@ -146,11 +146,11 @@ const AppContent: React.FC = () => {
     );
   }
 
-  if (!user && !isGuest) {
+  if (!user && !isGuest && !isDeveloper) {
     return <AuthView />;
   }
 
-  if (!onboardingComplete && !isGuest) {
+  if (!onboardingComplete && !isGuest && !isDeveloper) {
     return <OnboardingView onComplete={handleOnboardingComplete} />;
   }
 
