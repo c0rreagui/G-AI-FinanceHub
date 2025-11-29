@@ -212,34 +212,14 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // --- DATA FETCHING ---
     const fetchData = useCallback(async () => {
-        if (isGuest || isDeveloper) {
+        if (isGuest) {
             setLoading(true);
             setError(null);
             
-            // For developer mode, we can use a separate key or just in-memory/mock data
-            // For now, let's reuse the guest data logic but perhaps seeded with rich data if empty
-            // Or better, just treat it like guest mode but with a different persistence or none.
-            // Actually, the prompt implies developer mode should just work. 
-            // Let's use the same local storage for now to persist dev changes, 
-            // OR we could generate fresh mock data every time if we want a "clean slate" dev mode.
-            // Given the user wants to "access login", persistence is likely expected.
-            // Let's share the guest data mechanism for simplicity but maybe with a different key if we wanted separation.
-            // For now, let's just use the guest logic.
-            
             let data = getGuestData();
             if (!data.categories || data.categories.length === 0) {
-                const userId = isDeveloper ? 'developer' : 'guest';
+                const userId = 'guest';
                 data.categories = getDefaultCategories(userId).map(cat => ({ ...cat, id: crypto.randomUUID() }));
-                
-                // If developer, maybe seed with some initial data immediately?
-                if (isDeveloper) {
-                     const mockData = generateMockData(userId, data.categories);
-                     data.transactions = mockData.transactions.map(t => ({...t, id: crypto.randomUUID(), created_at: new Date().toISOString()}));
-                     data.goals = mockData.goals.map(g => ({...g, id: crypto.randomUUID()}));
-                     data.debts = mockData.debts.map(d => ({...d, id: crypto.randomUUID()}));
-                     data.scheduledTransactions = mockData.scheduledTransactions.map(s => ({...s, id: crypto.randomUUID(), created_at: new Date().toISOString()}));
-                }
-                
                 setGuestData(data);
             }
             const populatedCategories = data.categories.map((c: any) => ({ ...c, icon: getIconByName(c.icon.displayName || c.icon) }));
@@ -255,6 +235,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             return;
         }
 
+        // Developer Mode now has a mock user, so it will pass this check
         if (!user) return;
         setLoading(true);
         setError(null);
@@ -787,10 +768,10 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     }, id);
 
     const clearAllUserData = () => withMutation(async () => {
-        if (isGuest || isDeveloper) {
+        if (isGuest) {
             // Instead of removing the key (which triggers auto-seeding in fetchData),
             // we explicitly set a "clean" state with default categories but no transactions.
-            const userId = isDeveloper ? 'developer' : 'guest';
+            const userId = 'guest';
             const defaultCategories = getDefaultCategories(userId).map(cat => ({ ...cat, id: crypto.randomUUID() }));
             
             const cleanData = {

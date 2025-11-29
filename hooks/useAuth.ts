@@ -129,21 +129,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [isGuest]); // Re-executa se o status de visitante mudar
 
 
-  const value: AuthContextType = useMemo(() => ({
-    session,
-    user,
-    loading,
-    apiKey,
-    setApiKey,
-    isDeveloper,
-    setDeveloperMode,
-    isGuest,
-    enterGuestMode,
-    logout,
-    signIn,
-    signUp,
-    loginWithPin,
-  }), [session, user, loading, apiKey, isDeveloper, isGuest]);
+  const value: AuthContextType = useMemo(() => {
+    // Mock Master User for Developer Mode
+    const masterUser: User = {
+        id: 'master-user-id',
+        app_metadata: {},
+        user_metadata: {},
+        aud: 'authenticated',
+        created_at: new Date().toISOString(),
+        email: 'master@financehub.com',
+        phone: '',
+        role: 'authenticated',
+        updated_at: new Date().toISOString()
+    };
+
+    const currentUser = isDeveloper ? masterUser : user;
+
+    return {
+        session,
+        user: currentUser,
+        loading,
+        apiKey,
+        setApiKey,
+        isDeveloper,
+        setDeveloperMode,
+        isGuest,
+        enterGuestMode,
+        logout,
+        signIn,
+        signUp,
+        loginWithPin,
+    };
+  }, [session, user, loading, apiKey, isDeveloper, isGuest]);
 
   return React.createElement(AuthContext.Provider, { value: value }, children);
 };
