@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { AnimatedCurrency } from '../ui/AnimatedCurrency';
+import { PrivacyMask } from '../ui/PrivacyMask';
 import { Heading, Text } from '../ui/typography';
 import { cn } from '../../utils/utils';
 import { formatCurrencyBRL } from '../../utils/formatters';
@@ -19,7 +20,9 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({ balance, className }) 
       </CardHeader>
       <CardContent>
         <div className="text-3xl md:text-4xl font-bold text-white tracking-tight tabular-nums truncate" title={formatCurrencyBRL(balance)}>
-          <AnimatedCurrency value={balance} />
+          <PrivacyMask>
+            <AnimatedCurrency value={balance} />
+          </PrivacyMask>
         </div>
       </CardContent>
     </Card>
