@@ -132,7 +132,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const value: AuthContextType = useMemo(() => {
     // Mock Master User for Developer Mode
     const masterUser: User = {
-        id: 'master-user-id',
+        id: '11111111-1111-1111-1111-111111111111',
         app_metadata: {},
         user_metadata: {},
         aud: 'authenticated',
