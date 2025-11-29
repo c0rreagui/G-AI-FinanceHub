@@ -13,7 +13,20 @@ import { motion, AnimatePresence } from 'framer-motion';
 import type { Variants } from 'framer-motion';
 import { XIcon, Mic } from '../Icons';
 
-// ...
+
+interface AddTransactionFormProps {
+  isOpen: boolean;
+  onClose: () => void;
+  prefill?: Partial<Transaction>;
+  transactionToEdit?: Transaction;
+}
+
+const triggerHapticFeedback = () => {
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate(10);
+    }
+};
+
 
 const QuickValueChip: React.FC<{ value: number; onSelect: (value: number) => void }> = ({ value, onSelect }) => (
     <button
@@ -29,13 +42,62 @@ const QuickValueChip: React.FC<{ value: number; onSelect: (value: number) => voi
     </button>
 );
 
-// ...
+const quickValues = [10, 20, 50, 100];
+
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: { 
+      opacity: 1,
+      transition: {
+          staggerChildren: 0.1
+      }
+  }
+};
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 }
+};
 
 export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, onClose, prefill, transactionToEdit }) => {
-  // ... existing hooks ...
+  const { addTransaction, updateTransaction, categories } = useDashboardData();
+  const isDesktop = useMediaQuery('(min-width: 768px)');
+  
+  const [description, setDescription] = useState('');
+  const [amount, setAmount] = useState('');
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [type, setType] = useState<TransactionType>(TransactionType.DESPESA);
+  const [categoryId, setCategoryId] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isEditing = !!transactionToEdit;
   const [isListening, setIsListening] = useState(false);
 
-  // ... existing useEffects ...
+  useEffect(() => {
+    if (transactionToEdit) {
+        setDescription(transactionToEdit.description);
+        setAmount(String(Math.abs(transactionToEdit.amount)));
+        setDate(new Date(transactionToEdit.date).toISOString().split('T')[0]);
+        setType(transactionToEdit.type);
+        setCategoryId(transactionToEdit.category_id);
+    } else if (prefill) {
+        if (prefill.description) setDescription(prefill.description);
+        if (prefill.amount) setAmount(String(Math.abs(prefill.amount)));
+        if (prefill.date) setDate(new Date(prefill.date).toISOString().split('T')[0]);
+        if (prefill.type) setType(prefill.type);
+        if (prefill.category_id) setCategoryId(prefill.category_id);
+    } else {
+        resetForm();
+    }
+  }, [transactionToEdit, prefill, isOpen]);
+
+  const resetForm = () => {
+      setDescription('');
+      setAmount('');
+      setDate(new Date().toISOString().split('T')[0]);
+      setType(TransactionType.DESPESA);
+      setCategoryId('');
+  };
 
   const startListening = () => {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
@@ -61,7 +123,46 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
     recognition.start();
   };
 
-  // ... existing logic ...
+  const handleAmountBlur = () => {
+      try {
+          if (amount.includes('+')) {
+              const parts = amount.split('+').map(p => parseFloat(p.trim()));
+              const sum = parts.reduce((a, b) => a + b, 0);
+              if (!isNaN(sum)) setAmount(sum.toFixed(2));
+          } else {
+              const val = parseFloat(amount.replace(',', '.'));
+              if (!isNaN(val)) setAmount(val.toFixed(2));
+          }
+      } catch (e) {
+          // ignore
+      }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setIsSubmitting(true);
+      try {
+          const txData = {
+              description,
+              amount: parseFloat(amount),
+              date: new Date(date).toISOString(),
+              type,
+              categoryId,
+          };
+
+          if (isEditing && transactionToEdit) {
+              await updateTransaction({ ...txData, id: transactionToEdit.id });
+          } else {
+              await addTransaction(txData);
+          }
+          onClose();
+          resetForm();
+      } catch (error) {
+          console.error("Error saving transaction", error);
+      } finally {
+          setIsSubmitting(false);
+      }
+  };
 
   const FormFields = (
     <>

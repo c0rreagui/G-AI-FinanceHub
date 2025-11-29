@@ -7,6 +7,8 @@ import { Card } from '../ui/Card';
 import { motion } from 'framer-motion';
 import { APP_VERSION } from '../../config';
 import { useAuth } from '../../hooks/useAuth';
+import { BackupManager } from '../settings/BackupManager';
+import { BudgetSettings } from '../settings/BudgetSettings';
 
 export const SettingsView: React.FC = () => {
     const { logout } = useAuth();
@@ -33,12 +35,16 @@ export const SettingsView: React.FC = () => {
                 actions={<Button onClick={logout} variant="secondary">Sair</Button>}
             />
             <motion.div 
-                className="flex-grow overflow-y-auto pr-2 space-y-6"
+                {...({ className: "flex-grow overflow-y-auto pr-2 space-y-6" } as any)}
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
             >
+
+
                 <motion.div variants={itemVariants}><ApiKeySettings /></motion.div>
+                <motion.div variants={itemVariants}><BudgetSettings /></motion.div>
+                <motion.div variants={itemVariants}><BackupManager /></motion.div>
 
                  <Card className="p-6">
                     <h2 className="text-xl font-semibold text-white mb-2">Sobre</h2>

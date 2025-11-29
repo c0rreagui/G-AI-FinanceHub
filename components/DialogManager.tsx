@@ -10,6 +10,7 @@ import { ConfirmationModal } from './ui/ConfirmationModal';
 import { BulkRecategorizeForm } from './forms/BulkRecategorizeForm';
 
 import { AchievementsDialog } from './dashboard/AchievementsDialog';
+import { ProfileAnalysisQuiz } from './onboarding/ProfileAnalysisQuiz';
 
 export const DialogManager: React.FC = () => {
   const { dialogType, closeDialog, dialogProps } = useDialog();
@@ -47,6 +48,8 @@ export const DialogManager: React.FC = () => {
         />
     case 'achievements':
         return <AchievementsDialog isOpen={true} onClose={closeDialog} />;
+    case 'profile-quiz':
+        return <ProfileAnalysisQuiz isOpen={true} onClose={closeDialog} />;
     default:
       return null;
   }

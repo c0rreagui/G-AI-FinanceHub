@@ -83,3 +83,4 @@ export const List = React.memo((props: React.SVGProps<SVGSVGElement>) => <Compou
 export const Search = React.memo((props: React.SVGProps<SVGSVGElement>) => <Icon d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" {...props} />);
 export const CheckSquare = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M9 11l3 3L22 4", "M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"]} {...props} />);
 export const Square = React.memo((props: React.SVGProps<SVGSVGElement>) => <Icon d="M3 3h18v18H3z" {...props} />);
+export const Mic = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z", "M19 10v2a7 7 0 0 1-14 0v-2", "M12 19v4", "M8 23h8"]} {...props} />);

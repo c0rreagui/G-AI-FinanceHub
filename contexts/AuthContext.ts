@@ -12,6 +12,9 @@ export interface AuthContextType {
   isGuest: boolean;
   enterGuestMode: () => void;
   logout: () => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<void>;
+  loginWithPin: (pin: string) => Promise<boolean>;
 }
 
 export const AuthContext = React.createContext<AuthContextType | undefined>(undefined);

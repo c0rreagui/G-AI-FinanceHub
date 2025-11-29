@@ -130,7 +130,7 @@ const AppContent: React.FC = () => {
         exit="out"
         variants={pageVariants}
         transition={pageTransition}
-        className="flex flex-col flex-grow h-full"
+        {...({ className: "flex flex-col flex-grow h-full" } as any)}
       >
         {viewComponent}
       </motion.div>
@@ -140,7 +140,7 @@ const AppContent: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex h-screen w-screen items-center justify-center bg-oklch-background">
+      <div className="flex items-center justify-center h-screen bg-black text-white">
         <LoadingSpinner />
       </div>
     );
@@ -155,28 +155,15 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <>
-      {isGuest && <GuestModeBanner />}
-      <AppLayout currentView={currentView} setCurrentView={setCurrentView}>
-        <AnimatePresence mode="wait">
-          {renderView()}
-        </AnimatePresence>
-      </AppLayout>
-      <div className="fixed bottom-1 right-2 text-xs text-white/20 pointer-events-none select-none">
-        v{APP_VERSION} ({APP_CODENAME})
-      </div>
-    </>
+    <AppLayout currentView={currentView} setCurrentView={setCurrentView}>
+      <AnimatePresence mode="wait">
+        {renderView()}
+      </AnimatePresence>
+      <GuestModeBanner />
+      <ToastContainer />
+    </AppLayout>
   );
 };
-
-// Envolve AppContent com DialogProvider para que `useDialog` funcione
-const AppWithDialog: React.FC = () => (
-  <DialogProvider>
-    <AppContent />
-    <ToastContainer />
-  </DialogProvider>
-);
-
 
 const App: React.FC = () => {
   return (
@@ -184,9 +171,11 @@ const App: React.FC = () => {
       <ToastProvider>
         <DashboardDataProvider>
           <PrivacyProvider>
-            <ErrorBoundary>
-              <AppWithDialog />
-            </ErrorBoundary>
+            <DialogProvider>
+              <ErrorBoundary>
+                <AppContent />
+              </ErrorBoundary>
+            </DialogProvider>
           </PrivacyProvider>
         </DashboardDataProvider>
       </ToastProvider>

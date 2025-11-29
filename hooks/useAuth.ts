@@ -73,6 +73,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // For guests, we manually cleared state.
   };
 
+  const signIn = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+  };
+
+  const signUp = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signUp({ email, password });
+    if (error) throw error;
+  };
+
+  const loginWithPin = async (pin: string): Promise<boolean> => {
+    // Implement PIN logic here. For now, hardcode a dev PIN or check against local storage if implemented.
+    // Example: Check if PIN is '1234' for dev mode access
+    if (pin === '1234') {
+        setDeveloperMode(true);
+        return true;
+    }
+    return false;
+  };
+
   useEffect(() => {
     // Se for um visitante, não precisamos verificar a sessão do Supabase.
     if (isGuest) {
@@ -120,6 +140,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isGuest,
     enterGuestMode,
     logout,
+    signIn,
+    signUp,
+    loginWithPin,
   }), [session, user, loading, apiKey, isDeveloper, isGuest]);
 
   return React.createElement(AuthContext.Provider, { value: value }, children);

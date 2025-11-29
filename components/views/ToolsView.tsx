@@ -7,13 +7,13 @@ import { ViewType } from '../../types';
 import { Button } from '../ui/Button';
 import { Settings } from '../Icons';
 import { Card } from '../ui/Card';
+import { CompoundInterestCalculator } from '../tools/CompoundInterestCalculator';
+import { RateComparator } from '../tools/RateComparator';
+import { FinancialQuiz } from '../education/FinancialQuiz';
 
 interface ToolsViewProps {
   setCurrentView: (view: ViewType) => void;
 }
-
-import { CompoundInterestCalculator } from '../tools/CompoundInterestCalculator';
-import { RateComparator } from '../tools/RateComparator';
 
 export const ToolsView: React.FC<ToolsViewProps> = ({ setCurrentView }) => {
   const { apiKey } = useAuth();
@@ -31,6 +31,11 @@ export const ToolsView: React.FC<ToolsViewProps> = ({ setCurrentView }) => {
             {/* Comparador de Taxas */}
             <div>
                 <RateComparator />
+            </div>
+
+            {/* Quiz Financeiro */}
+            <div>
+                <FinancialQuiz />
             </div>
 
             {/* Scanner de Recibos */}

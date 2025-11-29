@@ -1,4 +1,8 @@
 import { useDialog } from '../../hooks/useDialog';
+import { useDashboardData } from '../../hooks/useDashboardData';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
+import { Progress } from '../ui/Progress';
+import { Trophy } from '../Icons';
 
 export const UserLevelBar: React.FC = () => {
     const { userLevel } = useDashboardData();

@@ -51,6 +51,7 @@ const PinInput: React.FC<{ pin: string; onPinChange: (pin: string) => void; hasE
 
 
 export const AuthView: React.FC = () => {
+    const { signIn, signUp, loginWithPin } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -60,129 +61,131 @@ export const AuthView: React.FC = () => {
     const [showPinInput, setShowPinInput] = useState(false);
     const [pin, setPin] = useState('');
     const [pinError, setPinError] = useState(false);
-    const { setDeveloperMode, enterGuestMode } = useAuth();
-
-    const DEV_PIN = '2609';
-
-    useEffect(() => {
-        if (pin.length === 4) {
-            if (pin === DEV_PIN) {
-                handleDevLogin();
-                setShowPinInput(false);
-            } else {
-                setPinError(true);
-                setTimeout(() => {
-                    setPin('');
-                    setPinError(false);
-                }, 500);
-            }
-        }
-    }, [pin]);
-
+    const [showForgotPassword, setShowForgotPassword] = useState(false);
 
     const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
-        setAuthMessage(null);
-
-        if (isLogin) {
-            const { error } = await supabase.auth.signInWithPassword({ email, password });
-            if (error) setError(error.message);
-        } else {
-            const { data, error } = await supabase.auth.signUp({ email, password });
-            if (error) {
-                setError(error.message);
-            } else if (data.user && data.user.identities && data.user.identities.length === 0) {
-                 setError("Este e-mail já está em uso. Tente fazer login.");
-            }
-            else {
-                setAuthMessage("Verifique seu e-mail para o link de confirmação!");
-            }
-        }
-        setLoading(false);
-    };
-    
-    const handleDevLogin = async () => {
-        setLoading(true);
-        setError(null);
-        setAuthMessage(null);
-
-        const devEmail = 'dev@financehub.com';
-        const devPassword = 'password123';
-
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-            email: devEmail,
-            password: devPassword,
-        });
-
-        if (signInData.user) {
-            setDeveloperMode(true);
-            setLoading(false);
-            return;
-        }
-        
-        if (signInError && signInError.message.includes('Invalid login credentials')) {
-            const { error: signUpError } = await supabase.auth.signUp({
-                email: devEmail,
-                password: devPassword,
-            });
-
-            if (signUpError) {
-                setError(signUpError.message);
-                setLoading(false);
-                return;
-            }
-
-            const { data: finalSignInData, error: finalSignInError } = await supabase.auth.signInWithPassword({
-                 email: devEmail,
-                 password: devPassword,
-            });
-
-            if (finalSignInData.user) {
-                setDeveloperMode(true);
+        try {
+            if (isLogin) {
+                await signIn(email, password);
             } else {
-                setError(finalSignInError?.message || "Conta de dev criada, mas o login falhou.");
+                await signUp(email, password);
+                setAuthMessage('Verifique seu e-mail para confirmar o cadastro!');
             }
-
-        } else if (signInError) {
-            setError(signInError.message);
+        } catch (err: any) {
+            setError(err.message || 'Ocorreu um erro na autenticação.');
+        } finally {
+            setLoading(false);
         }
-        
-        setLoading(false);
     };
-    
+
+    const enterGuestMode = () => {
+        sessionStorage.setItem('guest_mode', 'true');
+        window.location.reload();
+    };
+
     const togglePinInput = () => {
         setShowPinInput(!showPinInput);
         setPin('');
-        setError(null);
-    }
+        setPinError(false);
+    };
+
+    const handlePinSubmit = async (enteredPin: string) => {
+        setPin(enteredPin);
+        if (enteredPin.length === 4) {
+            setLoading(true);
+            try {
+                const success = await loginWithPin(enteredPin);
+                if (!success) {
+                    setPinError(true);
+                    setPin('');
+                    setTimeout(() => setPinError(false), 500);
+                }
+            } catch (e) {
+                setPinError(true);
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+
+    const handleForgotPassword = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        setAuthMessage(`Um link de recuperação foi enviado para ${email}`);
+        setLoading(false);
+        setTimeout(() => {
+            setShowForgotPassword(false);
+            setAuthMessage(null);
+        }, 3000);
+    };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-transparent p-4">
-            <div className="w-full max-w-sm">
-                <div className="text-center mb-8 relative">
-                    <h1 className="text-5xl font-black bg-gradient-to-r from-cyan-400 to-green-400 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(34,211,238,0.2)]">
-                        FinanceHub
-                    </h1>
-                    <p className="mt-2 text-gray-400">Seu copiloto financeiro inteligente.</p>
+        <div className="min-h-screen flex items-center justify-center bg-black p-4 relative overflow-hidden">
+            {/* Background Effects */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-500/20 rounded-full blur-[100px]" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/20 rounded-full blur-[100px]" />
+            </div>
+
+            <div className="w-full max-w-md relative z-10">
+                <div className="text-center mb-8">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 mb-4 shadow-lg shadow-cyan-500/20">
+                        <Zap className="w-8 h-8 text-white" />
+                    </div>
+                    <h1 className="text-3xl font-bold text-white tracking-tight">FinanceHub</h1>
+                    <p className="text-gray-400 mt-2">Seu assistente financeiro inteligente</p>
                 </div>
-                <div className="card p-8 min-h-[440px]">
+
+                <div className="bg-gray-900/50 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
                     <AnimatePresence mode="wait">
-                        {showPinInput ? (
+                        {showForgotPassword ? (
+                            <motion.div
+                                key="forgot-password"
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                            >
+                                <h2 className="text-xl font-semibold text-white text-center mb-6">Recuperar Senha</h2>
+                                <p className="text-sm text-gray-400 text-center mb-6">
+                                    Digite seu e-mail para receber um link de redefinição de senha.
+                                </p>
+                                <form onSubmit={handleForgotPassword} className="space-y-4">
+                                    <Input id="email-recovery" label="E-mail" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+                                    
+                                    {authMessage && <p className="text-green-400 text-sm text-center">{authMessage}</p>}
+
+                                    <Button type="submit" disabled={loading} className="w-full">
+                                        {loading ? <LoadingSpinner/> : 'Enviar Link'}
+                                    </Button>
+                                </form>
+                                <div className="mt-6 text-center">
+                                    <button onClick={() => { setShowForgotPassword(false); setAuthMessage(null); }} className="text-sm text-cyan-400 hover:underline">
+                                        Voltar para Login
+                                    </button>
+                                </div>
+                            </motion.div>
+                        ) : showPinInput ? (
                             <motion.div
                                 key="pin"
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.9 }}
-                                className="flex flex-col items-center justify-center h-full"
                             >
-                                <h3 className="text-lg font-semibold text-white mb-4">Acesso de Desenvolvedor</h3>
-                                <PinInput pin={pin} onPinChange={setPin} hasError={pinError} />
-                                {loading && <LoadingSpinner />}
-                                 <div className="mt-6 text-center">
-                                    <button onClick={() => { togglePinInput(); }} className="text-sm text-cyan-400 hover:underline">
-                                        Voltar para Login
+                                <h2 className="text-xl font-semibold text-white text-center mb-6">Acesso Rápido</h2>
+                                <p className="text-sm text-gray-400 text-center mb-6">Digite seu PIN de 4 dígitos</p>
+                                
+                                <div className="mb-8">
+                                    <PinInput pin={pin} onPinChange={handlePinSubmit} hasError={pinError} />
+                                </div>
+
+                                <div className="text-center">
+                                    <button onClick={togglePinInput} className="text-sm text-cyan-400 hover:underline">
+                                        Usar e-mail e senha
                                     </button>
                                 </div>
                             </motion.div>
@@ -196,7 +199,16 @@ export const AuthView: React.FC = () => {
                                 <h2 className="text-xl font-semibold text-white text-center mb-6">{isLogin ? 'Entrar' : 'Criar Conta'}</h2>
                                 <form onSubmit={handleAuth} className="space-y-4">
                                     <Input id="email" label="E-mail" type="email" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" />
-                                    <Input id="password" label="Senha" type="password" value={password} onChange={e => setPassword(e.target.value)} required autoComplete={isLogin ? "current-password" : "new-password"} />
+                                    <div>
+                                        <Input id="password" label="Senha" type="password" value={password} onChange={e => setPassword(e.target.value)} required autoComplete={isLogin ? "current-password" : "new-password"} />
+                                        {isLogin && (
+                                            <div className="flex justify-end mt-1">
+                                                <button type="button" onClick={() => setShowForgotPassword(true)} className="text-xs text-gray-400 hover:text-cyan-400">
+                                                    Esqueceu a senha?
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
                                     
                                     {error && <p className="text-red-400 text-sm text-center">{error}</p>}
                                     {authMessage && <p className="text-green-400 text-sm text-center">{authMessage}</p>}

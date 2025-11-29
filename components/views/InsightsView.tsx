@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { BalanceEvolutionChart } from '../ui/charts/BalanceEvolutionChart';
-import { LoadingSpinner } from '../ui/LoadingSpinner';
+import { LoadingSpinner } from '../LoadingSpinner';
 import { EmptyState } from '../ui/EmptyState';
 import { Lightbulb } from 'lucide-react';
 import { 
@@ -14,6 +14,8 @@ import {
     Tooltip, 
     Legend 
 } from 'recharts';
+import { InvestmentSuggestions } from '../dashboard/InvestmentSuggestions';
+
 import { formatCurrencyBRL } from '../../utils/formatters';
 import { TransactionType } from '../../types';
 
@@ -68,9 +70,13 @@ export const InsightsView: React.FC = () => {
                     <LoadingSpinner />
                 </div>
             ) : (
+
+// ...
+
                 <div className="mt-6 flex-grow flex flex-col overflow-y-auto pr-2 pb-20 space-y-6">
                      {transactions.length > 0 ? (
                         <>
+                            <InvestmentSuggestions />
                             <BalanceEvolutionChart transactions={transactions} />
                             
                             {categoryAnalysis.length > 0 && (
