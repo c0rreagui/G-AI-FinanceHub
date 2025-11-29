@@ -95,10 +95,10 @@ export const WealthFunnelChart: React.FC<WealthFunnelChartProps> = ({ income, ex
                         />
                         <Legend 
                             iconSize={8} 
-                            layout="vertical" 
-                            verticalAlign="middle" 
-                            align="right"
-                            wrapperStyle={{ right: 0, fontSize: '10px', fontWeight: 500 }}
+                            layout="horizontal" 
+                            verticalAlign="bottom" 
+                            align="center"
+                            wrapperStyle={{ fontSize: '10px', fontWeight: 500, paddingTop: '10px' }}
                         />
                         <Tooltip content={<CustomTooltip />} cursor={false} />
                     </RadialBarChart>
