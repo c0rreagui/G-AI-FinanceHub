@@ -85,8 +85,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loginWithPin = async (pin: string): Promise<boolean> => {
     // Implement PIN logic here. For now, hardcode a dev PIN or check against local storage if implemented.
-    // Example: Check if PIN is '1234' for dev mode access
-    if (pin === '1234') {
+    // Example: Check if PIN is '2609' for dev mode access
+    if (pin === '2609') {
         setDeveloperMode(true);
         return true;
     }
