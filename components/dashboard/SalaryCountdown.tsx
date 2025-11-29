@@ -31,10 +31,10 @@ export const SalaryCountdown: React.FC = () => {
                     <div className="p-2 bg-emerald-500/20 rounded-full">
                         <Clock className="w-5 h-5 text-emerald-400" />
                     </div>
-                    <div>
-                        <Text size="xs" variant="muted" className="uppercase tracking-wider">Próximo Pagamento</Text>
-                        <Text weight="bold" className="text-emerald-100 whitespace-nowrap truncate">
-                            {daysUntilSalary === 0 ? 'É hoje! 🎉' : `Faltam ${daysUntilSalary} dias`}
+                    <div className="flex flex-col">
+                        <Text size="xs" variant="muted" className="uppercase tracking-wider leading-none mb-1">Próximo Pagamento</Text>
+                        <Text weight="bold" className="text-emerald-100 whitespace-nowrap truncate text-lg leading-none">
+                            {daysUntilSalary === 0 ? 'É hoje! 🎉' : `em ${daysUntilSalary} dias`}
                         </Text>
                     </div>
                 </div>

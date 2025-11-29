@@ -75,27 +75,27 @@ export const WealthFunnelChart: React.FC<WealthFunnelChartProps> = ({ income, ex
                 </h3>
             </div>
             
-            <div className="flex-grow relative z-10 -ml-4">
+            <div className="flex-grow relative z-10 -ml-4 flex items-center justify-center">
                 <ResponsiveContainer width="100%" height="100%">
                     <RadialBarChart 
-                        innerRadius="20%" 
+                        innerRadius="30%" 
                         outerRadius="100%" 
-                        barSize={20} 
+                        barSize={15} 
                         data={data}
                         startAngle={90}
                         endAngle={-270}
                     >
                         <RadialBar
-                            label={{ position: 'insideStart', fill: '#fff', fontSize: 10, fontWeight: 'bold' }}
-                            background
+                            background={{ fill: 'rgba(255, 255, 255, 0.05)' }}
                             dataKey="value"
                             cornerRadius={10}
                         />
                         <Legend 
-                            iconSize={10} 
+                            iconSize={8} 
                             layout="vertical" 
                             verticalAlign="middle" 
-                            wrapperStyle={{ right: 0, top: '50%', transform: 'translateY(-50%)' }}
+                            align="right"
+                            wrapperStyle={{ right: 0, fontSize: '10px', fontWeight: 500 }}
                         />
                         <Tooltip content={<CustomTooltip />} cursor={false} />
                     </RadialBarChart>
