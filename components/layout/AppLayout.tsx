@@ -7,6 +7,7 @@ import { DialogManager } from '../DialogManager';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { ErrorModal } from '../ui/ErrorModal';
 import { useAuth } from '../../hooks/useAuth';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -14,9 +15,7 @@ interface AppLayoutProps {
   setCurrentView: (view: ViewType) => void;
 }
 
-import { useTheme } from '../../contexts/ThemeContext';
 
-// ...
 
 export const AppLayout: React.FC<AppLayoutProps> = ({ children, currentView, setCurrentView }) => {
   const isDesktop = useMediaQuery('(min-width: 768px)');

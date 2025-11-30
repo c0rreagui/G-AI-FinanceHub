@@ -37,7 +37,8 @@ export const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) =>
         variants={containerVariants} 
         initial="hidden" 
         animate="visible" 
-        className="w-full max-w-2xl"
+
+        {...{ className: "w-full max-w-2xl" } as any}
       >
         <AnimatePresence mode="wait">
           {step === 0 && (
@@ -48,7 +49,7 @@ export const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) =>
               animate="center"
               exit="exit"
               transition={{ duration: 0.4 }}
-              className="text-center"
+              {...{ className: "text-center" } as any}
             >
               <h1 className="text-6xl font-black bg-gradient-to-r from-cyan-400 to-green-400 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(34,211,238,0.2)]">
                 Bem-vindo ao FinanceHub
@@ -77,7 +78,7 @@ export const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) =>
               animate="center"
               exit="exit"
               transition={{ duration: 0.4 }}
-              className="text-center"
+              {...{ className: "text-center" } as any}
             >
               <h2 className="text-3xl font-bold text-white">Qual seu principal objetivo financeiro hoje?</h2>
               <p className="mt-2 text-gray-400">Isso nos ajuda a personalizar sua experiência.</p>
@@ -85,8 +86,9 @@ export const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) =>
                 {goals.map(goal => (
                   <motion.button 
                     key={goal.id} 
+
                     onClick={() => setSelectedGoal(goal.id)}
-                    className={`p-6 rounded-2xl text-left border-2 transition-all duration-200 ${selectedGoal === goal.id ? 'border-cyan-500 bg-cyan-500/10' : 'border-[oklch(var(--border-oklch))] bg-[oklch(var(--card-oklch))] hover:bg-[oklch(var(--border-oklch))]'}`}
+                    {...{ className: `p-6 rounded-2xl text-left border-2 transition-all duration-200 ${selectedGoal === goal.id ? 'border-cyan-500 bg-cyan-500/10' : 'border-[oklch(var(--border-oklch))] bg-[oklch(var(--card-oklch))] hover:bg-[oklch(var(--border-oklch))]'}` } as any}
                     whileHover={{ y: -4 }}
                     animate={selectedGoal === goal.id ? { scale: 1.05, y: -5 } : { scale: 1, y: 0 }}
                   >
@@ -118,7 +120,7 @@ export const OnboardingView: React.FC<OnboardingViewProps> = ({ onComplete }) =>
               animate="center"
               exit="exit"
               transition={{ duration: 0.4 }}
-              className="text-center"
+              {...{ className: "text-center" } as any}
             >
               <Zap className="w-16 h-16 text-green-400 mx-auto mb-4" />
               <h2 className="text-3xl font-bold text-white">Tudo pronto!</h2>

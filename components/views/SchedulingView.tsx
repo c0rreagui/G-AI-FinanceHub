@@ -84,12 +84,12 @@ const ScheduledTransactionCard: React.FC<{ item: ScheduledTransaction }> = ({ it
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className={`relative group transition-opacity ${isMutating ? 'opacity-50 pointer-events-none' : ''}`}
+            {...{ className: `relative group transition-opacity ${isMutating ? 'opacity-50 pointer-events-none' : ''}` } as any}
         >
             {!isDesktop && mobileSwipeActions}
             
             <motion.div
-              className="relative z-10 w-full"
+              {...{ className: "relative z-10 w-full" } as any}
               drag={!isDesktop ? "x" : false}
               dragConstraints={{ left: -actionButtonsWidth, right: 0 }}
               dragElastic={0.2}
@@ -197,7 +197,7 @@ export const SchedulingView: React.FC = () => {
                                 <motion.div 
                                     initial={{ opacity: 0, y: 20 }} 
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="h-full flex flex-col"
+                                    {...{ className: "h-full flex flex-col" } as any}
                                 >
                                     <div className="flex items-center justify-between mb-4">
                                         <h3 className="text-lg font-semibold text-white capitalize">{currentMonthName}</h3>

@@ -67,7 +67,7 @@ const GoalCard: React.FC<{ goal: Goal }> = ({ goal }) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className={isMutating ? 'opacity-50 pointer-events-none' : ''}
+            {...{ className: isMutating ? 'opacity-50 pointer-events-none' : '' } as any}
         >
             <Card className={`h-full flex flex-col justify-between overflow-hidden group relative ${isCompleted ? 'border-success/50 bg-success/5' : ''}`}>
                 

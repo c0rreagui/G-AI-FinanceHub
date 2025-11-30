@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { PageHeader } from '../layout/PageHeader';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { BalanceEvolutionChart } from '../ui/charts/BalanceEvolutionChart';
 import { LoadingSpinner } from '../LoadingSpinner';
@@ -67,13 +68,18 @@ export const InsightsView: React.FC = () => {
 
     return (
         <>
+            <PageHeader 
+                icon={Lightbulb} 
+                title="Insights e Análises" 
+                breadcrumbs={['FinanceHub', 'Insights']}
+            />
             {loading ? (
                 <div className="flex-grow flex items-center justify-center">
                     <LoadingSpinner />
                 </div>
             ) : (
 
-// ...
+
 
                 <div className="mt-6 flex-grow flex flex-col overflow-y-auto pr-2 pb-20 space-y-6">
                      {transactions.length > 0 ? (

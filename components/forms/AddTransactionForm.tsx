@@ -62,7 +62,77 @@ const itemVariants: Variants = {
 export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, onClose, prefill, transactionToEdit }) => {
   const { addTransaction, updateTransaction, categories, checkForDuplicates } = useDashboardData();
   
-  // ...
+  const [description, setDescription] = useState('');
+  const [amount, setAmount] = useState('');
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [type, setType] = useState<TransactionType>(TransactionType.DESPESA);
+  const [categoryId, setCategoryId] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+
+  const isEditing = !!transactionToEdit;
+  const isDesktop = useMediaQuery('(min-width: 768px)');
+
+  useEffect(() => {
+    if (isOpen) {
+        if (transactionToEdit) {
+            setDescription(transactionToEdit.description);
+            setAmount(Math.abs(transactionToEdit.amount).toString());
+            setDate(new Date(transactionToEdit.date).toISOString().split('T')[0]);
+            setType(transactionToEdit.type);
+            setCategoryId(transactionToEdit.category_id);
+        } else if (prefill) {
+            if (prefill.type) setType(prefill.type);
+            if (prefill.date) setDate(new Date(prefill.date).toISOString().split('T')[0]);
+            if (prefill.category_id) setCategoryId(prefill.category_id);
+        } else {
+            resetForm();
+        }
+    }
+  }, [isOpen, transactionToEdit, prefill]);
+
+  const resetForm = () => {
+      setDescription('');
+      setAmount('');
+      setDate(new Date().toISOString().split('T')[0]);
+      setType(TransactionType.DESPESA);
+      setCategoryId('');
+      setIsListening(false);
+  };
+
+  const startListening = () => {
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+          const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+          const recognition = new SpeechRecognition();
+          recognition.lang = 'pt-BR';
+          recognition.continuous = false;
+          recognition.interimResults = false;
+
+          recognition.onstart = () => setIsListening(true);
+          recognition.onend = () => setIsListening(false);
+          recognition.onresult = (event: any) => {
+              const transcript = event.results[0][0].transcript;
+              setDescription(transcript);
+          };
+          recognition.start();
+      } else {
+          alert('Seu navegador não suporta reconhecimento de voz.');
+      }
+  };
+
+  const handleAmountBlur = () => {
+      if (amount.includes('+') || amount.includes('-') || amount.includes('*') || amount.includes('/')) {
+          try {
+              // eslint-disable-next-line no-eval
+              const result = eval(amount.replace(',', '.'));
+              if (!isNaN(result)) {
+                  setAmount(result.toFixed(2));
+              }
+          } catch (e) {
+              // Ignore invalid math
+          }
+      }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();

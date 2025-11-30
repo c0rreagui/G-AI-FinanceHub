@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { motion } from 'framer-motion';
 import { DailyTipCard } from '../dashboard/DailyTipCard';
+import { HealthScoreGauge } from '../dashboard/HealthScoreGauge';
 import { BalanceCard } from '../dashboard/BalanceCard';
 import { MonthlySummaryChart } from '../ui/charts/MonthlySummaryChart';
 import { WealthFunnelChart } from '../ui/charts/WealthFunnelChart';
@@ -33,14 +34,14 @@ const variants = {
 };
 
 export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrentView }) => {
-    const { summary, monthlyChartData, transactions, loading, goals, savingsSuggestion, dueSoonBills } = useDashboardData();
+    const { summary, monthlyChartData, transactions, loading, goals, savingsSuggestion, dueSoonBills, healthScore } = useDashboardData();
     const { openDialog } = useDialog();
     const firstGoal = goals[0];
     
     // Calculate investment amount (mock or real logic)
     const investmentAmount = 0; // Placeholder, replace with real logic if available
 
-// ... inside component ...
+
     const { greetingName, zenMode, density, hiddenModules } = useTheme();
 
     // Greeting Logic
@@ -212,15 +213,20 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                     </motion.div>
                 )}
 
-                {/* BLOCO 3: Funil (Direita) - Hide in Zen Mode OR if hidden */}
+                {/* BLOCO 3: Funil & Health Score (Direita) - Hide in Zen Mode OR if hidden */}
                 {!zenMode && !hiddenModules.includes('investments') && (
                     // @ts-ignore
-                    <motion.div variants={variants} className="md:col-span-4 lg:col-span-1 h-[320px] md:h-auto">
-                        <WealthFunnelChart 
-                            income={summary.monthlyIncome} 
-                            expenses={Math.abs(summary.monthlyExpenses)} 
-                            investments={investmentAmount} 
-                        />
+                    <motion.div variants={variants} className="md:col-span-4 lg:col-span-1 flex flex-col gap-4">
+                        <div className="h-[200px]">
+                            <HealthScoreGauge score={healthScore} />
+                        </div>
+                        <div className="h-[320px] md:h-auto flex-1">
+                            <WealthFunnelChart 
+                                income={summary.monthlyIncome} 
+                                expenses={Math.abs(summary.monthlyExpenses)} 
+                                investments={investmentAmount} 
+                            />
+                        </div>
                     </motion.div>
                 )}
             </Grid>

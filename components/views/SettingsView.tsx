@@ -9,6 +9,7 @@ import { APP_VERSION } from '../../config';
 import { useAuth } from '../../hooks/useAuth';
 import { BackupManager } from '../settings/BackupManager';
 import { BudgetSettings } from '../settings/BudgetSettings';
+import { AppearanceSettings } from '../settings/AppearanceSettings';
 
 export const SettingsView: React.FC = () => {
     const { logout } = useAuth();
@@ -42,9 +43,7 @@ export const SettingsView: React.FC = () => {
             >
 
 
-import { AppearanceSettings } from '../settings/AppearanceSettings';
 
-// ...
 
                 <motion.div variants={itemVariants}><AppearanceSettings /></motion.div>
                 <motion.div variants={itemVariants}><ApiKeySettings /></motion.div>

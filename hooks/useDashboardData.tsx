@@ -390,27 +390,25 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const healthScore = useMemo(() => {
         let score = 0;
-        // 1. Positive Balance (+30)
-        if (summary.totalBalance > 0) score += 30;
+        // 1. Positive Balance (+300)
+        if (summary.totalBalance > 0) score += 300;
         
-        // 2. Savings Rate > 20% (+30)
+        // 2. Savings Rate > 20% (+300)
         const savingsRate = summary.monthlyIncome > 0 
             ? (summary.monthlyIncome - Math.abs(summary.monthlyExpenses)) / summary.monthlyIncome 
             : 0;
-        if (savingsRate >= 0.2) score += 30;
-        else if (savingsRate > 0) score += 15; // Partial points for any savings
+        if (savingsRate >= 0.2) score += 300;
+        else if (savingsRate > 0) score += 150; // Partial points for any savings
 
-        // 3. No Overdue Debts (+20) - Assuming all active debts are "ok" for now, but could check due dates
-        // For simplicity: Has debts?
-        if (debts.length === 0) score += 20;
-        else if (debts.every(d => d.status === DebtStatus.PAGA)) score += 20;
+        // 3. No Overdue Debts (+200)
+        if (debts.length === 0) score += 200;
+        else if (debts.every(d => d.status === DebtStatus.PAGA)) score += 200;
         
-        // 4. Has Investments (+20)
-        // Check if there are transactions in "Investimentos" category
+        // 4. Has Investments (+200)
         const hasInvestments = transactions.some(t => t.category.name === 'Investimentos' || t.category.name === 'Investimento');
-        if (hasInvestments) score += 20;
+        if (hasInvestments) score += 200;
 
-        return Math.min(100, score);
+        return Math.min(1000, score);
     }, [summary, debts, transactions]);
     
     const achievements: Achievement[] = useMemo(() => {
