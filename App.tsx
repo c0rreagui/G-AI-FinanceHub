@@ -28,6 +28,7 @@ import { useToast } from './hooks/useToast';
 import { DashboardDataProvider } from './hooks/useDashboardData';
 import { DialogProvider } from './contexts/DialogContext';
 import { ToastProvider } from './contexts/ToastContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 const AppContent: React.FC = () => {
   const { user, loading, isGuest, isDeveloper } = useAuth();
@@ -171,11 +172,13 @@ const App: React.FC = () => {
       <ToastProvider>
         <DashboardDataProvider>
           <PrivacyProvider>
-            <DialogProvider>
-              <ErrorBoundary>
-                <AppContent />
-              </ErrorBoundary>
-            </DialogProvider>
+            <ThemeProvider>
+                <DialogProvider>
+                <ErrorBoundary>
+                    <AppContent />
+                </ErrorBoundary>
+                </DialogProvider>
+            </ThemeProvider>
           </PrivacyProvider>
         </DashboardDataProvider>
       </ToastProvider>

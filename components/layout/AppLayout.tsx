@@ -14,13 +14,26 @@ interface AppLayoutProps {
   setCurrentView: (view: ViewType) => void;
 }
 
+import { useTheme } from '../../contexts/ThemeContext';
+
+// ...
+
 export const AppLayout: React.FC<AppLayoutProps> = ({ children, currentView, setCurrentView }) => {
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const { error, clearError } = useDashboardData();
   const { isGuest } = useAuth();
+  const { wallpaper } = useTheme();
 
   return (
     <>
+      {/* Wallpaper Layer */}
+      {wallpaper && (
+          <div className="fixed inset-0 z-[-1]">
+              <div className="absolute inset-0 bg-black/60 z-10" /> {/* Overlay for readability */}
+              <img src={wallpaper} alt="Background" className="w-full h-full object-cover" />
+          </div>
+      )}
+
       <div className={`flex h-screen w-screen bg-transparent text-oklch-foreground overflow-hidden ${isGuest ? 'flex-col' : ''}`}>
         {isDesktop && <Sidebar currentView={currentView} setCurrentView={setCurrentView} />}
         

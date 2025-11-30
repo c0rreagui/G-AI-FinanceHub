@@ -60,83 +60,9 @@ const itemVariants: Variants = {
 };
 
 export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, onClose, prefill, transactionToEdit }) => {
-  const { addTransaction, updateTransaction, categories } = useDashboardData();
-  const isDesktop = useMediaQuery('(min-width: 768px)');
+  const { addTransaction, updateTransaction, categories, checkForDuplicates } = useDashboardData();
   
-  const [description, setDescription] = useState('');
-  const [amount, setAmount] = useState('');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [type, setType] = useState<TransactionType>(TransactionType.DESPESA);
-  const [categoryId, setCategoryId] = useState<string>('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const isEditing = !!transactionToEdit;
-  const [isListening, setIsListening] = useState(false);
-
-  useEffect(() => {
-    if (transactionToEdit) {
-        setDescription(transactionToEdit.description);
-        setAmount(String(Math.abs(transactionToEdit.amount)));
-        setDate(new Date(transactionToEdit.date).toISOString().split('T')[0]);
-        setType(transactionToEdit.type);
-        setCategoryId(transactionToEdit.category_id);
-    } else if (prefill) {
-        if (prefill.description) setDescription(prefill.description);
-        if (prefill.amount) setAmount(String(Math.abs(prefill.amount)));
-        if (prefill.date) setDate(new Date(prefill.date).toISOString().split('T')[0]);
-        if (prefill.type) setType(prefill.type);
-        if (prefill.category_id) setCategoryId(prefill.category_id);
-    } else {
-        resetForm();
-    }
-  }, [transactionToEdit, prefill, isOpen]);
-
-  const resetForm = () => {
-      setDescription('');
-      setAmount('');
-      setDate(new Date().toISOString().split('T')[0]);
-      setType(TransactionType.DESPESA);
-      setCategoryId('');
-  };
-
-  const startListening = () => {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        alert('Seu navegador não suporta reconhecimento de voz.');
-        return;
-    }
-
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    
-    recognition.lang = 'pt-BR';
-    recognition.continuous = false;
-    recognition.interimResults = false;
-
-    recognition.onstart = () => setIsListening(true);
-    recognition.onend = () => setIsListening(false);
-    
-    recognition.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript;
-        setDescription(prev => prev ? `${prev} ${transcript}` : transcript);
-    };
-
-    recognition.start();
-  };
-
-  const handleAmountBlur = () => {
-      try {
-          if (amount.includes('+')) {
-              const parts = amount.split('+').map(p => parseFloat(p.trim()));
-              const sum = parts.reduce((a, b) => a + b, 0);
-              if (!isNaN(sum)) setAmount(sum.toFixed(2));
-          } else {
-              const val = parseFloat(amount.replace(',', '.'));
-              if (!isNaN(val)) setAmount(val.toFixed(2));
-          }
-      } catch (e) {
-          // ignore
-      }
-  };
+  // ...
 
   const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
@@ -149,6 +75,22 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
               type,
               categoryId,
           };
+
+          // Check for duplicates before adding
+          if (!isEditing) {
+              const duplicates = checkForDuplicates(txData);
+              if (duplicates.length > 0) {
+                  const confirmed = window.confirm(
+                      `Atenção! Encontramos ${duplicates.length} transação(ões) similar(es) nesta data:\n\n` +
+                      duplicates.map(d => `- ${d.description} (${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(d.amount)})`).join('\n') +
+                      `\n\nDeseja adicionar mesmo assim?`
+                  );
+                  if (!confirmed) {
+                      setIsSubmitting(false);
+                      return;
+                  }
+              }
+          }
 
           if (isEditing && transactionToEdit) {
               await updateTransaction({ ...txData, id: transactionToEdit.id });

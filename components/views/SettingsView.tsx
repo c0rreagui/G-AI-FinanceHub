@@ -42,6 +42,11 @@ export const SettingsView: React.FC = () => {
             >
 
 
+import { AppearanceSettings } from '../settings/AppearanceSettings';
+
+// ...
+
+                <motion.div variants={itemVariants}><AppearanceSettings /></motion.div>
                 <motion.div variants={itemVariants}><ApiKeySettings /></motion.div>
                 <motion.div variants={itemVariants}><BudgetSettings /></motion.div>
                 <motion.div variants={itemVariants}><BackupManager /></motion.div>

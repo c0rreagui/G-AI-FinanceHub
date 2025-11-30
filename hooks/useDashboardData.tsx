@@ -19,6 +19,7 @@ import {
     UserRank,
     Achievement,
     ScheduledTransactionFrequency,
+    DailyMission,
 } from '../types';
 import { DashboardDataContext } from '../contexts/DashboardDataContext';
 import { getIconByName } from '../utils/categoryIcons';
@@ -163,6 +164,17 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     const [debts, setDebts] = useState<Debt[]>([]);
     const [scheduledTransactions, setScheduledTransactions] = useState<ScheduledTransaction[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [dailyMissions, setDailyMissions] = useState<DailyMission[]>([
+        { id: '1', title: 'Adicionar uma transação', completed: false, type: 'add_transaction' },
+        { id: '2', title: 'Verificar saldo', completed: false, type: 'check_balance' },
+        { id: '3', title: 'Revisar metas', completed: false, type: 'review_goals' },
+    ]);
+
+    const completeMission = useCallback((missionId: string) => {
+        setDailyMissions(prev => prev.map(m => 
+            m.id === missionId && !m.completed ? { ...m, completed: true } : m
+        ));
+    }, []);
 
     // --- GUEST DATA HANDLING ---
     const getGuestData = useCallback(() => {
@@ -184,7 +196,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     }, []);
     
     // --- UTILITY FUNCTIONS ---
-    const withMutation = useCallback(async <T>(asyncFunc: () => Promise<T>, ...ids: string[]): Promise<T | null> => {
+    const withMutation = useCallback(async <T,>(asyncFunc: () => Promise<T>, ...ids: string[]): Promise<T | null> => {
         setIsMutating(true);
         if (ids.length > 0) {
             setMutatingIds(prev => new Set([...prev, ...ids]));
@@ -375,6 +387,31 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         
         return { level, xp: currentXp, xpToNextLevel, rank };
     }, [transactions, goals, debts, user, isGuest]);
+
+    const healthScore = useMemo(() => {
+        let score = 0;
+        // 1. Positive Balance (+30)
+        if (summary.totalBalance > 0) score += 30;
+        
+        // 2. Savings Rate > 20% (+30)
+        const savingsRate = summary.monthlyIncome > 0 
+            ? (summary.monthlyIncome - Math.abs(summary.monthlyExpenses)) / summary.monthlyIncome 
+            : 0;
+        if (savingsRate >= 0.2) score += 30;
+        else if (savingsRate > 0) score += 15; // Partial points for any savings
+
+        // 3. No Overdue Debts (+20) - Assuming all active debts are "ok" for now, but could check due dates
+        // For simplicity: Has debts?
+        if (debts.length === 0) score += 20;
+        else if (debts.every(d => d.status === DebtStatus.PAGA)) score += 20;
+        
+        // 4. Has Investments (+20)
+        // Check if there are transactions in "Investimentos" category
+        const hasInvestments = transactions.some(t => t.category.name === 'Investimentos' || t.category.name === 'Investimento');
+        if (hasInvestments) score += 20;
+
+        return Math.min(100, score);
+    }, [summary, debts, transactions]);
     
     const achievements: Achievement[] = useMemo(() => {
         return [
@@ -382,11 +419,66 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             { id: '2', name: 'Planejador', description: 'Crie sua primeira meta financeira.', unlocked: goals.length > 0 },
             { id: '3', name: 'Economista', description: 'Acumule R$ 1.000,00 em saldo.', unlocked: summary.totalBalance >= 1000 },
             { id: '4', name: 'Livre de Dívidas', description: 'Pague sua primeira dívida.', unlocked: debts.some(d => d.status === DebtStatus.PAGA) },
+            { id: '5', name: 'Mestre da Saúde', description: 'Atinja 100 de Score de Saúde.', unlocked: healthScore === 100 },
         ];
-    }, [transactions, goals, debts, summary.totalBalance]);
+
+    }, [transactions, goals, debts, summary.totalBalance, healthScore]);
+
+    const savingsSuggestion = useMemo(() => {
+        if (transactions.length === 0) return null;
+
+        const currentMonth = new Date().getMonth();
+        const expenses = transactions.filter(t => t.type === TransactionType.DESPESA && new Date(t.date).getMonth() === currentMonth);
+        
+        if (expenses.length === 0) return "Parabéns! Você ainda não gastou nada este mês.";
+
+        const expensesByCategory: { [key: string]: number } = {};
+        expenses.forEach(t => {
+            const catName = t.category.name;
+            expensesByCategory[catName] = (expensesByCategory[catName] || 0) + Math.abs(t.amount);
+        });
+
+        const sortedCategories = Object.entries(expensesByCategory).sort((a, b) => b[1] - a[1]);
+        const topCategory = sortedCategories[0];
+
+        if (topCategory) {
+            return `Você gastou ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(topCategory[1])} em ${topCategory[0]} este mês. Que tal tentar reduzir 10% na próxima semana?`;
+        }
+        return null;
+    }, [transactions]);
+
+    const dueSoonBills = useMemo(() => {
+        const today = new Date();
+        const threeDaysFromNow = new Date();
+        threeDaysFromNow.setDate(today.getDate() + 3);
+
+        return scheduledTransactions.filter(st => {
+            const dueDate = new Date(st.next_due_date);
+            return dueDate >= today && dueDate <= threeDaysFromNow;
+        });
+    }, [scheduledTransactions]);
+
+    const checkForDuplicates = useCallback((newTx: Partial<Transaction>): Transaction[] => {
+        if (!newTx.amount || !newTx.date) return [];
+        
+        const newDate = new Date(newTx.date).toISOString().split('T')[0];
+        
+        return transactions.filter(tx => {
+            const txDate = new Date(tx.date).toISOString().split('T')[0];
+            const isSameDay = txDate === newDate;
+            const isSameAmount = Math.abs(tx.amount) === Math.abs(newTx.amount!);
+            const isSameType = tx.type === newTx.type;
+            const isSameDescription = tx.description.toLowerCase().trim() === newTx.description?.toLowerCase().trim();
+            
+            return isSameDay && isSameAmount && isSameType && isSameDescription;
+        });
+    }, [transactions]);
 
     // --- CRUD FUNCTIONS ---
     const addTransaction = (tx: Omit<Transaction, 'id' | 'category'|'user_id'|'category_id'> & {categoryId: string}) => withMutation(async () => {
+        // Complete mission
+        completeMission('1'); // 'add_transaction' mission
+        
         if (isGuest) {
             const data = getGuestData();
             const newTx = { ...tx, id: crypto.randomUUID(), user_id: 'guest', category_id: tx.categoryId, created_at: new Date().toISOString() };
@@ -805,7 +897,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     const addMockData = () => withMutation(async () => {
-        if (isGuest || isDeveloper) {
+        if (isGuest) {
             localStorage.removeItem(GUEST_DATA_KEY);
             const userId = isDeveloper ? 'developer' : 'guest';
             const mockCategories = getDefaultCategories(userId).map(c => ({...c, id: crypto.randomUUID()}));
@@ -881,7 +973,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // --- DEV TOOLS ---
     const addMockTransactions = (count: number) => withMutation(async () => {
-        const userId = isGuest || isDeveloper ? (isDeveloper ? 'developer' : 'guest') : user!.id;
+        const userId = isGuest ? 'guest' : user!.id;
         if (!userId || categories.length === 0) return;
 
         const despesaCats = categories.filter(c => ['Alimentação', 'Compras', 'Transporte', 'Moradia', 'Lazer'].includes(c.name)).map(c => c.id);
@@ -896,7 +988,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             category_id: getRandomCatId(),
         }));
 
-        if (isGuest || isDeveloper) {
+        if (isGuest) {
             const data = getGuestData();
             data.transactions.push(...newTransactions.map(t => ({...t, id: crypto.randomUUID() })));
             setGuestData(data);
@@ -909,7 +1001,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     });
     
     const addMockGoals = (count: number) => withMutation(async () => {
-        const userId = isGuest || isDeveloper ? (isDeveloper ? 'developer' : 'guest') : user!.id;
+        const userId = isGuest ? 'guest' : user!.id;
         const now = new Date();
         const newGoals = Array.from({ length: count }, (_, i) => ({
             user_id: userId,
@@ -919,7 +1011,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             deadline: new Date(now.getFullYear() + 1, Math.floor(Math.random() * 12), 1).toISOString(),
             status: GoalStatus.EM_ANDAMENTO,
         }));
-         if (isGuest || isDeveloper) {
+        if (isGuest) {
             const data = getGuestData();
             data.goals.push(...newGoals.map(g => ({...g, id: crypto.randomUUID() })));
             setGuestData(data);
@@ -932,7 +1024,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     const addMockDebts = (count: number) => withMutation(async () => {
-         const userId = isGuest || isDeveloper ? (isDeveloper ? 'developer' : 'guest') : user!.id;
+         const userId = isGuest ? 'guest' : user!.id;
          const newDebts = Array.from({ length: count }, (_, i) => ({
              user_id: userId,
              name: `Dívida de Teste ${i+1}`,
@@ -942,7 +1034,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
              category: 'Teste',
              status: DebtStatus.ATIVA,
          }));
-          if (isGuest || isDeveloper) {
+          if (isGuest) {
             const data = getGuestData();
             data.debts.push(...newDebts.map(d => ({...d, id: crypto.randomUUID() })));
             setGuestData(data);
@@ -955,7 +1047,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     const clearTable = (tableName: 'transactions' | 'goals' | 'debts' | 'scheduled_transactions') => withMutation(async () => {
-        if (isGuest || isDeveloper) {
+        if (isGuest) {
             const data = getGuestData();
             data[tableName] = [];
             setGuestData(data);
@@ -983,6 +1075,10 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         monthlyChartData,
         userLevel,
         achievements,
+        healthScore,
+        dailyMissions,
+        savingsSuggestion,
+        dueSoonBills,
         loading,
         isMutating,
         mutatingIds,
@@ -1001,6 +1097,8 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         addScheduledTransaction,
         updateScheduledTransaction,
         deleteScheduledTransaction,
+        completeMission,
+        checkForDuplicates,
         addMockData,
         clearAllUserData,
         addMockTransactions,
@@ -1009,12 +1107,57 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         clearTable,
         forceError,
     }), [
-        transactions, goals, debts, scheduledTransactions, categories, summary, monthlyChartData, userLevel, achievements, 
+        transactions, goals, debts, scheduledTransactions, categories, summary, monthlyChartData, userLevel, achievements,
+        healthScore, dailyMissions, savingsSuggestion, dueSoonBills, completeMission, checkForDuplicates,
         loading, isMutating, mutatingIds, error, user, isGuest
     ]);
 
-    // FIX: Replaced JSX with `React.createElement` to avoid syntax errors in a `.ts` file.
-    return React.createElement(DashboardDataContext.Provider, { value: value }, children);
+    return (
+        <DashboardDataContext.Provider value={{
+            transactions,
+            goals,
+            debts,
+            scheduledTransactions,
+            categories,
+            summary,
+            monthlyChartData,
+            userLevel,
+            achievements,
+            healthScore,
+            dailyMissions,
+            savingsSuggestion,
+            dueSoonBills,
+            loading,
+            isMutating,
+            mutatingIds,
+            error,
+            addTransaction,
+            updateTransaction,
+            deleteTransaction,
+            updateTransactionsCategory,
+            addGoal,
+            updateGoalValue,
+            deleteGoal,
+            addDebt,
+            addPaymentToDebt,
+            deleteDebt,
+            addScheduledTransaction,
+            updateScheduledTransaction,
+            deleteScheduledTransaction,
+            completeMission,
+            checkForDuplicates,
+            clearError,
+            addMockData,
+            clearAllUserData,
+            addMockTransactions,
+            addMockGoals,
+            addMockDebts,
+            clearTable,
+            forceError
+        }}>
+            {children}
+        </DashboardDataContext.Provider>
+    );
 };
 
 export const useDashboardData = (): DashboardDataContextType => {

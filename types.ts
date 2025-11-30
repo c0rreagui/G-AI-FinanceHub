@@ -125,6 +125,13 @@ export type NewScheduledTransaction = Omit<ScheduledTransaction, 'id' | 'categor
 export type UpdateScheduledTransaction = Omit<ScheduledTransaction, 'category' | 'user_id'>;
 
 
+export interface DailyMission {
+  id: string;
+  title: string;
+  completed: boolean;
+  type: 'add_transaction' | 'check_balance' | 'view_insights' | 'review_goals';
+}
+
 export interface DashboardDataContextType {
   // Data
   transactions: Transaction[];
@@ -136,6 +143,10 @@ export interface DashboardDataContextType {
   monthlyChartData: MonthlyChartData[];
   userLevel: UserLevel | null;
   achievements: Achievement[];
+  healthScore: number;
+  dailyMissions: DailyMission[];
+  savingsSuggestion: string | null;
+  dueSoonBills: ScheduledTransaction[];
 
   // State
   loading: boolean;
@@ -148,6 +159,7 @@ export interface DashboardDataContextType {
   updateTransaction: (tx: Omit<Transaction, 'category' | 'user_id' | 'category_id'> & { categoryId: string }) => Promise<boolean>;
   deleteTransaction: (id: string) => Promise<boolean>;
   updateTransactionsCategory: (transactionIds: string[], newCategoryId: string) => Promise<boolean>;
+  checkForDuplicates: (transaction: Partial<Transaction>) => Transaction[];
 
   addGoal: (goal: Omit<Goal, 'id' | 'current_amount' | 'status' | 'user_id' | 'target_amount' | 'deadline'> & { targetAmount: number; deadline: string; }) => Promise<Goal | null>;
   updateGoalValue: (goalId: string, amount: number) => Promise<boolean>;
@@ -161,6 +173,7 @@ export interface DashboardDataContextType {
   updateScheduledTransaction: (item: Omit<ScheduledTransaction, 'category' | 'user_id' | 'category_id' | 'start_date'> & { categoryId: string; startDate: string }) => Promise<boolean>;
   deleteScheduledTransaction: (id: string) => Promise<boolean>;
 
+  completeMission: (missionId: string) => void;
   clearError: () => void;
 
   // Dev Tools

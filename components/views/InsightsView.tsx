@@ -35,9 +35,11 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     return null;
 };
 
+import { useMediaQuery } from '../../hooks/useMediaQuery';
+
 export const InsightsView: React.FC = () => {
     const { transactions, loading } = useDashboardData();
-    const isMobile = window.innerWidth < 768; // Simple check, ideally use a hook
+    const isMobile = useMediaQuery('(max-width: 768px)');
 
     const categoryAnalysis = useMemo(() => {
         if (!transactions.length) return [];
