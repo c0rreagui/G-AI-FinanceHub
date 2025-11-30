@@ -22,7 +22,7 @@ import { ArrowUpRight, ArrowDownLeft, Info, Target } from '../Icons';
 import { formatCurrencyBRL } from '../../utils/formatters';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { useDialog } from '../../hooks/useDialog';
-import { ViewType } from '../../types';
+import { ViewType, TransactionType } from '../../types';
 
 interface HomeDashboardViewProps {
     setCurrentView: (view: ViewType) => void;
@@ -38,8 +38,12 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
     const { openDialog } = useDialog();
     const firstGoal = goals[0];
     
-    // Calculate investment amount (mock or real logic)
-    const investmentAmount = 0; // Placeholder, replace with real logic if available
+    // Calculate investment amount
+    const investmentAmount = useMemo(() => {
+        return transactions
+            .filter(t => t.type === TransactionType.DESPESA && t.category?.name.toLowerCase().includes('investimento'))
+            .reduce((acc, t) => acc + Math.abs(t.amount), 0);
+    }, [transactions]);
 
 
     const { greetingName, zenMode, density, hiddenModules } = useTheme();
@@ -143,7 +147,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                 
                 {/* BLOCO 1: KPIs (Coluna Esquerda) */}
                 {/* @ts-ignore */}
-                <motion.div variants={variants} className={`${zenMode ? 'md:col-span-4' : 'md:col-span-2 lg:col-span-1'} grid grid-cols-1 ${gridGap}`}>
+                <motion.div variants={variants} className={`${zenMode ? 'md:col-span-4' : 'md:col-span-2 lg:col-span-1'} grid grid-cols-1 gap-4`}>
                     <div id="balance-card">
                         <BalanceCard balance={summary.totalBalance} />
                     </div>
@@ -223,7 +227,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                         <div className="h-[320px] md:h-auto flex-1">
                             <WealthFunnelChart 
                                 income={summary.monthlyIncome} 
-                                expenses={Math.abs(summary.monthlyExpenses)} 
+                                expenses={Math.max(0, Math.abs(summary.monthlyExpenses) - investmentAmount)} 
                                 investments={investmentAmount} 
                             />
                         </div>
