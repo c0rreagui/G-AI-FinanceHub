@@ -8,6 +8,7 @@ import { useDialog } from '../../hooks/useDialog';
 import { TransactionsViewSkeleton } from './skeletons/TransactionsViewSkeleton';
 import { EmptyState } from '../ui/EmptyState';
 import { TransactionsTable } from '../transactions/TransactionsTable';
+import { InvestmentsTabContent } from '../transactions/InvestmentsTabContent';
 import { Input } from '../ui/Input';
 import { Tabs, TabsList, TabsTrigger } from '../ui/Tabs';
 import { Flex, Box, Grid } from '../ui/layout';
@@ -95,8 +96,8 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                 title="Transações" 
                 breadcrumbs={['FinanceHub', 'Transações']}
                 actions={
-                    <Button onClick={() => openDialog('add-transaction')}>
-                        <PlusCircle className="w-4 h-4 mr-2"/> Nova Transação
+                    <Button onClick={() => openDialog('add-transaction', { isInvestmentMode: typeFilter === 'investments' })}>
+                        <PlusCircle className="w-4 h-4 mr-2"/> {typeFilter === 'investments' ? 'Novo Investimento' : 'Nova Transação'}
                     </Button>
                 }
             />
@@ -140,7 +141,11 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
 
                     {/* Table Area */}
                     <div className="flex-grow overflow-auto rounded-md border bg-card">
-                        {filteredTransactions.length > 0 ? (
+                        {typeFilter === 'investments' ? (
+                            <div className="p-4">
+                                <InvestmentsTabContent transactions={filteredTransactions} />
+                            </div>
+                        ) : filteredTransactions.length > 0 ? (
                             <TransactionsTable 
                                 transactions={filteredTransactions}
                                 selectedIds={selectedIds}

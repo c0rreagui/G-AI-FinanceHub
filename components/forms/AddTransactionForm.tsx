@@ -19,6 +19,7 @@ interface AddTransactionFormProps {
   onClose: () => void;
   prefill?: Partial<Transaction>;
   transactionToEdit?: Transaction;
+  isInvestmentMode?: boolean;
 }
 
 const triggerHapticFeedback = () => {
@@ -59,7 +60,7 @@ const itemVariants: Variants = {
   visible: { opacity: 1, y: 0 }
 };
 
-export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, onClose, prefill, transactionToEdit }) => {
+export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, onClose, prefill, transactionToEdit, isInvestmentMode }) => {
   const { addTransaction, updateTransaction, categories, checkForDuplicates } = useDashboardData();
   
   const [description, setDescription] = useState('');
@@ -81,6 +82,12 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
             setDate(new Date(transactionToEdit.date).toISOString().split('T')[0]);
             setType(transactionToEdit.type);
             setCategoryId(transactionToEdit.category_id);
+        } else if (isInvestmentMode) {
+            // Investment Mode Logic
+            setType(TransactionType.DESPESA);
+            const investCat = categories.find(c => c.name.toLowerCase().includes('investimento'));
+            if (investCat) setCategoryId(investCat.id);
+            resetForm(false); // Don't clear what we just set
         } else if (prefill) {
             if (prefill.type) setType(prefill.type);
             if (prefill.date) setDate(new Date(prefill.date).toISOString().split('T')[0]);
@@ -89,14 +96,16 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
             resetForm();
         }
     }
-  }, [isOpen, transactionToEdit, prefill]);
+  }, [isOpen, transactionToEdit, prefill, isInvestmentMode, categories]);
 
-  const resetForm = () => {
+  const resetForm = (full = true) => {
       setDescription('');
       setAmount('');
       setDate(new Date().toISOString().split('T')[0]);
-      setType(TransactionType.DESPESA);
-      setCategoryId('');
+      if (full) {
+          setType(TransactionType.DESPESA);
+          setCategoryId('');
+      }
       setIsListening(false);
   };
 
@@ -251,7 +260,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
 
   if (isDesktop) {
       return (
-          <Modal isOpen={isOpen} onClose={onClose} title={isEditing ? "Editar Transação" : "Nova Transação"}>
+          <Modal isOpen={isOpen} onClose={onClose} title={isEditing ? "Editar Transação" : (isInvestmentMode ? "Novo Investimento" : "Nova Transação")}>
               <motion.form 
                   onSubmit={handleSubmit} 
                   {...({ className: "space-y-4" } as any)}
@@ -265,7 +274,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                       Cancelar
                     </Button>
                     <Button type="submit" disabled={isSubmitting || !categoryId}>
-                      {isSubmitting ? <><LoadingSpinner /> Salvando...</> : (isEditing ? 'Salvar Alterações' : 'Salvar Transação')}
+                      {isSubmitting ? <><LoadingSpinner /> Salvando...</> : (isEditing ? 'Salvar Alterações' : (isInvestmentMode ? 'Confirmar Aporte' : 'Salvar Transação'))}
                     </Button>
                   </div>
               </motion.form>
