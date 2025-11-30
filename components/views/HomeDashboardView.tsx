@@ -40,8 +40,18 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
     
     // Calculate investment amount
     const investmentAmount = useMemo(() => {
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+
         return transactions
-            .filter(t => t.type === TransactionType.DESPESA && t.category?.name.toLowerCase().includes('investimento'))
+            .filter(t => {
+                const tDate = new Date(t.date);
+                return t.type === TransactionType.DESPESA && 
+                       t.category?.name.toLowerCase().includes('investimento') &&
+                       tDate.getMonth() === currentMonth &&
+                       tDate.getFullYear() === currentYear;
+            })
             .reduce((acc, t) => acc + Math.abs(t.amount), 0);
     }, [transactions]);
 
