@@ -9,7 +9,7 @@ import { TransactionsViewSkeleton } from './skeletons/TransactionsViewSkeleton';
 import { EmptyState } from '../ui/EmptyState';
 import { TransactionsTable } from '../transactions/TransactionsTable';
 import { Input } from '../ui/Input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
+import { Tabs, TabsList, TabsTrigger } from '../ui/Tabs';
 import { Flex, Box, Grid } from '../ui/layout';
 import { Card, CardContent } from '../ui/Card';
 
@@ -28,7 +28,23 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
         return transactions.filter(tx => {
             const matchesSearch = tx.description.toLowerCase().includes(searchTerm.toLowerCase()) || 
                                   tx.category.name.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesType = typeFilter === 'all' || tx.type === typeFilter;
+            
+            // Investment Logic
+            const catName = (tx.category?.name || '').toLowerCase();
+            const isInvestment = ['investimento', 'aporte', 'aplicação', 'poupança', 'cdb', 'tesouro'].some(k => catName.includes(k));
+
+            let matchesType = true;
+            if (typeFilter === 'all') {
+                matchesType = true;
+            } else if (typeFilter === 'receita') {
+                matchesType = tx.type === 'receita';
+            } else if (typeFilter === 'despesa') {
+                // Exclude investments from 'despesa' tab to keep it clean
+                matchesType = tx.type === 'despesa' && !isInvestment;
+            } else if (typeFilter === 'investments') {
+                matchesType = isInvestment && tx.type === 'despesa';
+            }
+
             return matchesSearch && matchesType;
         });
     }, [transactions, searchTerm, typeFilter]);
@@ -92,7 +108,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                     {/* Filters Bar */}
                     <Card>
                         <CardContent className="p-4">
-                            <Grid cols={1} className="md:grid-cols-4 gap-4">
+                            <Grid cols={1} className="md:grid-cols-4 gap-4 items-center">
                                 <div className="md:col-span-2 relative">
                                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                                     <Input 
@@ -102,16 +118,16 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                     />
                                 </div>
-                                <Select value={typeFilter} onValueChange={setTypeFilter}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Tipo" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">Todos os tipos</SelectItem>
-                                        <SelectItem value="receita">Receitas</SelectItem>
-                                        <SelectItem value="despesa">Despesas</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                <div className="md:col-span-2 flex justify-end">
+                                    <Tabs value={typeFilter} onValueChange={setTypeFilter} className="w-full md:w-auto">
+                                        <TabsList className="w-full md:w-auto grid grid-cols-4 md:flex">
+                                            <TabsTrigger value="all">Todas</TabsTrigger>
+                                            <TabsTrigger value="receita">Receitas</TabsTrigger>
+                                            <TabsTrigger value="despesa">Despesas</TabsTrigger>
+                                            <TabsTrigger value="investments">Investimentos</TabsTrigger>
+                                        </TabsList>
+                                    </Tabs>
+                                </div>
                                 {selectedIds.length > 0 && (
                                     <Button variant="secondary" onClick={handleBulkRecategorize}>
                                         <FolderSync className="w-4 h-4 mr-2" />
