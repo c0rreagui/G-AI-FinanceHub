@@ -47,8 +47,11 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
         return transactions
             .filter(t => {
                 const tDate = new Date(t.date);
+                const catName = (t.category?.name || '').toLowerCase();
+                const isInvestment = ['investimento', 'aporte', 'aplicação', 'poupança', 'cdb', 'tesouro'].some(k => catName.includes(k));
+                
                 return t.type === TransactionType.DESPESA && 
-                       t.category?.name.toLowerCase().includes('investimento') &&
+                       isInvestment &&
                        tDate.getMonth() === currentMonth &&
                        tDate.getFullYear() === currentYear;
             })
