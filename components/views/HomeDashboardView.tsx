@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
-import { motion } from 'framer-motion';
+import { motion, Reorder } from 'framer-motion';
 import { DailyTipCard } from '../dashboard/DailyTipCard';
 import { HealthScoreGauge } from '../dashboard/HealthScoreGauge';
 import { BalanceCard } from '../dashboard/BalanceCard';
@@ -18,11 +18,12 @@ import { Grid } from '../ui/Grid';
 import { Flex } from '../ui/Flex';
 import { Text, Heading } from '../ui/typography';
 import { ProgressBar } from '../ui/ProgressBar';
-import { ArrowUpRight, ArrowDownLeft, Info, Target } from '../Icons';
+import { ArrowUpRight, ArrowDownLeft, Info, Target, LayoutGrid, RotateCcw } from '../Icons';
 import { formatCurrencyBRL } from '../../utils/formatters';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { useDialog } from '../../hooks/useDialog';
 import { ViewType, TransactionType } from '../../types';
+import { useLayout, WidgetId } from '../../hooks/useLayout';
 
 interface HomeDashboardViewProps {
     setCurrentView: (view: ViewType) => void;
@@ -36,6 +37,7 @@ const variants = {
 export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrentView }) => {
     const { summary, monthlyChartData, transactions, loading, goals, savingsSuggestion, dueSoonBills, healthScore } = useDashboardData();
     const { openDialog } = useDialog();
+    const { layout, setLayout, isEditMode, toggleEditMode, resetLayout } = useLayout();
     const firstGoal = goals[0];
     
     // Calculate investment amount
@@ -86,6 +88,137 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
     const [showSavingsSuggestion, setShowSavingsSuggestion] = React.useState(true);
     const [showDueBills, setShowDueBills] = React.useState(true);
 
+    const renderWidget = (id: WidgetId) => {
+        switch (id) {
+            case 'daily_tip':
+                return !zenMode && !hiddenModules.includes('tips') ? <DailyTipCard /> : null;
+            case 'kpi_overview':
+                return (
+                    <div className={`grid grid-cols-1 gap-4`}>
+                        <div id="balance-card">
+                            <BalanceCard balance={summary.totalBalance} />
+                        </div>
+                        {!zenMode && (
+                            <Grid cols={2} gap={density === 'compact' ? 'sm' : density === 'spacious' ? 'lg' : 'md'}>
+                                <Card className="flex flex-col justify-center">
+                                    <CardContent className="p-4">
+                                        <div className="text-success mb-1"><ArrowUpRight className="w-5 h-5"/></div>
+                                        <div className="flex items-center gap-1 mb-1">
+                                            <Text size="xs" weight="bold" variant="muted" className="uppercase">Entradas</Text>
+                                        </div>
+                                        <div className="truncate" title={formatCurrencyBRL(summary.monthlyIncome)}>
+                                            <Text size="lg" weight="bold" className="truncate">
+                                                <PrivacyMask>
+                                                    <AnimatedCurrency value={summary.monthlyIncome}/>
+                                                </PrivacyMask>
+                                            </Text>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                                <Card className="flex flex-col justify-center">
+                                    <CardContent className="p-4">
+                                        <div className="text-destructive mb-1"><ArrowDownLeft className="w-5 h-5"/></div>
+                                        <div className="flex items-center gap-1 mb-1">
+                                            <Text size="xs" weight="bold" variant="muted" className="uppercase">Saídas</Text>
+                                        </div>
+                                        <div className="truncate" title={formatCurrencyBRL(Math.abs(summary.monthlyExpenses))}>
+                                            <Text size="lg" weight="bold" className="truncate">
+                                                <PrivacyMask>
+                                                    <AnimatedCurrency value={Math.abs(summary.monthlyExpenses)}/>
+                                                </PrivacyMask>
+                                            </Text>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        )}
+                    </div>
+                );
+            case 'monthly_chart':
+                return !zenMode && !hiddenModules.includes('chart') ? (
+                    <div className="h-[320px] md:h-auto" id="monthly-chart">
+                        <MonthlySummaryChart data={monthlyChartData} />
+                    </div>
+                ) : null;
+            case 'wealth_health':
+                return !zenMode && !hiddenModules.includes('investments') ? (
+                    <div className="flex flex-col gap-4 h-full">
+                        <div className="h-[200px]">
+                            <HealthScoreGauge score={healthScore} />
+                        </div>
+                        <div className="h-[320px] md:h-auto flex-1">
+                            <WealthFunnelChart 
+                                income={summary.monthlyIncome} 
+                                expenses={Math.max(0, Math.abs(summary.monthlyExpenses) - investmentAmount)} 
+                                investments={investmentAmount} 
+                            />
+                        </div>
+                    </div>
+                ) : null;
+            case 'quick_actions_goals':
+                return (
+                    <div className={containerSpacing}>
+                        <div id="quick-actions">
+                            <QuickActions />
+                        </div>
+                        {!hiddenModules.includes('goals') && (
+                            <div id="goals-section">
+                                {firstGoal ? (
+                                    <Card className="relative overflow-hidden group cursor-pointer border-none bg-card" onClick={() => setCurrentView('goals')}>
+                                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                        <CardContent className="p-5">
+                                            <Flex justify="between" align="center" className="mb-3">
+                                                <Text size="sm" className="text-purple-300 font-medium">Foco Principal</Text>
+                                                <Target className="w-4 h-4 text-purple-400" />
+                                            </Flex>
+                                            <Heading size="h4" className="mb-4">{firstGoal.name}</Heading>
+                                            <ProgressBar percentage={(firstGoal.current_amount / firstGoal.target_amount) * 100} color="primary" />
+                                            <Flex justify="between" className="mt-2">
+                                                <PrivacyMask>
+                                                    <Text size="xs" variant="muted">{formatCurrencyBRL(firstGoal.current_amount)}</Text>
+                                                </PrivacyMask>
+                                                <PrivacyMask>
+                                                    <Text size="xs" variant="muted">{formatCurrencyBRL(firstGoal.target_amount)}</Text>
+                                                </PrivacyMask>
+                                            </Flex>
+                                        </CardContent>
+                                    </Card>
+                                ) : (
+                                    <Card className="border-dashed border-muted-foreground/20 flex flex-col items-center justify-center py-8 bg-transparent">
+                                        <Text size="sm" variant="muted" className="mb-3">Nenhuma meta definida</Text>
+                                        <Button size="sm" variant="secondary" onClick={() => openDialog('add-goal')}>Criar Meta</Button>
+                                    </Card>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                );
+            case 'challenges':
+                return !hiddenModules.includes('challenges') ? <MonthlyChallengesCard /> : null;
+            case 'recent_transactions':
+                return (
+                    <Card className="h-full">
+                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                            <CardTitle>Últimas Atividades</CardTitle>
+                            <Button variant="ghost" size="sm" onClick={() => setCurrentView('transactions')} className="text-xs text-cyan-400 hover:text-cyan-300 h-8">
+                                Ver todas
+                            </Button>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-1">
+                                {transactions.slice(0, 5).map(tx => (
+                                    <TransactionRow key={tx.id} tx={tx} />
+                                ))}
+                                {transactions.length === 0 && <Text variant="muted" align="center" className="py-4">Sem movimentações recentes.</Text>}
+                            </div>
+                        </CardContent>
+                    </Card>
+                );
+            default:
+                return null;
+        }
+    };
+
     return (
         // @ts-ignore
         <motion.div
@@ -100,6 +233,21 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                     <Text variant="muted">Visão geral das suas finanças hoje.</Text>
                 </div>
                 <div className="flex gap-2">
+                    <Button 
+                        variant={isEditMode ? "default" : "ghost"} 
+                        size="sm" 
+                        onClick={toggleEditMode}
+                        className={isEditMode ? "bg-yellow-500 hover:bg-yellow-600 text-black" : ""}
+                    >
+                        <LayoutGrid className="w-4 h-4 mr-2" />
+                        {isEditMode ? 'Salvar Layout' : 'Personalizar'}
+                    </Button>
+                    {isEditMode && (
+                        <Button variant="outline" size="sm" onClick={resetLayout}>
+                            <RotateCcw className="w-4 h-4 mr-2" />
+                            Restaurar
+                        </Button>
+                    )}
                     <Button variant="outline" size="sm" onClick={() => openDialog('add-transaction')}>
                         Nova Transação
                     </Button>
@@ -147,177 +295,34 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                 )}
             </div>
 
-            {/* BENTO GRID PRINCIPAL */}
-            {/* Daily Tip - Hide in Zen Mode OR if hidden in settings */}
-            {!zenMode && !hiddenModules.includes('tips') && (
-                // @ts-ignore
-                <motion.div variants={variants}>
-                    <DailyTipCard />
-                </motion.div>
-            )}
+            {/* DRAGGABLE GRID */}
+            <Reorder.Group 
+                axis="y" 
+                values={layout} 
+                onReorder={setLayout} 
+                className={`grid grid-cols-1 md:grid-cols-4 ${gridGap}`}
+            >
+                {layout.map((widget) => {
+                    const content = renderWidget(widget.id);
+                    if (!content) return null;
 
-            <Grid cols={1} className={`md:grid-cols-4 ${gridGap}`}>
-                
-                {/* BLOCO 1: KPIs (Coluna Esquerda) */}
-                {/* @ts-ignore */}
-                <motion.div variants={variants} className={`${zenMode ? 'md:col-span-4' : 'md:col-span-2 lg:col-span-1'} grid grid-cols-1 gap-4`}>
-                    <div id="balance-card">
-                        <BalanceCard balance={summary.totalBalance} />
-                    </div>
-                    
-                    {!zenMode && (
-                        <Grid cols={2} gap={density === 'compact' ? 'sm' : density === 'spacious' ? 'lg' : 'md'}>
-                             {/* ... Income/Expense Cards ... */}
-                             <Card className="flex flex-col justify-center">
-                                <CardContent className="p-4">
-                                    <div className="text-success mb-1"><ArrowUpRight className="w-5 h-5"/></div>
-                                    <div className="flex items-center gap-1 mb-1">
-                                        <Text size="xs" weight="bold" variant="muted" className="uppercase">Entradas</Text>
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger>
-                                                    <Info className="w-3 h-3 text-gray-500 hover:text-gray-300" />
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>Soma de todas as suas receitas no mês atual.</p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-                                    </div>
-                                    <div className="truncate" title={formatCurrencyBRL(summary.monthlyIncome)}>
-                                        <Text size="lg" weight="bold" className="truncate">
-                                            <PrivacyMask>
-                                                <AnimatedCurrency value={summary.monthlyIncome}/>
-                                            </PrivacyMask>
-                                        </Text>
-                                    </div>
-                                </CardContent>
-                             </Card>
-                             <Card className="flex flex-col justify-center">
-                                <CardContent className="p-4">
-                                    <div className="text-destructive mb-1"><ArrowDownLeft className="w-5 h-5"/></div>
-                                    <div className="flex items-center gap-1 mb-1">
-                                        <Text size="xs" weight="bold" variant="muted" className="uppercase">Saídas</Text>
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger>
-                                                    <Info className="w-3 h-3 text-gray-500 hover:text-gray-300" />
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>Soma de todas as suas despesas no mês atual.</p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-                                    </div>
-                                    <div className="truncate" title={formatCurrencyBRL(Math.abs(summary.monthlyExpenses))}>
-                                        <Text size="lg" weight="bold" className="truncate">
-                                            <PrivacyMask>
-                                                <AnimatedCurrency value={Math.abs(summary.monthlyExpenses)}/>
-                                            </PrivacyMask>
-                                        </Text>
-                                    </div>
-                                </CardContent>
-                             </Card>
-                        </Grid>
-                    )}
-                </motion.div>
-
-                {/* BLOCO 2: Gráfico Principal (Centro Expandido) - Hide in Zen Mode OR if hidden */}
-                {!zenMode && !hiddenModules.includes('chart') && (
-                    // @ts-ignore
-                    <motion.div variants={variants} className="md:col-span-2 lg:col-span-2 h-[320px] md:h-auto" id="monthly-chart">
-                        <MonthlySummaryChart data={monthlyChartData} />
-                    </motion.div>
-                )}
-
-                {/* BLOCO 3: Funil & Health Score (Direita) - Hide in Zen Mode OR if hidden */}
-                {!zenMode && !hiddenModules.includes('investments') && (
-                    // @ts-ignore
-                    <motion.div variants={variants} className="md:col-span-4 lg:col-span-1 flex flex-col gap-4">
-                        <div className="h-[200px]">
-                            <HealthScoreGauge score={healthScore} />
-                        </div>
-                        <div className="h-[320px] md:h-auto flex-1">
-                            <WealthFunnelChart 
-                                income={summary.monthlyIncome} 
-                                expenses={Math.max(0, Math.abs(summary.monthlyExpenses) - investmentAmount)} 
-                                investments={investmentAmount} 
-                            />
-                        </div>
-                    </motion.div>
-                )}
-            </Grid>
-
-            {/* GRID SECUNDÁRIO */}
-            <Grid cols={1} className={`lg:grid-cols-3 ${gridGap}`}>
-                
-                {/* Ações Rápidas & Metas */}
-                {/* @ts-ignore */}
-                <motion.div variants={variants} className={containerSpacing}>
-                    <div id="quick-actions">
-                        <QuickActions />
-                    </div>
-                    {!hiddenModules.includes('goals') && (
-                        <div id="goals-section">
-                            {firstGoal ? (
-                                <Card className="relative overflow-hidden group cursor-pointer border-none bg-card" onClick={() => setCurrentView('goals')}>
-                                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                    <CardContent className="p-5">
-                                        <Flex justify="between" align="center" className="mb-3">
-                                            <Text size="sm" className="text-purple-300 font-medium">Foco Principal</Text>
-                                            <Target className="w-4 h-4 text-purple-400" />
-                                        </Flex>
-                                        <Heading size="h4" className="mb-4">{firstGoal.name}</Heading>
-                                        <ProgressBar percentage={(firstGoal.current_amount / firstGoal.target_amount) * 100} color="primary" />
-                                        <Flex justify="between" className="mt-2">
-                                            <PrivacyMask>
-                                                <Text size="xs" variant="muted">{formatCurrencyBRL(firstGoal.current_amount)}</Text>
-                                            </PrivacyMask>
-                                            <PrivacyMask>
-                                                <Text size="xs" variant="muted">{formatCurrencyBRL(firstGoal.target_amount)}</Text>
-                                            </PrivacyMask>
-                                        </Flex>
-                                    </CardContent>
-                                </Card>
-                            ) : (
-                                <Card className="border-dashed border-muted-foreground/20 flex flex-col items-center justify-center py-8 bg-transparent">
-                                    <Text size="sm" variant="muted" className="mb-3">Nenhuma meta definida</Text>
-                                    <Button size="sm" variant="secondary" onClick={() => openDialog('add-goal')}>Criar Meta</Button>
-                                </Card>
-                            )}
-                        </div>
-                    )}
-                </motion.div>
-
-                {/* Desafios Mensais */}
-                {!hiddenModules.includes('challenges') && (
-                    // @ts-ignore
-                    <motion.div variants={variants}>
-                        <MonthlyChallengesCard />
-                    </motion.div>
-                )}
-
-                {/* Transações Recentes */}
-                {/* @ts-ignore */}
-                <motion.div variants={variants} className="lg:col-span-1">
-                    <Card className="h-full">
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle>Últimas Atividades</CardTitle>
-                            <Button variant="ghost" size="sm" onClick={() => setCurrentView('transactions')} className="text-xs text-cyan-400 hover:text-cyan-300 h-8">
-                                Ver todas
-                            </Button>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-1">
-                                {transactions.slice(0, 5).map(tx => (
-                                    <TransactionRow key={tx.id} tx={tx} />
-                                ))}
-                                {transactions.length === 0 && <Text variant="muted" align="center" className="py-4">Sem movimentações recentes.</Text>}
-                            </div>
-                        </CardContent>
-                    </Card>
-                </motion.div>
-            </Grid>
+                    return (
+                        <Reorder.Item 
+                            key={widget.id} 
+                            value={widget}
+                            drag={isEditMode}
+                            // @ts-ignore
+                            className={`
+                                ${widget.colSpan.md === 4 ? 'md:col-span-4' : widget.colSpan.md === 2 ? 'md:col-span-2' : 'md:col-span-1'}
+                                ${widget.colSpan.lg === 4 ? 'lg:col-span-4' : widget.colSpan.lg === 2 ? 'lg:col-span-2' : widget.colSpan.lg === 3 ? 'lg:col-span-3' : 'lg:col-span-1'}
+                                ${isEditMode ? 'cursor-move ring-2 ring-yellow-500/50 rounded-lg bg-card/50' : ''}
+                            `}
+                        >
+                            {content}
+                        </Reorder.Item>
+                    );
+                })}
+            </Reorder.Group>
         </motion.div>
     );
 };
