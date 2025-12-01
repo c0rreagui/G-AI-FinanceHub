@@ -277,3 +277,11 @@ Facilitando a entrada de dados em cada contexto.
 151. **DragHandle**: Ícone indicador de área arrastável para reordenação.
 152. **SwipeAction**: Container que revela ações ao deslizar (mobile).
 153. **VirtualKeyboard**: Teclado numérico customizado na tela para inputs financeiros rápidos.
+154. **AddExpenseDrawer**: Modal/Drawer especializado para lançamento de despesas com foco em rapidez.
+155. **AddIncomeDrawer**: Modal/Drawer para receitas com campos de dedução e fonte.
+156. **AddInvestmentDrawer**: Interface rica para investimentos com busca de ticker e cálculo de cotas.
+
+158. **ReceiptScanner**: Interface de câmera com OCR para preenchimento automático via comprovante.
+159. **TickerSearch**: Input com autocomplete para buscar ativos financeiros (B3, Crypto).
+160. **MerchantLookup**: Componente que identifica e busca o logo do estabelecimento comercial.
+161. **CategoryPredictor**: Sugestão inteligente de categoria baseada no histórico e descrição.

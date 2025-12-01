@@ -135,13 +135,16 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
         }
     };
 
+    // Cast framer-motion components to any to avoid strict type issues with custom props
+    const MotionDiv = motion.div as any;
+    const ReorderGroup = Reorder.Group as any;
+
     return (
-        // @ts-ignore
-        <motion.div
+        <MotionDiv
             initial="hidden"
             animate="visible"
             variants={variants}
-            {...{ className: `p-4 md:p-8 max-w-7xl mx-auto ${containerSpacing}` } as any}
+            className={`p-4 md:p-8 max-w-7xl mx-auto ${containerSpacing}`}
         >
             <div className="flex justify-between items-center mb-8">
                 <div className="w-full">
@@ -211,12 +214,11 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
             </div>
 
             {/* DRAGGABLE GRID */}
-            {/* @ts-ignore */}
-            <Reorder.Group 
+            <ReorderGroup 
                 axis="y" 
                 values={layout} 
                 onReorder={setLayout} 
-                {...({ className: `grid grid-cols-1 md:grid-cols-4 ${gridGap}` } as any)}
+                className={`grid grid-cols-1 md:grid-cols-4 ${gridGap}`}
             >
                 {layout.map((widget) => {
                     const content = renderWidget(widget.id);
@@ -237,7 +239,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                         </Reorder.Item>
                     );
                 })}
-            </Reorder.Group>
-        </motion.div>
+            </ReorderGroup>
+        </MotionDiv>
     );
 };
