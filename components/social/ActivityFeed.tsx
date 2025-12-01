@@ -5,7 +5,7 @@ import { Transaction } from '../../types';
 import { formatCurrencyBRL } from '../../utils/formatters';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { ArrowLeftRight, TrendingDown, TrendingUp } from 'lucide-react';
+import { ArrowRight, TrendingDown, TrendingUp } from 'lucide-react';
 
 export const ActivityFeed: React.FC = () => {
     const { family } = useSocial();
@@ -44,7 +44,7 @@ export const ActivityFeed: React.FC = () => {
     return (
         <div className="space-y-4">
             <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                <ArrowLeftRight className="w-5 h-5 text-primary" />
+                <ArrowRight className="w-5 h-5 text-primary" />
                 Atividade Recente
             </h3>
             

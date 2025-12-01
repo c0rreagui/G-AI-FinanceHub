@@ -3,7 +3,7 @@ import { useSocial } from '../../contexts/SocialContext';
 import { PageHeader } from '../layout/PageHeader';
 import { Button } from '../ui/Button';
 import { SmartInput } from '../ui/SmartInput';
-import { Users, UserPlus, LogOut, Shield, User as UserIcon } from 'lucide-react';
+import { Users, UserPlus, LogOut, Shield } from 'lucide-react';
 import { FamilyInvite } from '../social/FamilyInvite';
 import { ActivityFeed } from '../social/ActivityFeed';
 import { motion } from 'framer-motion';
@@ -13,6 +13,9 @@ export const SocialView: React.FC = () => {
     const [familyName, setFamilyName] = useState('');
     const [inviteToken, setInviteToken] = useState('');
     const [showInvite, setShowInvite] = useState(false);
+
+    // Cast framer-motion component to any to avoid strict type issues
+    const MotionDiv = motion.div as any;
 
     const handleCreate = async () => {
         if (!familyName) return;
@@ -31,6 +34,7 @@ export const SocialView: React.FC = () => {
     return (
         <div className="flex flex-col h-full bg-background text-white overflow-y-auto pb-20">
             <PageHeader 
+                icon={Users}
                 title="Família & Social" 
                 subtitle="Gerencie seu grupo familiar e compartilhamento"
             />
@@ -39,7 +43,7 @@ export const SocialView: React.FC = () => {
                 {!family ? (
                     <div className="grid md:grid-cols-2 gap-8">
                         {/* Create Family */}
-                        <motion.div 
+                        <MotionDiv 
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             className="bg-white/5 p-6 rounded-2xl border border-white/10 space-y-4"
@@ -65,10 +69,10 @@ export const SocialView: React.FC = () => {
                                     Criar Família
                                 </Button>
                             </div>
-                        </motion.div>
+                        </MotionDiv>
 
                         {/* Join Family */}
-                        <motion.div 
+                        <MotionDiv 
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
@@ -96,7 +100,7 @@ export const SocialView: React.FC = () => {
                                     Entrar
                                 </Button>
                             </div>
-                        </motion.div>
+                        </MotionDiv>
                     </div>
                 ) : (
                     <div className="space-y-8">
@@ -123,7 +127,7 @@ export const SocialView: React.FC = () => {
                             {/* Members List */}
                             <div className="md:col-span-2 space-y-6">
                                 <h3 className="text-xl font-semibold flex items-center gap-2">
-                                    <UserIcon size={20} className="text-primary" />
+                                    <Users size={20} className="text-primary" />
                                     Membros
                                 </h3>
                                 <div className="grid gap-4">
