@@ -15,8 +15,6 @@ interface AppLayoutProps {
   setCurrentView: (view: ViewType) => void;
 }
 
-
-
 export const AppLayout: React.FC<AppLayoutProps> = ({ children, currentView, setCurrentView }) => {
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const { error, clearError } = useDashboardData();

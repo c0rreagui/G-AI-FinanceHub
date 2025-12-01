@@ -1,6 +1,6 @@
 /// <reference path="./types.d.ts" />
 import type { Preview } from "@storybook/react";
-import '../src/styles/globals.css'; // Import global styles
+import '../styles/globals.css'; // Import global styles
 
 const preview: Preview = {
   parameters: {

@@ -28,7 +28,18 @@
     "noEmit": true
   },
   "include": [
-    "src/**/*",
+    "components/**/*",
+    "contexts/**/*",
+    "hooks/**/*",
+    "services/**/*",
+    "styles/**/*",
+    "utils/**/*",
+    "*.tsx",
+    "*.ts",
     ".storybook/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
   ]
 }
