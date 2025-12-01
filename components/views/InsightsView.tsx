@@ -17,7 +17,7 @@ import {
 } from 'recharts';
 import { InvestmentSuggestions } from '../dashboard/InvestmentSuggestions';
 
-import { formatCurrencyBRL } from '../../utils/formatters';
+import { formatCurrency } from '../../utils/formatters';
 import { TransactionType } from '../../types';
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -27,7 +27,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
                 <p className="font-bold text-white mb-2">{label}</p>
                 {payload.map((entry: any, index: number) => (
                     <p key={index} style={{ color: entry.color }} className="text-sm font-medium">
-                        {entry.name}: {formatCurrencyBRL(entry.value)}
+                        {entry.name}: {formatCurrency(entry.value)}
                     </p>
                 ))}
             </div>
@@ -102,7 +102,7 @@ export const InsightsView: React.FC = () => {
                                                 type="number"
                                                 tick={{ fill: '#d1d5db', fontSize: 12 }} 
                                                 stroke="rgba(255, 255, 255, 0.2)"
-                                                tickFormatter={(value) => formatCurrencyBRL(Number(value))}
+                                                tickFormatter={(value) => formatCurrency(Number(value))}
                                                 axisLine={false}
                                                 tickLine={false}
                                             />

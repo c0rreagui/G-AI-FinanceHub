@@ -1,6 +1,6 @@
 import React from 'react';
 import { Transaction, TransactionType } from '../../types';
-import { formatCurrencyBRL, formatDate } from '../../utils/formatters';
+import { formatCurrency, formatDate } from '../../utils/formatters';
 import { ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import { Text } from '../ui/typography';
 import { PrivacyMask } from '../ui/PrivacyMask';
@@ -27,7 +27,7 @@ export const TransactionRow: React.FC<TransactionRowProps> = ({ tx }) => {
             </div>
             <PrivacyMask>
                 <Text size="sm" weight="bold" className={colorClass}>
-                    {isExpense ? '-' : '+'}{formatCurrencyBRL(Math.abs(tx.amount))}
+                    {isExpense ? '-' : '+'}{formatCurrency(Math.abs(tx.amount))}
                 </Text>
             </PrivacyMask>
         </div>

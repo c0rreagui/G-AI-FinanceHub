@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Popover, PopoverContent, PopoverTrigger } from './popover';
+import { Popover, PopoverContent, PopoverTrigger } from './Popover';
 import { Button } from './Button';
 import { cn } from '../../utils/utils';
 import { Check } from 'lucide-react';

@@ -4,7 +4,7 @@ import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { Wallet } from 'lucide-react';
 import { useToast } from '../../hooks/useToast';
-import { formatCurrencyBRL } from '../../utils/formatters';
+import { formatCurrency } from '../../utils/formatters';
 
 export const BudgetSettings: React.FC = () => {
     const [budget, setBudget] = useState('');
@@ -21,7 +21,7 @@ export const BudgetSettings: React.FC = () => {
         } else {
             localStorage.setItem('financehub_monthly_budget', budget);
         }
-        showToast('Orçamento Atualizado', { description: `Seu limite mensal é ${formatCurrencyBRL(Number(budget))}`, type: 'success' });
+        showToast('Orçamento Atualizado', { description: `Seu limite mensal é ${formatCurrency(Number(budget))}`, type: 'success' });
     };
 
     return (

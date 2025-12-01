@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '../ui/Card';
 import { PrivacyMask } from '../ui/PrivacyMask';
 import { TrendingUp } from '../Icons';
-import { formatCurrencyBRL } from '../../utils/formatters';
+import { formatCurrency } from '../../utils/formatters';
 
 export const CountUp: React.FC<{ value: number, duration?: number }> = ({ value, duration = 1.5 }) => {
     const [displayValue, setDisplayValue] = useState(0);
@@ -31,7 +31,7 @@ export const CountUp: React.FC<{ value: number, duration?: number }> = ({ value,
         return () => cancelAnimationFrame(animationFrame);
     }, [value, duration]);
 
-    return <>{formatCurrencyBRL(displayValue)}</>;
+    return <>{formatCurrency(displayValue)}</>;
 };
 
 export const KPICard: React.FC<{ title: string; value: number; trend: number; icon: any; color: string }> = ({ title, value, trend, icon: Icon, color }) => {

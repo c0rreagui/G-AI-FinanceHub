@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
-import { formatCurrencyBRL } from '../../utils/formatters';
+import { formatCurrency } from '../../utils/formatters';
 
 interface AnimatedCurrencyProps {
     value: number;
@@ -24,7 +24,7 @@ export const AnimatedCurrency: React.FC<AnimatedCurrencyProps> = ({ value, class
         return controls.stop;
     }, [value]);
 
-    const formattedValue = useTransform(rounded, (latest: number) => formatCurrencyBRL(latest));
+    const formattedValue = useTransform(rounded, (latest: number) => formatCurrency(latest));
 
     return <motion.span {...({ className } as any)}>{formattedValue}</motion.span>;
 };

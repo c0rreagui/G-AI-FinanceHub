@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/utils/utils';
-import { Badge } from './badge';
+import { Badge } from './Badge';
 
 interface BadgeStatusProps {
   status: 'online' | 'offline' | 'busy' | 'away';

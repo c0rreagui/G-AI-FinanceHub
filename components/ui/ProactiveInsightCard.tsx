@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { Lightbulb, Target, TrendingUp, Wallet } from '../Icons';
 import { TransactionType, ViewType, GoalStatus } from '../../types';
-import { formatCurrencyBRL, formatDaysUntil } from '../../utils/formatters';
+import { formatCurrency, formatDaysUntil } from '../../utils/formatters';
 import { Button } from './Button';
 
 interface ProactiveInsightCardProps {
@@ -107,7 +107,7 @@ export const ProactiveInsightCard: React.FC<ProactiveInsightCardProps> = ({ setC
             return {
                 type: InsightType.HIGH_SPENDING,
                 title: 'Fique de Olho',
-                message: <>Sua maior despesa este mês foi com <span className="font-semibold" style={{color: highest.color}}>{highest.name}</span>, totalizando <span className="font-bold text-white">{formatCurrencyBRL(highest.total)}</span>.</>,
+                message: <>Sua maior despesa este mês foi com <span className="font-semibold" style={{color: highest.color}}>{highest.name}</span>, totalizando <span className="font-bold text-white">{formatCurrency(highest.total)}</span>.</>,
                 actionText: 'Analisar Gastos',
                 actionView: 'insights',
                 icon: Lightbulb,

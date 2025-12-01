@@ -7,7 +7,7 @@ import { Target } from 'lucide-react';
 import { ProgressBar } from '../../ui/ProgressBar';
 import { PrivacyMask } from '../../ui/PrivacyMask';
 import { Button } from '../../ui/Button';
-import { formatCurrencyBRL } from '../../../utils/formatters';
+import { formatCurrency } from '../../../utils/formatters';
 import { Goal, ViewType } from '../../../types';
 
 interface GoalsWidgetProps {
@@ -38,10 +38,10 @@ export const GoalsWidget: React.FC<GoalsWidgetProps> = ({ hiddenModules, firstGo
                                 <ProgressBar percentage={(firstGoal.current_amount / firstGoal.target_amount) * 100} color="primary" />
                                 <Flex justify="between" className="mt-2">
                                     <PrivacyMask>
-                                        <Text size="xs" variant="muted">{formatCurrencyBRL(firstGoal.current_amount)}</Text>
+                                        <Text size="xs" variant="muted">{formatCurrency(firstGoal.current_amount)}</Text>
                                     </PrivacyMask>
                                     <PrivacyMask>
-                                        <Text size="xs" variant="muted">{formatCurrencyBRL(firstGoal.target_amount)}</Text>
+                                        <Text size="xs" variant="muted">{formatCurrency(firstGoal.target_amount)}</Text>
                                     </PrivacyMask>
                                 </Flex>
                             </CardContent>

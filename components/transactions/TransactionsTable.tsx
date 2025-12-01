@@ -8,7 +8,7 @@ import {
   TableRow,
 } from '../ui/Table';
 import { Transaction, TransactionType } from '../../types';
-import { formatCurrencyBRL } from '../../utils/formatters';
+import { formatCurrency } from '../../utils/formatters';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { PencilIcon, TrashIcon, LockClosed, LinkIcon } from '../Icons';
@@ -108,7 +108,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
 
                     <Text weight="bold" className={isExpense ? 'text-destructive' : 'text-success'}>
                         <PrivacyMask>
-                            {isExpense ? '-' : '+'} {formatCurrencyBRL(Math.abs(tx.amount))}
+                            {isExpense ? '-' : '+'} {formatCurrency(Math.abs(tx.amount))}
                         </PrivacyMask>
                     </Text>
                 </TableCell>

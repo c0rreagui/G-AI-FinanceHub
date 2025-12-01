@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { ScheduledTransaction } from '../../types';
-import { formatCurrencyBRL } from '../../utils/formatters';
+import { formatCurrency } from '../../utils/formatters';
 import { motion } from 'framer-motion';
 
 interface CalendarGridProps {
@@ -56,7 +56,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({ items, currentDate }
                         
                         <div className="flex flex-col gap-1 w-full px-1 overflow-y-auto no-scrollbar max-h-[70%]">
                             {dayItems.map(item => (
-                                <div key={item.id} className="w-full h-1.5 rounded-full" style={{ backgroundColor: item.category.color }} title={`${item.description} - ${formatCurrencyBRL(item.amount)}`} />
+                                <div key={item.id} className="w-full h-1.5 rounded-full" style={{ backgroundColor: item.category.color }} title={`${item.description} - ${formatCurrency(item.amount)}`} />
                             ))}
                         </div>
                     </motion.div>

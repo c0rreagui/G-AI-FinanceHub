@@ -1,5 +1,5 @@
 import React from 'react';
-import { Drawer } from './drawer';
+import { Drawer } from './Drawer';
 
 interface BottomSheetProps {
   trigger?: React.ReactNode;

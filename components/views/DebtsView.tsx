@@ -3,7 +3,7 @@ import { PageHeader } from '../layout/PageHeader';
 import { TrendingDown, PlusCircle, TrashIcon, Trophy } from '../Icons';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { Debt, DebtStatus } from '../../types';
-import { formatCurrencyBRL } from '../../utils/formatters';
+import { formatCurrency } from '../../utils/formatters';
 import { Button } from '../ui/Button';
 import { Progress } from '../ui/Progress';
 import { Badge } from '../ui/Badge';
@@ -62,7 +62,7 @@ const DebtCard: React.FC<{ debt: Debt }> = ({ debt }) => {
                     <Box>
                         <Flex justify="between" className="mb-2 text-sm">
                             <Text className="truncate">
-                                Pago <Text weight="bold" as="span"><AnimatedCurrency value={debt.paid_amount} /></Text> de {formatCurrencyBRL(debt.total_amount)}
+                                Pago <Text weight="bold" as="span"><AnimatedCurrency value={debt.paid_amount} /></Text> de {formatCurrency(debt.total_amount)}
                             </Text>
                             <Text variant="muted">{`${progress.toFixed(0)}%`}</Text>
                         </Flex>

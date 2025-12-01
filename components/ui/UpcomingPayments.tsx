@@ -2,7 +2,7 @@
 import React from 'react';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { ScheduledTransaction } from '../../types';
-import { formatCurrencyBRL, formatDaysUntil } from '../../utils/formatters';
+import { formatCurrency, formatDaysUntil } from '../../utils/formatters';
 import { Calendar } from '../Icons';
 
 const UpcomingPaymentItem: React.FC<{ item: ScheduledTransaction }> = ({ item }) => {
@@ -24,7 +24,7 @@ const UpcomingPaymentItem: React.FC<{ item: ScheduledTransaction }> = ({ item })
                 </div>
             </div>
             <p className={`text-sm font-semibold tabular-nums ${amountColor}`}>
-                {formatCurrencyBRL(item.amount)}
+                {formatCurrency(item.amount)}
             </p>
         </div>
     )

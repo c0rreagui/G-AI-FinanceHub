@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
-import { formatCurrencyBRL } from '../../utils/formatters';
+import { formatCurrency } from '../../utils/formatters';
 import { TrendingUp } from 'lucide-react';
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
@@ -84,15 +84,15 @@ export const CompoundInterestCalculator: React.FC = () => {
                 <div className="grid grid-cols-3 gap-2 text-center bg-white/5 p-4 rounded-lg">
                     <div>
                         <p className="text-xs text-gray-400">Total Investido</p>
-                        <p className="font-bold text-white">{formatCurrencyBRL(totalInvested)}</p>
+                        <p className="font-bold text-white">{formatCurrency(totalInvested)}</p>
                     </div>
                     <div>
                         <p className="text-xs text-gray-400">Juros Ganhos</p>
-                        <p className="font-bold text-green-400">+{formatCurrencyBRL(totalInterest)}</p>
+                        <p className="font-bold text-green-400">+{formatCurrency(totalInterest)}</p>
                     </div>
                     <div>
                         <p className="text-xs text-gray-400">Valor Final</p>
-                        <p className="font-bold text-cyan-400">{formatCurrencyBRL(finalAmount)}</p>
+                        <p className="font-bold text-cyan-400">{formatCurrency(finalAmount)}</p>
                     </div>
                 </div>
 
@@ -110,7 +110,7 @@ export const CompoundInterestCalculator: React.FC = () => {
                             <YAxis stroke="#666" fontSize={12} tickFormatter={(val) => `R$${(val/1000).toFixed(0)}k`} />
                             <Tooltip 
                                 contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}
-                                formatter={(value: number) => formatCurrencyBRL(value)}
+                                formatter={(value: number) => formatCurrency(value)}
                                 labelFormatter={(label) => `Ano ${label}`}
                             />
                             <Area type="monotone" dataKey="amount" stroke="#22d3ee" fillOpacity={1} fill="url(#colorAmount)" name="Total" />

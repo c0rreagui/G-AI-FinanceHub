@@ -26,7 +26,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, currentView, set
       {/* Wallpaper Layer */}
       {wallpaper && (
           <div className="fixed inset-0 z-[-1]">
-              <div className="absolute inset-0 bg-black/60 z-10" /> {/* Overlay for readability */}
+              <div className="absolute inset-0 bg-black/60 z-10" /> 
               <img src={wallpaper} alt="Background" className="w-full h-full object-cover" />
           </div>
       )}

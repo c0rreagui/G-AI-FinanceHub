@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Transaction, TransactionType } from '../../../types';
-import { formatCurrencyBRL } from '../../../utils/formatters';
+import { formatCurrency } from '../../../utils/formatters';
 import { Card, CardContent, CardHeader, CardTitle } from '../Card';
 import { TrendingUp } from 'lucide-react';
 
@@ -60,7 +60,7 @@ export const BalanceEvolutionChart: React.FC<BalanceEvolutionChartProps> = ({ tr
                         Evolução Patrimonial
                     </CardTitle>
                     <div className={`text-sm font-medium ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
-                        {isPositive ? '+' : ''}{formatCurrencyBRL(growth)} (Total)
+                        {isPositive ? '+' : ''}{formatCurrency(growth)} (Total)
                     </div>
                 </div>
             </CardHeader>
@@ -91,7 +91,7 @@ export const BalanceEvolutionChart: React.FC<BalanceEvolutionChartProps> = ({ tr
                         />
                         <Tooltip 
                             contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333', borderRadius: '8px' }}
-                            formatter={(value: number) => [formatCurrencyBRL(value), 'Saldo Acumulado']}
+                            formatter={(value: number) => [formatCurrency(value), 'Saldo Acumulado']}
                             labelStyle={{ color: '#9ca3af', marginBottom: '4px' }}
                         />
                         <Area 

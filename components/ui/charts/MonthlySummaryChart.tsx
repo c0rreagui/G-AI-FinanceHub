@@ -1,7 +1,7 @@
 import React from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 import { MonthlyChartData } from '../../../types';
-import { formatCurrencyBRL } from '../../../utils/formatters';
+import { formatCurrency } from '../../../utils/formatters';
 import { useMediaQuery } from '../../../hooks/useMediaQuery';
 
 interface MonthlySummaryChartProps {

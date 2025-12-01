@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Transaction } from '../../types';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
-import { formatCurrencyBRL, formatDate } from '../../utils/formatters';
+import { formatCurrency, formatDate } from '../../utils/formatters';
 import { TrendingUp, PlusCircle, PieChart, ArrowUpRight, ShieldCheck } from '../Icons';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -48,7 +48,7 @@ export const InvestmentsTabContent: React.FC<InvestmentsTabContentProps> = ({ tr
                         </CardHeader>
                         <CardContent>
                             <div className="text-3xl font-bold text-white font-mono tracking-tight">
-                                {formatCurrencyBRL(totalInvested)}
+                                {formatCurrency(totalInvested)}
                             </div>
                             <p className="text-xs text-emerald-400/70 mt-1 flex items-center">
                                 <ShieldCheck className="w-3 h-3 mr-1" /> Patrimônio Protegido
@@ -71,7 +71,7 @@ export const InvestmentsTabContent: React.FC<InvestmentsTabContentProps> = ({ tr
                         </CardHeader>
                         <CardContent>
                             <div className="text-3xl font-bold text-white font-mono tracking-tight">
-                                + {formatCurrencyBRL(monthlyReturn)}
+                                + {formatCurrency(monthlyReturn)}
                             </div>
                             <p className="text-xs text-cyan-400/70 mt-1 flex items-center">
                                 <ArrowUpRight className="w-3 h-3 mr-1" /> +1.2% este mês (Simulado)
@@ -156,7 +156,7 @@ export const InvestmentsTabContent: React.FC<InvestmentsTabContentProps> = ({ tr
                                                 {formatDate(t.date)}
                                             </td>
                                             <td className="px-6 py-4 text-right font-bold text-emerald-400 font-mono tracking-tight">
-                                                {formatCurrencyBRL(Math.abs(t.amount))}
+                                                {formatCurrency(Math.abs(t.amount))}
                                             </td>
                                             <td className="px-6 py-4 text-center">
                                                 <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400">

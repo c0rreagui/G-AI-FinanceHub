@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { AnimatedCurrency } from '../ui/AnimatedCurrency';
 import { Heading, Text } from '../ui/typography';
 import { cn } from '../../utils/utils';
-import { formatCurrencyBRL } from '../../utils/formatters';
+import { formatCurrency } from '../../utils/formatters';
 import { usePrivacy } from '../../contexts/PrivacyContext';
 
 interface BalanceCardProps {
@@ -26,7 +26,7 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({ balance, className }) 
                 "text-3xl md:text-4xl font-bold text-white tracking-tight tabular-nums truncate transition-all duration-300", 
                 isPrivacyMode && "blur-md select-none"
             )} 
-            title={isPrivacyMode ? undefined : formatCurrencyBRL(balance)}
+            title={isPrivacyMode ? undefined : formatCurrency(balance)}
         >
           <AnimatedCurrency value={balance} />
         </div>

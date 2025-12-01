@@ -127,9 +127,6 @@ const AppContent: React.FC = () => {
       case 'investments':
         viewComponent = <InvestmentsView />;
         break;
-      default:
-        viewComponent = <HomeDashboardView setCurrentView={setCurrentView} />;
-        break;
     }
 
     return (

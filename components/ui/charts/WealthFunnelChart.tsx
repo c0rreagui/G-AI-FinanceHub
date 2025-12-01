@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResponsiveContainer, RadialBarChart, RadialBar, Legend, Tooltip } from 'recharts';
-import { formatCurrencyBRL } from '../../../utils/formatters';
+import { formatCurrency } from '../../../utils/formatters';
 import { PrivacyMask } from '../PrivacyMask';
 
 interface WealthFunnelChartProps {
@@ -16,7 +16,7 @@ const CustomTooltip = ({ active, payload }: any) => {
             <div className="bg-black/90 border border-white/10 backdrop-blur-xl p-3 rounded-xl shadow-xl">
                 <p className="font-bold text-white mb-1 text-xs uppercase tracking-wider">{data.name}</p>
                 <PrivacyMask>
-                    <p className="text-cyan-300 font-mono text-lg font-bold">{formatCurrencyBRL(data.realValue)}</p>
+                    <p className="text-cyan-300 font-mono text-lg font-bold">{formatCurrency(data.realValue)}</p>
                 </PrivacyMask>
                 <p className="text-[10px] text-gray-400 mt-1">{data.value.toFixed(1)}% da Renda</p>
             </div>

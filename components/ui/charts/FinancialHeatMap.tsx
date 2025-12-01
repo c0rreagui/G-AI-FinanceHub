@@ -1,13 +1,3 @@
-import React, { useMemo } from 'react';
-import { ResponsiveContainer, Tooltip } from 'recharts';
-import { formatCurrencyBRL } from '../../../utils/formatters';
-import { Transaction, TransactionType } from '../../../types';
-import { Card } from '../Card';
-
-interface FinancialHeatMapProps {
-    transactions: Transaction[];
-}
-
 export const FinancialHeatMap: React.FC<FinancialHeatMapProps> = ({ transactions }) => {
     // 1. Process data: Group expenses by date (last 30-60 days?)
     // Let's show the current month or last 5 weeks.

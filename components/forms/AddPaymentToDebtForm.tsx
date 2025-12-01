@@ -3,7 +3,7 @@ import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { Debt } from '../../types';
-import { formatCurrencyBRL } from '../../utils/formatters';
+import { formatCurrency } from '../../utils/formatters';
 import { Input } from '../ui/Input';
 import { LoadingSpinner } from '../LoadingSpinner';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
@@ -63,7 +63,7 @@ export const AddPaymentToDebtForm: React.FC<AddPaymentToDebtFormProps> = ({ isOp
     if (valueToAdd > remainingAmount) {
         openDialog('confirmation', {
             title: 'Pagamento Excedente',
-            message: `O valor do pagamento (${formatCurrencyBRL(valueToAdd)}) é maior que o saldo restante (${formatCurrencyBRL(remainingAmount)}). Deseja continuar? O valor final pago excederá o total da dívida.`,
+            message: `O valor do pagamento (${formatCurrency(valueToAdd)}) é maior que o saldo restante (${formatCurrency(remainingAmount)}). Deseja continuar? O valor final pago excederá o total da dívida.`,
             confirmText: 'Sim, Continuar',
             confirmVariant: 'destructive',
             onConfirm: () => continueSubmission(valueToAdd),
@@ -76,7 +76,7 @@ export const AddPaymentToDebtForm: React.FC<AddPaymentToDebtFormProps> = ({ isOp
   const FormFields = (
     <>
       <p className="text-gray-300">
-        Saldo Restante: <span className="font-bold text-white">{formatCurrencyBRL(remainingAmount)}</span>
+        Saldo Restante: <span className="font-bold text-white">{formatCurrency(remainingAmount)}</span>
       </p>
       <Input
         id="debt-payment-amount"

@@ -13,7 +13,7 @@ import { useToast } from '../../hooks/useToast';
 import { useLayout, WidgetId } from '../../hooks/useLayout';
 import { LayoutGrid, RotateCcw, Info, Target } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
-import { formatCurrencyBRL } from '../../utils/formatters';
+import { formatCurrency } from '../../utils/formatters';
 
 // Micro-components
 import { GreetingHeader } from '../dashboard/GreetingHeader';
@@ -184,7 +184,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                                     Você tem {dueSoonBills.length} conta(s) vencendo nos próximos 3 dias.
                                     <br />
                                     <span className="text-xs opacity-70">
-                                        {dueSoonBills.map(b => `${b.description} (${formatCurrencyBRL(Math.abs(b.amount))})`).join(', ')}
+                                        {dueSoonBills.map(b => `${b.description} (${formatCurrency(Math.abs(b.amount))})`).join(', ')}
                                     </span>
                                 </p>
                             </div>

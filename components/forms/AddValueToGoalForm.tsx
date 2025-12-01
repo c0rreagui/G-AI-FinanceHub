@@ -3,7 +3,7 @@ import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { Goal } from '../../types';
-import { formatCurrencyBRL } from '../../utils/formatters';
+import { formatCurrency } from '../../utils/formatters';
 import { Input } from '../ui/Input';
 import { LoadingSpinner } from '../LoadingSpinner';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
@@ -74,7 +74,7 @@ export const AddValueToGoalForm: React.FC<AddValueToGoalFormProps> = ({ isOpen, 
         openDialog('confirmation', {
             title: 'Contribuição Excedente',
             // FIX: Corrected field name to snake_case to match database schema.
-            message: `O valor de ${formatCurrencyBRL(valueToAdd)} fará com que o total ultrapasse a meta de ${formatCurrencyBRL(goal.target_amount)}. Deseja continuar?`,
+            message: `O valor de ${formatCurrency(valueToAdd)} fará com que o total ultrapasse a meta de ${formatCurrency(goal.target_amount)}. Deseja continuar?`,
             confirmText: 'Sim, Continuar',
             onConfirm: () => continueSubmission(valueToAdd),
         });
@@ -87,7 +87,7 @@ export const AddValueToGoalForm: React.FC<AddValueToGoalFormProps> = ({ isOpen, 
     <>
       <p className="text-gray-300">
         {/* FIX: Corrected field names to snake_case to match database schema. */}
-        Valor Atual: <span className="font-semibold text-white">{formatCurrencyBRL(goal.current_amount)}</span> / <span className="text-gray-400">{formatCurrencyBRL(goal.target_amount)}</span>
+        Valor Atual: <span className="font-semibold text-white">{formatCurrency(goal.current_amount)}</span> / <span className="text-gray-400">{formatCurrency(goal.target_amount)}</span>
       </p>
       <Input
         id="goal-value-amount"

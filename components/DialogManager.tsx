@@ -11,10 +11,8 @@ import { BulkRecategorizeForm } from './forms/BulkRecategorizeForm';
 import { AddExpenseDrawer } from './forms/AddExpenseDrawer';
 import { AddIncomeDrawer } from './forms/AddIncomeDrawer';
 import { AddInvestmentDrawer } from './forms/AddInvestmentDrawer';
-
 import { AchievementsDialog } from './dashboard/AchievementsDialog';
 import { ProfileAnalysisQuiz } from './onboarding/ProfileAnalysisQuiz';
-
 import { TransactionCommentsDialog } from './social/TransactionCommentsDialog';
 
 export const DialogManager: React.FC = () => {
