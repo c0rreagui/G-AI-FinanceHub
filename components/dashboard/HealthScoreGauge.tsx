@@ -18,9 +18,9 @@ export const HealthScoreGauge: React.FC<HealthScoreGaugeProps> = ({ score }) => 
     const angle = (percentage / 100) * 180 - 90;
 
     const getColor = (s: number) => {
-        if (s >= 800) return '#22c55e'; // Green
-        if (s >= 500) return '#eab308'; // Yellow
-        return '#ef4444'; // Red
+        if (s >= 800) return '#22c55e'; // Green-500
+        if (s >= 500) return '#eab308'; // Yellow-500
+        return '#ef4444'; // Red-500
     };
 
     const color = getColor(score);

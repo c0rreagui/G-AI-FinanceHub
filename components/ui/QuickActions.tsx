@@ -31,13 +31,14 @@ const ActionButton: React.FC<{ icon: React.ElementType, title: string, ariaLabel
 export const QuickActions: React.FC = () => {
   const { openDialog } = useDialog();
   const [isEditing, setIsEditing] = useState(false);
+  const STORAGE_KEY = 'financehub_quick_actions';
   const [visibleActions, setVisibleActions] = useState<{ [key: string]: boolean }>(() => {
-      const saved = localStorage.getItem('financehub_quick_actions');
+      const saved = localStorage.getItem(STORAGE_KEY);
       return saved ? JSON.parse(saved) : { expense: true, income: true, goal: true, scan: true, transfer: true };
   });
 
   useEffect(() => {
-      localStorage.setItem('financehub_quick_actions', JSON.stringify(visibleActions));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(visibleActions));
   }, [visibleActions]);
 
   const toggleAction = (key: string) => {
