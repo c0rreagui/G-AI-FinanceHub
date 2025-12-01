@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Sun, Moon, CloudRain, Bell, Settings } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
+import { ViewType } from '../../types';
 
 const TypingEffect: React.FC<{ text: string }> = ({ text }) => {
     const [displayedText, setDisplayedText] = useState('');
@@ -23,7 +24,12 @@ const TypingEffect: React.FC<{ text: string }> = ({ text }) => {
     return <span>{displayedText}</span>;
 };
 
-export const GreetingHeader: React.FC<{ user: any }> = ({ user }) => {
+interface GreetingHeaderProps {
+    user: any;
+    setCurrentView?: (view: ViewType) => void;
+}
+
+export const GreetingHeader: React.FC<GreetingHeaderProps> = ({ user, setCurrentView }) => {
     const [greeting, setGreeting] = useState('');
     const [icon, setIcon] = useState<React.ReactNode>(null);
     const today = new Date();
@@ -73,7 +79,15 @@ export const GreetingHeader: React.FC<{ user: any }> = ({ user }) => {
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" className="relative text-gray-400 hover:text-white">
+                            <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="relative text-gray-400 hover:text-white"
+                                onClick={() => {
+                                    // TODO: Implement notifications panel
+                                    console.log('Abrindo notificações...');
+                                }}
+                            >
                                 <Bell className="w-5 h-5" />
                                 <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-ping" />
                                 <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full" />
@@ -83,9 +97,21 @@ export const GreetingHeader: React.FC<{ user: any }> = ({ user }) => {
                     </Tooltip>
                 </TooltipProvider>
 
-                <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white hover:rotate-90 transition-transform duration-500">
-                    <Settings className="w-5 h-5" />
-                </Button>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="text-gray-400 hover:text-white hover:rotate-90 transition-transform duration-500"
+                                onClick={() => setCurrentView?.('settings')}
+                            >
+                                <Settings className="w-5 h-5" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Configurações</TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
             </div>
         </div>
     );
