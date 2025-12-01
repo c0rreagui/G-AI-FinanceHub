@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../../services/supabase';
+import { supabase } from '../../services/supabaseClient';
 import { useSocial } from '../../contexts/SocialContext';
 import { Transaction } from '../../types';
 import { formatCurrencyBRL } from '../../utils/formatters';
@@ -44,7 +44,7 @@ export const ActivityFeed: React.FC = () => {
     return (
         <div className="space-y-4">
             <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                <ArrowLeftRight size={20} className="text-primary" />
+                <ArrowLeftRight className="w-5 h-5 text-primary" />
                 Atividade Recente
             </h3>
             

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { supabase } from '../../services/supabase';
+import { supabase } from '../../services/supabaseClient';
 import { TransactionComment } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
 import { SmartInput } from '../ui/SmartInput';
