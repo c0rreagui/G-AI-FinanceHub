@@ -3,7 +3,7 @@ import { Card, CardContent } from '../../ui/Card';
 import { QuickActions } from '../../ui/QuickActions';
 import { Flex } from '../../ui/Flex';
 import { Text, Heading } from '../../ui/typography';
-import { Target } from '../../Icons';
+import { Target } from 'lucide-react';
 import { ProgressBar } from '../../ui/ProgressBar';
 import { PrivacyMask } from '../../ui/PrivacyMask';
 import { Button } from '../../ui/Button';

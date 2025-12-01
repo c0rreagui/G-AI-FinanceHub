@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDialog } from '../../hooks/useDialog';
-import { ArrowDownLeft, ArrowUpRight, Target, Settings, CheckSquare, Square, QrCode, Send } from '../Icons';
+import { ArrowDownLeft, ArrowUpRight, Target, Settings, CheckSquare, Square, QrCode, Send } from 'lucide-react';
 import { TransactionType } from '../../types';
 import { Button } from './Button';
 

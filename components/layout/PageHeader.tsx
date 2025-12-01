@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronDown } from '../Icons'; // Usaremos o Chevron para a direita
+import { ChevronDown } from 'lucide-react'; // Usaremos o Chevron para a direita
 import { PrivacyToggle } from '../ui/PrivacyMask';
 
 interface PageHeaderProps {

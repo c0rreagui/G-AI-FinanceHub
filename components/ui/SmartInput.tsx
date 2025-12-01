@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Calculator } from '../Icons';
+import { Calculator } from 'lucide-react';
 
 interface SmartInputProps {
     value: string;

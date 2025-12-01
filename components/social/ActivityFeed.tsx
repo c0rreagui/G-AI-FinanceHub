@@ -5,7 +5,7 @@ import { Transaction } from '../../types';
 import { formatCurrencyBRL } from '../../utils/formatters';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { ArrowLeftRight, TrendingDown, TrendingUp } from '../Icons';
+import { ArrowLeftRight, TrendingDown, TrendingUp } from 'lucide-react';
 
 export const ActivityFeed: React.FC = () => {
     const { family } = useSocial();

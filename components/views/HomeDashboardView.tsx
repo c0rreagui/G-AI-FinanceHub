@@ -11,7 +11,7 @@ import { useDashboardData } from '../../hooks/useDashboardData';
 import { useDialog } from '../../hooks/useDialog';
 import { useToast } from '../../hooks/useToast';
 import { useLayout, WidgetId } from '../../hooks/useLayout';
-import { LayoutGrid, RotateCcw, Info, Target } from '../Icons';
+import { LayoutGrid, RotateCcw, Info, Target } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { formatCurrencyBRL } from '../../utils/formatters';
 

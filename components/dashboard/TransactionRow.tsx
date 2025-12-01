@@ -1,7 +1,7 @@
 import React from 'react';
 import { Transaction, TransactionType } from '../../types';
 import { formatCurrencyBRL, formatDate } from '../../utils/formatters';
-import { ArrowUpRight, ArrowDownLeft } from '../Icons';
+import { ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import { Text } from '../ui/typography';
 import { PrivacyMask } from '../ui/PrivacyMask';
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sun, Moon, CloudRain, Bell, Settings } from '../Icons';
+import { Sun, Moon, CloudRain, Bell, Settings } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
 

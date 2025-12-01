@@ -1,7 +1,7 @@
 import React from 'react';
 import { BalanceCard } from '../BalanceCard';
 import { KPICard } from '../KPICard';
-import { ArrowUpRight, ArrowDownLeft } from '../../Icons';
+import { ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import { SummaryData } from '../../../types';
 
 interface BalanceWidgetProps {
