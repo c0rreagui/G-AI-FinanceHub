@@ -148,6 +148,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ currentView, s
     // FIX: Explicitly type the array to ensure `item.view` is of type `ViewType`, not `string`.
     const items: { name: string; view: ViewType; icon: React.ElementType }[] = [
         { name: 'Dívidas', view: 'debts', icon: TrendingDown },
+        { name: 'Investimentos', view: 'investments', icon: PiggyBank }, // Added Investments
         { name: 'Agendamentos', view: 'scheduling', icon: Calendar },
         { name: 'Insights', view: 'insights', icon: Lightbulb },
         { name: 'Ferramentas', view: 'tools', icon: Wrench },

@@ -31,6 +31,7 @@ import { ToastProvider } from './contexts/ToastContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { SocialProvider } from './contexts/SocialContext';
 import { SocialView } from './components/views/SocialView';
+import { InvestmentsView } from './components/views/InvestmentsView';
 
 const AppContent: React.FC = () => {
   const { user, loading, isGuest, isDeveloper } = useAuth();
@@ -122,6 +123,9 @@ const AppContent: React.FC = () => {
         break;
       case 'social':
         viewComponent = <SocialView />;
+        break;
+      case 'investments':
+        viewComponent = <InvestmentsView />;
         break;
       default:
         viewComponent = <HomeDashboardView setCurrentView={setCurrentView} />;

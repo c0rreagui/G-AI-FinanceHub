@@ -1,7 +1,6 @@
 import React from 'react';
 import { ViewType } from '../../types';
-import { HomeIcon, ArrowLeftRight, Lightbulb, Target, TrendingDown, Calendar, Wrench, Settings, Zap } from '../Icons';
-import { Users } from 'lucide-react';
+import { LayoutDashboard, ArrowLeftRight, PieChart, Target, TrendingDown, Calendar, Wrench, Settings, Terminal, Palette, Users, PiggyBank, Lightbulb, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useDashboardData } from '../../hooks/useDashboardData';
 
@@ -11,10 +10,11 @@ interface SidebarProps {
 }
 
 const navigation = [
-  { name: 'Início', view: 'home', icon: HomeIcon },
+  { name: 'Início', view: 'home', icon: LayoutDashboard },
   { name: 'Transações', view: 'transactions', icon: ArrowLeftRight },
   { name: 'Metas', view: 'goals', icon: Target },
   { name: 'Dívidas', view: 'debts', icon: TrendingDown },
+  { name: 'Investimentos', view: 'investments', icon: PiggyBank },
   { name: 'Agenda', view: 'scheduling', icon: Calendar },
   { name: 'Insights', view: 'insights', icon: Lightbulb },
   { name: 'Tools', view: 'tools', icon: Wrench },
