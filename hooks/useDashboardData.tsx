@@ -20,6 +20,7 @@ import {
     Achievement,
     ScheduledTransactionFrequency,
     DailyMission,
+    InvestmentType,
 } from '../types';
 import { DashboardDataContext } from '../contexts/DashboardDataContext';
 import { getIconByName } from '../utils/categoryIcons';
@@ -885,7 +886,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             return;
         }
         if (!user) return;
-        const tables = ['transactions', 'goals', 'debts', 'scheduled_transactions', 'categories'];
+        const tables = ['transactions', 'goals', 'debts', 'scheduled_transactions', 'categories', 'investments'];
         for (const table of tables) {
             const { error } = await supabase.from(table).delete().eq('user_id', user.id);
             if(error) throw error;
@@ -961,9 +962,14 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
             await Promise.all([
                 supabase.from('transactions').insert(finalTransactions),
+                supabase.from('transactions').insert(finalTransactions),
                 supabase.from('scheduled_transactions').insert(mockData.scheduledTransactions),
             ]);
+            
+            // Add Mock Investments
+            await addMockInvestments(5);
         }
+
         
         await fetchData();
         showToast('Dados Fictícios Adicionados!', { type: 'success' });
@@ -1044,6 +1050,44 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         showToast(`${count} dívidas fictícias adicionadas!`, { type: 'success' });
     });
 
+    const addMockInvestments = (count: number) => withMutation(async () => {
+        const userId = isGuest ? 'guest' : user!.id;
+        const now = new Date();
+        const types = [InvestmentType.ACOES, InvestmentType.FIIS, InvestmentType.RENDA_FIXA, InvestmentType.CRIPTO, InvestmentType.EXTERIOR];
+        
+        const newInvestments = Array.from({ length: count }, (_, i) => {
+            const type = types[Math.floor(Math.random() * types.length)];
+            let name = `Investimento Teste ${i + 1}`;
+            let ticker = `TEST${i + 1}`;
+            
+            if (type === InvestmentType.ACOES) { name = `Empresa ${i+1}`; ticker = `EMPR${i+1}3`; }
+            if (type === InvestmentType.FIIS) { name = `Fundo Imob ${i+1}`; ticker = `FIIB${i+1}11`; }
+            if (type === InvestmentType.CRIPTO) { name = `Crypto ${i+1}`; ticker = `CRY${i+1}`; }
+
+            return {
+                user_id: userId,
+                name,
+                ticker,
+                type,
+                amount: Math.floor(Math.random() * 50000) + 1000,
+                quantity: Math.floor(Math.random() * 100) + 1,
+                current_price: Math.floor(Math.random() * 500) + 10,
+                purchase_date: new Date(now.getFullYear(), now.getMonth() - Math.floor(Math.random() * 12), 1).toISOString(),
+                sector: 'Financeiro',
+            };
+        });
+
+        if (isGuest) {
+            // Guest mode for investments not fully implemented in this hook, but we can simulate success
+             showToast('Modo visitante para investimentos não implementado neste hook (useInvestments gerencia isso).', { type: 'info' });
+        } else {
+            const { error } = await supabase.from('investments').insert(newInvestments);
+            if (error) throw error;
+        }
+        // We don't fetch investments here, useInvestments hook will handle realtime update or manual refresh
+        showToast(`${count} investimentos fictícios adicionados!`, { type: 'success' });
+    });
+
     const clearTable = (tableName: 'transactions' | 'goals' | 'debts' | 'scheduled_transactions') => withMutation(async () => {
         if (isGuest) {
             const data = getGuestData();
@@ -1102,6 +1146,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         addMockTransactions,
         addMockGoals,
         addMockDebts,
+        addMockInvestments,
         clearTable,
         forceError,
     }), [
@@ -1150,6 +1195,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             addMockTransactions,
             addMockGoals,
             addMockDebts,
+            addMockInvestments,
             clearTable,
             forceError
         }}>

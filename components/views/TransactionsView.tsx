@@ -8,7 +8,7 @@ import { useDialog } from '../../hooks/useDialog';
 import { TransactionsViewSkeleton } from './skeletons/TransactionsViewSkeleton';
 import { EmptyState } from '../ui/EmptyState';
 import { TransactionsTable } from '../transactions/TransactionsTable';
-import { InvestmentsTabContent } from '../transactions/InvestmentsTabContent';
+
 import { Input } from '../ui/Input';
 import { Tabs, TabsList, TabsTrigger } from '../ui/Tabs';
 import { Flex, Box, Grid } from '../ui/layout';
@@ -40,10 +40,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
             } else if (typeFilter === 'receita') {
                 matchesType = tx.type === 'receita';
             } else if (typeFilter === 'despesa') {
-                // Exclude investments from 'despesa' tab to keep it clean
-                matchesType = tx.type === 'despesa' && !isInvestment;
-            } else if (typeFilter === 'investments') {
-                matchesType = isInvestment && tx.type === 'despesa';
+                matchesType = tx.type === 'despesa';
             }
 
             return matchesSearch && matchesType;
@@ -96,8 +93,8 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                 title="Transações" 
                 breadcrumbs={['FinanceHub', 'Transações']}
                 actions={
-                    <Button onClick={() => openDialog('add-transaction', { isInvestmentMode: typeFilter === 'investments' })}>
-                        <PlusCircle className="w-4 h-4 mr-2"/> {typeFilter === 'investments' ? 'Novo Investimento' : 'Nova Transação'}
+                    <Button onClick={() => openDialog('add-transaction')}>
+                        <PlusCircle className="w-4 h-4 mr-2"/> Nova Transação
                     </Button>
                 }
             />
@@ -121,11 +118,10 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                                 </div>
                                 <div className="md:col-span-2 flex justify-end">
                                     <Tabs value={typeFilter} onValueChange={setTypeFilter} className="w-full md:w-auto">
-                                        <TabsList className="w-full md:w-auto grid grid-cols-4 md:flex">
+                                    <TabsList className="w-full md:w-auto grid grid-cols-3 md:flex">
                                             <TabsTrigger value="all">Todas</TabsTrigger>
                                             <TabsTrigger value="receita">Receitas</TabsTrigger>
                                             <TabsTrigger value="despesa">Despesas</TabsTrigger>
-                                            <TabsTrigger value="investments">Investimentos</TabsTrigger>
                                         </TabsList>
                                     </Tabs>
                                 </div>
@@ -141,11 +137,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
 
                     {/* Table Area */}
                     <div className="flex-grow overflow-auto rounded-md border bg-card">
-                        {typeFilter === 'investments' ? (
-                            <div className="p-4">
-                                <InvestmentsTabContent transactions={filteredTransactions} />
-                            </div>
-                        ) : filteredTransactions.length > 0 ? (
+                        {filteredTransactions.length > 0 ? (
                             <TransactionsTable 
                                 transactions={filteredTransactions}
                                 selectedIds={selectedIds}

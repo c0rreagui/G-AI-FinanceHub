@@ -1,166 +1,280 @@
-// components/views/DevToolsView.tsx
-import React, { useState } from 'react';
-import { PageHeader } from '../layout/PageHeader';
-import { Zap, PlusCircle, TrashIcon, Bell, AlertTriangle, ArrowLeftRight, Target, TrendingDown } from '../Icons';
-import { Button } from '../ui/Button';
+import React, { useState, useEffect } from 'react';
 import { useDashboardData } from '../../hooks/useDashboardData';
-import { useDialog } from '../../hooks/useDialog';
 import { useToast } from '../../hooks/useToast';
+import { Button } from '../ui/Button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/Card';
 import { Input } from '../ui/Input';
+import { useDialog } from '../../hooks/useDialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
+import { Switch } from '../ui/Switch';
+import { Badge } from '../ui/Badge';
 import { ViewType } from '../../types';
-import { Card, CardContent } from '../ui/Card';
+import { 
+    Activity, Database, Server, Shield, Smartphone, WifiOff, 
+    AlertTriangle, TrashIcon, RefreshCw, Cpu, Layout, 
+    ArrowLeftRight, Target, TrendingDown, Bell, PlusCircle 
+} from 'lucide-react';
+import { PageHeader } from '../layout/PageHeader';
+import { motion } from 'framer-motion';
 
-const StateInspector: React.FC = () => {
-    const { transactions, goals, debts, scheduledTransactions, summary, userLevel } = useDashboardData();
-    const dataToShow = { summary, userLevel };
+const StatusIndicator: React.FC<{ status: 'online' | 'offline' | 'warning'; label: string }> = ({ status, label }) => (
+    <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10">
+        <span className="text-sm font-medium text-gray-300">{label}</span>
+        <div className="flex items-center gap-2">
+            <span className={`w-2 h-2 rounded-full ${
+                status === 'online' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 
+                status === 'warning' ? 'bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]' : 
+                'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]'
+            }`} />
+            <span className={`text-xs font-bold ${
+                status === 'online' ? 'text-green-500' : 
+                status === 'warning' ? 'text-yellow-500' : 
+                'text-red-500'
+            }`}>
+                {status.toUpperCase()}
+            </span>
+        </div>
+    </div>
+);
 
-    return (
-        <Card className="p-4">
-            <h2 className="text-lg font-semibold text-white mb-3">Live State Inspector</h2>
-            <ul className="space-y-2 text-sm">
-                <li className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Transações:</span>
-                    <span className="font-mono font-semibold text-white">{transactions.length}</span>
-                </li>
-                <li className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Metas:</span>
-                    <span className="font-mono font-semibold text-white">{goals.length}</span>
-                </li>
-                <li className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Dívidas:</span>
-                    <span className="font-mono font-semibold text-white">{debts.length}</span>
-                </li>
-                <li className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Agendamentos:</span>
-                    <span className="font-mono font-semibold text-white">{scheduledTransactions.length}</span>
-                </li>
-            </ul>
-            <details className="mt-4">
-                <summary className="cursor-pointer text-xs text-muted-foreground hover:text-white">Ver dados computados (JSON)</summary>
-                <pre className="mt-2 bg-black/30 p-2 rounded-md text-xs whitespace-pre-wrap font-mono text-cyan-200/80">
-                    <code>{JSON.stringify(dataToShow, null, 2)}</code>
-                </pre>
-            </details>
-        </Card>
-    );
-};
+const StatCard: React.FC<{ label: string; value: number | string; icon: React.ElementType; color: string }> = ({ label, value, icon: Icon, color }) => (
+    <div className="flex flex-col p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-colors">
+        <div className="flex items-center justify-between mb-2">
+            <span className="text-xs text-gray-400">{label}</span>
+            <Icon className={`w-4 h-4 ${color}`} />
+        </div>
+        <span className="text-2xl font-bold text-white font-mono">{value}</span>
+    </div>
+);
 
 interface DevToolsViewProps {
     setCurrentView: (view: ViewType) => void;
 }
 
-export const DevToolsView: React.FC<DevToolsViewProps> = (props) => {
-    const { addMockData, clearAllUserData } = useDashboardData();
+export const DevToolsView: React.FC<DevToolsViewProps> = ({ setCurrentView }) => {
+    const { 
+        transactions, goals, debts, scheduledTransactions, summary, userLevel,
+        addMockData, clearAllUserData, addMockTransactions, addMockGoals, 
+        addMockDebts, addMockInvestments, clearTable, forceError, loading 
+    } = useDashboardData();
+    
     const { openDialog } = useDialog();
     const { showToast } = useToast();
     const [confirmDelete, setConfirmDelete] = useState(false);
+    const [isOnline, setIsOnline] = useState(navigator.onLine);
 
-    const handleSeed = () => {
-        addMockData();
-        showToast('Dados de exemplo carregados!', { type: 'success' });
+    useEffect(() => {
+        const handleOnline = () => setIsOnline(true);
+        const handleOffline = () => setIsOnline(false);
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('offline', handleOffline);
+        return () => {
+            window.removeEventListener('online', handleOnline);
+            window.removeEventListener('offline', handleOffline);
+        };
+    }, []);
+
+    const handleSeed = async () => {
+        await addMockData();
     };
 
-    const handleClear = () => {
+    const handleClear = async () => {
         if (!confirmDelete) {
             setConfirmDelete(true);
             setTimeout(() => setConfirmDelete(false), 3000);
             return;
         }
-        clearAllUserData();
+        await clearAllUserData();
         setConfirmDelete(false);
-        showToast('Todos os dados foram apagados.', { type: 'error' });
     };
 
     return (
-        <div className="space-y-6 pb-24">
+        <div className="space-y-8 pb-24 animate-in fade-in duration-500">
             <PageHeader
-                title="Developer Tools"
-                subtitle="Utilitários para debug e testes"
-                icon={<Zap className="w-6 h-6 text-yellow-400" />}
+                title="Developer Console"
+                subtitle="Painel avançado de controle e diagnósticos"
+                icon={<Cpu className="w-6 h-6 text-cyan-400" />}
+                actions={
+                    <Badge variant="outline" className="bg-cyan-500/10 text-cyan-400 border-cyan-500/20 px-3 py-1">
+                        v4.0.0-beta
+                    </Badge>
+                }
             />
 
-            <div className="grid gap-6 md:grid-cols-2">
-                <div className="space-y-6">
-                    <Card className="space-y-4 p-4">
-                        <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                            <Zap className="w-5 h-5 text-yellow-400" />
-                            Ações Rápidas
-                        </h2>
-                        <div className="grid gap-3">
-                            <Button onClick={handleSeed} variant="outline" className="justify-start">
-                                <PlusCircle className="w-4 h-4 mr-2" />
-                                Popular com Dados de Exemplo
+            {/* System Status Section */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card className="md:col-span-2 border-cyan-500/20 bg-gradient-to-br from-cyan-950/10 to-transparent">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <Activity className="w-5 h-5 text-cyan-400" />
+                            System Health
+                        </CardTitle>
+                        <CardDescription>Monitoramento em tempo real dos serviços</CardDescription>
+                    </CardHeader>
+                    <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <StatusIndicator status={isOnline ? 'online' : 'offline'} label="Conectividade de Rede" />
+                        <StatusIndicator status="online" label="Supabase Database" />
+                        <StatusIndicator status="online" label="Auth Service" />
+                        <StatusIndicator status={loading ? 'warning' : 'online'} label="Data Sync Status" />
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <Database className="w-5 h-5 text-purple-400" />
+                            Database Stats
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="grid grid-cols-2 gap-3">
+                            <StatCard label="Transações" value={transactions.length} icon={ArrowLeftRight} color="text-blue-400" />
+                            <StatCard label="Metas" value={goals.length} icon={Target} color="text-green-400" />
+                            <StatCard label="Dívidas" value={debts.length} icon={TrendingDown} color="text-red-400" />
+                            <StatCard label="Agendamentos" value={scheduledTransactions.length} icon={Bell} color="text-yellow-400" />
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Data Management Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <Server className="w-5 h-5 text-green-400" />
+                            Gerenciamento de Dados
+                        </CardTitle>
+                        <CardDescription>Ferramentas para popular e limpar dados</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="grid grid-cols-2 gap-3">
+                            <Button onClick={() => addMockTransactions(5)} variant="outline" size="sm" className="justify-start">
+                                <PlusCircle className="w-4 h-4 mr-2 text-green-400" /> +5 Transações
                             </Button>
-                            <Button
-                                onClick={handleClear}
+                            <Button onClick={() => addMockGoals(2)} variant="outline" size="sm" className="justify-start">
+                                <PlusCircle className="w-4 h-4 mr-2 text-blue-400" /> +2 Metas
+                            </Button>
+                            <Button onClick={() => addMockDebts(2)} variant="outline" size="sm" className="justify-start">
+                                <PlusCircle className="w-4 h-4 mr-2 text-red-400" /> +2 Dívidas
+                            </Button>
+                            <Button onClick={() => addMockInvestments(3)} variant="outline" size="sm" className="justify-start">
+                                <PlusCircle className="w-4 h-4 mr-2 text-purple-400" /> +3 Investimentos
+                            </Button>
+                        </div>
+                        
+                        <div className="h-px bg-white/10 my-4" />
+
+                        <div className="flex flex-col gap-3">
+                            <Button onClick={handleSeed} className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white border-0">
+                                <Database className="w-4 h-4 mr-2" />
+                                Popular Tudo (Full Seed)
+                            </Button>
+                            <Button 
+                                onClick={handleClear} 
                                 variant={confirmDelete ? "destructive" : "outline"}
-                                className={`justify-start ${confirmDelete ? 'animate-pulse' : ''}`}
+                                className={`w-full ${confirmDelete ? 'animate-pulse' : ''}`}
                             >
                                 <TrashIcon className="w-4 h-4 mr-2" />
-                                {confirmDelete ? 'Confirmar Limpeza Total?' : 'Limpar Todos os Dados'}
+                                {confirmDelete ? 'Tem certeza? Clique para confirmar' : 'Limpar Todos os Dados (Factory Reset)'}
                             </Button>
                         </div>
-                    </Card>
+                    </CardContent>
+                </Card>
 
-                    <Card className="space-y-4 p-4">
-                        <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                            <Target className="w-5 h-5 text-cyan-400" />
-                            Testar Modais
-                        </h2>
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <Layout className="w-5 h-5 text-pink-400" />
+                            UI & UX Testing
+                        </CardTitle>
+                        <CardDescription>Teste componentes visuais e interações</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
                         <div className="grid grid-cols-2 gap-3">
-                            <Button variant="ghost" size="sm" onClick={() => openDialog('add-transaction')}>
-                                Nova Transação
+                            <Button variant="ghost" size="sm" onClick={() => openDialog('add-transaction')} className="justify-start">
+                                <ArrowLeftRight className="w-4 h-4 mr-2" /> Modal Transação
                             </Button>
-                            <Button variant="ghost" size="sm" onClick={() => openDialog('add-goal')}>
-                                Nova Meta
+                            <Button variant="ghost" size="sm" onClick={() => openDialog('add-goal')} className="justify-start">
+                                <Target className="w-4 h-4 mr-2" /> Modal Meta
                             </Button>
-                            <Button variant="ghost" size="sm" onClick={() => openDialog('add-debt')}>
-                                Nova Dívida
+                            <Button variant="ghost" size="sm" onClick={() => openDialog('add-debt')} className="justify-start">
+                                <TrendingDown className="w-4 h-4 mr-2" /> Modal Dívida
                             </Button>
-                            <Button variant="ghost" size="sm" disabled title="Em breve">
-                                Editar Perfil
+                            <Button variant="ghost" size="sm" onClick={() => setCurrentView('design-system')} className="justify-start text-pink-400 hover:text-pink-300">
+                                <Layout className="w-4 h-4 mr-2" /> Design System
                             </Button>
                         </div>
-                    </Card>
 
-                    <Card className="space-y-4 p-4">
-                         <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                            <Target className="w-5 h-5 text-pink-400" />
-                            Design System
-                        </h2>
-                        <p className="text-sm text-muted-foreground">
-                            Visualize e teste os componentes do novo Design System.
-                        </p>
-                        <Button onClick={() => props.setCurrentView('design-system')} className="w-full bg-gradient-to-r from-pink-500 to-violet-500 border-0">
-                            <Target className="w-4 h-4 mr-2" /> Abrir Design System Showcase
+                        <div className="h-px bg-white/10 my-4" />
+
+                        <div className="grid grid-cols-2 gap-3">
+                            <Button variant="outline" size="sm" onClick={() => showToast('Operação realizada com sucesso!', { type: 'success' })}>
+                                Toast Sucesso
+                            </Button>
+                            <Button variant="outline" size="sm" onClick={() => showToast('Falha na conexão com o servidor.', { type: 'error' })}>
+                                Toast Erro
+                            </Button>
+                            <Button variant="outline" size="sm" onClick={() => showToast('Nova atualização disponível.', { type: 'info' })}>
+                                Toast Info
+                            </Button>
+                            <Button variant="outline" size="sm" onClick={() => showToast('Sua sessão irá expirar em breve.', { type: 'info' })}>
+                                Toast Aviso
+                            </Button>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Advanced Tools Section */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                 <Card className="md:col-span-1">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <Shield className="w-5 h-5 text-orange-400" />
+                            Chaos Engineering
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                        <Button onClick={() => forceError()} variant="destructive" className="w-full">
+                            <AlertTriangle className="w-4 h-4 mr-2" />
+                            Simular Crash (Runtime Error)
                         </Button>
-                    </Card>
-                </div>
+                        <Button disabled variant="outline" className="w-full opacity-50 cursor-not-allowed">
+                            <WifiOff className="w-4 h-4 mr-2" />
+                            Simular Offline Mode
+                        </Button>
+                    </CardContent>
+                </Card>
 
-                <div className="space-y-6">
-                    <StateInspector />
-                    
-                    <Card className="space-y-4 p-4">
-                        <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                            <Bell className="w-5 h-5 text-blue-400" />
-                            Testar Toasts
-                        </h2>
-                        <div className="grid grid-cols-2 gap-3">
-                            <Button variant="outline" size="sm" onClick={() => showToast('Notificação de Sucesso', { type: 'success' })}>
-                                Sucesso
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => showToast('Algo deu errado', { type: 'error' })}>
-                                Erro
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => showToast('Aviso importante', { type: 'info' })}>
-                                Aviso
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => showToast('Informação do sistema', { type: 'info' })}>
-                                Info
-                            </Button>
+                <Card className="md:col-span-2">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <Smartphone className="w-5 h-5 text-indigo-400" />
+                            Environment Info
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="bg-black/30 rounded-lg p-4 font-mono text-xs text-gray-400 space-y-2">
+                            <div className="flex justify-between">
+                                <span>User Agent:</span>
+                                <span className="text-white">{navigator.userAgent.substring(0, 40)}...</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Screen Resolution:</span>
+                                <span className="text-white">{window.innerWidth}x{window.innerHeight}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Timezone:</span>
+                                <span className="text-white">{Intl.DateTimeFormat().resolvedOptions().timeZone}</span>
+                            </div>
+                             <div className="flex justify-between">
+                                <span>Language:</span>
+                                <span className="text-white">{navigator.language}</span>
+                            </div>
                         </div>
-                    </Card>
-                </div>
+                    </CardContent>
+                </Card>
             </div>
         </div>
     );

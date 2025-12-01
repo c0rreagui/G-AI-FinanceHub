@@ -250,6 +250,7 @@ export interface DashboardDataContextType {
   addMockTransactions: (count: number) => Promise<void>;
   addMockGoals: (count: number) => Promise<void>;
   addMockDebts: (count: number) => Promise<void>;
+  addMockInvestments: (count: number) => Promise<void>;
   clearTable: (tableName: 'transactions' | 'goals' | 'debts' | 'scheduled_transactions') => Promise<void>;
   forceError: () => Promise<void>;
 }
