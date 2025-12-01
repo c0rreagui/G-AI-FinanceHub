@@ -91,3 +91,8 @@ export const ShieldCheck = React.memo((props: React.SVGProps<SVGSVGElement>) => 
 export const CheckCircle = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M22 11.08V12a10 10 0 1 1-5.93-9.14", "M22 4 12 14.01l-3-3"]} {...props} />);
 export const Clock = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z", "M12 6v6l4 2"]} {...props} />);
 export const MoreVertical = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M12 12h.01", "M12 5h.01", "M12 19h.01"]} {...props} />);
+export const QrCode = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M3 7V5a2 2 0 0 1 2-2h2", "M17 3h2a2 2 0 0 1 2 2v2", "M21 17v2a2 2 0 0 1-2 2h-2", "M7 21H5a2 2 0 0 1-2-2v-2", "M7 9h.01", "M7 15h.01", "M12 12h.01", "M17 9h.01", "M17 15h.01"]} {...props} />);
+export const Send = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M22 2 11 13", "M22 2 15 22 11 13 2 9 22 2"]} {...props} />);
+export const Sun = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M12 2v2", "M12 20v2", "m4.93 4.93-1.41 1.41", "m19.07 19.07-1.41 1.41", "M20 12h2", "M2 12h2", "m19.07 4.93-1.41-1.41", "m4.93 19.07-1.41-1.41", "M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10z"]} {...props} />);
+export const Moon = React.memo((props: React.SVGProps<SVGSVGElement>) => <Icon d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" {...props} />);
+export const CloudRain = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242", "M16 14v6", "M8 14v6", "M12 16v6"]} {...props} />);

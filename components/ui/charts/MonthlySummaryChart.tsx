@@ -61,56 +61,58 @@ export const MonthlySummaryChart: React.FC<MonthlySummaryChartProps> = ({ data }
                     <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                         <defs>
                             <linearGradient id="colorReceita" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#34d399" stopOpacity={0.3}/>
+                                <stop offset="5%" stopColor="#34d399" stopOpacity={0.4}/>
                                 <stop offset="95%" stopColor="#34d399" stopOpacity={0}/>
                             </linearGradient>
                             <linearGradient id="colorDespesa" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#fb7185" stopOpacity={0.3}/>
+                                <stop offset="5%" stopColor="#fb7185" stopOpacity={0.4}/>
                                 <stop offset="95%" stopColor="#fb7185" stopOpacity={0}/>
                             </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" vertical={false} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" vertical={false} />
                         <XAxis 
                             dataKey="name" 
-                            tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 600 }} 
+                            tick={{ fill: '#64748b', fontSize: 10, fontWeight: 500 }} 
                             axisLine={false}
                             tickLine={false}
                             tickMargin={10}
                         />
                         <YAxis 
                             tickFormatter={(value) => `R$${Number(value)/1000}k`}
-                            tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 600 }} 
+                            tick={{ fill: '#64748b', fontSize: 10, fontWeight: 500 }} 
                             axisLine={false}
                             tickLine={false}
-                            width={40}
+                            width={35}
                         />
-                        <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.2)', strokeWidth: 1, strokeDasharray: '4 4' }} />
+                        <Tooltip 
+                            content={<CustomTooltip />} 
+                            cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1, strokeDasharray: '4 4' }} 
+                        />
                         <Legend 
                             verticalAlign="top" 
                             align="right" 
                             iconType="circle"
-                            wrapperStyle={{ paddingBottom: '20px', fontSize: '12px', fontWeight: 600 }}
+                            iconSize={8}
+                            wrapperStyle={{ paddingBottom: '15px', fontSize: '11px', fontWeight: 600, opacity: 0.8 }}
                         />
                         <Area 
                             type="monotone" 
                             dataKey="receita" 
                             name="Receitas"
                             stroke="#34d399" 
-                            strokeWidth={3}
+                            strokeWidth={2}
                             fillOpacity={1} 
                             fill="url(#colorReceita)" 
-                            dot={{ r: 4, fill: '#34d399', strokeWidth: 2, stroke: '#0f172a' }}
-                            activeDot={{ r: 6, fill: '#34d399', stroke: '#fff', strokeWidth: 2 }}
+                            activeDot={{ r: 6, fill: '#34d399', stroke: '#fff', strokeWidth: 2, className: "animate-ping" }}
                         />
                         <Area 
                             type="monotone" 
                             dataKey="despesa" 
                             name="Despesas"
                             stroke="#fb7185" 
-                            strokeWidth={3}
+                            strokeWidth={2}
                             fillOpacity={1} 
                             fill="url(#colorDespesa)" 
-                            dot={{ r: 4, fill: '#fb7185', strokeWidth: 2, stroke: '#0f172a' }}
                             activeDot={{ r: 6, fill: '#fb7185', stroke: '#fff', strokeWidth: 2 }}
                         />
                     </AreaChart>

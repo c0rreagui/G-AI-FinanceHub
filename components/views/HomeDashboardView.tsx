@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { motion, Reorder } from 'framer-motion';
 import { DailyTipCard } from '../dashboard/DailyTipCard';
@@ -10,68 +10,197 @@ import { FinancialHeatMap } from '../ui/charts/FinancialHeatMap';
 import { QuickActions } from '../ui/QuickActions';
 import { MonthlyChallengesCard } from '../dashboard/MonthlyChallengesCard';
 import { TransactionRow } from '../dashboard/TransactionRow';
-import { PrivacyMask } from '../ui/PrivacyMask';
-import { AnimatedCurrency } from '../ui/AnimatedCurrency';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
-import { Button } from '../ui/Button';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../ui/Tooltip';
-import { Grid } from '../ui/Grid';
-import { Flex } from '../ui/Flex';
+import { PrivacyMask } from '../ui/PrivacyMask';
+import { formatCurrencyBRL } from '../../utils/formatters';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
 import { Text, Heading } from '../ui/typography';
 import { ProgressBar } from '../ui/ProgressBar';
-import { ArrowUpRight, ArrowDownLeft, Info, Target, LayoutGrid, RotateCcw } from '../Icons';
-import { formatCurrencyBRL } from '../../utils/formatters';
+import { Flex } from '../ui/Flex';
+import { AnimatedCurrency } from '../ui/AnimatedCurrency';
+import { TransactionType } from '../../types';
+import { Button } from '../ui/Button';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { useDialog } from '../../hooks/useDialog';
-import { ViewType, TransactionType } from '../../types';
 import { useLayout, WidgetId } from '../../hooks/useLayout';
+import { 
+    Sun, Moon, CloudRain, Bell, Settings, TrendingUp, 
+    ArrowUpRight, ArrowDownLeft, Target, Info, LayoutGrid, RotateCcw 
+} from '../Icons';
+
+import { useAuth } from '../../hooks/useAuth';
 
 interface HomeDashboardViewProps {
-    setCurrentView: (view: ViewType) => void;
+    setCurrentView: (view: any) => void;
 }
 
-const variants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
+// --- Micro-Components ---
+
+const TypingEffect: React.FC<{ text: string }> = ({ text }) => {
+    const [displayedText, setDisplayedText] = useState('');
+    
+    useEffect(() => {
+        let i = 0;
+        const timer = setInterval(() => {
+            if (i < text.length) {
+                setDisplayedText(prev => prev + text.charAt(i));
+                i++;
+            } else {
+                clearInterval(timer);
+            }
+        }, 50);
+        return () => clearInterval(timer);
+    }, [text]);
+
+    return <span>{displayedText}</span>;
 };
 
+const CountUp: React.FC<{ value: number, duration?: number }> = ({ value, duration = 2 }) => {
+    const [count, setCount] = useState(0);
+
+    useEffect(() => {
+        let start = 0;
+        const end = value;
+        const totalFrames = Math.round(duration * 60);
+        const easeOutQuad = (t: number) => t * (2 - t);
+        let frame = 0;
+
+        const counter = setInterval(() => {
+            frame++;
+            const progress = easeOutQuad(frame / totalFrames);
+            setCount(start + (end - start) * progress);
+
+            if (frame === totalFrames) {
+                clearInterval(counter);
+            }
+        }, 1000 / 60);
+
+        return () => clearInterval(counter);
+    }, [value, duration]);
+
+    return <>{formatCurrencyBRL(count)}</>;
+};
+
+const GreetingHeader: React.FC<{ user: any }> = ({ user }) => {
+    const [greeting, setGreeting] = useState('');
+    const [icon, setIcon] = useState(<Sun className="w-6 h-6 text-yellow-400" />);
+    const today = new Date();
+    const dateStr = today.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+    useEffect(() => {
+        const hour = new Date().getHours();
+        if (hour < 12) {
+            setGreeting('Bom dia');
+            setIcon(<Sun className="w-6 h-6 text-yellow-400 animate-spin-slow" />);
+        } else if (hour < 18) {
+            setGreeting('Boa tarde');
+            setIcon(<Sun className="w-6 h-6 text-orange-400" />);
+        } else {
+            setGreeting('Boa noite');
+            setIcon(<Moon className="w-6 h-6 text-indigo-400" />);
+        }
+    }, []);
+
+    return (
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+            <div className="flex items-center gap-4">
+                <div className="relative group cursor-pointer">
+                    <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-600 p-[2px] group-hover:scale-105 transition-transform duration-300">
+                        <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden">
+                             {/* Placeholder Avatar */}
+                             <span className="text-xl font-bold text-white">
+                                {user?.name?.charAt(0) || 'D'}
+                             </span>
+                        </div>
+                    </div>
+                    <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-black rounded-full"></div>
+                </div>
+                <div>
+                    <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-2">
+                        <TypingEffect text={`${greeting}, ${user?.name || 'Dev'}!`} /> {icon}
+                    </h1>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                         <span className="capitalize">{dateStr}</span>
+                         <span className="w-1 h-1 rounded-full bg-gray-600"></span>
+                         <span className="flex items-center gap-1">
+                            <CloudRain className="w-3 h-3 text-blue-400" /> 24°C
+                         </span>
+                    </div>
+                </div>
+            </div>
+            <div className="flex items-center gap-2">
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" className="relative text-gray-400 hover:text-white">
+                                <Bell className="w-5 h-5" />
+                                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-ping" />
+                                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Notificações</TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+
+                <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white hover:rotate-90 transition-transform duration-500">
+                    <Settings className="w-5 h-5" />
+                </Button>
+            </div>
+        </div>
+    );
+};
+
+const KPICard: React.FC<{ title: string; value: number; trend: number; icon: any; color: string }> = ({ title, value, trend, icon: Icon, color }) => (
+    <Card className="bg-gradient-to-br from-slate-900 to-slate-800 border-slate-700/50 hover:border-slate-600 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group overflow-hidden relative">
+        <div className={`absolute top-0 right-0 w-24 h-24 ${color} opacity-5 rounded-full blur-2xl -mr-8 -mt-8 group-hover:opacity-10 transition-opacity`} />
+        <CardContent className="p-5">
+            <div className="flex justify-between items-start mb-4">
+                <div className={`p-2 rounded-xl ${color} bg-opacity-10`}>
+                    <Icon className={`w-5 h-5 ${color.replace('bg-', 'text-')}`} />
+                </div>
+                {trend !== 0 && (
+                    <div className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${trend > 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
+                        {trend > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingUp className="w-3 h-3 rotate-180" />}
+                        {Math.abs(trend)}%
+                    </div>
+                )}
+            </div>
+            <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">{title}</p>
+            <PrivacyMask>
+                <h3 className="text-2xl font-bold text-white font-mono tracking-tight">
+                    <CountUp value={value} />
+                </h3>
+            </PrivacyMask>
+
+            {/* Sparkline Mock */}
+            <div className="mt-4 h-1 w-full bg-slate-800 rounded-full overflow-hidden flex items-end gap-[1px] opacity-50">
+                {Array.from({ length: 20 }).map((_, i) => (
+                    <div
+                        key={i}
+                        className={`w-full rounded-t-sm ${color.replace('bg-', 'bg-')}`}
+                        style={{ height: `${Math.random() * 100}%`, opacity: 0.3 + (i/20)*0.7 }}
+                    />
+                ))}
+            </div>
+        </CardContent>
+    </Card>
+);
+
 export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrentView }) => {
+    const { user } = useAuth();
     const { summary, monthlyChartData, transactions, loading, goals, savingsSuggestion, dueSoonBills, healthScore } = useDashboardData();
     const { openDialog } = useDialog();
     const { layout, setLayout, isEditMode, toggleEditMode, resetLayout } = useLayout();
-    const firstGoal = goals[0];
-    
-    // Calculate investment amount
-    const investmentAmount = useMemo(() => {
-        const now = new Date();
-        const currentMonth = now.getMonth();
-        const currentYear = now.getFullYear();
-
-        return transactions
-            .filter(t => {
-                const tDate = new Date(t.date);
-                const catName = (t.category?.name || '').toLowerCase();
-                const isInvestment = ['investimento', 'aporte', 'aplicação', 'poupança', 'cdb', 'tesouro'].some(k => catName.includes(k));
-                
-                return t.type === TransactionType.DESPESA && 
-                       isInvestment &&
-                       tDate.getMonth() === currentMonth &&
-                       tDate.getFullYear() === currentYear;
-            })
-            .reduce((acc, t) => acc + Math.abs(t.amount), 0);
-    }, [transactions]);
-
-
     const { greetingName, zenMode, density, hiddenModules } = useTheme();
+    const firstGoal = goals[0];
 
-    // Greeting Logic
-    const greeting = useMemo(() => {
-        const hour = new Date().getHours();
-        const name = greetingName || 'Família';
-        if (hour < 12) return `Bom dia, ${name}!`;
-        if (hour < 18) return `Boa tarde, ${name}!`;
-        return `Boa noite, ${name}!`;
-    }, [greetingName]);
+    const [showSavingsSuggestion, setShowSavingsSuggestion] = useState(true);
+    const [showDueBills, setShowDueBills] = useState(true);
+
+    const variants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: { opacity: 1, y: 0 }
+    };
 
     // Density Logic
     const gridGap = {
@@ -86,55 +215,99 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
         spacious: 'space-y-10'
     }[density];
 
-    const [showSavingsSuggestion, setShowSavingsSuggestion] = React.useState(true);
-    const [showDueBills, setShowDueBills] = React.useState(true);
+    // Konami Code Easter Egg
+    useEffect(() => {
+        const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+        let konamiIndex = 0;
 
-    const renderWidget = (id: WidgetId) => {
-        switch (id) {
-            case 'daily_tip':
-                return !zenMode && !hiddenModules.includes('tips') ? <DailyTipCard /> : null;
-            case 'kpi_overview':
+        const handleKeydown = (e: KeyboardEvent) => {
+            if (e.key === konamiCode[konamiIndex]) {
+                konamiIndex++;
+                if (konamiIndex === konamiCode.length) {
+                    alert('🚀 GOD MODE ENABLED (Just kidding, but nice try!)');
+                    konamiIndex = 0;
+                }
+            } else {
+                konamiIndex = 0;
+            }
+        };
+
+        window.addEventListener('keydown', handleKeydown);
+        return () => window.removeEventListener('keydown', handleKeydown);
+    }, []);
+
+    const renderWidget = (widgetId: WidgetId) => {
+        switch (widgetId) {
+            case 'balance':
                 return (
-                    <div className={`grid grid-cols-1 gap-4`}>
-                        <div id="balance-card">
-                            <BalanceCard balance={summary.totalBalance} />
-                        </div>
-                        {!zenMode && (
-                            <Grid cols={2} gap={density === 'compact' ? 'sm' : density === 'spacious' ? 'lg' : 'md'}>
-                                <Card className="flex flex-col justify-center">
-                                    <CardContent className="p-4">
-                                        <div className="text-success mb-1"><ArrowUpRight className="w-5 h-5"/></div>
-                                        <div className="flex items-center gap-1 mb-1">
-                                            <Text size="xs" weight="bold" variant="muted" className="uppercase">Entradas</Text>
-                                        </div>
-                                        <div className="truncate" title={formatCurrencyBRL(summary.monthlyIncome)}>
-                                            <Text size="lg" weight="bold" className="truncate">
-                                                <PrivacyMask>
-                                                    <AnimatedCurrency value={summary.monthlyIncome}/>
-                                                </PrivacyMask>
-                                            </Text>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                                <Card className="flex flex-col justify-center">
-                                    <CardContent className="p-4">
-                                        <div className="text-destructive mb-1"><ArrowDownLeft className="w-5 h-5"/></div>
-                                        <div className="flex items-center gap-1 mb-1">
-                                            <Text size="xs" weight="bold" variant="muted" className="uppercase">Saídas</Text>
-                                        </div>
-                                        <div className="truncate" title={formatCurrencyBRL(Math.abs(summary.monthlyExpenses))}>
-                                            <Text size="lg" weight="bold" className="truncate">
-                                                <PrivacyMask>
-                                                    <AnimatedCurrency value={Math.abs(summary.monthlyExpenses)}/>
-                                                </PrivacyMask>
-                                            </Text>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            </Grid>
-                        )}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
+                        <BalanceCard balance={summary.totalBalance} className="md:col-span-1 h-full" />
+                        <KPICard
+                            title="Receitas (Mês)"
+                            value={summary.monthlyIncome}
+                            trend={12}
+                            icon={ArrowUpRight}
+                            color="bg-emerald-500"
+                        />
+                        <KPICard
+                            title="Despesas (Mês)"
+                            value={Math.abs(summary.monthlyExpenses)}
+                            trend={-5}
+                            icon={ArrowDownLeft}
+                            color="bg-rose-500"
+                        />
                     </div>
                 );
+            case 'charts':
+                return (
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+                        <div className="lg:col-span-2 h-[350px]">
+                            <MonthlySummaryChart data={monthlyChartData} />
+                        </div>
+                        <div className="h-[350px]">
+                            <FinancialHeatMap transactions={transactions} />
+                        </div>
+                    </div>
+                );
+            case 'health':
+                return (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
+                        <HealthScoreGauge score={healthScore} />
+                        <MonthlyChallengesCard />
+                    </div>
+                );
+            case 'quick-actions':
+                 return (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="md:col-span-2">
+                             <QuickActions />
+                        </div>
+                        <Card className="bg-gradient-to-br from-slate-900 to-slate-800 border-slate-700/50">
+                            <CardHeader className="pb-2">
+                                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center justify-between">
+                                    Últimas Transações
+                                    <Button variant="link" size="sm" className="h-auto p-0 text-cyan-400" onClick={() => setCurrentView('transactions')}>
+                                        Ver todas
+                                    </Button>
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-0">
+                                <div className="divide-y divide-white/5">
+                                    {transactions.slice(0, 4).map(tx => (
+                                        <TransactionRow key={tx.id} tx={tx} />
+                                    ))}
+                                    {transactions.length === 0 && (
+                                        <div className="p-4 text-center text-sm text-muted-foreground">
+                                            Nenhuma transação recente.
+                                        </div>
+                                    )}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                 );
+            case 'daily_tip':
+                return !zenMode && !hiddenModules.includes('tips') ? <DailyTipCard /> : null;
             case 'monthly_chart':
                 return !zenMode && !hiddenModules.includes('chart') ? (
                     <div className="h-[320px] md:h-auto" id="monthly-chart">
@@ -225,9 +398,8 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
             {...{ className: `p-4 md:p-8 max-w-7xl mx-auto ${containerSpacing}` } as any}
         >
             <Flex justify="between" align="center" className="mb-8">
-                <div>
-                    <Heading size="h2" className="mb-1">{greeting}</Heading>
-                    <Text variant="muted">Visão geral das suas finanças hoje.</Text>
+                <div className="w-full">
+                    <GreetingHeader user={user} />
                 </div>
                 <div className="flex gap-2">
                     <Button 

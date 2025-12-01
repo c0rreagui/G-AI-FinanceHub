@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDialog } from '../../hooks/useDialog';
-import { ArrowDownLeft, ArrowUpRight, Target, Settings, CheckSquare, Square } from '../Icons';
+import { ArrowDownLeft, ArrowUpRight, Target, Settings, CheckSquare, Square, QrCode, Send } from '../Icons';
 import { TransactionType } from '../../types';
 import { Button } from './Button';
 
@@ -33,7 +33,7 @@ export const QuickActions: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [visibleActions, setVisibleActions] = useState<{ [key: string]: boolean }>(() => {
       const saved = localStorage.getItem('financehub_quick_actions');
-      return saved ? JSON.parse(saved) : { expense: true, income: true, goal: true };
+      return saved ? JSON.parse(saved) : { expense: true, income: true, goal: true, scan: true, transfer: true };
   });
 
   useEffect(() => {
@@ -83,6 +83,26 @@ export const QuickActions: React.FC = () => {
             isEditing={isEditing}
             isVisible={visibleActions.goal}
             onToggle={() => toggleAction('goal')}
+        />
+        <ActionButton
+            title="Escanear"
+            ariaLabel="Escanear recibo ou QR Code"
+            icon={QrCode}
+            color="bg-purple-500/80"
+            onClick={() => alert('Funcionalidade em breve!')}
+            isEditing={isEditing}
+            isVisible={visibleActions.scan}
+            onToggle={() => toggleAction('scan')}
+        />
+        <ActionButton
+            title="Transferir"
+            ariaLabel="Realizar transferência"
+            icon={Send}
+            color="bg-blue-500/80"
+            onClick={() => alert('Funcionalidade em breve!')}
+            isEditing={isEditing}
+            isVisible={visibleActions.transfer}
+            onToggle={() => toggleAction('transfer')}
         />
         </div>
     </div>

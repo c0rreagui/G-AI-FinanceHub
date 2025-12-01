@@ -2,7 +2,10 @@ import { useState, useEffect } from 'react';
 
 export type WidgetId = 
     | 'daily_tip' 
-    | 'kpi_overview' 
+    | 'balance'
+    | 'charts'
+    | 'health'
+    | 'quick-actions'
     | 'monthly_chart' 
     | 'wealth_health' 
     | 'quick_actions_goals' 
@@ -20,10 +23,10 @@ export interface WidgetConfig {
 
 const DEFAULT_LAYOUT: WidgetConfig[] = [
     { id: 'daily_tip', isVisible: true, colSpan: { md: 4, lg: 4 } }, // Full width
-    { id: 'kpi_overview', isVisible: true, colSpan: { md: 2, lg: 1 } },
-    { id: 'monthly_chart', isVisible: true, colSpan: { md: 2, lg: 2 } },
-    { id: 'wealth_health', isVisible: true, colSpan: { md: 4, lg: 1 } },
-    { id: 'quick_actions_goals', isVisible: true, colSpan: { md: 4, lg: 1 } },
+    { id: 'balance', isVisible: true, colSpan: { md: 4, lg: 4 } },
+    { id: 'charts', isVisible: true, colSpan: { md: 4, lg: 4 } },
+    { id: 'health', isVisible: true, colSpan: { md: 4, lg: 4 } },
+    { id: 'quick-actions', isVisible: true, colSpan: { md: 4, lg: 4 } },
     { id: 'challenges', isVisible: true, colSpan: { md: 4, lg: 1 } },
     { id: 'recent_transactions', isVisible: true, colSpan: { md: 4, lg: 1 } },
 ];
