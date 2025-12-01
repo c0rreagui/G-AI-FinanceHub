@@ -10,7 +10,7 @@ interface ConfirmationModalProps {
   title: string;
   confirmText?: string;
   cancelText?: string;
-  confirmVariant?: 'primary' | 'destructive';
+  confirmVariant?: 'default' | 'destructive';
   children: React.ReactNode;
 }
 
@@ -21,7 +21,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   title,
   confirmText = 'Confirmar',
   cancelText = 'Cancelar',
-  confirmVariant = 'primary',
+  confirmVariant = 'default',
   children,
 }) => {
   if (!isOpen) return null;

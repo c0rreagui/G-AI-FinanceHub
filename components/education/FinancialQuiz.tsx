@@ -153,9 +153,11 @@ export const FinancialQuiz: React.FC = () => {
                 <AnimatePresence>
                     {isAnswered && (
                         <motion.div 
-                            initial={{ opacity: 0, y: 10 }} 
-                            animate={{ opacity: 1, y: 0 }}
-                            className="bg-blue-900/30 p-3 rounded-lg border border-blue-500/30"
+                            {...({
+                                initial: { opacity: 0, y: 10 },
+                                animate: { opacity: 1, y: 0 },
+                                className: "bg-blue-900/30 p-3 rounded-lg border border-blue-500/30"
+                            } as any)}
                         >
                             <p className="text-sm text-blue-200">
                                 <strong>Explicação:</strong> {question.explanation}

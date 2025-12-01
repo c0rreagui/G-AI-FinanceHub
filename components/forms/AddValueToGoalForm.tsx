@@ -135,12 +135,14 @@ export const AddValueToGoalForm: React.FC<AddValueToGoalFormProps> = ({ isOpen, 
     <AnimatePresence>
         {isOpen && (
             <motion.div
-                className="fixed inset-0 z-50 flex flex-col bg-[oklch(var(--background-oklch))]"
-                initial={{ y: '100%' }}
-                animate={{ y: '0%' }}
-                exit={{ y: '100%' }}
-                transition={{ type: 'spring', stiffness: 400, damping: 40 }}
-                onAnimationComplete={() => { if (!isOpen) setAmount(''); }}
+                {...({
+                    className: "fixed inset-0 z-50 flex flex-col bg-[oklch(var(--background-oklch))]",
+                    initial: { y: '100%' },
+                    animate: { y: '0%' },
+                    exit: { y: '100%' },
+                    transition: { type: 'spring', stiffness: 400, damping: 40 },
+                    onAnimationComplete: () => { if (!isOpen) setAmount(''); }
+                } as any)}
             >
                 <div className="flex items-center justify-between p-4 border-b border-[oklch(var(--border-oklch))] flex-shrink-0">
                     <h2 className="text-xl font-semibold text-white truncate max-w-[80%]">{`Adicionar a: ${goal.name}`}</h2>

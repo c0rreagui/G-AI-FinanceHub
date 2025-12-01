@@ -41,22 +41,26 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({ isOpen, onClose, error }
     <AnimatePresence>
       {isOpen && error && (
         <motion.div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70"
-          aria-labelledby="error-modal-title"
-          role="alertdialog"
-          aria-modal="true"
-          initial="hidden"
-          animate="visible"
-          exit="hidden"
-          variants={backdropVariants}
+          {...({ 
+            className: "fixed inset-0 z-[60] flex items-center justify-center bg-black/70",
+            "aria-labelledby": "error-modal-title",
+            role: "alertdialog",
+            "aria-modal": "true",
+            initial: "hidden",
+            animate: "visible",
+            exit: "hidden",
+            variants: backdropVariants
+          } as any)}
         >
           <motion.div
-            className="relative w-full max-w-lg p-6 bg-[oklch(var(--danger-oklch)_/_0.2)] backdrop-blur-2xl border border-[oklch(var(--danger-oklch)_/_0.3)] rounded-2xl shadow-2xl shadow-black/40 text-red-200"
-            role="document"
-            variants={modalVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
+            {...({ 
+              className: "relative w-full max-w-lg p-6 bg-[oklch(var(--danger-oklch)_/_0.2)] backdrop-blur-2xl border border-[oklch(var(--danger-oklch)_/_0.3)] rounded-2xl shadow-2xl shadow-black/40 text-red-200",
+              role: "document",
+              variants: modalVariants,
+              initial: "hidden",
+              animate: "visible",
+              exit: "exit"
+            } as any)}
           >
             <div className="flex items-start">
               <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-xl bg-black/20">

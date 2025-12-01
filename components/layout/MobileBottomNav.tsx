@@ -46,8 +46,10 @@ const NavItem: React.FC<NavItemProps> = ({ name, view, icon: Icon, isActive, onC
       <span className={`transition-colors ${isActive ? 'text-white' : 'text-gray-400'}`}>{name}</span>
       {isActive && (
         <motion.div
-          layoutId="mobile-active-nav"
-          className="absolute -bottom-2 h-1 w-8 bg-cyan-500 rounded-full"
+          {...({
+              layoutId: "mobile-active-nav",
+              className: "absolute -bottom-2 h-1 w-8 bg-cyan-500 rounded-full"
+          } as any)}
         />
       )}
     </button>
@@ -86,20 +88,24 @@ const SpeedDial: React.FC = () => {
                 {isOpen && (
                     <>
                         <motion.div 
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40" 
-                          onClick={toggleOpen}
+                          {...({
+                              initial: { opacity: 0 },
+                              animate: { opacity: 1 },
+                              exit: { opacity: 0 },
+                              className: "fixed inset-0 bg-black/60 backdrop-blur-sm z-40",
+                              onClick: toggleOpen
+                          } as any)}
                         />
                         <div className="absolute bottom-24 flex flex-col items-center gap-4 z-50">
                             {actions.map((action, index) => (
                                 <motion.div
                                     key={action.label}
-                                    initial={{ opacity: 0, y: 50 }}
-                                    animate={{ opacity: 1, y: 0, transition: { type: 'spring', stiffness: 380, damping: 20, delay: index * 0.06 } }}
-                                    exit={{ opacity: 0, y: 50, transition: { duration: 0.15 } }}
-                                    className="flex items-center gap-3 w-40 justify-end"
+                                    {...({
+                                        initial: { opacity: 0, y: 50 },
+                                        animate: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 380, damping: 20, delay: index * 0.06 } },
+                                        exit: { opacity: 0, y: 50, transition: { duration: 0.15 } },
+                                        className: "flex items-center gap-3 w-40 justify-end"
+                                    } as any)}
                                 >
                                     <span className="bg-[oklch(var(--card-oklch))] text-white text-xs font-semibold px-2 py-1 rounded-md shadow-lg">{action.label}</span>
                                     <button 
@@ -116,12 +122,14 @@ const SpeedDial: React.FC = () => {
                 )}
             </AnimatePresence>
             <motion.button 
-                onClick={toggleOpen} 
-                className="relative z-50 flex items-center justify-center w-14 h-14 bg-gradient-to-r from-cyan-500 to-green-500 rounded-full text-white shadow-lg -translate-y-4"
-                whileTap={{ scale: 0.9 }}
-                animate={isOpen ? "open" : "closed"}
-                aria-label={isOpen ? "Fechar ações rápidas" : "Abrir ações rápidas"}
-                aria-expanded={isOpen}
+                {...({
+                    onClick: toggleOpen,
+                    className: "relative z-50 flex items-center justify-center w-14 h-14 bg-gradient-to-r from-cyan-500 to-green-500 rounded-full text-white shadow-lg -translate-y-4",
+                    whileTap: { scale: 0.9 },
+                    animate: isOpen ? "open" : "closed",
+                    "aria-label": isOpen ? "Fechar ações rápidas" : "Abrir ações rápidas",
+                    "aria-expanded": isOpen
+                } as any)}
             >
                 <motion.div variants={{ open: { rotate: 45 }, closed: { rotate: 0 } }} transition={{ type: 'spring', stiffness: 400, damping: 17 }}>
                     <PlusCircle className="w-8 h-8" />

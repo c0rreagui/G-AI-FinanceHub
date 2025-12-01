@@ -18,7 +18,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ percentage, color = 'p
     return (
         <div className="w-full bg-gray-700 rounded-full h-2">
             <motion.div
-                className={`${colorClasses[color]} h-2 rounded-full`}
+                {...({ className: `${colorClasses[color]} h-2 rounded-full` } as any)}
                 initial={{ width: 0 }}
                 animate={{ width: `${safePercentage}%` }}
                 transition={{ duration: 0.8, ease: 'easeOut' }}

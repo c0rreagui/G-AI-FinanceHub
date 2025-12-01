@@ -73,7 +73,7 @@ export const TourGuide: React.FC<TourGuideProps> = ({ steps, isOpen, onClose, on
         {/* Highlight Border */}
         <motion.div
            layoutId="tour-highlight"
-           className="absolute border-2 border-cyan-500 rounded-lg shadow-[0_0_30px_rgba(6,182,212,0.5)] pointer-events-none"
+           {...({ className: "absolute border-2 border-cyan-500 rounded-lg shadow-[0_0_30px_rgba(6,182,212,0.5)] pointer-events-none" } as any)}
            style={{
              top: position.top - 4,
              left: position.left - 4,
@@ -82,13 +82,12 @@ export const TourGuide: React.FC<TourGuideProps> = ({ steps, isOpen, onClose, on
            }}
            transition={{ type: "spring", stiffness: 300, damping: 30 }}
         />
-
         {/* Tooltip Card */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           key={currentStepIndex}
-          className="absolute max-w-sm w-full"
+          {...({ className: "absolute max-w-sm w-full" } as any)}
           style={{
              top: position.top + position.height + 20, // Simple positioning below for now
              left: position.left,

@@ -21,7 +21,7 @@ export interface ListProps
   as?: 'ul' | 'ol';
 }
 
-const List = forwardRef<HTMLUListElement, ListProps>(
+const List = forwardRef<any, ListProps>(
   ({ className, variant, as = 'ul', ...props }, ref) => {
     const Component = as;
     return (

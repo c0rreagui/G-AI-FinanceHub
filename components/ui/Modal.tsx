@@ -41,9 +41,11 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose} // Permite fechar ao clicar no fundo
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm"
-            aria-hidden="true"
+            {...({ 
+              onClick: onClose,
+              className: "fixed inset-0 bg-black/70 backdrop-blur-sm",
+              "aria-hidden": "true"
+            } as any)}
           />
 
           {/* Container do conteúdo do modal */}
@@ -53,9 +55,10 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 30, scale: 0.95 }}
               transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-              className="w-full max-w-lg rounded-2xl bg-[oklch(var(--card-oklch))] border border-[oklch(var(--border-oklch))] p-6 shadow-2xl shadow-black/40"
-              // Impede que o clique no painel do modal feche-o (propagação)
-              onClick={(e) => e.stopPropagation()}
+              {...({ 
+                className: "w-full max-w-lg rounded-2xl bg-[oklch(var(--card-oklch))] border border-[oklch(var(--border-oklch))] p-6 shadow-2xl shadow-black/40",
+                onClick: (e: any) => e.stopPropagation()
+              } as any)}
             >
               <div className="flex items-start justify-between">
                 <h2 id="modal-title" className="text-xl font-semibold text-white">

@@ -88,3 +88,6 @@ export const Info = React.memo((props: React.SVGProps<SVGSVGElement>) => <Compou
 export const RotateCcw = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M1 4v6h6", "M3.51 15a9 9 0 1 0 2.13-9.36L1 10"]} {...props} />);
 export const PieChart = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M21.21 15.89A10 10 0 1 1 8 2.83", "M22 12A10 10 0 0 0 12 2v10z"]} {...props} />);
 export const ShieldCheck = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z", "m9 12 2 2 4-4"]} {...props} />);
+export const CheckCircle = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M22 11.08V12a10 10 0 1 1-5.93-9.14", "M22 4 12 14.01l-3-3"]} {...props} />);
+export const Clock = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z", "M12 6v6l4 2"]} {...props} />);
+export const MoreVertical = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M12 12h.01", "M12 5h.01", "M12 19h.01"]} {...props} />);

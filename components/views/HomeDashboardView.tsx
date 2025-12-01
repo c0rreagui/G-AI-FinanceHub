@@ -6,6 +6,7 @@ import { HealthScoreGauge } from '../dashboard/HealthScoreGauge';
 import { BalanceCard } from '../dashboard/BalanceCard';
 import { MonthlySummaryChart } from '../ui/charts/MonthlySummaryChart';
 import { WealthFunnelChart } from '../ui/charts/WealthFunnelChart';
+import { FinancialHeatMap } from '../ui/charts/FinancialHeatMap';
 import { QuickActions } from '../ui/QuickActions';
 import { MonthlyChallengesCard } from '../dashboard/MonthlyChallengesCard';
 import { TransactionRow } from '../dashboard/TransactionRow';
@@ -147,11 +148,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                             <HealthScoreGauge score={healthScore} />
                         </div>
                         <div className="h-[320px] md:h-auto flex-1">
-                            <WealthFunnelChart 
-                                income={summary.monthlyIncome} 
-                                expenses={Math.max(0, Math.abs(summary.monthlyExpenses) - investmentAmount)} 
-                                investments={investmentAmount} 
-                            />
+                            <FinancialHeatMap transactions={transactions} />
                         </div>
                     </div>
                 ) : null;
@@ -300,7 +297,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                 axis="y" 
                 values={layout} 
                 onReorder={setLayout} 
-                className={`grid grid-cols-1 md:grid-cols-4 ${gridGap}`}
+                {...({ className: `grid grid-cols-1 md:grid-cols-4 ${gridGap}` } as any)}
             >
                 {layout.map((widget) => {
                     const content = renderWidget(widget.id);

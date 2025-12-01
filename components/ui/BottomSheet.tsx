@@ -23,17 +23,21 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({ isOpen, onClose, title
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-            aria-hidden="true"
+            {...({ 
+              onClick: onClose,
+              className: "absolute inset-1 bg-black/70 backdrop-blur-sm",
+              "aria-hidden": "true"
+            } as any)}
           />
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: '0%' }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', stiffness: 400, damping: 40 }}
-            className="relative w-full max-w-3xl bg-[oklch(var(--card-oklch))] rounded-t-2xl border-t border-[oklch(var(--border-oklch))] shadow-2xl shadow-black/40 p-6"
-            onClick={(e) => e.stopPropagation()}
+            {...({ 
+              className: "relative w-full max-w-3xl bg-[oklch(var(--card-oklch))] rounded-t-2xl border-t border-[oklch(var(--border-oklch))] shadow-2xl shadow-black/40 p-6",
+              onClick: (e: any) => e.stopPropagation()
+            } as any)}
           >
             <div className="flex items-center justify-between mb-4">
               <h2 id="bottomsheet-title" className="text-xl font-semibold text-white">

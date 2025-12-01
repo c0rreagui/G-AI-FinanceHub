@@ -50,7 +50,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({ items, currentDate }
                         key={day}
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className={`aspect-square rounded-xl border flex flex-col items-center justify-start pt-1 overflow-hidden relative transition-colors ${isToday ? 'border-cyan-500 bg-cyan-500/10 shadow-[0_0_10px_rgba(34,211,238,0.2)]' : 'border-white/5 bg-white/5 hover:border-white/20'}`}
+                        {...({ className: `aspect-square rounded-xl border flex flex-col items-center justify-start pt-1 overflow-hidden relative transition-colors ${isToday ? 'border-cyan-500 bg-cyan-500/10 shadow-[0_0_10px_rgba(34,211,238,0.2)]' : 'border-white/5 bg-white/5 hover:border-white/20'}` } as any)}
                     >
                         <span className={`text-xs font-bold mb-1 ${isToday ? 'text-cyan-400' : 'text-gray-400'}`}>{day}</span>
                         

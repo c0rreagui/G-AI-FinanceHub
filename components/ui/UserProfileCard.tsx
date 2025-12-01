@@ -84,7 +84,7 @@ export const UserProfileCard: React.FC = () => {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: 10 }}
-                                className="absolute top-full left-0 mt-2 w-64 p-3 bg-black/80 border border-white/20 rounded-lg text-sm text-gray-300 shadow-lg backdrop-blur-md z-10"
+                                {...({ className: "absolute top-full left-0 mt-2 w-64 p-3 bg-black/80 border border-white/20 rounded-lg text-sm text-gray-300 shadow-lg backdrop-blur-md z-10" } as any)}
                             >
                                 <p className="font-bold mb-1 text-white">Como ganhar XP?</p>
                                 <ul className="list-disc list-inside text-xs space-y-1">

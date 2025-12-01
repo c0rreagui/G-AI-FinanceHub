@@ -314,7 +314,7 @@ export const DesignSystemView: React.FC = () => {
 
                 <div className="space-y-2">
                     <Text weight="medium">List Component</Text>
-                    <List variant="disc">
+                    <List variant="default">
                         <ListItem>First item in a disc list</ListItem>
                         <ListItem>Second item has some content</ListItem>
                         <ListItem>Third item is here</ListItem>

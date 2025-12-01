@@ -117,7 +117,7 @@ export const DevToolsView: React.FC<DevToolsViewProps> = (props) => {
                             <Button variant="ghost" size="sm" onClick={() => openDialog('add-debt')}>
                                 Nova Dívida
                             </Button>
-                            <Button variant="ghost" size="sm" onClick={() => openDialog('edit-profile')}>
+                            <Button variant="ghost" size="sm" disabled title="Em breve">
                                 Editar Perfil
                             </Button>
                         </div>
@@ -152,7 +152,7 @@ export const DevToolsView: React.FC<DevToolsViewProps> = (props) => {
                             <Button variant="outline" size="sm" onClick={() => showToast('Algo deu errado', { type: 'error' })}>
                                 Erro
                             </Button>
-                            <Button variant="outline" size="sm" onClick={() => showToast('Aviso importante', { type: 'warning' })}>
+                            <Button variant="outline" size="sm" onClick={() => showToast('Aviso importante', { type: 'info' })}>
                                 Aviso
                             </Button>
                             <Button variant="outline" size="sm" onClick={() => showToast('Informação do sistema', { type: 'info' })}>

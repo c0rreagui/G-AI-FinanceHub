@@ -79,7 +79,7 @@ export const HealthScoreGauge: React.FC<HealthScoreGaugeProps> = ({ score }) => 
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.5 }}
                     >
-                        <Text size="3xl" weight="bold" style={{ color }}>
+                        <Text size="xl" weight="bold" style={{ color }}>
                             {score}
                         </Text>
                         <Text size="xs" variant="muted" className="uppercase tracking-wider">

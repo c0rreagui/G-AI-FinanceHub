@@ -17,7 +17,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ icon: Icon, title, descr
       <motion.div
         animate={{ y: [0, -8, 0] }}
         transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-        className="w-16 h-16 flex items-center justify-center rounded-full bg-white/5 mb-4"
+        {...({ className: "w-16 h-16 flex items-center justify-center rounded-full bg-white/5 mb-4" } as any)}
       >
         <Icon className="w-8 h-8 text-gray-500" />
       </motion.div>

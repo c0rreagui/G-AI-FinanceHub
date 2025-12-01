@@ -22,10 +22,10 @@ export const TypeToggle: React.FC<TypeToggleProps> = ({ selectedType, onTypeChan
             </label>
             <div className="relative flex w-full bg-black/20 p-1 rounded-xl">
                 {selectedType === TransactionType.DESPESA && (
-                    <motion.div layoutId="toggle-bg" className="absolute inset-1 rounded-lg bg-[oklch(var(--danger-oklch))]" />
+                    <motion.div layoutId="toggle-bg" {...({ className: "absolute inset-1 rounded-lg bg-[oklch(var(--danger-oklch))]" } as any)} />
                 )}
                 {selectedType === TransactionType.RECEITA && (
-                    <motion.div layoutId="toggle-bg" className="absolute inset-1 rounded-lg bg-[oklch(var(--success-oklch))]" />
+                    <motion.div layoutId="toggle-bg" {...({ className: "absolute inset-1 rounded-lg bg-[oklch(var(--success-oklch))]" } as any)} />
                 )}
 
                 <button

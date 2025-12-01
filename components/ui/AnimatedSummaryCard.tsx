@@ -30,7 +30,7 @@ export const AnimatedSummaryCard: React.FC<AnimatedSummaryCardProps> = ({ title,
                 <Icon className="w-5 h-5"/>
             </div>
             <motion.p
-                className="text-3xl font-bold text-white mt-2"
+                {...({ className: "text-3xl font-bold text-white mt-2" } as any)}
                 key={`${title}-amount`}
             >
                 {formattedAmount}

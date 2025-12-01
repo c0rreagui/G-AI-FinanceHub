@@ -26,5 +26,5 @@ export const AnimatedCurrency: React.FC<AnimatedCurrencyProps> = ({ value, class
 
     const formattedValue = useTransform(rounded, (latest: number) => formatCurrencyBRL(latest));
 
-    return <motion.span className={className}>{formattedValue}</motion.span>;
+    return <motion.span {...({ className } as any)}>{formattedValue}</motion.span>;
 };

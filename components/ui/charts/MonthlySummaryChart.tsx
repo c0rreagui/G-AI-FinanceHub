@@ -31,6 +31,21 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export const MonthlySummaryChart: React.FC<MonthlySummaryChartProps> = ({ data }) => {
     const isMobile = !useMediaQuery('(min-width: 768px)');
+    const hasData = data.some(d => d.receita > 0 || d.despesa > 0);
+
+    if (!hasData) {
+        return (
+            <div className="card h-full flex flex-col min-h-[300px] items-center justify-center text-muted-foreground">
+                <div className="flex items-center justify-between mb-4 w-full px-4 absolute top-4">
+                    <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                        <span className="w-1 h-5 bg-gradient-to-b from-cyan-400 to-blue-600 rounded-full"/>
+                        Fluxo Financeiro
+                    </h3>
+                </div>
+                <p className="text-sm">Sem movimentações nos últimos 6 meses.</p>
+            </div>
+        );
+    }
 
     return (
         <div className="card h-full flex flex-col min-h-[300px]">

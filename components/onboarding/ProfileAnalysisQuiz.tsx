@@ -91,7 +91,7 @@ export const ProfileAnalysisQuiz: React.FC<{ isOpen: boolean; onClose: () => voi
             <div className="text-center space-y-6">
                 <motion.div 
                     initial={{ scale: 0 }} animate={{ scale: 1 }} 
-                    className="w-24 h-24 mx-auto bg-white/5 rounded-full flex items-center justify-center"
+                    {...({ className: "w-24 h-24 mx-auto bg-white/5 rounded-full flex items-center justify-center" } as any)}
                 >
                     <Icon className={`w-12 h-12 ${info.color}`} />
                 </motion.div>
@@ -127,10 +127,12 @@ export const ProfileAnalysisQuiz: React.FC<{ isOpen: boolean; onClose: () => voi
                             {questions[step].options.map((opt, idx) => (
                                 <motion.button
                                     key={idx}
-                                    whileHover={{ scale: 1.02, backgroundColor: 'rgba(255,255,255,0.1)' }}
-                                    whileTap={{ scale: 0.98 }}
-                                    onClick={() => handleAnswer(opt.points)}
-                                    className="w-full p-4 text-left rounded-xl bg-white/5 border border-white/10 hover:border-cyan-400/50 transition-colors"
+                                    {...({
+                                        whileHover: { scale: 1.02, backgroundColor: 'rgba(255,255,255,0.1)' },
+                                        whileTap: { scale: 0.98 },
+                                        onClick: () => handleAnswer(opt.points),
+                                        className: "w-full p-4 text-left rounded-xl bg-white/5 border border-white/10 hover:border-cyan-400/50 transition-colors"
+                                    } as any)}
                                 >
                                     {opt.text}
                                 </motion.button>
