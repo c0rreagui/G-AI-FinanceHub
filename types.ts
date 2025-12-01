@@ -176,6 +176,13 @@ export interface UserProfile {
     level: number;
 }
 
+export interface Family {
+    id: string;
+    name: string;
+    created_by: string;
+    created_at: string;
+}
+
 export interface FamilyMember {
     user_id: string;
     family_id: string;
