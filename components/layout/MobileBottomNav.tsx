@@ -15,8 +15,8 @@ import {
     ArrowUpRight,
     Lightbulb,
     Zap,
-    Users,
 } from '../Icons';
+import { Users } from 'lucide-react';
 import { useDialog } from '../../hooks/useDialog';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BottomSheet } from '../ui/BottomSheet';
