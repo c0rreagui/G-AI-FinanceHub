@@ -60,7 +60,7 @@ export const QuickActions: React.FC = () => {
             ariaLabel="Adicionar nova despesa"
             icon={ArrowDownLeft}
             color="bg-red-500/80"
-            onClick={() => openDialog('add-transaction', { prefill: { type: TransactionType.DESPESA } })}
+            onClick={() => openDialog('add-expense')}
             isEditing={isEditing}
             isVisible={visibleActions.expense}
             onToggle={() => toggleAction('expense')}
@@ -70,7 +70,7 @@ export const QuickActions: React.FC = () => {
             ariaLabel="Adicionar nova receita"
             icon={ArrowUpRight}
             color="bg-green-500/80"
-            onClick={() => openDialog('add-transaction', { prefill: { type: TransactionType.RECEITA } })}
+            onClick={() => openDialog('add-income')}
             isEditing={isEditing}
             isVisible={visibleActions.income}
             onToggle={() => toggleAction('income')}
@@ -86,11 +86,11 @@ export const QuickActions: React.FC = () => {
             onToggle={() => toggleAction('goal')}
         />
         <ActionButton
-            title="Escanear"
-            ariaLabel="Escanear recibo ou QR Code"
-            icon={QrCode}
-            color="bg-purple-500/80"
-            onClick={() => alert('Funcionalidade em breve!')}
+            title="Investir"
+            ariaLabel="Novo aporte de investimento"
+            icon={QrCode} // TODO: Change icon to something more appropriate like TrendingUp
+            color="bg-violet-500/80"
+            onClick={() => openDialog('add-investment')}
             isEditing={isEditing}
             isVisible={visibleActions.scan}
             onToggle={() => toggleAction('scan')}

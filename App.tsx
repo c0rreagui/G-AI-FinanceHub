@@ -29,6 +29,8 @@ import { DashboardDataProvider } from './hooks/useDashboardData';
 import { DialogProvider } from './contexts/DialogContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { SocialProvider } from './contexts/SocialContext';
+import { SocialView } from './components/views/SocialView';
 
 const AppContent: React.FC = () => {
   const { user, loading, isGuest, isDeveloper } = useAuth();
@@ -118,6 +120,9 @@ const AppContent: React.FC = () => {
       case 'design-system':
         viewComponent = <DesignSystemView />;
         break;
+      case 'social':
+        viewComponent = <SocialView />;
+        break;
       default:
         viewComponent = <HomeDashboardView setCurrentView={setCurrentView} />;
         break;
@@ -173,11 +178,13 @@ const App: React.FC = () => {
         <DashboardDataProvider>
           <PrivacyProvider>
             <ThemeProvider>
+              <SocialProvider>
                 <DialogProvider>
                 <ErrorBoundary>
                     <AppContent />
                 </ErrorBoundary>
                 </DialogProvider>
+              </SocialProvider>
             </ThemeProvider>
           </PrivacyProvider>
         </DashboardDataProvider>

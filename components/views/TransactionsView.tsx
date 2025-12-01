@@ -153,6 +153,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                                 onSelectAll={handleSelectAll}
                                 onEdit={handleEdit}
                                 onDelete={handleDelete}
+                                onComments={(tx) => openDialog('transaction-comments', { transaction: tx })}
                                 isMutating={(id) => mutatingIds.has(id)}
                             />
                         ) : (

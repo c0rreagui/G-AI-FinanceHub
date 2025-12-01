@@ -1,6 +1,6 @@
 import React from 'react';
 import { ViewType } from '../../types';
-import { HomeIcon, ArrowLeftRight, Lightbulb, Target, TrendingDown, Calendar, Wrench, Settings, Zap } from '../Icons';
+import { HomeIcon, ArrowLeftRight, Lightbulb, Target, TrendingDown, Calendar, Wrench, Settings, Zap, Users } from '../Icons';
 import { motion } from 'framer-motion';
 import { useDashboardData } from '../../hooks/useDashboardData';
 
@@ -17,6 +17,7 @@ const navigation = [
   { name: 'Agenda', view: 'scheduling', icon: Calendar },
   { name: 'Insights', view: 'insights', icon: Lightbulb },
   { name: 'Tools', view: 'tools', icon: Wrench },
+  { name: 'Família', view: 'social', icon: Users },
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView }) => {

@@ -8,9 +8,14 @@ import { AddValueToGoalForm } from './forms/AddValueToGoalForm';
 import { AddPaymentToDebtForm } from './forms/AddPaymentToDebtForm';
 import { ConfirmationModal } from './ui/ConfirmationModal';
 import { BulkRecategorizeForm } from './forms/BulkRecategorizeForm';
+import { AddExpenseDrawer } from './forms/AddExpenseDrawer';
+import { AddIncomeDrawer } from './forms/AddIncomeDrawer';
+import { AddInvestmentDrawer } from './forms/AddInvestmentDrawer';
 
 import { AchievementsDialog } from './dashboard/AchievementsDialog';
 import { ProfileAnalysisQuiz } from './onboarding/ProfileAnalysisQuiz';
+
+import { TransactionCommentsDialog } from './social/TransactionCommentsDialog';
 
 export const DialogManager: React.FC = () => {
   const { dialogType, closeDialog, dialogProps } = useDialog();
@@ -28,6 +33,12 @@ export const DialogManager: React.FC = () => {
       return <AddValueToGoalForm isOpen={true} onClose={closeDialog} {...dialogProps} />;
     case 'add-payment-to-debt':
         return <AddPaymentToDebtForm isOpen={true} onClose={closeDialog} {...dialogProps} />;
+    case 'add-expense':
+        return <AddExpenseDrawer isOpen={true} onClose={closeDialog} />;
+    case 'add-income':
+        return <AddIncomeDrawer isOpen={true} onClose={closeDialog} />;
+    case 'add-investment':
+        return <AddInvestmentDrawer isOpen={true} onClose={closeDialog} />;
     case 'confirmation':
         return <ConfirmationModal 
             isOpen={true} 
@@ -50,6 +61,8 @@ export const DialogManager: React.FC = () => {
         return <AchievementsDialog isOpen={true} onClose={closeDialog} />;
     case 'profile-quiz':
         return <ProfileAnalysisQuiz isOpen={true} onClose={closeDialog} />;
+    case 'transaction-comments':
+        return <TransactionCommentsDialog isOpen={true} onClose={closeDialog} transaction={dialogProps.transaction} />;
     default:
       return null;
   }

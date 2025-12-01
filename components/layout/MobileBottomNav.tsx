@@ -15,6 +15,7 @@ import {
     ArrowUpRight,
     Lightbulb,
     Zap,
+    Users,
 } from '../Icons';
 import { useDialog } from '../../hooks/useDialog';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -150,6 +151,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ currentView, s
         { name: 'Agendamentos', view: 'scheduling', icon: Calendar },
         { name: 'Insights', view: 'insights', icon: Lightbulb },
         { name: 'Ferramentas', view: 'tools', icon: Wrench },
+        { name: 'Família', view: 'social', icon: Users },
         { name: 'Ajustes', view: 'settings', icon: Settings },
     ];
     if (isDeveloper) {

@@ -11,7 +11,7 @@ import { Transaction, TransactionType } from '../../types';
 import { formatCurrencyBRL } from '../../utils/formatters';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
-import { PencilIcon, TrashIcon, LockClosed, LinkIcon } from '../Icons';
+import { PencilIcon, TrashIcon, LockClosed, LinkIcon, MessageSquare } from '../Icons';
 import { Flex, Box } from '../ui/layout';
 import { Text } from '../ui/typography';
 import { Checkbox } from '../ui/Checkbox';
@@ -24,6 +24,7 @@ interface TransactionsTableProps {
   onSelectAll: () => void;
   onEdit: (transaction: Transaction) => void;
   onDelete: (id: string) => void;
+  onComments: (transaction: Transaction) => void;
   isMutating: (id: string) => boolean;
 }
 
@@ -34,6 +35,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
   onSelectAll,
   onEdit,
   onDelete,
+  onComments,
   isMutating,
 }) => {
   const allSelected = transactions.length > 0 && selectedIds.length === transactions.length;
@@ -54,7 +56,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
             <TableHead>Categoria</TableHead>
             <TableHead>Data</TableHead>
             <TableHead className="text-right">Valor</TableHead>
-            <TableHead className="w-[100px]"></TableHead>
+            <TableHead className="w-[120px]"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -111,6 +113,14 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                 </TableCell>
                 <TableCell>
                     <Flex justify="end" gap="xs">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => onComments(tx)}
+                            className="h-8 w-8 text-gray-400 hover:text-white"
+                        >
+                            <MessageSquare className="w-4 h-4" />
+                        </Button>
                         <Button 
                             variant="ghost" 
                             size="icon" 

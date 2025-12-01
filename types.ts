@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type ViewType = 'home' | 'transactions' | 'insights' | 'goals' | 'debts' | 'scheduling' | 'tools' | 'settings' | 'devtools' | 'design-system';
+export type ViewType = 'home' | 'transactions' | 'insights' | 'goals' | 'debts' | 'scheduling' | 'tools' | 'settings' | 'devtools' | 'design-system' | 'social';
 
 export enum TransactionType {
   RECEITA = 'receita',
@@ -165,23 +165,39 @@ export interface DashboardDataContextType {
   updateGoalValue: (goalId: string, amount: number) => Promise<boolean>;
   deleteGoal: (id: string) => Promise<boolean>;
 
-  addDebt: (debt: Omit<Debt, 'id' | 'paid_amount' | 'status' | 'user_id' | 'total_amount' | 'interest_rate'> & { totalAmount: number; interestRate: number }) => Promise<Debt | null>;
-  addPaymentToDebt: (debtId: string, amount: number) => Promise<boolean>;
-  deleteDebt: (id: string) => Promise<boolean>;
+    created_at: string;
+}
 
-  addScheduledTransaction: (item: Omit<ScheduledTransaction, 'id' | 'category' | 'next_due_date' | 'user_id' | 'category_id' | 'start_date'> & { categoryId: string; startDate: string }) => Promise<boolean>;
-  updateScheduledTransaction: (item: Omit<ScheduledTransaction, 'category' | 'user_id' | 'category_id' | 'start_date'> & { categoryId: string; startDate: string }) => Promise<boolean>;
-  deleteScheduledTransaction: (id: string) => Promise<boolean>;
+export interface UserProfile {
+    id: string;
+    full_name: string | null;
+    avatar_url: string | null;
+    xp: number;
+    level: number;
+}
 
-  completeMission: (missionId: string) => void;
-  clearError: () => void;
+export interface FamilyMember {
+    user_id: string;
+    family_id: string;
+    role: 'admin' | 'member';
+    profile?: UserProfile;
+}
 
-  // Dev Tools
-  addMockData: () => Promise<void>;
-  clearAllUserData: () => Promise<void>;
-  addMockTransactions: (count: number) => Promise<void>;
-  addMockGoals: (count: number) => Promise<void>;
-  addMockDebts: (count: number) => Promise<void>;
-  clearTable: (tableName: 'transactions' | 'goals' | 'debts' | 'scheduled_transactions') => Promise<void>;
-  forceError: () => Promise<void>;
+export interface TransactionComment {
+    id: string;
+    transaction_id: string;
+    user_id: string;
+    content: string;
+    created_at: string;
+    user?: UserProfile; // Joined data
+}
+
+export interface FamilyInvite {
+    id: string;
+    family_id: string;
+    email: string;
+    token: string;
+    status: 'pending' | 'accepted' | 'expired';
+    created_by: string;
+    expires_at: string;
 }
