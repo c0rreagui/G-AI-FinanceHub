@@ -1,20 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/Dialog';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Label } from '../ui/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 import { useInvestments } from '../../hooks/useInvestments';
-import { InvestmentType, NewInvestment } from '../../types';
+import { Investment, InvestmentType, NewInvestment } from '../../types';
 import { Loader2 } from 'lucide-react';
 
 interface AddInvestmentModalProps {
   isOpen: boolean;
   onClose: () => void;
+  investmentToEdit?: Investment | null;
 }
 
-export const AddInvestmentModal: React.FC<AddInvestmentModalProps> = ({ isOpen, onClose }) => {
-  const { addInvestment } = useInvestments();
+export const AddInvestmentModal: React.FC<AddInvestmentModalProps> = ({ isOpen, onClose, investmentToEdit }) => {
+  const { addInvestment, updateInvestment } = useInvestments();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<NewInvestment>({
     name: '',
@@ -27,26 +28,19 @@ export const AddInvestmentModal: React.FC<AddInvestmentModalProps> = ({ isOpen, 
     current_price: 0
   });
 
-  const handleChange = (field: keyof NewInvestment, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      const success = await addInvestment({
-        ...formData,
-        amount: Number(formData.amount),
-        quantity: Number(formData.quantity),
-        current_price: Number(formData.current_price || 0),
-        purchase_date: new Date(formData.purchase_date).toISOString()
-      });
-
-      if (success) {
-        onClose();
-        // Reset form
+  useEffect(() => {
+    if (investmentToEdit) {
+        setFormData({
+            name: investmentToEdit.name,
+            ticker: investmentToEdit.ticker || '',
+            type: investmentToEdit.type,
+            amount: investmentToEdit.amount,
+            quantity: investmentToEdit.quantity,
+            purchase_date: new Date(investmentToEdit.purchase_date).toISOString().split('T')[0],
+            sector: investmentToEdit.sector || '',
+            current_price: investmentToEdit.current_price || 0
+        });
+    } else {
         setFormData({
             name: '',
             ticker: '',
@@ -57,6 +51,48 @@ export const AddInvestmentModal: React.FC<AddInvestmentModalProps> = ({ isOpen, 
             sector: '',
             current_price: 0
         });
+    }
+  }, [investmentToEdit, isOpen]);
+
+  const handleChange = (field: keyof NewInvestment, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const investmentData = {
+        ...formData,
+        amount: Number(formData.amount),
+        quantity: Number(formData.quantity),
+        current_price: Number(formData.current_price || 0),
+        purchase_date: new Date(formData.purchase_date).toISOString()
+      };
+
+      let success;
+      if (investmentToEdit) {
+        success = await updateInvestment(investmentToEdit.id, investmentData);
+      } else {
+        success = await addInvestment(investmentData);
+      }
+
+      if (success) {
+        onClose();
+        if (!investmentToEdit) {
+            // Reset form only if adding
+            setFormData({
+                name: '',
+                ticker: '',
+                type: InvestmentType.RENDA_FIXA,
+                amount: 0,
+                quantity: 1,
+                purchase_date: new Date().toISOString().split('T')[0],
+                sector: '',
+                current_price: 0
+            });
+        }
       }
     } finally {
       setLoading(false);
@@ -67,7 +103,7 @@ export const AddInvestmentModal: React.FC<AddInvestmentModalProps> = ({ isOpen, 
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Novo Aporte</DialogTitle>
+          <DialogTitle>{investmentToEdit ? 'Editar Investimento' : 'Novo Aporte'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -178,7 +214,7 @@ export const AddInvestmentModal: React.FC<AddInvestmentModalProps> = ({ isOpen, 
             </Button>
             <Button type="submit" disabled={loading}>
               {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Salvar Investimento
+              {investmentToEdit ? 'Salvar Alterações' : 'Salvar Investimento'}
             </Button>
           </DialogFooter>
         </form>

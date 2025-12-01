@@ -37,7 +37,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, currentView, set
         {isDesktop && <Sidebar currentView={currentView} setCurrentView={setCurrentView} />}
         
         <main className={`flex-1 flex flex-col overflow-hidden ${!isDesktop ? 'pb-20' : ''}`}>
-          <div className="p-4 sm:p-6 lg:p-8 flex-grow flex flex-col h-full max-h-screen">
+          <div className="p-4 sm:p-6 lg:p-8 flex-grow flex flex-col h-full overflow-y-auto custom-scrollbar">
               {children}
           </div>
         </main>

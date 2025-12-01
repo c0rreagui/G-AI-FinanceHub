@@ -1,10 +1,11 @@
 import React from 'react';
 import { Investment, InvestmentType } from '../../types';
-import { TrendingUp, TrendingDown, MoreHorizontal, Building2, Bitcoin, Globe, Landmark, Wallet } from 'lucide-react';
+import { TrendingUp, TrendingDown, MoreHorizontal, Building2, Bitcoin, Globe, Landmark, Wallet, Pencil } from 'lucide-react';
 import { Button } from '../ui/Button';
 
 interface AssetListProps {
   investments: Investment[];
+  onEdit: (investment: Investment) => void;
 }
 
 const getIconForType = (type: InvestmentType) => {
@@ -29,7 +30,7 @@ const getColorForType = (type: InvestmentType) => {
   }
 };
 
-export const AssetList: React.FC<AssetListProps> = ({ investments }) => {
+export const AssetList: React.FC<AssetListProps> = ({ investments, onEdit }) => {
   if (investments.length === 0) {
     return (
       <div className="text-center py-10 text-gray-400">
@@ -45,7 +46,7 @@ export const AssetList: React.FC<AssetListProps> = ({ investments }) => {
         const colorClass = getColorForType(inv.type);
         
         return (
-          <div key={inv.id} className="p-4 bg-card rounded-xl border border-white/5 hover:border-white/10 transition-colors group">
+          <div key={inv.id} className="p-4 bg-card rounded-xl border border-white/5 hover:border-white/10 transition-colors group relative">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-4">
                 <div className={`p-3 rounded-xl ${colorClass}`}>
@@ -67,18 +68,29 @@ export const AssetList: React.FC<AssetListProps> = ({ investments }) => {
                 </div>
               </div>
 
-              <div className="text-right">
-                <p className="font-bold text-white text-lg">
-                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(inv.amount))}
-                </p>
-                <p className="text-sm text-gray-400">
-                  {Number(inv.quantity)} cotas
-                  {inv.current_price && (
-                     <span className="ml-2 text-xs text-gray-500">
-                       ({new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(inv.current_price))}/un)
-                     </span>
-                  )}
-                </p>
+              <div className="flex items-center gap-4">
+                <div className="text-right">
+                  <p className="font-bold text-white text-lg">
+                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(inv.amount))}
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    {Number(inv.quantity)} cotas
+                    {inv.current_price && (
+                       <span className="ml-2 text-xs text-gray-500">
+                         ({new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(inv.current_price))}/un)
+                       </span>
+                    )}
+                  </p>
+                </div>
+                
+                <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={() => onEdit(inv)}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                    <Pencil className="w-4 h-4 text-gray-400 hover:text-white" />
+                </Button>
               </div>
             </div>
           </div>

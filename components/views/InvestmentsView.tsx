@@ -10,16 +10,27 @@ import { AssetAllocationChart } from '../investments/AssetAllocationChart';
 import { AssetList } from '../investments/AssetList';
 import { CompoundInterestCalculator } from '../investments/CompoundInterestCalculator';
 
-import { InvestmentType } from '../../types';
+import { Investment, InvestmentType } from '../../types';
 
 export const InvestmentsView: React.FC = () => {
   const { investments, loading } = useInvestments();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingInvestment, setEditingInvestment] = useState<Investment | null>(null);
   const [filter, setFilter] = useState<InvestmentType | 'ALL'>('ALL');
 
   const filteredInvestments = investments.filter(inv => 
     filter === 'ALL' ? true : inv.type === filter
   );
+
+  const handleEdit = (investment: Investment) => {
+    setEditingInvestment(investment);
+    setIsAddModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsAddModalOpen(false);
+    setEditingInvestment(null);
+  };
 
   if (loading) {
     return (
@@ -93,7 +104,7 @@ export const InvestmentsView: React.FC = () => {
                   </Button>
                 </div>
               </div>
-              <AssetList investments={filteredInvestments} />
+              <AssetList investments={filteredInvestments} onEdit={handleEdit} />
            </div>
         </div>
         <div className="space-y-6">
@@ -108,7 +119,11 @@ export const InvestmentsView: React.FC = () => {
         <CompoundInterestCalculator />
       </div>
 
-      <AddInvestmentModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
+      <AddInvestmentModal 
+        isOpen={isAddModalOpen} 
+        onClose={handleCloseModal} 
+        investmentToEdit={editingInvestment}
+      />
     </div>
   );
 };
