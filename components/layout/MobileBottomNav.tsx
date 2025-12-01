@@ -175,12 +175,12 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ currentView, s
             <NavItem 
                 {...mainNavItems[0]}
                 isActive={currentView === mainNavItems[0].view}
-                onClick={setCurrentView}
+                onClick={(v) => v && setCurrentView(v)}
             />
              <NavItem 
                 {...mainNavItems[1]}
                 isActive={currentView === mainNavItems[1].view}
-                onClick={setCurrentView}
+                onClick={(v) => v && setCurrentView(v)}
             />
             
             <SpeedDial />
@@ -188,7 +188,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ currentView, s
             <NavItem 
                 {...mainNavItems[2]}
                 isActive={currentView === mainNavItems[2].view}
-                onClick={setCurrentView}
+                onClick={(v) => v && setCurrentView(v)}
             />
             <NavItem
                 name="Mais"

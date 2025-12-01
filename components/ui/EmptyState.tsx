@@ -1,29 +1,32 @@
-
-
-// components/ui/EmptyState.tsx
 import React from 'react';
-import { motion } from 'framer-motion';
+import { cn } from '@/utils/utils';
+import { LucideIcon } from 'lucide-react';
 
 interface EmptyStateProps {
-  icon: React.ElementType;
+  icon?: LucideIcon;
   title: string;
   description: string;
-  children?: React.ReactNode; // Para o botão de ação
+  action?: React.ReactNode;
+  className?: string;
 }
 
-export const EmptyState: React.FC<EmptyStateProps> = ({ icon: Icon, title, description, children }) => {
+export const EmptyState: React.FC<EmptyStateProps> = ({ 
+  icon: Icon, 
+  title, 
+  description, 
+  action, 
+  className 
+}) => {
   return (
-    <div className="flex flex-col items-center justify-center text-center text-gray-400 py-16 h-full rounded-2xl bg-gradient-to-t from-black/10 via-transparent to-transparent">
-      <motion.div
-        animate={{ y: [0, -8, 0] }}
-        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-        {...({ className: "w-16 h-16 flex items-center justify-center rounded-full bg-white/5 mb-4" } as any)}
-      >
-        <Icon className="w-8 h-8 text-gray-500" />
-      </motion.div>
-      <h3 className="text-xl font-semibold text-white">{title}</h3>
-      <p className="mt-2 max-w-xs text-sm">{description}</p>
-      {children && <div className="mt-6">{children}</div>}
+    <div className={cn("flex flex-col items-center justify-center p-8 text-center animate-fade-in", className)}>
+      {Icon && (
+        <div className="mb-4 rounded-full bg-muted/50 p-4 ring-1 ring-white/10">
+          <Icon className="h-8 w-8 text-muted-foreground" />
+        </div>
+      )}
+      <h3 className="mb-2 text-lg font-semibold tracking-tight">{title}</h3>
+      <p className="mb-6 text-sm text-muted-foreground max-w-xs">{description}</p>
+      {action}
     </div>
   );
 };

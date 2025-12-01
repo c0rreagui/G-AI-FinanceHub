@@ -26,5 +26,9 @@
     "allowImportingTsExtensions": true,
     "downlevelIteration": true,
     "noEmit": true
-  }
+  },
+  "include": [
+    "src/**/*",
+    ".storybook/**/*"
+  ]
 }

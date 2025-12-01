@@ -73,6 +73,39 @@ export default {
                 heading: ["Outfit", "sans-serif"],
                 mono: ["JetBrains Mono", "monospace"],
             },
+            boxShadow: {
+                'glow': '0 0 20px rgba(var(--primary), 0.3)',
+                'glow-sm': '0 0 10px rgba(var(--primary), 0.2)',
+            },
+            animation: {
+                "accordion-down": "accordion-down 0.2s ease-out",
+                "accordion-up": "accordion-up 0.2s ease-out",
+                "shimmer": "shimmer 2s linear infinite",
+                "fade-in": "fade-in 0.5s ease-out",
+                "slide-up": "slide-up 0.5s ease-out",
+            },
+            keyframes: {
+                "accordion-down": {
+                    from: { height: 0 },
+                    to: { height: "var(--radix-accordion-content-height)" },
+                },
+                "accordion-up": {
+                    from: { height: "var(--radix-accordion-content-height)" },
+                    to: { height: 0 },
+                },
+                shimmer: {
+                    from: { backgroundPosition: "0 0" },
+                    to: { backgroundPosition: "-200% 0" },
+                },
+                "fade-in": {
+                    from: { opacity: 0 },
+                    to: { opacity: 1 },
+                },
+                "slide-up": {
+                    from: { transform: "translateY(10px)", opacity: 0 },
+                    to: { transform: "translateY(0)", opacity: 1 },
+                },
+            },
         },
     },
     plugins: [tailwindAnimate],
