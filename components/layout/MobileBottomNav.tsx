@@ -22,6 +22,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { BottomSheet } from '../ui/BottomSheet';
 import { triggerHapticFeedback } from '../../utils/haptics';
 import { useAuth } from '../../hooks/useAuth';
+import { useScrollDirection } from '../../hooks/useScrollDirection';
 
 interface MobileBottomNavProps {
   currentView: ViewType;
@@ -38,7 +39,10 @@ interface NavItemProps {
 
 const NavItem: React.FC<NavItemProps> = ({ name, view, icon: Icon, isActive, onClick }) => (
     <button
-      onClick={() => onClick(view)}
+      onClick={() => {
+          triggerHapticFeedback();
+          onClick(view);
+      }}
       className="relative flex flex-col items-center justify-center gap-1 text-xs font-medium w-full"
       aria-label={name}
       aria-current={isActive ? 'page' : undefined}
@@ -47,10 +51,8 @@ const NavItem: React.FC<NavItemProps> = ({ name, view, icon: Icon, isActive, onC
       <span className={`transition-colors ${isActive ? 'text-white' : 'text-gray-400'}`}>{name}</span>
       {isActive && (
         <motion.div
-          {...({
-              layoutId: "mobile-active-nav",
-              className: "absolute -bottom-2 h-1 w-8 bg-cyan-500 rounded-full"
-          } as any)}
+          layoutId="mobile-active-nav"
+          className="absolute -bottom-2 h-1 w-8 bg-cyan-500 rounded-full"
         />
       )}
     </button>
@@ -89,24 +91,20 @@ const SpeedDial: React.FC = () => {
                 {isOpen && (
                     <>
                         <motion.div 
-                          {...({
-                              initial: { opacity: 0 },
-                              animate: { opacity: 1 },
-                              exit: { opacity: 0 },
-                              className: "fixed inset-0 bg-black/60 backdrop-blur-sm z-40",
-                              onClick: toggleOpen
-                          } as any)}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+                          onClick={toggleOpen}
                         />
                         <div className="absolute bottom-24 flex flex-col items-center gap-4 z-50">
                             {actions.map((action, index) => (
                                 <motion.div
                                     key={action.label}
-                                    {...({
-                                        initial: { opacity: 0, y: 50 },
-                                        animate: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 380, damping: 20, delay: index * 0.06 } },
-                                        exit: { opacity: 0, y: 50, transition: { duration: 0.15 } },
-                                        className: "flex items-center gap-3 w-40 justify-end"
-                                    } as any)}
+                                    initial={{ opacity: 0, y: 50 }}
+                                    animate={{ opacity: 1, y: 0, transition: { type: 'spring', stiffness: 380, damping: 20, delay: index * 0.06 } }}
+                                    exit={{ opacity: 0, y: 50, transition: { duration: 0.15 } }}
+                                    className="flex items-center gap-3 w-40 justify-end"
                                 >
                                     <span className="bg-[oklch(var(--card-oklch))] text-white text-xs font-semibold px-2 py-1 rounded-md shadow-lg">{action.label}</span>
                                     <button 
@@ -123,14 +121,12 @@ const SpeedDial: React.FC = () => {
                 )}
             </AnimatePresence>
             <motion.button 
-                {...({
-                    onClick: toggleOpen,
-                    className: "relative z-50 flex items-center justify-center w-14 h-14 bg-gradient-to-r from-cyan-500 to-green-500 rounded-full text-white shadow-lg -translate-y-4",
-                    whileTap: { scale: 0.9 },
-                    animate: isOpen ? "open" : "closed",
-                    "aria-label": isOpen ? "Fechar ações rápidas" : "Abrir ações rápidas",
-                    "aria-expanded": isOpen
-                } as any)}
+                onClick={toggleOpen}
+                className="relative z-50 flex items-center justify-center w-14 h-14 bg-gradient-to-r from-cyan-500 to-green-500 rounded-full text-white shadow-lg -translate-y-4"
+                whileTap={{ scale: 0.9 }}
+                animate={isOpen ? "open" : "closed"}
+                aria-label={isOpen ? "Fechar ações rápidas" : "Abrir ações rápidas"}
+                aria-expanded={isOpen}
             >
                 <motion.div variants={{ open: { rotate: 45 }, closed: { rotate: 0 } }} transition={{ type: 'spring', stiffness: 400, damping: 17 }}>
                     <PlusCircle className="w-8 h-8" />
@@ -143,12 +139,13 @@ const SpeedDial: React.FC = () => {
 export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ currentView, setCurrentView }) => {
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const { isDeveloper } = useAuth();
+  const scrollDirection = useScrollDirection();
+  const isVisible = scrollDirection === 'up' || scrollDirection === null; // Show initially or when scrolling up
 
   const moreNavItems = useMemo(() => {
-    // FIX: Explicitly type the array to ensure `item.view` is of type `ViewType`, not `string`.
     const items: { name: string; view: ViewType; icon: React.ElementType }[] = [
         { name: 'Dívidas', view: 'debts', icon: TrendingDown },
-        { name: 'Investimentos', view: 'investments', icon: PiggyBank }, // Added Investments
+        { name: 'Investimentos', view: 'investments', icon: PiggyBank },
         { name: 'Agendamentos', view: 'scheduling', icon: Calendar },
         { name: 'Insights', view: 'insights', icon: Lightbulb },
         { name: 'Ferramentas', view: 'tools', icon: Wrench },
@@ -162,6 +159,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ currentView, s
   }, [isDeveloper]);
   
   const handleMoreItemClick = (view: ViewType) => {
+    triggerHapticFeedback();
     setCurrentView(view);
     setIsMoreMenuOpen(false);
   }
@@ -170,34 +168,47 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ currentView, s
 
   return (
     <>
-      <div className="fixed bottom-0 left-0 right-0 h-20 bg-[oklch(var(--background-oklch)_/_0.75)] backdrop-blur-xl border-t border-[oklch(var(--border-oklch))] z-40">
-        <div className="grid grid-cols-5 h-full items-center">
-            <NavItem 
-                {...mainNavItems[0]}
-                isActive={currentView === mainNavItems[0].view}
-                onClick={(v) => v && setCurrentView(v)}
-            />
-             <NavItem 
-                {...mainNavItems[1]}
-                isActive={currentView === mainNavItems[1].view}
-                onClick={(v) => v && setCurrentView(v)}
-            />
-            
-            <SpeedDial />
+      <AnimatePresence>
+        {isVisible && (
+            <motion.div 
+                initial={{ y: 100 }}
+                animate={{ y: 0 }}
+                exit={{ y: 100 }}
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
+                className="fixed bottom-0 left-0 right-0 h-20 bg-[oklch(var(--background-oklch)_/_0.75)] backdrop-blur-xl border-t border-[oklch(var(--border-oklch))] z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.2)]"
+            >
+                <div className="grid grid-cols-5 h-full items-center">
+                    <NavItem 
+                        {...mainNavItems[0]}
+                        isActive={currentView === mainNavItems[0].view}
+                        onClick={(v) => v && setCurrentView(v)}
+                    />
+                    <NavItem 
+                        {...mainNavItems[1]}
+                        isActive={currentView === mainNavItems[1].view}
+                        onClick={(v) => v && setCurrentView(v)}
+                    />
+                    
+                    <SpeedDial />
 
-            <NavItem 
-                {...mainNavItems[2]}
-                isActive={currentView === mainNavItems[2].view}
-                onClick={(v) => v && setCurrentView(v)}
-            />
-            <NavItem
-                name="Mais"
-                icon={MoreHorizontal}
-                isActive={isMoreActive}
-                onClick={() => setIsMoreMenuOpen(true)}
-            />
-        </div>
-      </div>
+                    <NavItem 
+                        {...mainNavItems[2]}
+                        isActive={currentView === mainNavItems[2].view}
+                        onClick={(v) => v && setCurrentView(v)}
+                    />
+                    <NavItem
+                        name="Mais"
+                        icon={MoreHorizontal}
+                        isActive={isMoreActive}
+                        onClick={() => {
+                            triggerHapticFeedback();
+                            setIsMoreMenuOpen(true);
+                        }}
+                    />
+                </div>
+            </motion.div>
+        )}
+      </AnimatePresence>
       
       <BottomSheet
         isOpen={isMoreMenuOpen}

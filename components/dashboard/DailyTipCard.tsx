@@ -1,30 +1,63 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from '../ui/Card';
-import { Lightbulb, X } from 'lucide-react';
+import { Lightbulb, X, Share2, RefreshCw } from 'lucide-react';
 import { getDailyTip } from '../../utils/financialTips';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useToast } from '../../hooks/useToast';
 
 export const DailyTipCard: React.FC = () => {
     const [isVisible, setIsVisible] = useState(true);
-    const tip = getDailyTip();
+    const [tip, setTip] = useState(getDailyTip());
+    const [isRotating, setIsRotating] = useState(false);
+    const { showToast } = useToast();
+
+    const handleShare = () => {
+        navigator.clipboard.writeText(`Dica Financeira: ${tip}`);
+        showToast('Dica copiada para a área de transferência!', { type: 'success' });
+    };
+
+    const handleRefresh = () => {
+        setIsRotating(true);
+        setTimeout(() => {
+            setTip(getDailyTip());
+            setIsRotating(false);
+        }, 500);
+    };
 
     if (!isVisible) return null;
 
     return (
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.3 }}
+                key={tip}
+                initial={{ opacity: 0, rotateX: -90 }}
+                animate={{ opacity: 1, rotateX: 0 }}
+                exit={{ opacity: 0, rotateX: 90 }}
+                transition={{ duration: 0.5, type: "spring" }}
+                className="perspective-1000"
             >
-                <Card className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/20 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-2">
+                <Card className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/20 relative overflow-hidden group">
+                    <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button 
+                            onClick={handleRefresh}
+                            className={`p-1.5 text-amber-500/50 hover:text-amber-500 transition-colors rounded-full hover:bg-amber-500/10 ${isRotating ? 'animate-spin' : ''}`}
+                            title="Nova dica"
+                        >
+                            <RefreshCw size={14} />
+                        </button>
+                        <button 
+                            onClick={handleShare}
+                            className="p-1.5 text-amber-500/50 hover:text-amber-500 transition-colors rounded-full hover:bg-amber-500/10"
+                            title="Compartilhar"
+                        >
+                            <Share2 size={14} />
+                        </button>
                         <button 
                             onClick={() => setIsVisible(false)}
-                            className="text-amber-500/50 hover:text-amber-500 transition-colors"
+                            className="p-1.5 text-amber-500/50 hover:text-amber-500 transition-colors rounded-full hover:bg-amber-500/10"
+                            title="Fechar"
                         >
-                            <X size={16} />
+                            <X size={14} />
                         </button>
                     </div>
                     <CardContent className="p-4 flex items-start gap-4">

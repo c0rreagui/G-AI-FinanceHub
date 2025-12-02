@@ -120,7 +120,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                 return (
                     <GoalsWidget 
                         hiddenModules={hiddenModules} 
-                        firstGoal={firstGoal} 
+                        goals={goals} 
                         setCurrentView={setCurrentView} 
                         openDialog={openDialog} 
                         containerSpacing={containerSpacing} 

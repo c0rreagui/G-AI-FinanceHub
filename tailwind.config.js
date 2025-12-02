@@ -76,6 +76,8 @@ export default {
             boxShadow: {
                 'glow': '0 0 20px rgba(var(--primary), 0.3)',
                 'glow-sm': '0 0 10px rgba(var(--primary), 0.2)',
+                'primary': '0 0 20px rgba(var(--primary), 0.3)',
+                'primary-sm': '0 0 10px rgba(var(--primary), 0.2)',
             },
             animation: {
                 "accordion-down": "accordion-down 0.2s ease-out",

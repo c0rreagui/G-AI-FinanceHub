@@ -3,6 +3,9 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianG
 import { MonthlyChartData } from '../../../types';
 import { formatCurrency } from '../../../utils/formatters';
 import { useMediaQuery } from '../../../hooks/useMediaQuery';
+import { motion } from 'framer-motion';
+import { Progress } from '../Progress';
+import { cn } from '../../../utils/utils';
 
 interface MonthlySummaryChartProps {
     data: MonthlyChartData[];
@@ -16,11 +19,11 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           <div className="space-y-1">
               <p className="text-emerald-400 flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"/>
-                  Receita: <span className="font-mono font-bold text-white">{formatCurrencyBRL(payload[0].value)}</span>
+                  Receita: <span className="font-mono font-bold text-white">{formatCurrency(payload[0].value)}</span>
               </p>
               <p className="text-rose-400 flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.5)]"/>
-                  Despesa: <span className="font-mono font-bold text-white">{formatCurrencyBRL(payload[1].value)}</span>
+                  Despesa: <span className="font-mono font-bold text-white">{formatCurrency(payload[1].value)}</span>
               </p>
           </div>
         </div>
@@ -32,6 +35,14 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 export const MonthlySummaryChart: React.FC<MonthlySummaryChartProps> = ({ data }) => {
     const isMobile = !useMediaQuery('(min-width: 768px)');
     const hasData = data.some(d => d.receita > 0 || d.despesa > 0);
+    const MotionDiv = motion.div as any;
+
+    // Calculate Savings Rate for the last month
+    const lastMonth = data[data.length - 1] || { receita: 0, despesa: 0 };
+    const savings = lastMonth.receita - lastMonth.despesa;
+    const savingsRate = lastMonth.receita > 0 ? (savings / lastMonth.receita) * 100 : 0;
+    const isPositive = savings >= 0;
+    const progressValue = isPositive ? savingsRate : Math.min((Math.abs(savings) / lastMonth.despesa) * 100, 100);
 
     if (!hasData) {
         return (
@@ -54,9 +65,48 @@ export const MonthlySummaryChart: React.FC<MonthlySummaryChartProps> = ({ data }
                     <span className="w-1 h-5 bg-gradient-to-b from-cyan-400 to-blue-600 rounded-full"/>
                     Fluxo Financeiro
                 </h3>
+                <div className="flex items-center gap-2">
+                    <div className="flex bg-slate-800/50 rounded-lg p-0.5 border border-slate-700/50">
+                        {['7D', '30D', '3M', 'YTD'].map((period) => (
+                            <button
+                                key={period}
+                                className={cn(
+                                    "px-2 py-1 text-[10px] font-medium rounded-md transition-all",
+                                    period === '30D' 
+                                        ? "bg-cyan-500/20 text-cyan-400 shadow-sm" 
+                                        : "text-slate-400 hover:text-slate-200 hover:bg-slate-700/50"
+                                )}
+                            >
+                                {period}
+                            </button>
+                        ))}
+                    </div>
+                </div>
             </div>
             
-            <div className="flex-grow w-full -ml-2">
+            <div className="flex items-center justify-between mb-4 px-1">
+                <div className="flex flex-col">
+                     <span className={cn("text-xs font-medium", isPositive ? "text-emerald-400" : "text-rose-400")}>
+                        {isPositive ? "Taxa de Poupança" : "Déficit Mensal"}
+                    </span>
+                    <span className="text-2xl font-bold text-white tracking-tight">{Math.abs(savingsRate).toFixed(1)}%</span>
+                </div>
+            </div>
+            
+            <div className="mb-4">
+                <Progress 
+                    value={Math.abs(progressValue)} 
+                    className="h-1.5 bg-white/5" 
+                    indicatorClassName={isPositive ? "bg-emerald-500" : "bg-rose-500"}
+                />
+            </div>
+
+            <MotionDiv 
+                className="flex-grow w-full -ml-2"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+            >
                 <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                         <defs>
@@ -104,6 +154,7 @@ export const MonthlySummaryChart: React.FC<MonthlySummaryChartProps> = ({ data }
                             fillOpacity={1} 
                             fill="url(#colorReceita)" 
                             activeDot={{ r: 6, fill: '#34d399', stroke: '#fff', strokeWidth: 2, className: "animate-ping" }}
+                            animationDuration={1500}
                         />
                         <Area 
                             type="monotone" 
@@ -114,10 +165,11 @@ export const MonthlySummaryChart: React.FC<MonthlySummaryChartProps> = ({ data }
                             fillOpacity={1} 
                             fill="url(#colorDespesa)" 
                             activeDot={{ r: 6, fill: '#fb7185', stroke: '#fff', strokeWidth: 2 }}
+                            animationDuration={1500}
                         />
                     </AreaChart>
                 </ResponsiveContainer>
-            </div>
+            </motion.div>
         </div>
     );
 };

@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ViewType } from '../../types';
-import { LayoutDashboard, ArrowLeftRight, PieChart, Target, TrendingDown, Calendar, Wrench, Settings, Terminal, Palette, Users, PiggyBank, Lightbulb, Zap } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { LayoutDashboard, ArrowLeftRight, PieChart, Target, TrendingDown, Calendar, Wrench, Settings, Terminal, Palette, Users, PiggyBank, Lightbulb, Zap, ChevronRight, ChevronLeft, Search } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useDashboardData } from '../../hooks/useDashboardData';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
+import { cn } from '../../utils/utils';
 
 interface SidebarProps {
   currentView: ViewType;
@@ -23,47 +25,111 @@ const navigation = [
 
 export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView }) => {
   const { isMutating } = useDashboardData();
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   return (
-    <aside className="hidden lg:flex flex-col w-20 hover:w-64 transition-all duration-300 ease-in-out h-full bg-[oklch(var(--card-oklch)_/_0.3)] border-r border-white/5 backdrop-blur-xl z-50 group overflow-hidden">
-      <div className="h-20 flex items-center justify-center group-hover:justify-start group-hover:px-6 shrink-0">
-        <div className={`w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 shadow-lg shadow-cyan-500/20 flex-shrink-0 ${isMutating ? 'animate-pulse' : ''}`} />
-        <span className="ml-3 font-bold text-xl text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-            FinanceHub
-        </span>
-      </div>
+    <TooltipProvider delayDuration={300}>
+        <motion.aside 
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            className={cn(
+                "hidden lg:flex flex-col h-full bg-[oklch(var(--card-oklch)_/_0.3)] border-r border-white/5 backdrop-blur-xl z-50 transition-all duration-300 ease-in-out relative",
+                isCollapsed ? "w-20" : "w-64"
+            )}
+        >
+        <div className={cn("h-20 flex items-center shrink-0 transition-all duration-300", isCollapsed ? "justify-center" : "px-6")}>
+            <div className="relative group cursor-pointer">
+                <div className={`w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 shadow-lg shadow-cyan-500/20 flex-shrink-0 ${isMutating ? 'animate-pulse' : ''}`}>
+                    <div className="absolute inset-0 bg-white/30 rounded-full animate-[shimmer_2s_infinite] opacity-0 group-hover:opacity-100" />
+                </div>
+            </div>
+            <span className={cn(
+                "ml-3 font-bold text-xl text-white transition-all duration-300 whitespace-nowrap overflow-hidden",
+                isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
+            )}>
+                FinanceHub
+            </span>
+        </div>
 
-      <nav className="flex-1 px-3 space-y-2 mt-4">
-        {navigation.map((item) => {
-            const isActive = currentView === item.view;
-            return (
-                <button
-                    key={item.name}
-                    onClick={() => setCurrentView(item.view as ViewType)}
-                    className={`relative w-full flex items-center h-12 rounded-xl transition-all duration-200 group/item overflow-hidden ${isActive ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-                >
-                    {isActive && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-cyan-400 rounded-r-full shadow-[0_0_10px_#22d3ee]" />}
-                    <div className="w-14 flex items-center justify-center flex-shrink-0">
-                        <item.icon className={`w-6 h-6 transition-transform group-hover/item:scale-110 ${isActive ? 'text-cyan-400' : ''}`} />
+        <nav className="flex-1 px-3 space-y-2 mt-4 overflow-y-auto custom-scrollbar overflow-x-hidden">
+            {navigation.map((item) => {
+                const isActive = currentView === item.view;
+                const ButtonContent = (
+                    <motion.button
+                        key={item.name}
+                        onClick={() => setCurrentView(item.view as ViewType)}
+                        whileTap={{ scale: 0.95 }}
+                        className={cn(
+                            "relative w-full flex items-center h-12 rounded-xl transition-all duration-200 group/item overflow-hidden",
+                            isActive ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'
+                        )}
+                    >
+                        {isActive && <motion.div layoutId="active-indicator" className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-cyan-400 rounded-r-full shadow-[0_0_10px_#22d3ee]" />}
+                        <div className="w-14 flex items-center justify-center flex-shrink-0">
+                            <item.icon className={cn("w-6 h-6 transition-transform group-hover/item:scale-110", isActive ? 'text-cyan-400' : '')} />
+                        </div>
+                        <span className={cn(
+                            "transition-all duration-300 font-medium text-sm whitespace-nowrap overflow-hidden",
+                            isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
+                        )}>
+                            {item.name}
+                        </span>
+                    </motion.button>
+                );
+
+                return isCollapsed ? (
+                    <Tooltip key={item.name}>
+                        <TooltipTrigger asChild>
+                            {ButtonContent}
+                        </TooltipTrigger>
+                        <TooltipContent side="right" className="bg-gray-900 border-gray-800 text-white">
+                            {item.name}
+                        </TooltipContent>
+                    </Tooltip>
+                ) : ButtonContent;
+            })}
+        </nav>
+
+        <div className="p-3 mt-auto mb-4 space-y-2">
+            <button 
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                className="w-full flex items-center h-12 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-colors justify-center"
+            >
+                {isCollapsed ? <ChevronRight className="w-5 h-5" /> : (
+                    <div className="flex items-center w-full px-4">
+                        <ChevronLeft className="w-5 h-5 mr-2" />
+                        <span className="text-sm font-medium">Colapsar</span>
                     </div>
-                    <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-medium text-sm whitespace-nowrap">
-                        {item.name}
-                    </span>
-                </button>
-            );
-        })}
-      </nav>
+                )}
+            </button>
 
-      <div className="p-3 mt-auto mb-4 space-y-2">
-         <button onClick={() => setCurrentView('devtools')} className="w-full flex items-center h-12 rounded-xl text-yellow-500/70 hover:text-yellow-400 hover:bg-yellow-500/10 transition-colors">
-             <div className="w-14 flex items-center justify-center flex-shrink-0"><Zap className="w-5 h-5" /></div>
-             <span className="opacity-0 group-hover:opacity-100 transition-opacity font-medium text-sm whitespace-nowrap">DevTools</span>
-         </button>
-         <button onClick={() => setCurrentView('settings')} className="w-full flex items-center h-12 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
-             <div className="w-14 flex items-center justify-center flex-shrink-0"><Settings className="w-5 h-5" /></div>
-             <span className="opacity-0 group-hover:opacity-100 transition-opacity font-medium text-sm whitespace-nowrap">Ajustes</span>
-         </button>
-      </div>
-    </aside>
+            <div className="h-px bg-white/5 my-2 mx-2" />
+
+             <Tooltip>
+                <TooltipTrigger asChild>
+                    <button onClick={() => setCurrentView('devtools')} className="w-full flex items-center h-12 rounded-xl text-yellow-500/70 hover:text-yellow-400 hover:bg-yellow-500/10 transition-colors">
+                        <div className="w-14 flex items-center justify-center flex-shrink-0"><Zap className="w-5 h-5" /></div>
+                        <span className={cn("transition-all duration-300 font-medium text-sm whitespace-nowrap overflow-hidden", isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100")}>DevTools</span>
+                    </button>
+                </TooltipTrigger>
+                {isCollapsed && <TooltipContent side="right">DevTools</TooltipContent>}
+            </Tooltip>
+
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <button onClick={() => setCurrentView('settings')} className="w-full flex items-center h-12 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
+                        <div className="w-14 flex items-center justify-center flex-shrink-0"><Settings className="w-5 h-5" /></div>
+                        <span className={cn("transition-all duration-300 font-medium text-sm whitespace-nowrap overflow-hidden", isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100")}>Ajustes</span>
+                    </button>
+                </TooltipTrigger>
+                {isCollapsed && <TooltipContent side="right">Ajustes</TooltipContent>}
+            </Tooltip>
+            
+             <div className={cn("text-[10px] text-gray-600 text-center mt-2 transition-opacity duration-300", isCollapsed ? "opacity-0" : "opacity-100")}>
+                v4.0.0 Neon Genesis
+            </div>
+        </div>
+        </motion.aside>
+    </TooltipProvider>
   );
 };

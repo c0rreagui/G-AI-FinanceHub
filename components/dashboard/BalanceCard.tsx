@@ -5,21 +5,34 @@ import { Heading, Text } from '../ui/typography';
 import { cn } from '../../utils/utils';
 import { formatCurrency } from '../../utils/formatters';
 import { usePrivacy } from '../../contexts/PrivacyContext';
+import { Eye, EyeOff, TrendingUp, TrendingDown } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
 
 interface BalanceCardProps {
   balance: number;
   className?: string;
+  trend?: number; // Percentage change, e.g., 12.5 or -5.2
 }
 
-export const BalanceCard: React.FC<BalanceCardProps> = ({ balance, className }) => {
-  const { isPrivacyMode } = usePrivacy();
+export const BalanceCard: React.FC<BalanceCardProps> = ({ balance, className, trend = 12.5 }) => {
+  const { isPrivacyMode, togglePrivacy } = usePrivacy();
+  const isPositive = trend >= 0;
 
   return (
-    <Card className={cn("bg-gradient-to-br from-cyan-900/40 to-blue-900/20 !border-cyan-500/30 relative overflow-hidden", className)}>
+    <Card className={cn("bg-gradient-to-br from-cyan-900/40 to-blue-900/20 !border-cyan-500/30 relative overflow-hidden group", className)}>
       <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/20 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
-      <CardHeader className="pb-2">
+      
+      <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
         <CardTitle className="text-sm font-medium text-cyan-200 uppercase tracking-wider">Saldo Total</CardTitle>
+        <button 
+            onClick={togglePrivacy} 
+            className="text-cyan-200/50 hover:text-cyan-200 transition-colors opacity-0 group-hover:opacity-100"
+            title={isPrivacyMode ? "Mostrar valores" : "Ocultar valores"}
+        >
+            {isPrivacyMode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+        </button>
       </CardHeader>
+      
       <CardContent>
         <div 
             className={cn(
@@ -29,6 +42,26 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({ balance, className }) 
             title={isPrivacyMode ? undefined : formatCurrency(balance)}
         >
           <AnimatedCurrency value={balance} />
+        </div>
+
+        <div className="mt-2 flex items-center gap-2">
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <div className={cn(
+                            "flex items-center text-xs font-medium px-2 py-0.5 rounded-full cursor-help",
+                            isPositive ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"
+                        )}>
+                            {isPositive ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
+                            {Math.abs(trend)}%
+                        </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        {isPositive ? "Aumento" : "Queda"} em relação ao mês anterior
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+            <span className="text-xs text-gray-400">vs. mês anterior</span>
         </div>
       </CardContent>
     </Card>
