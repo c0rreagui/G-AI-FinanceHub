@@ -74,6 +74,7 @@ export const Dumbbell = React.memo((props: React.SVGProps<SVGSVGElement>) => <Co
 export const Gamepad = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M14 6L12 8l-2-2","M6 14l-2 2 2 2","m 14 0 2 2 -2 2","M10 18v-4h4v4Z","M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10Z"]} {...props} />);
 export const Film = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M22 6a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z", "M6 2v20", "M18 2v20"]} {...props} />);
 export const TrashIcon = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M3 6h18", "M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2", "M10 11v6", "M14 11v6"]} {...props} />);
+export const Trash2 = TrashIcon;
 export const LinkIcon = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72", "M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"]} {...props} />);
 export const ChevronDown = React.memo((props: React.SVGProps<SVGSVGElement>) => <Icon d="m6 9 6 6 6-6" {...props} />);
 export const AlertTriangle = React.memo((props: React.SVGProps<SVGSVGElement>) => <Icon d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" {...props} /> );

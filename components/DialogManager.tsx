@@ -13,7 +13,7 @@ import { AddIncomeDrawer } from './forms/AddIncomeDrawer';
 import { AddInvestmentDrawer } from './forms/AddInvestmentDrawer';
 import { AchievementsDialog } from './dashboard/AchievementsDialog';
 import { ProfileAnalysisQuiz } from './onboarding/ProfileAnalysisQuiz';
-import { TransactionCommentsDialog } from './social/TransactionCommentsDialog';
+import { ImportTransactionsDialog } from './forms/ImportTransactionsDialog';
 
 export const DialogManager: React.FC = () => {
   const { dialogType, closeDialog, dialogProps } = useDialog();
@@ -55,6 +55,8 @@ export const DialogManager: React.FC = () => {
             onClose={closeDialog}
             {...dialogProps}
         />
+    case 'import-transactions':
+        return <ImportTransactionsDialog isOpen={true} onClose={closeDialog} />;
     case 'achievements':
         return <AchievementsDialog isOpen={true} onClose={closeDialog} />;
     case 'profile-quiz':

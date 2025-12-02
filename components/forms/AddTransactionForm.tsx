@@ -75,6 +75,41 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
     }
   }, [isOpen, transactionToEdit, prefill, isInvestmentMode, categories]);
 
+  // Predictive Categorization
+  useEffect(() => {
+      if (!description || isEditing || categoryId) return;
+
+      const lowerDesc = description.toLowerCase();
+      
+      // 1. Exact match with category name
+      const exactMatch = categories.find(c => lowerDesc.includes(c.name.toLowerCase()));
+      if (exactMatch) {
+          setCategoryId(exactMatch.id);
+          return;
+      }
+
+      // 2. Keyword mapping (Simple heuristic)
+      const keywords: Record<string, string[]> = {
+          'alimentação': ['ifood', 'restaurante', 'mercado', 'burger', 'pizza', 'lanche', 'café'],
+          'transporte': ['uber', '99', 'taxi', 'ônibus', 'metro', 'combustível', 'posto'],
+          'lazer': ['cinema', 'netflix', 'spotify', 'jogo', 'steam'],
+          'saúde': ['farmácia', 'médico', 'hospital', 'exame'],
+          'casa': ['aluguel', 'condomínio', 'luz', 'água', 'internet'],
+          'salário': ['pagamento', 'remuneração', 'freela'],
+      };
+
+      for (const catName in keywords) {
+          if (keywords[catName].some(k => lowerDesc.includes(k))) {
+              const cat = categories.find(c => c.name.toLowerCase() === catName);
+              if (cat) {
+                  setCategoryId(cat.id);
+                  return;
+              }
+          }
+      }
+
+  }, [description, categories, isEditing, categoryId]);
+
   const resetForm = (full = true) => {
       setDescription('');
       setAmount('');

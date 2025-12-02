@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Filter, X } from 'lucide-react';
+import { Search, Filter, X, Calendar } from 'lucide-react';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { DateRangePicker } from '../ui/DateRangePicker';
@@ -7,6 +7,7 @@ import { MultiSelect, Option } from '../ui/MultiSelect';
 import { Category } from '../../types';
 import { Card, CardContent } from '../ui/Card';
 import { Badge } from '../ui/Badge';
+import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, format } from 'date-fns';
 
 interface FilterBarProps {
     searchTerm: string;
@@ -42,12 +43,34 @@ export const FilterBar: React.FC<FilterBarProps> = ({
 
     const hasActiveFilters = startDate || endDate || selectedCategories.length > 0 || typeFilter !== 'all';
 
+    const applyQuickFilter = (type: 'today' | 'week' | 'month') => {
+        const now = new Date();
+        let start, end;
+
+        switch (type) {
+            case 'today':
+                start = startOfDay(now);
+                end = endOfDay(now);
+                break;
+            case 'week':
+                start = startOfWeek(now, { weekStartsOn: 0 }); // Sunday start
+                end = endOfWeek(now, { weekStartsOn: 0 });
+                break;
+            case 'month':
+                start = startOfMonth(now);
+                end = endOfMonth(now);
+                break;
+        }
+
+        onDateChange(format(start, 'yyyy-MM-dd'), format(end, 'yyyy-MM-dd'));
+    };
+
     return (
         <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
             <CardContent className="p-4 space-y-4">
-                <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex flex-col xl:flex-row gap-4">
                     {/* Search */}
-                    <div className="relative flex-grow md:max-w-xs">
+                    <div className="relative flex-grow xl:max-w-xs">
                         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input 
                             placeholder="Buscar transações..." 
@@ -57,16 +80,46 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                         />
                     </div>
 
-                    {/* Date Range */}
-                    <DateRangePicker 
-                        startDate={startDate} 
-                        endDate={endDate} 
-                        onChange={onDateChange}
-                        className="bg-background/50"
-                    />
+                    {/* Quick Filters & Date Range */}
+                    <div className="flex flex-col sm:flex-row gap-2 items-center">
+                        <div className="flex bg-background/50 p-1 rounded-lg border border-input h-10 items-center">
+                            <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-8 px-2 text-xs"
+                                onClick={() => applyQuickFilter('today')}
+                            >
+                                Hoje
+                            </Button>
+                            <div className="w-px h-4 bg-border mx-1" />
+                            <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-8 px-2 text-xs"
+                                onClick={() => applyQuickFilter('week')}
+                            >
+                                Semana
+                            </Button>
+                            <div className="w-px h-4 bg-border mx-1" />
+                            <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-8 px-2 text-xs"
+                                onClick={() => applyQuickFilter('month')}
+                            >
+                                Mês
+                            </Button>
+                        </div>
+                        <DateRangePicker 
+                            startDate={startDate} 
+                            endDate={endDate} 
+                            onChange={onDateChange}
+                            className="bg-background/50 w-full sm:w-auto"
+                        />
+                    </div>
 
                     {/* Categories */}
-                    <div className="flex-grow md:max-w-xs">
+                    <div className="flex-grow xl:max-w-xs w-full">
                         <MultiSelect
                             options={categoryOptions}
                             selected={selectedCategories}
@@ -76,8 +129,8 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                         />
                     </div>
 
-                    {/* Type Toggles (Visual only for now, can be expanded) */}
-                    <div className="flex bg-background/50 p-1 rounded-lg border border-input h-10 items-center">
+                    {/* Type Toggles */}
+                    <div className="flex bg-background/50 p-1 rounded-lg border border-input h-10 items-center w-full sm:w-auto justify-center sm:justify-start">
                         <button
                             onClick={() => onTypeFilterChange('all')}
                             className={`px-3 py-1 text-sm rounded-md transition-all ${typeFilter === 'all' ? 'bg-primary/10 text-primary font-medium' : 'text-muted-foreground hover:text-foreground'}`}
@@ -106,7 +159,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                             variant="ghost" 
                             size="icon"
                             onClick={onClearFilters}
-                            className="text-muted-foreground hover:text-destructive"
+                            className="text-muted-foreground hover:text-destructive shrink-0"
                             title="Limpar filtros"
                         >
                             <X className="h-4 w-4" />
@@ -114,7 +167,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                     )}
                 </div>
                 
-                {/* Active Filters Badges (Optional, for better visibility) */}
+                {/* Active Filters Badges */}
                 {selectedCategories.length > 0 && (
                     <div className="flex flex-wrap gap-2 pt-2 border-t border-border/50">
                         <span className="text-xs text-muted-foreground self-center">Filtros ativos:</span>

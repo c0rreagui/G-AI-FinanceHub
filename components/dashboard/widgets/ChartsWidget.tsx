@@ -16,8 +16,9 @@ export const ChartsWidget: React.FC<ChartsWidgetProps> = ({ monthlyChartData, tr
     const expenseByCategory = transactions
         .filter(t => t.amount < 0)
         .reduce((acc, t) => {
-            const category = t.category || 'Outros';
-            acc[category] = (acc[category] || 0) + Math.abs(t.amount);
+            const category = (t.category as any)?.name || t.category || 'Outros';
+            const categoryName = typeof category === 'string' ? category : 'Outros';
+            acc[categoryName] = (acc[categoryName] || 0) + Math.abs(t.amount);
             return acc;
         }, {} as Record<string, number>);
 

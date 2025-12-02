@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { PageHeader } from '../layout/PageHeader';
-import { ArrowLeftRight, PlusCircle, FolderSync, Search } from '../Icons';
+import { ArrowLeftRight, PlusCircle, FolderSync, Search, Upload, Trash2 } from '../Icons';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { Transaction, ViewType } from '../../types';
 import { Button } from '../ui/Button';
@@ -109,6 +109,24 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
         });
     };
 
+    const handleBulkDelete = () => {
+        openDialog('confirmation', {
+            title: 'Excluir Transações',
+            message: `Tem certeza que deseja excluir ${selectedIds.length} transações? Esta ação não pode ser desfeita.`,
+            confirmText: 'Sim, Excluir Tudo',
+            confirmVariant: 'destructive',
+            onConfirm: async () => {
+                // We need to delete one by one or implement a bulk delete API
+                // For now, let's assume we loop (or if deleteTransaction supported array)
+                // Since deleteTransaction takes a string, we loop. Ideally backend supports bulk.
+                for (const id of selectedIds) {
+                    await deleteTransaction(id);
+                }
+                setSelectedIds([]);
+            },
+        });
+    };
+
     const handleClearFilters = () => {
         setSearchTerm('');
         setTypeFilter('all');
@@ -124,9 +142,14 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                 title="Transações" 
                 breadcrumbs={['FinanceHub', 'Transações']}
                 actions={
-                    <Button onClick={() => openDialog('add-transaction')}>
-                        <PlusCircle className="w-4 h-4 mr-2"/> Nova Transação
-                    </Button>
+                    <Flex gap="sm">
+                        <Button variant="outline" onClick={() => openDialog('import-transactions')}>
+                            <Upload className="w-4 h-4 mr-2"/> Importar
+                        </Button>
+                        <Button onClick={() => openDialog('add-transaction')}>
+                            <PlusCircle className="w-4 h-4 mr-2"/> Nova Transação
+                        </Button>
+                    </Flex>
                 }
             />
 
@@ -153,13 +176,17 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                         <Card className="bg-primary/5 border-primary/20">
                             <CardContent className="p-2 flex justify-between items-center">
                                 <span className="text-sm font-medium ml-2">{selectedIds.length} transações selecionadas</span>
-                                <Button variant="secondary" size="sm" onClick={handleBulkRecategorize}>
-                                    <FolderSync className="w-4 h-4 mr-2" />
-                                    Recategorizar em Massa
-                                </Button>
+                                <div className="flex gap-2">
+                                    <Button variant="secondary" size="sm" onClick={handleBulkRecategorize}>
+                                        <FolderSync className="w-4 h-4 mr-2" />
+                                        Recategorizar
+                                    </Button>
+                                    <Button variant="destructive" size="sm" onClick={handleBulkDelete}>
+                                        <Trash2 className="w-4 h-4 mr-2" />
+                                        Excluir
+                                    </Button>
+                                </div>
                             </CardContent>
-                        </Card>
-                    )}
 
                     {/* Table Area */}
                     <div className="flex-grow overflow-auto rounded-md border bg-card">
