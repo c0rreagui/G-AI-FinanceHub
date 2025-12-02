@@ -6,8 +6,8 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { Badge } from "@/components/ui/badge"
+} from "@/components/ui/Popover"
+import { Badge } from "@/components/ui/Badge"
 
 export type Option = {
   label: string
