@@ -186,7 +186,10 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                                         Excluir
                                     </Button>
                                 </div>
+                                </div>
                             </CardContent>
+                        </Card>
+                    )}
 
                     {/* Table Area */}
                     <div className="flex-grow overflow-auto rounded-md border bg-card">
