@@ -36,7 +36,13 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const [currentTheme, setCurrentTheme] = useState<ThemeColor>(themes[0]);
     const [mode, setMode] = useState<'light' | 'dark'>('dark');
+    const [zenMode, setZenMode] = useState(false);
+    const [greetingName, setGreetingName] = useState('');
+    const [wallpaper, setWallpaper] = useState<string | null>(null);
+    const [density, setDensity] = useState<'compact' | 'comfortable' | 'spacious'>('comfortable');
+    const [hiddenModules, setHiddenModules] = useState<string[]>([]);
 
     // Load saved settings
     useEffect(() => {
