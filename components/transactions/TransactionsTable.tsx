@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
+import { motion, useAnimation, PanInfo } from 'framer-motion';
 import { Transaction, TransactionType } from '../../types';
 import { formatCurrency } from '../../utils/formatters';
 import { Badge } from '../ui/Badge';
@@ -7,7 +8,7 @@ import { Button } from '../ui/Button';
 import { PencilIcon, TrashIcon, LockClosed } from '../Icons';
 import { MessageSquare, ArrowUpDown } from 'lucide-react';
 import { Flex, Box } from '../ui/layout';
-import { Text } from '../ui/typography';
+import { Text } from '../ui/Typography';
 import { Checkbox } from '../ui/Checkbox';
 import { PrivacyMask } from '../ui/PrivacyMask';
 import { DataTable } from '../ui/DataTable';
@@ -35,67 +36,97 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
 }) => {
   const allSelected = transactions.length > 0 && selectedIds.length === transactions.length;
 
-  // Mobile Card View
+  // Mobile Card View with Swipe Actions
   const MobileCard = ({ tx }: { tx: Transaction }) => {
     const isSystem = !!tx.goal_contribution_id || !!tx.debt_payment_id;
     const isExpense = tx.type === TransactionType.DESPESA;
+    const controls = useAnimation();
+    const MotionDiv = motion.div as any;
     
+    const handleDragEnd = async (event: any, info: PanInfo) => {
+        const offset = info.offset.x;
+        const velocity = info.velocity.x;
+
+        if (offset < -100 || velocity < -500) {
+            // Swipe Left -> Delete
+            if (!isSystem && !isMutating(tx.id)) {
+                await controls.start({ x: -500, opacity: 0 });
+                onDelete(tx.id);
+            } else {
+                controls.start({ x: 0 });
+            }
+        } else if (offset > 100 || velocity > 500) {
+            // Swipe Right -> Edit
+            if (!isSystem && !isMutating(tx.id)) {
+                onEdit(tx);
+                controls.start({ x: 0 }); // Reset after triggering edit
+            } else {
+                controls.start({ x: 0 });
+            }
+        } else {
+            controls.start({ x: 0 });
+        }
+    };
+
     return (
-      <div className={`p-4 rounded-xl border border-border bg-card/50 mb-3 ${selectedIds.includes(tx.id) ? 'ring-1 ring-primary bg-primary/5' : ''}`}>
-        <Flex justify="between" align="start" className="mb-3">
-            <Flex align="center" gap="sm">
-                <div 
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-xs border border-border" 
-                    style={{backgroundColor: `${tx.category.color}20`}}
-                >
-                    <tx.category.icon className="w-5 h-5" style={{color: tx.category.color}} />
-                </div>
-                <Box>
-                    <Text weight="bold" className="truncate max-w-[180px] block">{tx.description}</Text>
-                    <Text size="xs" variant="muted">{new Date(tx.date).toLocaleDateString('pt-BR')}</Text>
-                </Box>
+      <div className="relative mb-3 overflow-hidden rounded-xl">
+        {/* Background Actions */}
+        <div className="absolute inset-0 flex items-center justify-between px-4">
+            <div className="flex items-center justify-start w-full h-full bg-blue-500/20 text-blue-500 rounded-xl">
+                <PencilIcon className="w-6 h-6 ml-4" />
+            </div>
+            <div className="absolute inset-0 flex items-center justify-end w-full h-full bg-destructive/20 text-destructive rounded-xl">
+                <TrashIcon className="w-6 h-6 mr-4" />
+            </div>
+        </div>
+
+        {/* Foreground Card */}
+        <MotionDiv 
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.2}
+            onDragEnd={handleDragEnd}
+            animate={controls}
+            className={`relative p-4 rounded-xl border border-border bg-card ${selectedIds.includes(tx.id) ? 'ring-1 ring-primary bg-primary/5' : ''}`}
+            style={{ touchAction: 'pan-y' }} // Allow vertical scroll
+        >
+            <Flex justify="between" align="start" className="mb-3">
+                <Flex align="center" gap="sm">
+                    <div 
+                        className="w-10 h-10 rounded-full flex items-center justify-center text-xs border border-border" 
+                        style={{backgroundColor: `${tx.category.color}20`}}
+                    >
+                        <tx.category.icon className="w-5 h-5" style={{color: tx.category.color}} />
+                    </div>
+                    <Box>
+                        <Text weight="bold" className="truncate max-w-[180px] block">{tx.description}</Text>
+                        <Text size="xs" variant="muted">{new Date(tx.date).toLocaleDateString('pt-BR')}</Text>
+                    </Box>
+                </Flex>
+                <Text weight="bold" size="lg" className={isExpense ? 'text-destructive' : 'text-success'}>
+                    <PrivacyMask>
+                        {isExpense ? '-' : '+'} {formatCurrency(Math.abs(tx.amount))}
+                    </PrivacyMask>
+                </Text>
             </Flex>
-            <Text weight="bold" size="lg" className={isExpense ? 'text-destructive' : 'text-success'}>
-                <PrivacyMask>
-                    {isExpense ? '-' : '+'} {formatCurrency(Math.abs(tx.amount))}
-                </PrivacyMask>
-            </Text>
-        </Flex>
-        
-        <Flex justify="between" align="center" className="pt-3 border-t border-white/5">
-            <Badge variant="outline" className="font-normal text-[10px]">
-                {tx.category.name}
-            </Badge>
             
-            <Flex gap="xs">
-                 <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onComments(tx)}
-                    className="h-8 w-8 text-gray-400 hover:text-white"
-                >
-                    <MessageSquare className="w-4 h-4" />
-                </Button>
-                <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={() => onEdit(tx)}
-                    disabled={isSystem || isMutating(tx.id)}
-                    className="h-8 w-8"
-                >
-                    <PencilIcon className="w-4 h-4" />
-                </Button>
-                <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={() => onDelete(tx.id)}
-                    disabled={isSystem || isMutating(tx.id)}
-                    className="h-8 w-8 text-destructive hover:text-destructive"
-                >
-                    <TrashIcon className="w-4 h-4" />
-                </Button>
+            <Flex justify="between" align="center" className="pt-3 border-t border-white/5">
+                <Badge variant="outline" className="font-normal text-[10px]">
+                    {tx.category.name}
+                </Badge>
+                
+                <Flex gap="xs">
+                     <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => { e.stopPropagation(); onComments(tx); }}
+                        className="h-8 w-8 text-gray-400 hover:text-white"
+                    >
+                        <MessageSquare className="w-4 h-4" />
+                    </Button>
+                </Flex>
             </Flex>
-        </Flex>
+        </MotionDiv>
       </div>
     );
   };
@@ -105,7 +136,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
       id: "select",
       header: ({ table }) => (
         <Checkbox
-          checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
+          checked={(table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")) as boolean | "indeterminate"}
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
         />

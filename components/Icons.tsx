@@ -58,6 +58,7 @@ export const MoreHorizontal = React.memo((props: React.SVGProps<SVGSVGElement>) 
 export const Trophy = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M6 9H4.5a2.5 2.5 0 0 1 0-5H6", "M18 9h1.5a2.5 2.5 0 0 0 0-5H18", "M4 22h16", "M10 14.66V22", "M14 14.66V22", "M8 4v.5", "M16 4v.5", "M12 6V2"]} {...props} />);
 export const LockClosed = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M7 11V7a5 5 0 0 1 10 0v4", "M2 11h20", "M3 22h18"]} {...props} />);
 export const UploadCloud = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242", "m 12 12 -4 -4 -4 4", "M12 12v9"]} {...props} />);
+export const Upload = UploadCloud;
 export const ArrowDownLeft = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M17 7 7 17", "M17 17H7V7"]} {...props} />);
 export const ArrowUpRight = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M7 17 17 7", "M17 17V7H7"]} {...props} />);
 export const Wallet = React.memo((props: React.SVGProps<SVGSVGElement>) => <CompoundIcon paths={["M21 12V7H5a2 2 0 0 1 0-4h14a2 2 0 0 1 2 2v4","M1 12v2a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2v-2","M1 12h22"]} {...props} />);

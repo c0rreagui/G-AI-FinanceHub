@@ -52,6 +52,7 @@ export const ExpenseDonutChart: React.FC<ExpenseDonutChartProps> = ({ data }) =>
               outerRadius={80}
               paddingAngle={5}
               dataKey="value"
+              nameKey="name"
             >
               {data.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
