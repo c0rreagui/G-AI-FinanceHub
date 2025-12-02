@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { motion, useAnimation, PanInfo } from 'framer-motion';
-import { Transaction, TransactionType } from '../../types';
+import { Transaction, TransactionType, TransactionStatus } from '../../types';
 import { formatCurrency } from '../../utils/formatters';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
@@ -13,13 +13,17 @@ import { Checkbox } from '../ui/Checkbox';
 import { PrivacyMask } from '../ui/PrivacyMask';
 import { DataTable } from '../ui/DataTable';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
+import { GroupBy, TransactionGroup } from '../../utils/dateGrouping';
 
 interface TransactionsTableProps {
   transactions: Transaction[];
+  groupBy?: GroupBy;
+  groupedData?: TransactionGroup[];
   selectedIds: string[];
   onSelect: (id: string) => void;
   onSelectAll: () => void;
   onEdit: (transaction: Transaction) => void;
+  onDuplicate: (transaction: Transaction) => void;
   onDelete: (id: string) => void;
   onComments: (transaction: Transaction) => void;
   isMutating: (id: string) => boolean;
@@ -27,15 +31,68 @@ interface TransactionsTableProps {
 
 export const TransactionsTable: React.FC<TransactionsTableProps> = ({
   transactions,
+  groupBy,
+  groupedData,
   selectedIds,
   onSelect,
   onSelectAll,
   onEdit,
+  onDuplicate,
   onDelete,
   onComments,
   isMutating,
 }) => {
   const allSelected = transactions.length > 0 && selectedIds.length === transactions.length;
+
+  // Render grouped view if grouping is enabled (Item 118)
+  if (groupBy && groupBy !== 'none' && groupedData && groupedData.length > 0) {
+    return (
+      <div className="w-full">
+        {groupedData.map((group) => (
+          <div key={group.dateKey} className="mb-4">
+            {/* Group Header */}
+            <div className="sticky top-0 z-10 bg-secondary/80 backdrop-blur-sm border-b border-border px-4 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <h3 className="font-semibold text-foreground">{group.dateLabel}</h3>
+                <Badge variant="secondary" className="text-xs">
+                  {group.transactions.length} {group.transactions.length === 1 ? 'transação' : 'transações'}
+                </Badge>
+              </div>
+              <div className="flex items-center gap-4 text-sm">
+                {group.totalIncome > 0 && (
+                  <span className="text-success font-mono">
+                    <PrivacyMask>+{formatCurrency(group.totalIncome)}</PrivacyMask>
+                  </span>
+                )}
+                {group.totalExpense > 0 && (
+                  <span className="text-destructive font-mono">
+                    <PrivacyMask>-{formatCurrency(group.totalExpense)}</PrivacyMask>
+                  </span>
+                )}
+                <span className={`font-bold font-mono ${group.netTotal >= 0 ? 'text-success' : 'text-destructive'}`}>
+                  <PrivacyMask>{group.netTotal >= 0 ? '+' : ''}{formatCurrency(group.netTotal)}</PrivacyMask>
+                </span>
+              </div>
+            </div>
+            
+            {/* Render group's transactions */}
+            <TransactionsTable 
+              transactions={group.transactions}
+              groupBy="none"
+              selectedIds={selectedIds}
+              onSelect={onSelect}
+              onSelectAll={onSelectAll}
+              onEdit={onEdit}
+              onDuplicate={onDuplicate}
+              onDelete={onDelete}
+              onComments={onComments}
+              isMutating={isMutating}
+            />
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   // Mobile Card View with Swipe Actions
   const MobileCard = ({ tx }: { tx: Transaction }) => {

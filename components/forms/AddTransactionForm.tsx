@@ -40,6 +40,8 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
   const [categoryId, setCategoryId] = useState('');
   const [accountId, setAccountId] = useState('');
   const [status, setStatus] = useState<TransactionStatus>(TransactionStatus.COMPLETED);
+  const [excludeFromReports, setExcludeFromReports] = useState(false);
+  const [reconciled, setReconciled] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isListening, setIsListening] = useState(false);
   
@@ -126,6 +128,8 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
           setCategoryId('');
           setAccountId('');
           setStatus(TransactionStatus.COMPLETED);
+          setExcludeFromReports(false);
+          setReconciled(false);
           setIsRecurring(false);
           setFrequency(ScheduledTransactionFrequency.MENSAL);
       }
@@ -184,6 +188,8 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                   notes,
                   account_id: accountId,
                   status,
+                  exclude_from_reports: excludeFromReports,
+                  reconciled,
               };
 
               if (!isEditing) {

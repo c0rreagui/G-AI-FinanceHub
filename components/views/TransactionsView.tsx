@@ -9,6 +9,7 @@ import { TransactionsViewSkeleton } from './skeletons/TransactionsViewSkeleton';
 import { EmptyState } from '../ui/EmptyState';
 import { TransactionsTable } from '../transactions/TransactionsTable';
 import { FilterBar } from '../transactions/FilterBar';
+import { groupTransactionsByDate, GroupBy } from '../../utils/dateGrouping';
 
 import { Input } from '../ui/Input';
 import { Tabs, TabsList, TabsTrigger } from '../ui/Tabs';
@@ -46,6 +47,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
     const [endDate, setEndDate] = useState<string | null>(null);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
+    const [groupBy, setGroupBy] = useState<GroupBy>('none');
 
     const filteredTransactions = useMemo(() => {
         return transactions.filter(tx => {
@@ -112,6 +114,22 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
 
     const handleEdit = (transaction: Transaction) => {
         openDialog('add-transaction', { transactionToEdit: transaction });
+    };
+
+    const handleDuplicate = (transaction: Transaction) => {
+        openDialog('add-transaction', { 
+            prefill: {
+                type: transaction.type,
+                description: `${transaction.description} (cópia)`,
+                amount: Math.abs(transaction.amount),
+                category_id: transaction.category_id,
+                notes: transaction.notes,
+                account_id: transaction.account_id,
+                status: transaction.status,
+                exclude_from_reports: transaction.exclude_from_reports,
+                reconciled: false,
+            }
+        });
     };
 
     const handleDelete = (transactionId: string) => {
@@ -214,17 +232,35 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                                 </div>
                             </CardContent>
                         </Card>
-                    )}
+                    )}\n\n                    {/* Date Grouping Control (Item 118) */}
+                    <div className="flex items-center gap-3 px-1 mb-2">
+                        <label className="text-sm font-medium text-muted-foreground">
+                            Agrupar por:
+                        </label>
+                        <select
+                            value={groupBy}
+                            onChange={(e) => setGroupBy(e.target.value as GroupBy)}
+                            className="bg-background border border-input rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        >
+                            <option value="none">Sem agrupamento</option>
+                            <option value="day">Dia</option>
+                            <option value="week">Semana</option>
+                            <option value="month">Mês</option>
+                        </select>
+                    </div>
 
                     {/* Table Area */}
                     <div className="flex-grow overflow-auto rounded-md border bg-card">
                         {filteredTransactions.length > 0 ? (
                             <TransactionsTable 
                                 transactions={filteredTransactions}
+                                groupBy={groupBy}
+                                groupedData={groupBy !== 'none' ? groupTransactionsByDate(filteredTransactions, groupBy) : []}
                                 selectedIds={selectedIds}
                                 onSelect={handleSelect}
                                 onSelectAll={handleSelectAll}
                                 onEdit={handleEdit}
+                                onDuplicate={handleDuplicate}
                                 onDelete={handleDelete}
                                 onComments={(tx) => openDialog('transaction-comments', { transaction: tx })}
                                 isMutating={(id) => mutatingIds.has(id)}
