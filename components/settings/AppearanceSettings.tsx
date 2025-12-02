@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { useTheme, themes } from '../../contexts/ThemeContext';
-import { Palette, Monitor, User, Image as ImageIcon, Layout } from 'lucide-react';
+import { Palette, Monitor, User, Image as ImageIcon, Layout, Sun, Moon } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const AppearanceSettings: React.FC = () => {
@@ -13,7 +13,8 @@ export const AppearanceSettings: React.FC = () => {
         greetingName, setGreetingName,
         wallpaper, setWallpaper,
         density, setDensity,
-        hiddenModules, toggleModuleVisibility
+        hiddenModules, toggleModuleVisibility,
+        mode, toggleMode
     } = useTheme();
 
     const wallpapers = [
@@ -54,6 +55,42 @@ export const AppearanceSettings: React.FC = () => {
                                 <span className="text-sm font-medium text-white">{theme.name}</span>
                             </button>
                         ))}
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Modo de Aparência */}
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <Sun className="w-5 h-5 text-primary" />
+                        Modo de Aparência
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid grid-cols-2 gap-4">
+                        <button
+                            onClick={() => mode === 'dark' && toggleMode()}
+                            className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
+                                mode === 'light'
+                                    ? 'border-primary bg-primary/10'
+                                    : 'border-transparent bg-white/5 hover:bg-white/10'
+                            }`}
+                        >
+                            <Sun className="w-8 h-8 text-yellow-500" />
+                            <span className="text-sm font-medium text-white">Claro</span>
+                        </button>
+                        <button
+                            onClick={() => mode === 'light' && toggleMode()}
+                            className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
+                                mode === 'dark'
+                                    ? 'border-primary bg-primary/10'
+                                    : 'border-transparent bg-white/5 hover:bg-white/10'
+                            }`}
+                        >
+                            <Moon className="w-8 h-8 text-indigo-400" />
+                            <span className="text-sm font-medium text-white">Escuro</span>
+                        </button>
                     </div>
                 </CardContent>
             </Card>

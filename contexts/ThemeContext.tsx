@@ -19,6 +19,8 @@ export const themes: ThemeColor[] = [
 interface ThemeContextType {
     currentTheme: ThemeColor;
     setTheme: (themeName: string) => void;
+    mode: 'light' | 'dark';
+    toggleMode: () => void;
     zenMode: boolean;
     toggleZenMode: () => void;
     greetingName: string;
@@ -34,12 +36,7 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [currentTheme, setCurrentTheme] = useState<ThemeColor>(themes[0]);
-    const [zenMode, setZenMode] = useState(false);
-    const [greetingName, setGreetingName] = useState('');
-    const [wallpaper, setWallpaper] = useState<string | null>(null);
-    const [density, setDensity] = useState<'compact' | 'comfortable' | 'spacious'>('comfortable');
-    const [hiddenModules, setHiddenModules] = useState<string[]>([]);
+    const [mode, setMode] = useState<'light' | 'dark'>('dark');
 
     // Load saved settings
     useEffect(() => {
@@ -47,6 +44,13 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (savedTheme) {
             const found = themes.find(t => t.name === savedTheme);
             if (found) setCurrentTheme(found);
+        }
+
+        const savedMode = localStorage.getItem('financehub_mode');
+        if (savedMode) {
+            setMode(savedMode as 'light' | 'dark');
+        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+            setMode('light');
         }
 
         const savedZen = localStorage.getItem('financehub_zen_mode');
@@ -65,7 +69,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (savedHiddenModules) setHiddenModules(JSON.parse(savedHiddenModules));
     }, []);
 
-    // Apply Theme
+    // Apply Theme & Mode
     useEffect(() => {
         const root = document.documentElement;
         root.style.setProperty('--primary', currentTheme.primary);
@@ -75,15 +79,24 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         // Also update ring to match primary
         root.style.setProperty('--ring', currentTheme.primary);
         
-        // Enforce dark mode
-        root.classList.add('dark');
-
+        // Apply Mode
+        if (mode === 'dark') {
+            root.classList.add('dark');
+        } else {
+            root.classList.remove('dark');
+        }
+        
         localStorage.setItem('financehub_theme', currentTheme.name);
-    }, [currentTheme]);
+        localStorage.setItem('financehub_mode', mode);
+    }, [currentTheme, mode]);
 
     const setTheme = (themeName: string) => {
         const theme = themes.find(t => t.name === themeName);
         if (theme) setCurrentTheme(theme);
+    };
+
+    const toggleMode = () => {
+        setMode(prev => prev === 'dark' ? 'light' : 'dark');
     };
 
     const toggleZenMode = () => {
@@ -122,6 +135,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         <ThemeContext.Provider value={{
             currentTheme,
             setTheme,
+            mode,
+            toggleMode,
             zenMode,
             toggleZenMode,
             greetingName,
