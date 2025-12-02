@@ -29,7 +29,10 @@ interface GreetingHeaderProps {
     setCurrentView?: (view: ViewType) => void;
 }
 
+import { useTheme } from '../../contexts/ThemeContext';
+
 export const GreetingHeader: React.FC<GreetingHeaderProps> = ({ user, setCurrentView }) => {
+    const { greetingName } = useTheme();
     const [greeting, setGreeting] = useState('');
     const [icon, setIcon] = useState<React.ReactNode>(null);
     const today = new Date();
@@ -64,7 +67,7 @@ export const GreetingHeader: React.FC<GreetingHeaderProps> = ({ user, setCurrent
                 </div>
                 <div>
                     <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-2">
-                        <TypingEffect text={`${greeting}, ${user?.name || 'Dev'}!`} /> {icon}
+                        <TypingEffect text={`${greeting}, ${greetingName || user?.user_metadata?.name || user?.name || 'Dev'}!`} /> {icon}
                     </h1>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                          <span className="capitalize">{dateStr}</span>

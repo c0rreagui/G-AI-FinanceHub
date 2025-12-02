@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ChevronDown, Bell, Search, User, LogOut, Settings, Command } from 'lucide-react';
 import { PrivacyToggle } from '../ui/PrivacyMask';
 import { useAuth } from '../../hooks/useAuth';
+import { useTheme } from '../../contexts/ThemeContext';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/Avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
@@ -16,7 +17,8 @@ interface PageHeaderProps {
 }
 
 export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs = [], actions }) => {
-  const { user, signOut } = useAuth();
+  const { user, logout } = useAuth();
+  const { greetingName } = useTheme();
   const [greeting, setGreeting] = useState({ text: 'Bem-vindo', icon: '👋' });
 
   useEffect(() => {
@@ -51,7 +53,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs
           <div>
              <h1 className="text-3xl font-bold tracking-tight text-white">{title}</h1>
              <p className="text-sm text-gray-400 flex items-center gap-2">
-                <span>{greeting.icon} {greeting.text}, <span className="text-cyan-400 font-medium">{user?.user_metadata?.name || 'Visitante'}</span></span>
+                <span>{greeting.icon} {greeting.text}, <span className="text-cyan-400 font-medium">{greetingName || user?.user_metadata?.name || 'Visitante'}</span></span>
              </p>
           </div>
         </div>
@@ -73,9 +75,9 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs
          <TooltipProvider>
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <button className="relative w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-colors border border-white/5">
+                    <button className="relative w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-colors border border-white/5 overflow-visible">
                         <Search className="w-5 h-5" />
-                        <span className="absolute -bottom-1 -right-1 bg-gray-800 text-[10px] px-1 rounded border border-gray-700 text-gray-400 flex items-center gap-0.5">
+                        <span className="absolute -bottom-2 -right-2 bg-gray-800 text-[9px] px-1 rounded border border-gray-700 text-gray-400 flex items-center gap-0.5 shadow-sm z-10">
                             <Command className="w-2 h-2" />K
                         </span>
                     </button>
@@ -124,7 +126,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs
                     </button>
                     <div className="h-px bg-white/10 my-1" />
                     <button 
-                        onClick={signOut}
+                        onClick={logout}
                         className="flex items-center gap-2 px-2 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-md transition-colors w-full text-left"
                     >
                         <LogOut className="w-4 h-4" /> Sair

@@ -75,6 +75,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         // Also update ring to match primary
         root.style.setProperty('--ring', currentTheme.primary);
         
+        // Enforce dark mode
+        root.classList.add('dark');
+
         localStorage.setItem('financehub_theme', currentTheme.name);
     }, [currentTheme]);
 
