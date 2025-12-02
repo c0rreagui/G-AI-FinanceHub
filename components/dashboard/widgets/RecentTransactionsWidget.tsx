@@ -15,7 +15,7 @@ export const RecentTransactionsWidget: React.FC<RecentTransactionsWidgetProps> =
         <Card className="h-full">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle>Últimas Atividades</CardTitle>
-                <Button variant="ghost" size="sm" onClick={() => setCurrentView('transactions')} className="text-xs text-cyan-400 hover:text-cyan-300 h-8">
+                <Button variant="ghost" size="sm" onClick={() => setCurrentView('transactions')} className="text-xs text-primary hover:text-primary/80 h-8">
                     Ver todas
                 </Button>
             </CardHeader>

@@ -26,12 +26,12 @@ export const MonthlyChallengesCard: React.FC = () => {
                     return (
                         <div key={challenge.id} className="space-y-1">
                             <div className="flex justify-between items-center text-sm">
-                                <span className={isCompleted ? 'text-green-400 font-medium' : 'text-gray-300'}>
+                                <span className={isCompleted ? 'text-green-500 font-medium' : 'text-foreground'}>
                                     {challenge.title}
                                 </span>
-                                {isCompleted && <CheckCircle className="w-4 h-4 text-green-400" />}
+                                {isCompleted && <CheckCircle className="w-4 h-4 text-green-500" />}
                             </div>
-                            <p className="text-xs text-gray-500 mb-1">{challenge.description}</p>
+                            <p className="text-xs text-muted-foreground mb-1">{challenge.description}</p>
                             <Progress value={progress} className="h-2" indicatorClassName={isCompleted ? 'bg-green-500' : 'bg-yellow-500'} />
                             <div className="flex justify-between text-xs text-gray-500 mt-1">
                                 <span>{challenge.unit === 'currency' ? `R$ ${current.toFixed(0)}` : current} / {challenge.unit === 'currency' ? `R$ ${challenge.target}` : challenge.target}</span>

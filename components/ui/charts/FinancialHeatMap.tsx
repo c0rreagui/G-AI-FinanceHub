@@ -59,7 +59,7 @@ export const FinancialHeatMap: React.FC<FinancialHeatMapProps> = ({ transactions
     const weekDays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
     return (
-        <div className="card h-full flex flex-col min-h-[340px] bg-card border border-border rounded-2xl p-4 relative overflow-hidden shadow-sm">
+        <div className="h-full flex flex-col min-h-[340px] bg-card border border-border rounded-2xl p-4 relative overflow-hidden shadow-sm">
              {/* Background Glow */}
              <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
 

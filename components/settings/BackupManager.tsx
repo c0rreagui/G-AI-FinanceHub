@@ -67,12 +67,12 @@ export const BackupManager: React.FC = () => {
         <Card>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                    <Database className="w-5 h-5 text-cyan-400" />
+                    <Database className="w-5 h-5 text-primary" />
                     Backup e Dados
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-muted-foreground">
                     Exporte seus dados para segurança ou transfira para outro dispositivo.
                 </p>
                 <div className="flex gap-4">

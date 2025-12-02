@@ -16,7 +16,7 @@ export const TransactionRow: React.FC<TransactionRowProps> = ({ tx }) => {
     const isPending = new Date(tx.date) > new Date();
 
     return (
-        <div className="flex items-center justify-between p-3 hover:bg-white/5 rounded-xl transition-colors group cursor-default">
+        <div className="flex items-center justify-between p-3 hover:bg-muted/50 rounded-xl transition-colors group cursor-default">
             <div className="flex items-center gap-3">
                 <div 
                     className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110" 
@@ -29,7 +29,7 @@ export const TransactionRow: React.FC<TransactionRowProps> = ({ tx }) => {
                     )}
                 </div>
                 <div>
-                    <Text size="sm" weight="medium" className="text-white group-hover:text-cyan-200 transition-colors">{tx.description}</Text>
+                    <Text size="sm" weight="medium" className="text-foreground group-hover:text-primary transition-colors">{tx.description}</Text>
                     <div className="flex items-center gap-2">
                         <Text size="xs" variant="muted" className="capitalize">{formatRelativeTime(tx.date)}</Text>
                         <TooltipProvider>

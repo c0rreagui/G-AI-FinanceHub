@@ -63,7 +63,7 @@ export const Sheet: React.FC<SheetProps> = ({ isOpen, onClose, title, children, 
                         animate="visible"
                         exit="hidden"
                         variants={overlayVariants}
-                        {...({ className: "fixed inset-0 bg-black/60 backdrop-blur-sm z-50", onClick: onClose } as any)}
+                        {...({ className: "fixed inset-0 bg-background/80 backdrop-blur-sm z-50", onClick: onClose } as any)}
                     />
 
                     {/* Content */}

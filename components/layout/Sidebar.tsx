@@ -33,18 +33,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             className={cn(
-                "hidden lg:flex flex-col h-full bg-[oklch(var(--card-oklch)_/_0.3)] border-r border-white/5 backdrop-blur-xl z-50 transition-all duration-300 ease-in-out relative",
+                "hidden lg:flex flex-col h-full bg-card/30 border-r border-border backdrop-blur-xl z-50 transition-all duration-300 ease-in-out relative",
                 isCollapsed ? "w-20" : "w-64"
             )}
         >
         <div className={cn("h-20 flex items-center shrink-0 transition-all duration-300", isCollapsed ? "justify-center" : "px-6")}>
             <div className="relative group cursor-pointer">
-                <div className={`w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 shadow-lg shadow-cyan-500/20 flex-shrink-0 ${isMutating ? 'animate-pulse' : ''}`}>
+                <div className={`w-8 h-8 rounded-full bg-gradient-to-br from-primary to-blue-600 shadow-lg shadow-primary/20 flex-shrink-0 ${isMutating ? 'animate-pulse' : ''}`}>
                     <div className="absolute inset-0 bg-white/30 rounded-full animate-[shimmer_2s_infinite] opacity-0 group-hover:opacity-100" />
                 </div>
             </div>
             <span className={cn(
-                "ml-3 font-bold text-xl text-white transition-all duration-300 whitespace-nowrap overflow-hidden",
+                "ml-3 font-bold text-xl text-foreground transition-all duration-300 whitespace-nowrap overflow-hidden",
                 isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
             )}>
                 FinanceHub
@@ -61,12 +61,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
                         whileTap={{ scale: 0.95 }}
                         className={cn(
                             "relative w-full flex items-center h-12 rounded-xl transition-all duration-200 group/item overflow-hidden",
-                            isActive ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'
+                            isActive ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                         )}
                     >
-                        {isActive && <motion.div layoutId="active-indicator" className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-cyan-400 rounded-r-full shadow-[0_0_10px_#22d3ee]" />}
+                        {isActive && <motion.div layoutId="active-indicator" className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full shadow-[0_0_10px_var(--primary)]" />}
                         <div className="w-14 flex items-center justify-center flex-shrink-0">
-                            <item.icon className={cn("w-6 h-6 transition-transform group-hover/item:scale-110", isActive ? 'text-cyan-400' : '')} />
+                            <item.icon className={cn("w-6 h-6 transition-transform group-hover/item:scale-110", isActive ? 'text-primary' : '')} />
                         </div>
                         <span className={cn(
                             "transition-all duration-300 font-medium text-sm whitespace-nowrap overflow-hidden",
@@ -82,7 +82,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
                         <TooltipTrigger asChild>
                             {ButtonContent}
                         </TooltipTrigger>
-                        <TooltipContent side="right" className="bg-gray-900 border-gray-800 text-white">
+                        <TooltipContent side="right" className="bg-popover border-border text-popover-foreground">
                             {item.name}
                         </TooltipContent>
                     </Tooltip>
@@ -93,7 +93,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
         <div className="p-3 mt-auto mb-4 space-y-2">
             <button 
                 onClick={() => setIsCollapsed(!isCollapsed)}
-                className="w-full flex items-center h-12 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-colors justify-center"
+                className="w-full flex items-center h-12 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors justify-center"
             >
                 {isCollapsed ? <ChevronRight className="w-5 h-5" /> : (
                     <div className="flex items-center w-full px-4">
@@ -103,7 +103,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
                 )}
             </button>
 
-            <div className="h-px bg-white/5 my-2 mx-2" />
+            <div className="h-px bg-border my-2 mx-2" />
 
              <Tooltip>
                 <TooltipTrigger asChild>
@@ -117,7 +117,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
 
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <button onClick={() => setCurrentView('settings')} className="w-full flex items-center h-12 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
+                    <button onClick={() => setCurrentView('settings')} className="w-full flex items-center h-12 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
                         <div className="w-14 flex items-center justify-center flex-shrink-0"><Settings className="w-5 h-5" /></div>
                         <span className={cn("transition-all duration-300 font-medium text-sm whitespace-nowrap overflow-hidden", isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100")}>Ajustes</span>
                     </button>
@@ -125,7 +125,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
                 {isCollapsed && <TooltipContent side="right">Ajustes</TooltipContent>}
             </Tooltip>
             
-             <div className={cn("text-[10px] text-gray-600 text-center mt-2 transition-opacity duration-300", isCollapsed ? "opacity-0" : "opacity-100")}>
+             <div className={cn("text-[10px] text-muted-foreground text-center mt-2 transition-opacity duration-300", isCollapsed ? "opacity-0" : "opacity-100")}>
                 v4.0.0 Neon Genesis
             </div>
         </div>

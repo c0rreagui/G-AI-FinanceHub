@@ -28,12 +28,12 @@ export const BudgetSettings: React.FC = () => {
         <Card>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                    <Wallet className="w-5 h-5 text-green-400" />
+                    <Wallet className="w-5 h-5 text-primary" />
                     Limite de Gastos Mensal
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-muted-foreground">
                     Defina um teto para seus gastos mensais. Avisaremos se você tentar adicionar uma despesa que ultrapasse esse valor.
                 </p>
                 <div className="flex gap-4 items-end">

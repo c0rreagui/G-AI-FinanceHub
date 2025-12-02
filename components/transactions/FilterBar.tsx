@@ -87,14 +87,14 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                         <div className="w-px h-4 bg-border mx-1" />
                         <button
                             onClick={() => onTypeFilterChange('receita')}
-                            className={`px-3 py-1 text-sm rounded-md transition-all ${typeFilter === 'receita' ? 'bg-emerald-500/10 text-emerald-500 font-medium' : 'text-muted-foreground hover:text-foreground'}`}
+                            className={`px-3 py-1 text-sm rounded-md transition-all ${typeFilter === 'receita' ? 'bg-success/10 text-success font-medium' : 'text-muted-foreground hover:text-foreground'}`}
                         >
                             Receitas
                         </button>
                         <div className="w-px h-4 bg-border mx-1" />
                         <button
                             onClick={() => onTypeFilterChange('despesa')}
-                            className={`px-3 py-1 text-sm rounded-md transition-all ${typeFilter === 'despesa' ? 'bg-rose-500/10 text-rose-500 font-medium' : 'text-muted-foreground hover:text-foreground'}`}
+                            className={`px-3 py-1 text-sm rounded-md transition-all ${typeFilter === 'despesa' ? 'bg-destructive/10 text-destructive font-medium' : 'text-muted-foreground hover:text-foreground'}`}
                         >
                             Despesas
                         </button>

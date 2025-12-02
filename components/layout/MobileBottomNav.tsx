@@ -47,12 +47,12 @@ const NavItem: React.FC<NavItemProps> = ({ name, view, icon: Icon, isActive, onC
       aria-label={name}
       aria-current={isActive ? 'page' : undefined}
     >
-      <Icon className={`w-6 h-6 transition-colors ${isActive ? 'text-cyan-400' : 'text-gray-400'}`} />
-      <span className={`transition-colors ${isActive ? 'text-white' : 'text-gray-400'}`}>{name}</span>
+      <Icon className={`w-6 h-6 transition-colors ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
+      <span className={`transition-colors ${isActive ? 'text-foreground' : 'text-muted-foreground'}`}>{name}</span>
       {isActive && (
         <motion.div
           layoutId="mobile-active-nav"
-          className="absolute -bottom-2 h-1 w-8 bg-cyan-500 rounded-full"
+          className="absolute -bottom-2 h-1 w-8 bg-primary rounded-full"
         />
       )}
     </button>
@@ -94,7 +94,7 @@ const SpeedDial: React.FC = () => {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
-                          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+                          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40"
                           onClick={toggleOpen}
                         />
                         <div className="absolute bottom-24 flex flex-col items-center gap-4 z-50">
@@ -106,10 +106,10 @@ const SpeedDial: React.FC = () => {
                                     exit={{ opacity: 0, y: 50, transition: { duration: 0.15 } }}
                                     className="flex items-center gap-3 w-40 justify-end"
                                 >
-                                    <span className="bg-[oklch(var(--card-oklch))] text-white text-xs font-semibold px-2 py-1 rounded-md shadow-lg">{action.label}</span>
+                                    <span className="bg-card text-foreground text-xs font-semibold px-2 py-1 rounded-md shadow-lg border border-border">{action.label}</span>
                                     <button 
                                       onClick={action.onClick} 
-                                      className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center shadow-lg"
+                                      className="w-12 h-12 rounded-full bg-popover backdrop-blur-md border border-border text-popover-foreground flex items-center justify-center shadow-lg hover:bg-muted/50"
                                       aria-label={action.ariaLabel}
                                     >
                                         <action.icon className="w-6 h-6" />
@@ -122,7 +122,7 @@ const SpeedDial: React.FC = () => {
             </AnimatePresence>
             <motion.button 
                 onClick={toggleOpen}
-                className="relative z-50 flex items-center justify-center w-14 h-14 bg-gradient-to-r from-cyan-500 to-green-500 rounded-full text-white shadow-lg -translate-y-4"
+                className="relative z-50 flex items-center justify-center w-14 h-14 bg-gradient-to-r from-primary to-blue-600 rounded-full text-primary-foreground shadow-lg -translate-y-4"
                 whileTap={{ scale: 0.9 }}
                 animate={isOpen ? "open" : "closed"}
                 aria-label={isOpen ? "Fechar ações rápidas" : "Abrir ações rápidas"}
@@ -175,7 +175,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ currentView, s
                 animate={{ y: 0 }}
                 exit={{ y: 100 }}
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
-                className="fixed bottom-0 left-0 right-0 h-20 bg-[oklch(var(--background-oklch)_/_0.75)] backdrop-blur-xl border-t border-[oklch(var(--border-oklch))] z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.2)]"
+                className="fixed bottom-0 left-0 right-0 h-20 bg-background/80 backdrop-blur-xl border-t border-border z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]"
             >
                 <div className="grid grid-cols-5 h-full items-center">
                     <NavItem 
@@ -220,7 +220,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ currentView, s
                 <button
                     key={item.view}
                     onClick={() => handleMoreItemClick(item.view)}
-                    className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl text-gray-300 transition-colors ${item.view === 'devtools' ? 'bg-yellow-500/10 hover:bg-yellow-500/20' : 'bg-white/5 hover:bg-white/10'}`}
+                    className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl text-muted-foreground transition-colors ${item.view === 'devtools' ? 'bg-yellow-500/10 hover:bg-yellow-500/20' : 'bg-muted/50 hover:bg-muted'}`}
                 >
                     <item.icon className={`w-8 h-8 ${item.view === 'devtools' ? 'text-yellow-400' : ''}`} />
                     <span className="text-sm font-medium">{item.name}</span>

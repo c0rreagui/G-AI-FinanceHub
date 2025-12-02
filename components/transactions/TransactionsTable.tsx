@@ -47,11 +47,11 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
     const isExpense = tx.type === TransactionType.DESPESA;
     
     return (
-      <div className={`p-4 rounded-xl border border-white/5 bg-card/50 mb-3 ${selectedIds.includes(tx.id) ? 'ring-1 ring-primary bg-primary/5' : ''}`}>
+      <div className={`p-4 rounded-xl border border-border bg-card/50 mb-3 ${selectedIds.includes(tx.id) ? 'ring-1 ring-primary bg-primary/5' : ''}`}>
         <Flex justify="between" align="start" className="mb-3">
             <Flex align="center" gap="sm">
                 <div 
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-xs border border-white/10" 
+                    className="w-10 h-10 rounded-full flex items-center justify-center text-xs border border-border" 
                     style={{backgroundColor: `${tx.category.color}20`}}
                 >
                     <tx.category.icon className="w-5 h-5" style={{color: tx.category.color}} />
@@ -130,7 +130,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
         <div className="max-h-[600px] overflow-auto relative">
             <Table>
                 <TableHeader className="sticky top-0 z-10 bg-card shadow-sm">
-                <TableRow className="hover:bg-transparent border-b border-white/10">
+                <TableRow className="hover:bg-transparent border-b border-border">
                     <TableHead className="w-[50px]">
                     <Checkbox 
                         checked={allSelected}
@@ -154,7 +154,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                     <TableRow 
                         key={tx.id} 
                         data-state={selectedIds.includes(tx.id) ? "selected" : undefined}
-                        className="even:bg-muted/20 hover:bg-muted/40 transition-colors border-b border-white/5"
+                        className="even:bg-muted/20 hover:bg-muted/40 transition-colors border-b border-border"
                     >
                         <TableCell>
                         <Checkbox 
@@ -206,7 +206,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => onComments(tx)}
-                                    className="h-8 w-8 text-gray-400 hover:text-white"
+                                    className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                 >
                                     <MessageSquare className="w-4 h-4" />
                                 </Button>

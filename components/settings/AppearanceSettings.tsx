@@ -44,7 +44,7 @@ export const AppearanceSettings: React.FC = () => {
                                 className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
                                     currentTheme.name === theme.name 
                                         ? 'border-primary bg-primary/10' 
-                                        : 'border-transparent bg-white/5 hover:bg-white/10'
+                                        : 'border-transparent bg-muted/50 hover:bg-muted'
                                 }`}
                             >
                                 <div className="flex gap-2">
@@ -52,7 +52,7 @@ export const AppearanceSettings: React.FC = () => {
                                     <div className="w-6 h-6 rounded-full" style={{ backgroundColor: `hsl(${theme.secondary})` }} />
                                     <div className="w-6 h-6 rounded-full" style={{ backgroundColor: `hsl(${theme.accent})` }} />
                                 </div>
-                                <span className="text-sm font-medium text-white">{theme.name}</span>
+                                <span className="text-sm font-medium text-foreground">{theme.name}</span>
                             </button>
                         ))}
                     </div>
@@ -74,22 +74,22 @@ export const AppearanceSettings: React.FC = () => {
                             className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
                                 mode === 'light'
                                     ? 'border-primary bg-primary/10'
-                                    : 'border-transparent bg-white/5 hover:bg-white/10'
+                                    : 'border-transparent bg-muted/50 hover:bg-muted'
                             }`}
                         >
                             <Sun className="w-8 h-8 text-yellow-500" />
-                            <span className="text-sm font-medium text-white">Claro</span>
+                            <span className="text-sm font-medium text-foreground">Claro</span>
                         </button>
                         <button
                             onClick={() => mode === 'light' && toggleMode()}
                             className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
                                 mode === 'dark'
                                     ? 'border-primary bg-primary/10'
-                                    : 'border-transparent bg-white/5 hover:bg-white/10'
+                                    : 'border-transparent bg-muted/50 hover:bg-muted'
                             }`}
                         >
                             <Moon className="w-8 h-8 text-indigo-400" />
-                            <span className="text-sm font-medium text-white">Escuro</span>
+                            <span className="text-sm font-medium text-foreground">Escuro</span>
                         </button>
                     </div>
                 </CardContent>
@@ -105,7 +105,7 @@ export const AppearanceSettings: React.FC = () => {
                 </CardHeader>
                 <CardContent className="space-y-6">
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-300">Como devemos te chamar?</label>
+                        <label className="text-sm font-medium text-muted-foreground">Como devemos te chamar?</label>
                         <Input 
                             value={greetingName} 
                             onChange={(e) => setGreetingName(e.target.value)} 
@@ -113,12 +113,12 @@ export const AppearanceSettings: React.FC = () => {
                         />
                     </div>
 
-                    <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+                    <div className="flex items-center justify-between p-4 bg-muted/50 rounded-xl">
                         <div className="flex items-center gap-3">
                             <Monitor className="w-5 h-5 text-cyan-400" />
                             <div>
-                                <p className="font-medium text-white">Modo Zen</p>
-                                <p className="text-xs text-gray-400">Oculta detalhes e foca no essencial.</p>
+                                <p className="font-medium text-foreground">Modo Zen</p>
+                                <p className="text-xs text-muted-foreground">Oculta detalhes e foca no essencial.</p>
                             </div>
                         </div>
                         <Button 
@@ -142,7 +142,7 @@ export const AppearanceSettings: React.FC = () => {
                 <CardContent className="space-y-6">
                     {/* Densidade */}
                     <div className="space-y-3">
-                        <label className="text-sm font-medium text-gray-300">Densidade de Informação</label>
+                        <label className="text-sm font-medium text-muted-foreground">Densidade de Informação</label>
                         <div className="grid grid-cols-3 gap-3">
                             {(['compact', 'comfortable', 'spacious'] as const).map((d) => (
                                 <button
@@ -150,8 +150,8 @@ export const AppearanceSettings: React.FC = () => {
                                     onClick={() => setDensity(d)}
                                     className={`p-3 rounded-lg border text-sm capitalize transition-all ${
                                         density === d 
-                                            ? 'border-primary bg-primary/10 text-white' 
-                                            : 'border-white/10 bg-white/5 text-gray-400 hover:bg-white/10'
+                                            ? 'border-primary bg-primary/10 text-foreground' 
+                                            : 'border-border bg-muted/50 text-muted-foreground hover:bg-muted'
                                     }`}
                                 >
                                     {d === 'compact' ? 'Compacto' : d === 'comfortable' ? 'Confortável' : 'Espaçoso'}
@@ -162,7 +162,7 @@ export const AppearanceSettings: React.FC = () => {
 
                     {/* Módulos Ocultos */}
                     <div className="space-y-3">
-                        <label className="text-sm font-medium text-gray-300">Módulos Visíveis</label>
+                        <label className="text-sm font-medium text-muted-foreground">Módulos Visíveis</label>
                         <div className="space-y-2">
                             {[
                                 { id: 'investments', label: 'Investimentos (Funil)' },
@@ -171,8 +171,8 @@ export const AppearanceSettings: React.FC = () => {
                                 { id: 'tips', label: 'Dica do Dia' },
                                 { id: 'chart', label: 'Gráfico Mensal' }
                             ].map((module) => (
-                                <div key={module.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                                    <span className="text-sm text-gray-300">{module.label}</span>
+                                <div key={module.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                                    <span className="text-sm text-foreground">{module.label}</span>
                                     <Button
                                         size="sm"
                                         variant={hiddenModules.includes(module.id) ? "secondary" : "default"}
@@ -209,7 +209,7 @@ export const AppearanceSettings: React.FC = () => {
                                 {wp.url ? (
                                     <img src={wp.url} alt={wp.name} className="w-full h-full object-cover" />
                                 ) : (
-                                    <div className="w-full h-full bg-gray-800 flex items-center justify-center text-xs text-gray-400">
+                                    <div className="w-full h-full bg-muted flex items-center justify-center text-xs text-muted-foreground">
                                         Padrão
                                     </div>
                                 )}

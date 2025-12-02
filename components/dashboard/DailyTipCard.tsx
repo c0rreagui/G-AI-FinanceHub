@@ -66,7 +66,7 @@ export const DailyTipCard: React.FC = () => {
                         </div>
                         <div>
                             <h4 className="text-sm font-bold text-amber-500 mb-1 uppercase tracking-wider">Dica do Dia</h4>
-                            <p className="text-sm text-gray-300 leading-relaxed">
+                            <p className="text-sm text-muted-foreground leading-relaxed">
                                 {tip}
                             </p>
                         </div>
