@@ -1,6 +1,6 @@
 import React from 'react';
 import { Transaction, TransactionType } from '../../types';
-import { formatCurrency, formatDate } from '../../utils/formatters';
+import { formatCurrency, formatDate, formatRelativeTime } from '../../utils/formatters';
 import { ArrowUpRight, ArrowDownLeft, CheckCircle2, Clock } from 'lucide-react';
 import { Text } from '../ui/typography';
 import { PrivacyMask } from '../ui/PrivacyMask';
