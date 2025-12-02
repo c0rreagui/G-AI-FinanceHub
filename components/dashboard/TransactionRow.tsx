@@ -2,7 +2,7 @@ import React from 'react';
 import { Transaction, TransactionType } from '../../types';
 import { formatCurrency, formatDate, formatRelativeTime } from '../../utils/formatters';
 import { ArrowUpRight, ArrowDownLeft, CheckCircle2, Clock } from 'lucide-react';
-import { Text } from '../ui/Typography';
+import { Text } from '../ui/AppTypography';
 import { PrivacyMask } from '../ui/PrivacyMask';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
 

@@ -11,7 +11,7 @@ import { useDialog } from '../../hooks/useDialog';
 // import { AnimatedCurrency } from '../ui/AnimatedCurrency';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/Card';
 import { Flex, Box } from '../ui/AppLayout';
-import { Text } from '../ui/Typography';
+import { Text } from '../ui/AppTypography';
 import { triggerConfetti } from '../ui/Confetti';
 
 export const GoalCard: React.FC<{ goal: Goal }> = ({ goal }) => {

@@ -8,7 +8,7 @@ import { Button } from '../ui/Button';
 import { PencilIcon, TrashIcon, LockClosed } from '../Icons';
 import { MessageSquare, ArrowUpDown } from 'lucide-react';
 import { Flex, Box } from '../ui/AppLayout';
-import { Text } from '../ui/Typography';
+import { Text } from '../ui/AppTypography';
 import { Checkbox } from '../ui/Checkbox';
 import { PrivacyMask } from '../ui/PrivacyMask';
 import { DataTable } from '../ui/DataTable';

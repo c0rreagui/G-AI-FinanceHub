@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Card, CardContent } from '../ui/Card';
 import { Clock } from 'lucide-react';
-import { Text } from '../ui/Typography';
+import { Text } from '../ui/AppTypography';
 
 export const SalaryCountdown: React.FC = () => {
     const daysUntilSalary = useMemo(() => {

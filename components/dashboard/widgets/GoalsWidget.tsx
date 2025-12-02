@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent } from '../../ui/Card';
 import { QuickActions } from '../../ui/QuickActions';
 import { Flex } from '../../ui/Flex';
-import { Text, Heading } from '../../ui/Typography';
+import { Text, Heading } from '../../ui/AppTypography';
 import { Target, Plus } from 'lucide-react';
 import { PrivacyMask } from '../../ui/PrivacyMask';
 import { Button } from '../../ui/Button';

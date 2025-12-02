@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import { TransactionRow } from '../TransactionRow';
-import { Text } from '../../ui/Typography';
+import { Text } from '../../ui/AppTypography';
 import { Transaction, ViewType } from '../../../types';
 
 interface RecentTransactionsWidgetProps {
