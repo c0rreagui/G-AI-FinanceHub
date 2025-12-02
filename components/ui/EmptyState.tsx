@@ -10,12 +10,13 @@ interface EmptyStateProps {
   className?: string;
 }
 
-export const EmptyState: React.FC<EmptyStateProps> = ({ 
+export const EmptyState: React.FC<EmptyStateProps & { children?: React.ReactNode }> = ({ 
   icon: Icon, 
   title, 
   description, 
   action, 
-  className 
+  className,
+  children
 }) => {
   return (
     <div className={cn("flex flex-col items-center justify-center p-8 text-center animate-fade-in", className)}>
@@ -27,6 +28,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       <h3 className="mb-2 text-lg font-semibold tracking-tight">{title}</h3>
       <p className="mb-6 text-sm text-muted-foreground max-w-xs">{description}</p>
       {action}
+      {children}
     </div>
   );
 };

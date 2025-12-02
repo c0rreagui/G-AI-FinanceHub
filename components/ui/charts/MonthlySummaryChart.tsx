@@ -1,5 +1,5 @@
 import React from 'react';
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend, Brush } from 'recharts';
 import { MonthlyChartData } from '../../../types';
 import { formatCurrency } from '../../../utils/formatters';
 import { useMediaQuery } from '../../../hooks/useMediaQuery';
@@ -145,6 +145,14 @@ export const MonthlySummaryChart: React.FC<MonthlySummaryChartProps> = ({ data }
                             iconSize={8}
                             wrapperStyle={{ paddingBottom: '15px', fontSize: '11px', fontWeight: 600, opacity: 0.8 }}
                         />
+                        <Brush 
+                            dataKey="name" 
+                            height={30} 
+                            stroke="#8884d8"
+                            fill="rgba(30, 41, 59, 0.5)"
+                            tickFormatter={() => ''}
+                            travellerWidth={10}
+                        />
                         <Area 
                             type="monotone" 
                             dataKey="receita" 
@@ -169,7 +177,7 @@ export const MonthlySummaryChart: React.FC<MonthlySummaryChartProps> = ({ data }
                         />
                     </AreaChart>
                 </ResponsiveContainer>
-            </motion.div>
+            </MotionDiv>
         </div>
     );
 };

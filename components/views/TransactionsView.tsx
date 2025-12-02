@@ -8,6 +8,7 @@ import { useDialog } from '../../hooks/useDialog';
 import { TransactionsViewSkeleton } from './skeletons/TransactionsViewSkeleton';
 import { EmptyState } from '../ui/EmptyState';
 import { TransactionsTable } from '../transactions/TransactionsTable';
+import { FilterBar } from '../transactions/FilterBar';
 
 import { Input } from '../ui/Input';
 import { Tabs, TabsList, TabsTrigger } from '../ui/Tabs';
@@ -19,21 +20,24 @@ interface TransactionsViewProps {
 }
 
 export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentView }) => {
-    const { transactions, loading, deleteTransaction, mutatingIds } = useDashboardData();
+    const { transactions, loading, deleteTransaction, mutatingIds, categories } = useDashboardData();
     const { openDialog } = useDialog();
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [typeFilter, setTypeFilter] = useState<string>('all');
+    
+    // Advanced Filters State
+    const [startDate, setStartDate] = useState<string | null>(null);
+    const [endDate, setEndDate] = useState<string | null>(null);
+    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
     const filteredTransactions = useMemo(() => {
         return transactions.filter(tx => {
+            // Search Logic
             const matchesSearch = tx.description.toLowerCase().includes(searchTerm.toLowerCase()) || 
                                   tx.category.name.toLowerCase().includes(searchTerm.toLowerCase());
             
-            // Investment Logic
-            const catName = (tx.category?.name || '').toLowerCase();
-            const isInvestment = ['investimento', 'aporte', 'aplicação', 'poupança', 'cdb', 'tesouro'].some(k => catName.includes(k));
-
+            // Type Logic
             let matchesType = true;
             if (typeFilter === 'all') {
                 matchesType = true;
@@ -43,9 +47,28 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                 matchesType = tx.type === 'despesa';
             }
 
-            return matchesSearch && matchesType;
+            // Date Range Logic
+            let matchesDate = true;
+            if (startDate && endDate) {
+                const txDate = new Date(tx.date).toISOString().split('T')[0];
+                matchesDate = txDate >= startDate && txDate <= endDate;
+            } else if (startDate) {
+                const txDate = new Date(tx.date).toISOString().split('T')[0];
+                matchesDate = txDate >= startDate;
+            } else if (endDate) {
+                const txDate = new Date(tx.date).toISOString().split('T')[0];
+                matchesDate = txDate <= endDate;
+            }
+
+            // Category Logic
+            let matchesCategory = true;
+            if (selectedCategories.length > 0) {
+                matchesCategory = selectedCategories.includes(tx.category_id);
+            }
+
+            return matchesSearch && matchesType && matchesDate && matchesCategory;
         });
-    }, [transactions, searchTerm, typeFilter]);
+    }, [transactions, searchTerm, typeFilter, startDate, endDate, selectedCategories]);
 
     const selectableTransactions = useMemo(() => 
         filteredTransactions.filter(tx => !tx.goal_contribution_id && !tx.debt_payment_id),
@@ -86,6 +109,14 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
         });
     };
 
+    const handleClearFilters = () => {
+        setSearchTerm('');
+        setTypeFilter('all');
+        setStartDate(null);
+        setEndDate(null);
+        setSelectedCategories([]);
+    };
+
     return (
         <Flex direction="col" className="h-full space-y-6">
             <PageHeader 
@@ -104,36 +135,31 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
              ) : (
                 <Flex direction="col" className="flex-grow overflow-hidden gap-4">
                     {/* Filters Bar */}
-                    <Card>
-                        <CardContent className="p-4">
-                            <Grid cols={1} className="md:grid-cols-4 gap-4 items-center">
-                                <div className="md:col-span-2 relative">
-                                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                    <Input 
-                                        placeholder="Buscar transações..." 
-                                        className="pl-9"
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                    />
-                                </div>
-                                <div className="md:col-span-2 flex justify-end">
-                                    <Tabs value={typeFilter} onValueChange={setTypeFilter} className="w-full md:w-auto">
-                                    <TabsList className="w-full md:w-auto grid grid-cols-3 md:flex">
-                                            <TabsTrigger value="all">Todas</TabsTrigger>
-                                            <TabsTrigger value="receita">Receitas</TabsTrigger>
-                                            <TabsTrigger value="despesa">Despesas</TabsTrigger>
-                                        </TabsList>
-                                    </Tabs>
-                                </div>
-                                {selectedIds.length > 0 && (
-                                    <Button variant="secondary" onClick={handleBulkRecategorize}>
-                                        <FolderSync className="w-4 h-4 mr-2" />
-                                        Recategorizar ({selectedIds.length})
-                                    </Button>
-                                )}
-                            </Grid>
-                        </CardContent>
-                    </Card>
+                    <FilterBar 
+                        searchTerm={searchTerm}
+                        onSearchChange={setSearchTerm}
+                        startDate={startDate}
+                        endDate={endDate}
+                        onDateChange={(start, end) => { setStartDate(start); setEndDate(end); }}
+                        selectedCategories={selectedCategories}
+                        onCategoriesChange={setSelectedCategories}
+                        categories={categories}
+                        typeFilter={typeFilter}
+                        onTypeFilterChange={setTypeFilter}
+                        onClearFilters={handleClearFilters}
+                    />
+                    
+                    {selectedIds.length > 0 && (
+                        <Card className="bg-primary/5 border-primary/20">
+                            <CardContent className="p-2 flex justify-between items-center">
+                                <span className="text-sm font-medium ml-2">{selectedIds.length} transações selecionadas</span>
+                                <Button variant="secondary" size="sm" onClick={handleBulkRecategorize}>
+                                    <FolderSync className="w-4 h-4 mr-2" />
+                                    Recategorizar em Massa
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    )}
 
                     {/* Table Area */}
                     <div className="flex-grow overflow-auto rounded-md border bg-card">

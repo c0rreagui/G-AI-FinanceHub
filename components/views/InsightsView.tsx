@@ -36,10 +36,11 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     return null;
 };
 
+import { CategoryBreakdownChart } from '../ui/charts/CategoryBreakdownChart';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 export const InsightsView: React.FC = () => {
-    const { transactions, loading } = useDashboardData();
+    const { transactions, categories, loading } = useDashboardData();
     const isMobile = useMediaQuery('(max-width: 768px)');
 
     const categoryAnalysis = useMemo(() => {
@@ -87,46 +88,53 @@ export const InsightsView: React.FC = () => {
                             <InvestmentSuggestions />
                             <BalanceEvolutionChart transactions={transactions} />
                             
-                            {categoryAnalysis.length > 0 && (
-                                <div className="card h-[500px] md:h-[600px] p-4 bg-gray-900/50 border border-white/5 rounded-xl">
-                                    <h3 className="text-lg font-semibold text-white mb-4">Fluxo por Categoria</h3>
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart 
-                                            data={categoryAnalysis} 
-                                            layout="vertical"
-                                            margin={{ top: 5, right: isMobile ? 5 : 30, left: 20, bottom: 20 }}
-                                            barCategoryGap="20%"
-                                        >
-                                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" horizontal={false} />
-                                            <XAxis 
-                                                type="number"
-                                                tick={{ fill: '#d1d5db', fontSize: 12 }} 
-                                                stroke="rgba(255, 255, 255, 0.2)"
-                                                tickFormatter={(value) => formatCurrency(Number(value))}
-                                                axisLine={false}
-                                                tickLine={false}
-                                            />
-                                            <YAxis 
-                                                type="category" 
-                                                dataKey="name" 
-                                                tick={{ fill: '#d1d5db', fontSize: 12 }} 
-                                                stroke="rgba(255, 255, 255, 0.2)"
-                                                width={isMobile ? 100 : 120}
-                                                tickLine={false}
-                                                axisLine={false}
-                                            />
-                                            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }} />
-                                            <Legend 
-                                                wrapperStyle={{ bottom: 0, left: 20 }}
-                                                iconType="circle"
-                                                formatter={(value) => <span className="text-gray-300 capitalize">{value}</span>}
-                                            />
-                                            <Bar dataKey="receita" name="Receita" fill="#4ade80" radius={[0, 4, 4, 0]} />
-                                            <Bar dataKey="despesa" name="Despesa" fill="#f87171" radius={[0, 4, 4, 0]} />
-                                        </BarChart>
-                                    </ResponsiveContainer>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="card h-[400px] p-4 bg-gray-900/50 border border-white/5 rounded-xl">
+                                    <h3 className="text-lg font-semibold text-white mb-4">Distribuição de Despesas</h3>
+                                    <CategoryBreakdownChart transactions={transactions} categories={categories} />
                                 </div>
-                            )}
+                                
+                                {categoryAnalysis.length > 0 && (
+                                    <div className="card h-[400px] p-4 bg-gray-900/50 border border-white/5 rounded-xl">
+                                        <h3 className="text-lg font-semibold text-white mb-4">Fluxo por Categoria</h3>
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <BarChart 
+                                                data={categoryAnalysis} 
+                                                layout="vertical"
+                                                margin={{ top: 5, right: isMobile ? 5 : 30, left: 20, bottom: 20 }}
+                                                barCategoryGap="20%"
+                                            >
+                                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" horizontal={false} />
+                                                <XAxis 
+                                                    type="number"
+                                                    tick={{ fill: '#d1d5db', fontSize: 12 }} 
+                                                    stroke="rgba(255, 255, 255, 0.2)"
+                                                    tickFormatter={(value) => formatCurrency(Number(value))}
+                                                    axisLine={false}
+                                                    tickLine={false}
+                                                />
+                                                <YAxis 
+                                                    type="category" 
+                                                    dataKey="name" 
+                                                    tick={{ fill: '#d1d5db', fontSize: 12 }} 
+                                                    stroke="rgba(255, 255, 255, 0.2)"
+                                                    width={isMobile ? 100 : 120}
+                                                    tickLine={false}
+                                                    axisLine={false}
+                                                />
+                                                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }} />
+                                                <Legend 
+                                                    wrapperStyle={{ bottom: 0, left: 20 }}
+                                                    iconType="circle"
+                                                    formatter={(value) => <span className="text-gray-300 capitalize">{value}</span>}
+                                                />
+                                                <Bar dataKey="receita" name="Receita" fill="#4ade80" radius={[0, 4, 4, 0]} />
+                                                <Bar dataKey="despesa" name="Despesa" fill="#f87171" radius={[0, 4, 4, 0]} />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                )}
+                            </div>
                         </>
                     ) : (
                         <div className="flex-grow">

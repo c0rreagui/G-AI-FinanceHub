@@ -1,18 +1,20 @@
-
 import React, { useState, useEffect } from 'react';
-import { Modal } from '../ui/Modal';
+import { Sheet } from '../ui/Sheet';
 import { Button } from '../ui/Button';
 import { useDashboardData } from '../../hooks/useDashboardData';
-import { Transaction, TransactionType } from '../../types';
+import { Transaction, TransactionType, ScheduledTransactionFrequency } from '../../types';
 import { Input } from '../ui/Input';
+import { SmartInput } from '../ui/SmartInput';
+import { SmartDatePicker } from '../ui/SmartDatePicker';
 import { TypeToggle } from '../ui/TypeToggle';
 import { CategoryPicker } from '../ui/CategoryPicker';
 import { LoadingSpinner } from '../LoadingSpinner';
-import { useMediaQuery } from '../../hooks/useMediaQuery';
-import { motion, AnimatePresence } from 'framer-motion';
+import { DragDropUpload } from '../ui/DragDropUpload';
+import { motion } from 'framer-motion';
 import type { Variants } from 'framer-motion';
-import { XIcon, Mic } from '../Icons';
-
+import { Mic, Repeat, CalendarClock } from 'lucide-react';
+import { Switch } from '../ui/Switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 
 interface AddTransactionFormProps {
   isOpen: boolean;
@@ -22,46 +24,13 @@ interface AddTransactionFormProps {
   isInvestmentMode?: boolean;
 }
 
-const triggerHapticFeedback = () => {
-    if (typeof navigator !== 'undefined' && navigator.vibrate) {
-        navigator.vibrate(10);
-    }
-};
-
-
-const QuickValueChip: React.FC<{ value: number; onSelect: (value: number) => void }> = ({ value, onSelect }) => (
-    <button
-        type="button"
-        onClick={() => {
-          triggerHapticFeedback();
-          onSelect(value);
-        }}
-        className="px-4 py-3 text-sm font-semibold rounded-full bg-white/5 hover:bg-white/10 text-gray-300 transition-colors min-w-[60px] touch-manipulation"
-        aria-label={`Selecionar valor rápido de ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)}`}
-    >
-        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)}
-    </button>
-);
-
-const quickValues = [10, 20, 50, 100];
-
-const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: { 
-      opacity: 1,
-      transition: {
-          staggerChildren: 0.1
-      }
-  }
-};
-
 const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 }
 };
 
 export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, onClose, prefill, transactionToEdit, isInvestmentMode }) => {
-  const { addTransaction, updateTransaction, categories, checkForDuplicates } = useDashboardData();
+  const { addTransaction, updateTransaction, addScheduledTransaction, categories, checkForDuplicates } = useDashboardData();
   
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
@@ -70,9 +39,15 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
   const [categoryId, setCategoryId] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  
+  // Recurrence State
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [frequency, setFrequency] = useState<ScheduledTransactionFrequency>(ScheduledTransactionFrequency.MENSAL);
+
+  // Attachments State
+  const [files, setFiles] = useState<File[]>([]);
 
   const isEditing = !!transactionToEdit;
-  const isDesktop = useMediaQuery('(min-width: 768px)');
 
   useEffect(() => {
     if (isOpen) {
@@ -82,16 +57,18 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
             setDate(new Date(transactionToEdit.date).toISOString().split('T')[0]);
             setType(transactionToEdit.type);
             setCategoryId(transactionToEdit.category_id);
+            setIsRecurring(false); // Editing regular transaction
         } else if (isInvestmentMode) {
-            // Investment Mode Logic
             setType(TransactionType.DESPESA);
             const investCat = categories.find(c => c.name.toLowerCase().includes('investimento'));
             if (investCat) setCategoryId(investCat.id);
-            resetForm(false); // Don't clear what we just set
+            resetForm(false);
         } else if (prefill) {
             if (prefill.type) setType(prefill.type);
             if (prefill.date) setDate(new Date(prefill.date).toISOString().split('T')[0]);
             if (prefill.category_id) setCategoryId(prefill.category_id);
+            if (prefill.description) setDescription(prefill.description);
+            if (prefill.amount) setAmount(Math.abs(prefill.amount).toString());
         } else {
             resetForm();
         }
@@ -102,9 +79,12 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
       setDescription('');
       setAmount('');
       setDate(new Date().toISOString().split('T')[0]);
+      setFiles([]);
       if (full) {
           setType(TransactionType.DESPESA);
           setCategoryId('');
+          setIsRecurring(false);
+          setFrequency(ScheduledTransactionFrequency.MENSAL);
       }
       setIsListening(false);
   };
@@ -129,53 +109,57 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
       }
   };
 
-  const handleAmountBlur = () => {
-      if (amount.includes('+') || amount.includes('-') || amount.includes('*') || amount.includes('/')) {
-          try {
-              // eslint-disable-next-line no-eval
-              const result = eval(amount.replace(',', '.'));
-              if (!isNaN(result)) {
-                  setAmount(result.toFixed(2));
-              }
-          } catch (e) {
-              // Ignore invalid math
-          }
-      }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       setIsSubmitting(true);
       try {
-          const txData = {
-              description,
-              amount: parseFloat(amount),
-              date: new Date(date).toISOString(),
-              type,
-              categoryId,
-          };
+          const numericAmount = parseFloat(amount.replace(',', '.'));
+          
+          // TODO: Implement attachment upload logic when backend supports it
+          if (files.length > 0) {
+              console.log("Attachments to upload:", files);
+          }
 
-          // Check for duplicates before adding
-          if (!isEditing) {
-              const duplicates = checkForDuplicates(txData);
-              if (duplicates.length > 0) {
-                  const confirmed = window.confirm(
-                      `Atenção! Encontramos ${duplicates.length} transação(ões) similar(es) nesta data:\n\n` +
-                      duplicates.map(d => `- ${d.description} (${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(d.amount)})`).join('\n') +
-                      `\n\nDeseja adicionar mesmo assim?`
-                  );
-                  if (!confirmed) {
-                      setIsSubmitting(false);
-                      return;
+          if (isRecurring) {
+              // Add Scheduled Transaction
+              await addScheduledTransaction({
+                  description,
+                  amount: numericAmount,
+                  type,
+                  categoryId,
+                  startDate: new Date(date).toISOString(),
+                  frequency
+              });
+          } else {
+              // Add Regular Transaction
+              const txData = {
+                  description,
+                  amount: numericAmount,
+                  date: new Date(date).toISOString(),
+                  type,
+                  categoryId,
+              };
+
+              if (!isEditing) {
+                  const duplicates = checkForDuplicates(txData);
+                  if (duplicates.length > 0) {
+                      const confirmed = window.confirm(
+                          `Atenção! Encontramos ${duplicates.length} transação(ões) similar(es) nesta data. Deseja adicionar mesmo assim?`
+                      );
+                      if (!confirmed) {
+                          setIsSubmitting(false);
+                          return;
+                      }
                   }
               }
-          }
 
-          if (isEditing && transactionToEdit) {
-              await updateTransaction({ ...txData, id: transactionToEdit.id });
-          } else {
-              await addTransaction(txData);
+              if (isEditing && transactionToEdit) {
+                  await updateTransaction({ ...txData, id: transactionToEdit.id });
+              } else {
+                  await addTransaction(txData);
+              }
           }
+          
           onClose();
           resetForm();
       } catch (error) {
@@ -185,145 +169,131 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
       }
   };
 
-  const FormFields = (
-    <>
-        <motion.div variants={itemVariants} {...({} as any)}>
-          <TypeToggle selectedType={type} onTypeChange={setType} />
-        </motion.div>
-        <motion.div variants={itemVariants} {...({} as any)}>
-          <div className="flex gap-2 items-end">
-              <div className="flex-grow">
-                <Input
-                    id="tx-description"
-                    label="Descrição"
-                    type="text"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    required
-                />
-              </div>
-              <Button 
-                type="button" 
-                variant={isListening ? "destructive" : "secondary"} 
-                className="mb-[2px] h-[42px] w-[42px] p-0 flex items-center justify-center flex-shrink-0"
-                onClick={startListening}
-                title="Falar descrição"
-              >
-                  <Mic className={`w-5 h-5 ${isListening ? 'animate-pulse' : ''}`} />
-              </Button>
-          </div>
-        </motion.div>
-        {/* ... rest of fields ... */}
-        <motion.div variants={itemVariants} className="grid grid-cols-2 gap-4" {...({} as any)}>
-            <Input
-              id="tx-amount"
-              label="Valor (R$)"
-              type="text" 
-              inputMode="decimal"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              onBlur={handleAmountBlur}
-              placeholder="0.00 ou 10+5"
-              required
-            />
-            <Input
-              id="tx-date"
-              label="Data"
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              required
-            />
-        </motion.div>
-        <motion.div variants={itemVariants} {...({} as any)}>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-                Valores Rápidos
-            </label>
-            <div className="flex items-center gap-2 flex-wrap">
-                {quickValues.map(val => (
-                    <QuickValueChip key={val} value={val} onSelect={(v) => setAmount(String(v))} />
-                ))}
-            </div>
-        </motion.div>
-        <motion.div variants={itemVariants} {...({} as any)}>
-            <label className="block text-sm font-medium text-gray-300">
-                Categoria
-            </label>
-            <CategoryPicker 
-                categories={categories}
-                selectedCategoryId={categoryId}
-                onSelectCategory={setCategoryId}
-            />
-        </motion.div>
-    </>
-  );
-
-  if (isDesktop) {
-      return (
-          <Modal isOpen={isOpen} onClose={onClose} title={isEditing ? "Editar Transação" : (isInvestmentMode ? "Novo Investimento" : "Nova Transação")}>
-              <motion.form 
-                  onSubmit={handleSubmit} 
-                  {...({ className: "space-y-4" } as any)}
-                  variants={containerVariants}
-                  initial="hidden"
-                  animate="visible"
-              >
-                  {FormFields}
-                  <div className="flex justify-end gap-2 pt-4">
-                    <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
-                      Cancelar
-                    </Button>
-                    <Button type="submit" disabled={isSubmitting || !categoryId}>
-                      {isSubmitting ? <><LoadingSpinner /> Salvando...</> : (isEditing ? 'Salvar Alterações' : (isInvestmentMode ? 'Confirmar Aporte' : 'Salvar Transação'))}
-                    </Button>
-                  </div>
-              </motion.form>
-          </Modal>
-      )
-  }
-
   return (
-    <AnimatePresence>
-        {isOpen && (
-            <motion.div
-                {...({ className: "fixed inset-0 z-50 flex flex-col bg-[oklch(var(--card-oklch))]" } as any)}
-                initial={{ y: '100%' }}
-                animate={{ y: '0%' }}
-                exit={{ y: '100%' }}
-                transition={{ type: 'spring', stiffness: 400, damping: 40 }}
-                onAnimationComplete={() => { if (!isOpen) resetForm(); }}
-            >
-                {/* Header Fixo */}
-                <div className="flex items-center justify-between p-4 border-b border-[oklch(var(--border-oklch))] flex-shrink-0">
-                    <h2 className="text-xl font-semibold text-white">{isEditing ? "Editar Transação" : "Nova Transação"}</h2>
-                    <button onClick={onClose} className="p-1 text-gray-400"><XIcon className="w-6 h-6" /></button>
-                </div>
-                
-                {/* Conteúdo Rolável */}
-                <div className="flex-grow p-4 overflow-y-auto">
-                    <motion.form 
-                        id="mobile-tx-form" 
-                        onSubmit={handleSubmit} 
-                        {...({ className: "space-y-6" } as any)}
-                        variants={containerVariants}
-                        initial="hidden"
-                        animate="visible"
-                    >
-                        {FormFields}
-                    </motion.form>
-                </div>
-
-                {/* Rodapé Fixo */}
-                <div className="flex justify-end gap-2 p-4 border-t border-[oklch(var(--border-oklch))] flex-shrink-0 bg-[oklch(var(--card-oklch))]">
-                  <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
+    <Sheet 
+        isOpen={isOpen} 
+        onClose={onClose} 
+        title={isEditing ? "Editar Transação" : (isInvestmentMode ? "Novo Investimento" : (isRecurring ? "Agendar Transação" : "Nova Transação"))}
+        footer={
+            <div className="flex justify-end gap-2 w-full">
+                <Button type="button" variant="ghost" onClick={onClose} disabled={isSubmitting}>
                     Cancelar
-                  </Button>
-                  <Button type="submit" form="mobile-tx-form" disabled={isSubmitting || !categoryId}>
-                    {isSubmitting ? <><LoadingSpinner /> Salvando...</> : (isEditing ? 'Salvar Alterações' : 'Salvar Transação')}
-                  </Button>
+                </Button>
+                <Button type="submit" onClick={handleSubmit} disabled={isSubmitting || !categoryId || !amount || !description}>
+                    {isSubmitting ? <><LoadingSpinner /> Salvando...</> : 'Salvar'}
+                </Button>
+            </div>
+        }
+    >
+        <motion.div 
+            className="space-y-6"
+            initial="hidden"
+            animate="visible"
+            variants={{
+                visible: { transition: { staggerChildren: 0.1 } }
+            }}
+        >
+            {/* Type Toggle */}
+            <motion.div variants={itemVariants}>
+                <TypeToggle selectedType={type} onTypeChange={setType} />
+            </motion.div>
+
+            {/* Amount */}
+            <motion.div variants={itemVariants}>
+                <SmartInput
+                    value={amount}
+                    onChange={setAmount}
+                    label="Valor"
+                    placeholder="0,00"
+                    autoFocus={!isEditing}
+                />
+            </motion.div>
+
+            {/* Description & Voice */}
+            <motion.div variants={itemVariants}>
+                <div className="flex gap-2 items-end">
+                    <div className="flex-grow">
+                        <Input
+                            label="Descrição"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            placeholder="Ex: Supermercado, Salário..."
+                        />
+                    </div>
+                    <Button 
+                        type="button" 
+                        variant={isListening ? "destructive" : "secondary"} 
+                        className="mb-[2px] h-[42px] w-[42px] p-0 flex items-center justify-center flex-shrink-0"
+                        onClick={startListening}
+                        title="Falar descrição"
+                    >
+                        <Mic className={`w-5 h-5 ${isListening ? 'animate-pulse' : ''}`} />
+                    </Button>
                 </div>
             </motion.div>
-        )}
-    </AnimatePresence>
+
+            {/* Date & Category */}
+            <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <SmartDatePicker
+                    label={isRecurring ? "Data de Início" : "Data"}
+                    value={date}
+                    onChange={setDate}
+                />
+                <div>
+                    <label className="text-sm font-medium text-muted-foreground mb-2 block">Categoria</label>
+                    <CategoryPicker 
+                        categories={categories}
+                        selectedCategoryId={categoryId}
+                        onSelectCategory={setCategoryId}
+                    />
+                </div>
+            </motion.div>
+
+            {/* Recurrence Toggle */}
+            {!isEditing && !isInvestmentMode && (
+                <motion.div variants={itemVariants} className="bg-secondary/20 p-4 rounded-xl border border-border">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                            <div className={`p-2 rounded-lg ${isRecurring ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                                {isRecurring ? <CalendarClock className="w-5 h-5" /> : <Repeat className="w-5 h-5" />}
+                            </div>
+                            <div>
+                                <h4 className="font-medium text-sm">Repetir Transação</h4>
+                                <p className="text-xs text-muted-foreground">Criar uma recorrência automática</p>
+                            </div>
+                        </div>
+                        <Switch checked={isRecurring} onCheckedChange={setIsRecurring} />
+                    </div>
+
+                    {isRecurring && (
+                        <div className="animate-fade-in">
+                            <label className="text-sm font-medium text-muted-foreground mb-2 block">Frequência</label>
+                            <Select value={frequency} onValueChange={(v) => setFrequency(v as ScheduledTransactionFrequency)}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Selecione a frequência" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {Object.values(ScheduledTransactionFrequency).map((freq) => (
+                                        <SelectItem key={freq} value={freq}>{freq}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
+                </motion.div>
+            )}
+
+            {/* Attachments */}
+            <motion.div variants={itemVariants}>
+                <label className="text-sm font-medium text-muted-foreground mb-2 block">Anexos</label>
+                <DragDropUpload 
+                    onUpload={setFiles}
+                    maxFiles={3}
+                    accept="image/*,.pdf"
+                />
+            </motion.div>
+
+        </motion.div>
+    </Sheet>
   );
 };
