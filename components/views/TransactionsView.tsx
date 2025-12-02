@@ -12,7 +12,7 @@ import { FilterBar } from '../transactions/FilterBar';
 
 import { Input } from '../ui/Input';
 import { Tabs, TabsList, TabsTrigger } from '../ui/Tabs';
-import { Flex, Box, Grid } from '../ui/layout';
+import { Flex, Box, Grid } from '../ui/Layout';
 import { Card, CardContent } from '../ui/Card';
 
 interface TransactionsViewProps {

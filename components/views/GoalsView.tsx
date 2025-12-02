@@ -6,7 +6,7 @@ import { Button } from '../ui/Button';
 import { useDialog } from '../../hooks/useDialog';
 import { EmptyState } from '../ui/EmptyState';
 import { GenericViewSkeleton } from './skeletons/GenericViewSkeleton';
-import { Flex, Box, Grid } from '../ui/layout';
+import { Flex, Box, Grid } from '../ui/Layout';
 import { GoalCard } from '../goals/GoalCard';
 
 export const GoalsView: React.FC = () => {

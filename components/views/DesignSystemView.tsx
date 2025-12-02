@@ -12,8 +12,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/Dialog"
-import { Box, Flex, Grid, Container } from '../ui/layout';
-import { Heading, Text, Paragraph, Code } from '../ui/typography';
+import { Box, Flex, Grid, Container } from '../ui/Layout';
+import { Heading, Text, Paragraph, Code } from '../ui/Typography';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../ui/Select';
 import { Switch } from '../ui/Switch';
 import { Checkbox } from '../ui/Checkbox';

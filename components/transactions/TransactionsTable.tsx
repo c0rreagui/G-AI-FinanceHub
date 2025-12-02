@@ -7,7 +7,7 @@ import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { PencilIcon, TrashIcon, LockClosed } from '../Icons';
 import { MessageSquare, ArrowUpDown } from 'lucide-react';
-import { Flex, Box } from '../ui/layout';
+import { Flex, Box } from '../ui/Layout';
 import { Text } from '../ui/Typography';
 import { Checkbox } from '../ui/Checkbox';
 import { PrivacyMask } from '../ui/PrivacyMask';

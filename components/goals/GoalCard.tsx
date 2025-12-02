@@ -10,8 +10,8 @@ import { useDialog } from '../../hooks/useDialog';
 // import { motion } from 'framer-motion';
 // import { AnimatedCurrency } from '../ui/AnimatedCurrency';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/Card';
-import { Flex, Box } from '../ui/layout';
-import { Text } from '../ui/typography';
+import { Flex, Box } from '../ui/Layout';
+import { Text } from '../ui/Typography';
 import { triggerConfetti } from '../ui/Confetti';
 
 export const GoalCard: React.FC<{ goal: Goal }> = ({ goal }) => {

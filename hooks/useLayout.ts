@@ -25,13 +25,13 @@ const DEFAULT_LAYOUT: WidgetConfig[] = [
     { id: 'daily_tip', isVisible: true, colSpan: { md: 4, lg: 4 } }, // Full width
     { id: 'balance', isVisible: true, colSpan: { md: 4, lg: 4 } },
     { id: 'charts', isVisible: true, colSpan: { md: 4, lg: 4 } },
-    { id: 'health', isVisible: true, colSpan: { md: 4, lg: 4 } },
-    { id: 'quick-actions', isVisible: true, colSpan: { md: 4, lg: 4 } },
-    { id: 'challenges', isVisible: true, colSpan: { md: 4, lg: 1 } },
-    { id: 'recent_transactions', isVisible: true, colSpan: { md: 4, lg: 1 } },
+    { id: 'health', isVisible: true, colSpan: { md: 2, lg: 2 } },
+    { id: 'challenges', isVisible: true, colSpan: { md: 2, lg: 2 } },
+    { id: 'quick-actions', isVisible: true, colSpan: { md: 2, lg: 2 } },
+    { id: 'recent_transactions', isVisible: true, colSpan: { md: 2, lg: 2 } },
 ];
 
-const STORAGE_KEY = 'financehub_layout_v1';
+const STORAGE_KEY = 'financehub_layout_v2';
 
 export const useLayout = () => {
     const [layout, setLayout] = useState<WidgetConfig[]>(DEFAULT_LAYOUT);

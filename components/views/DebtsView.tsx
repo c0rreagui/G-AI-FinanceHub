@@ -13,8 +13,8 @@ import { GenericViewSkeleton } from './skeletons/GenericViewSkeleton';
 import { motion } from 'framer-motion';
 import { AnimatedCurrency } from '../ui/AnimatedCurrency';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/Card';
-import { Flex, Box, Grid } from '../ui/layout';
-import { Text } from '../ui/typography';
+import { Flex, Box, Grid } from '../ui/Layout';
+import { Text } from '../ui/Typography';
 
 const DebtCard: React.FC<{ debt: Debt }> = ({ debt }) => {
     const { openDialog } = useDialog();

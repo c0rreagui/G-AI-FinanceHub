@@ -23,7 +23,7 @@ import { Button } from './Button';
 import { Input } from './Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './Select';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown } from 'lucide-react';
-import { Flex } from './layout';
+import { Flex } from './Layout';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
