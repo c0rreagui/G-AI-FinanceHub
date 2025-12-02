@@ -31,7 +31,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, currentView, set
           </div>
       )}
 
-      <div className={`flex h-screen w-screen bg-transparent text-oklch-foreground overflow-hidden ${isGuest ? 'flex-col' : ''}`}>
+      <div className={`flex h-screen w-screen bg-transparent text-foreground overflow-hidden ${isGuest ? 'flex-col' : ''}`}>
         {isDesktop && <Sidebar currentView={currentView} setCurrentView={setCurrentView} />}
         
         <main className={`flex-1 flex flex-col overflow-hidden ${!isDesktop ? 'pb-20' : ''}`}>
