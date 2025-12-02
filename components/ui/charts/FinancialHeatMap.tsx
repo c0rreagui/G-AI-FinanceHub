@@ -42,7 +42,7 @@ export const FinancialHeatMap: React.FC<FinancialHeatMapProps> = ({ transactions
     }, [transactions]);
 
     const getColor = (intensity: number) => {
-        if (intensity === 0) return 'bg-gray-800/50';
+        if (intensity === 0) return 'bg-muted';
         if (intensity < 0.2) return 'bg-emerald-900/40';
         if (intensity < 0.4) return 'bg-emerald-700/60';
         if (intensity < 0.6) return 'bg-emerald-600/80';
@@ -59,12 +59,12 @@ export const FinancialHeatMap: React.FC<FinancialHeatMapProps> = ({ transactions
     const weekDays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
     return (
-        <div className="card h-full flex flex-col min-h-[340px] bg-gradient-to-b from-gray-900/50 to-black/50 border border-white/5 rounded-2xl p-4 relative overflow-hidden">
+        <div className="card h-full flex flex-col min-h-[340px] bg-card border border-border rounded-2xl p-4 relative overflow-hidden shadow-sm">
              {/* Background Glow */}
              <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
 
             <div className="flex items-center justify-between mb-4 relative z-10">
-                <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
                     <span className="w-1 h-4 bg-emerald-400 rounded-full shadow-[0_0_8px_#34d399]"></span>
                     Mapa de Gastos
                 </h3>
@@ -86,11 +86,11 @@ export const FinancialHeatMap: React.FC<FinancialHeatMapProps> = ({ transactions
                             className={`aspect-square rounded-md ${getColor(day.intensity)} transition-all hover:scale-110 cursor-pointer group relative`}
                         >
                             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-50 min-w-[120px]">
-                                <div className="bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs shadow-xl">
-                                    <p className="font-bold text-white mb-1">
+                                <div className="bg-popover border border-border rounded-lg p-2 text-xs shadow-xl">
+                                    <p className="font-bold text-popover-foreground mb-1">
                                         {day.date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
                                     </p>
-                                    <p className="text-emerald-400 font-mono">
+                                    <p className="text-emerald-500 font-mono">
                                         {formatCurrency(day.value)}
                                     </p>
                                 </div>
@@ -102,7 +102,7 @@ export const FinancialHeatMap: React.FC<FinancialHeatMapProps> = ({ transactions
                 <div className="flex items-center gap-2 mt-4 text-[10px] text-muted-foreground">
                     <span>Menos</span>
                     <div className="flex gap-1">
-                        <div className="w-3 h-3 rounded-sm bg-gray-800/50"></div>
+                        <div className="w-3 h-3 rounded-sm bg-muted"></div>
                         <div className="w-3 h-3 rounded-sm bg-emerald-900/40"></div>
                         <div className="w-3 h-3 rounded-sm bg-emerald-600/80"></div>
                         <div className="w-3 h-3 rounded-sm bg-emerald-400"></div>

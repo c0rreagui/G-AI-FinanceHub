@@ -53,7 +53,7 @@ export const KPICard: React.FC<{ title: string; value: number; trend: number; ic
     const colorClass = color.replace('bg-', '');
 
     return (
-        <Card className={`bg-gradient-to-br from-slate-900 to-slate-800 border-slate-700/50 hover:border-${colorClass}-500/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-${colorClass}-500/10 group overflow-hidden relative`}>
+        <Card className={`bg-card border-border hover:border-${colorClass}-500/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-${colorClass}-500/10 group overflow-hidden relative`}>
             <div className={`absolute top-0 right-0 w-24 h-24 ${color} opacity-5 rounded-full blur-2xl -mr-8 -mt-8 group-hover:opacity-10 transition-opacity`} />
             <CardContent className="p-5 relative z-10">
                 <div className="flex justify-between items-start mb-4">
@@ -69,7 +69,7 @@ export const KPICard: React.FC<{ title: string; value: number; trend: number; ic
                 </div>
                 <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">{title}</p>
                 <PrivacyMask>
-                    <h3 className="text-2xl font-bold text-white font-mono tracking-tight">
+                    <h3 className="text-2xl font-bold text-foreground font-mono tracking-tight">
                         <CountUp value={value} />
                     </h3>
                 </PrivacyMask>

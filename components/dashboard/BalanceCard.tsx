@@ -19,14 +19,14 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({ balance, className, tr
   const isPositive = trend >= 0;
 
   return (
-    <Card className={cn("bg-gradient-to-br from-cyan-900/40 to-blue-900/20 !border-cyan-500/30 relative overflow-hidden group", className)}>
-      <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/20 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+    <Card className={cn("bg-card border-border relative overflow-hidden group shadow-sm", className)}>
+      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
       
       <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-        <CardTitle className="text-sm font-medium text-cyan-200 uppercase tracking-wider">Saldo Total</CardTitle>
+        <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Saldo Total</CardTitle>
         <button 
             onClick={togglePrivacy} 
-            className="text-cyan-200/50 hover:text-cyan-200 transition-colors opacity-0 group-hover:opacity-100"
+            className="text-muted-foreground/50 hover:text-foreground transition-colors opacity-0 group-hover:opacity-100"
             title={isPrivacyMode ? "Mostrar valores" : "Ocultar valores"}
         >
             {isPrivacyMode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -36,7 +36,7 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({ balance, className, tr
       <CardContent>
         <div 
             className={cn(
-                "text-3xl md:text-4xl font-bold text-white tracking-tight tabular-nums truncate transition-all duration-300", 
+                "text-3xl md:text-4xl font-bold text-foreground tracking-tight tabular-nums truncate transition-all duration-300", 
                 isPrivacyMode && "blur-md select-none"
             )} 
             title={isPrivacyMode ? undefined : formatCurrency(balance)}
