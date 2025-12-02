@@ -33,7 +33,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             className={cn(
-                "hidden lg:flex flex-col h-full bg-card/30 border-r border-border backdrop-blur-xl z-50 transition-all duration-300 ease-in-out relative",
+                "hidden lg:flex flex-col h-full bg-card/50 border-r border-border backdrop-blur-xl z-50 transition-all duration-300 ease-in-out relative",
                 isCollapsed ? "w-20" : "w-64"
             )}
         >

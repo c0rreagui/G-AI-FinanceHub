@@ -43,7 +43,7 @@ const NavItem: React.FC<NavItemProps> = ({ name, view, icon: Icon, isActive, onC
           triggerHapticFeedback();
           onClick(view);
       }}
-      className="relative flex flex-col items-center justify-center gap-1 text-xs font-medium w-full"
+      className="relative flex flex-col items-center justify-center gap-1 text-xs font-medium w-full transition-transform active:scale-95"
       aria-label={name}
       aria-current={isActive ? 'page' : undefined}
     >

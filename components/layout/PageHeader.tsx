@@ -42,7 +42,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs
   };
 
   return (
-    <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-5 mb-6 flex-shrink-0">
+    <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-md transition-all duration-300 relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-5 mb-6 flex-shrink-0 pt-4 -mx-6 px-6">
       <div 
         className="absolute bottom-[-1px] left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary to-transparent"
         style={{ animation: 'pulse-border 3s ease-in-out infinite' }}

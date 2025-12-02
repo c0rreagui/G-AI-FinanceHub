@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { AnimatedCurrency } from '../ui/AnimatedCurrency';
-import { Heading, Text } from '../ui/typography';
+import { Heading, Text } from '../ui/Typography';
 import { cn } from '../../utils/utils';
 import { formatCurrency } from '../../utils/formatters';
 import { usePrivacy } from '../../contexts/PrivacyContext';
@@ -15,17 +15,36 @@ interface BalanceCardProps {
 }
 
 export const BalanceCard: React.FC<BalanceCardProps> = ({ balance, className, trend = 12.5 }) => {
-  const { isPrivacyMode, togglePrivacy } = usePrivacy();
+  const { isPrivacyMode, togglePrivacyMode } = usePrivacy();
   const isPositive = trend >= 0;
 
   return (
     <Card className={cn("bg-card border-border relative overflow-hidden group shadow-sm", className)}>
       <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
       
+      {/* Sparkline Background */}
+      <div className="absolute bottom-0 left-0 right-0 h-16 opacity-10 pointer-events-none">
+        <svg viewBox="0 0 100 20" className="w-full h-full" preserveAspectRatio="none">
+          <path 
+            d="M0 15 Q 10 10, 20 12 T 40 8 T 60 14 T 80 5 T 100 10" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2" 
+            className="text-primary"
+          />
+          <path 
+            d="M0 15 Q 10 10, 20 12 T 40 8 T 60 14 T 80 5 T 100 10 V 20 H 0 Z" 
+            fill="currentColor" 
+            className="text-primary"
+            fillOpacity="0.2"
+          />
+        </svg>
+      </div>
+      
       <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
         <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Saldo Total</CardTitle>
         <button 
-            onClick={togglePrivacy} 
+            onClick={togglePrivacyMode} 
             className="text-muted-foreground/50 hover:text-foreground transition-colors opacity-0 group-hover:opacity-100"
             title={isPrivacyMode ? "Mostrar valores" : "Ocultar valores"}
         >
