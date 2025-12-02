@@ -1,3 +1,13 @@
+import React from 'react';
+import { Sidebar } from './Sidebar';
+import { ViewType } from '../../types';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { MobileBottomNav } from './MobileBottomNav';
+import { DialogManager } from '../DialogManager';
+import { useDashboardData } from '../../hooks/useDashboardData';
+import { ErrorModal } from '../ui/ErrorModal';
+import { useAuth } from '../../hooks/useAuth';
+import { useTheme } from '../../contexts/ThemeContext';
 import { AuroraBackground } from '../ui/AuroraBackground';
 
 interface AppLayoutProps {
