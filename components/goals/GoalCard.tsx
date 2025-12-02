@@ -91,7 +91,7 @@ export const GoalCard: React.FC<{ goal: Goal }> = ({ goal }) => {
                         </Badge>
                     </Flex>
                     <Text size="xs" variant="muted">
-                        Prazo final: {formatDate(goal.deadline, 'long')}
+                        Prazo final: {formatDate(goal.deadline, "d 'de' MMMM 'de' yyyy")}
                     </Text>
                 </CardHeader>
                 <CardContent className="space-y-4">

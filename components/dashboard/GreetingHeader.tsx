@@ -67,7 +67,7 @@ export const GreetingHeader: React.FC<GreetingHeaderProps> = ({ user, setCurrent
                 </div>
                 <div>
                     <h1 className="text-2xl md:text-3xl font-bold text-foreground flex items-center gap-2">
-                        <TypingEffect text={`${greeting}, ${greetingName || user?.user_metadata?.name || user?.name || 'Dev'}!`} /> {icon}
+                        {greeting}, {greetingName || user?.user_metadata?.name || user?.name || 'Dev'}! {icon}
                     </h1>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                          <span className="capitalize">{dateStr}</span>
