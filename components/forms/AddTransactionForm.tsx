@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Sheet } from '../ui/Sheet';
 import { Button } from '../ui/Button';
 import { useDashboardData } from '../../hooks/useDashboardData';
-import { Transaction, TransactionType, ScheduledTransactionFrequency } from '../../types';
+import { Transaction, TransactionType, ScheduledTransactionFrequency, TransactionStatus } from '../../types';
 import { Input } from '../ui/Input';
 import { SmartInput } from '../ui/SmartInput';
 import { SmartDatePicker } from '../ui/SmartDatePicker';
@@ -30,13 +30,16 @@ const itemVariants: Variants = {
 };
 
 export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, onClose, prefill, transactionToEdit, isInvestmentMode }) => {
-  const { addTransaction, updateTransaction, addScheduledTransaction, categories, checkForDuplicates } = useDashboardData();
+  const { addTransaction, updateTransaction, addScheduledTransaction, categories, accounts, checkForDuplicates } = useDashboardData();
   
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [notes, setNotes] = useState('');
   const [type, setType] = useState<TransactionType>(TransactionType.DESPESA);
   const [categoryId, setCategoryId] = useState('');
+  const [accountId, setAccountId] = useState('');
+  const [status, setStatus] = useState<TransactionStatus>(TransactionStatus.COMPLETED);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isListening, setIsListening] = useState(false);
   
@@ -57,6 +60,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
             setDate(new Date(transactionToEdit.date).toISOString().split('T')[0]);
             setType(transactionToEdit.type);
             setCategoryId(transactionToEdit.category_id);
+            setNotes(transactionToEdit.notes || '');
             setIsRecurring(false); // Editing regular transaction
         } else if (isInvestmentMode) {
             setType(TransactionType.DESPESA);
@@ -69,6 +73,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
             if (prefill.category_id) setCategoryId(prefill.category_id);
             if (prefill.description) setDescription(prefill.description);
             if (prefill.amount) setAmount(Math.abs(prefill.amount).toString());
+            if (prefill.notes) setNotes(prefill.notes);
         } else {
             resetForm();
         }
@@ -114,10 +119,13 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
       setDescription('');
       setAmount('');
       setDate(new Date().toISOString().split('T')[0]);
+      setNotes('');
       setFiles([]);
       if (full) {
           setType(TransactionType.DESPESA);
           setCategoryId('');
+          setAccountId('');
+          setStatus(TransactionStatus.COMPLETED);
           setIsRecurring(false);
           setFrequency(ScheduledTransactionFrequency.MENSAL);
       }
@@ -144,8 +152,8 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
       }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent, shouldClose: boolean = true) => {
+      if (e) e.preventDefault();
       setIsSubmitting(true);
       try {
           const numericAmount = parseFloat(amount.replace(',', '.'));
@@ -173,6 +181,9 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                   date: new Date(date).toISOString(),
                   type,
                   categoryId,
+                  notes,
+                  account_id: accountId,
+                  status,
               };
 
               if (!isEditing) {
@@ -195,7 +206,9 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
               }
           }
           
-          onClose();
+          if (shouldClose) {
+            onClose();
+          }
           resetForm();
       } catch (error) {
           console.error("Error saving transaction", error);
@@ -214,7 +227,17 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                 <Button type="button" variant="ghost" onClick={onClose} disabled={isSubmitting}>
                     Cancelar
                 </Button>
-                <Button type="submit" onClick={handleSubmit} disabled={isSubmitting || !categoryId || !amount || !description}>
+                {!isEditing && (
+                    <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={() => handleSubmit(undefined, false)} 
+                        disabled={isSubmitting || !categoryId || !amount || !description || !accountId}
+                    >
+                        Salvar e Novo
+                    </Button>
+                )}
+                <Button type="submit" onClick={(e) => handleSubmit(e, true)} disabled={isSubmitting || !categoryId || !amount || !description || !accountId}>
                     {isSubmitting ? <><LoadingSpinner /> Salvando...</> : 'Salvar'}
                 </Button>
             </div>
@@ -238,7 +261,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                 <SmartInput
                     value={amount}
                     onChange={setAmount}
-                    label="Valor"
+                    label="Valor *"
                     placeholder="0,00"
                     autoFocus={!isEditing}
                 />
@@ -249,7 +272,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                 <div className="flex gap-2 items-end">
                     <div className="flex-grow">
                         <Input
-                            label="Descrição"
+                            label="Descrição *"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             placeholder="Ex: Supermercado, Salário..."
@@ -270,17 +293,52 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
             {/* Date & Category */}
             <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <SmartDatePicker
-                    label={isRecurring ? "Data de Início" : "Data"}
+                    label={isRecurring ? "Data de Início *" : "Data *"}
                     value={date}
                     onChange={setDate}
                 />
                 <div>
-                    <label className="text-sm font-medium text-muted-foreground mb-2 block">Categoria</label>
+                    <label className="text-sm font-medium text-muted-foreground mb-2 block">Categoria *</label>
                     <CategoryPicker 
                         categories={categories}
                         selectedCategoryId={categoryId}
                         onSelectCategory={setCategoryId}
                     />
+                </div>
+            </motion.div>
+
+            {/* Account & Status */}
+            <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label className="text-sm font-medium text-muted-foreground mb-2 block">Conta *</label>
+                    <Select value={accountId} onValueChange={setAccountId}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Selecione a conta" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {accounts.map((account) => (
+                                <SelectItem key={account.id} value={account.id}>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-3 h-3 rounded-full" style={{backgroundColor: account.color}}></div>
+                                        {account.name}
+                                    </div>
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div>
+                    <label className="text-sm font-medium text-muted-foreground mb-2 block">Status</label>
+                    <Select value={status} onValueChange={(v) => setStatus(v as TransactionStatus)}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Selecione o status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value={TransactionStatus.COMPLETED}>Concluído</SelectItem>
+                            <SelectItem value={TransactionStatus.PENDING}>Pendente</SelectItem>
+                            <SelectItem value={TransactionStatus.SCHEDULED}>Agendado</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
             </motion.div>
 
@@ -325,6 +383,17 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                     onUpload={setFiles}
                     maxFiles={3}
                     accept="image/*,.pdf"
+                />
+            </motion.div>
+
+            {/* Notes */}
+            <motion.div variants={itemVariants}>
+                <label className="text-sm font-medium text-muted-foreground mb-2 block">Observações</label>
+                <textarea
+                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    placeholder="Detalhes adicionais..."
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
                 />
             </motion.div>
 

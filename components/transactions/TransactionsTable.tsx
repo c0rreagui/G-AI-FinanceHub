@@ -12,6 +12,7 @@ import { Text } from '../ui/AppTypography';
 import { Checkbox } from '../ui/Checkbox';
 import { PrivacyMask } from '../ui/PrivacyMask';
 import { DataTable } from '../ui/DataTable';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
 
 interface TransactionsTableProps {
   transactions: Transaction[];
@@ -178,7 +179,16 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                     <tx.category.icon className="w-4 h-4" style={{color: tx.category.color}} />
                 </div>
                 <Box>
-                    <Text weight="medium" className="truncate max-w-[200px] block">{tx.description}</Text>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Text weight="medium" className="truncate max-w-[200px] block cursor-default">{tx.description}</Text>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>{tx.description}</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                     {isSystem && (
                         <Flex align="center" gap="xs" className="text-muted-foreground">
                             <LockClosed className="w-3 h-3" />
@@ -247,6 +257,21 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
             </div>
         );
       },
+      footer: ({ table }) => {
+          const rows = table.getFilteredRowModel().rows;
+          const total = rows.reduce((sum, row) => {
+              const val = parseFloat(row.getValue("amount"));
+              return sum + (isNaN(val) ? 0 : val);
+          }, 0);
+          
+          return (
+              <div className="text-right font-bold font-mono text-foreground">
+                  <PrivacyMask>
+                      {formatCurrency(total)}
+                  </PrivacyMask>
+              </div>
+          );
+      },
     },
     {
       id: "actions",
@@ -314,6 +339,8 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                 columns={columns} 
                 data={transactions} 
                 searchKey="description"
+                showFooter={true}
+                enableZebraStriping={true}
                 rowSelection={selectedIds.reduce((acc, id) => ({ ...acc, [id]: true }), {})}
                 setRowSelection={(updater) => {
                     // This is a bit of a hack to bridge the gap between TanStack Table's internal state and our parent state

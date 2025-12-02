@@ -15,6 +15,22 @@ export interface Category {
   user_id: string;
 }
 
+export enum TransactionStatus {
+  PENDING = 'pending',
+  COMPLETED = 'completed',
+  SCHEDULED = 'scheduled',
+}
+
+export interface Account {
+  id: string;
+  name: string;
+  type: 'bank' | 'wallet' | 'investment' | 'other';
+  balance: number;
+  color: string;
+  icon?: string;
+  user_id: string;
+}
+
 export interface Transaction {
   id: string;
   description: string;
@@ -27,6 +43,9 @@ export interface Transaction {
   goal_contribution_id?: string | null;
   debt_payment_id?: string | null;
   investment_id?: string | null;
+  notes?: string | null;
+  account_id: string;
+  status: TransactionStatus;
 }
 
 export enum GoalStatus {

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { PageHeader } from '../layout/PageHeader';
 import { ArrowLeftRight, PlusCircle, FolderSync, Search, Upload, Trash2 } from '../Icons';
 import { useDashboardData } from '../../hooks/useDashboardData';
@@ -20,16 +20,32 @@ interface TransactionsViewProps {
 }
 
 export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentView }) => {
-    const { transactions, loading, deleteTransaction, mutatingIds, categories } = useDashboardData();
+    const { transactions, accounts, loading, deleteTransaction, mutatingIds, categories } = useDashboardData();
     const { openDialog } = useDialog();
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [typeFilter, setTypeFilter] = useState<string>('all');
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Ignore if input/textarea is focused
+            if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) return;
+
+            if (e.key.toLowerCase() === 'n') {
+                e.preventDefault();
+                openDialog('add-transaction');
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [openDialog]);
     
     // Advanced Filters State
     const [startDate, setStartDate] = useState<string | null>(null);
     const [endDate, setEndDate] = useState<string | null>(null);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+    const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
 
     const filteredTransactions = useMemo(() => {
         return transactions.filter(tx => {
@@ -66,9 +82,15 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                 matchesCategory = selectedCategories.includes(tx.category_id);
             }
 
-            return matchesSearch && matchesType && matchesDate && matchesCategory;
+            // Account Logic
+            let matchesAccount = true;
+            if (selectedAccounts.length > 0) {
+                matchesAccount = selectedAccounts.includes(tx.account_id);
+            }
+
+            return matchesSearch && matchesType && matchesDate && matchesCategory && matchesAccount;
         });
-    }, [transactions, searchTerm, typeFilter, startDate, endDate, selectedCategories]);
+    }, [transactions, searchTerm, typeFilter, startDate, endDate, selectedCategories, selectedAccounts]);
 
     const selectableTransactions = useMemo(() => 
         filteredTransactions.filter(tx => !tx.goal_contribution_id && !tx.debt_payment_id),
@@ -133,6 +155,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
         setStartDate(null);
         setEndDate(null);
         setSelectedCategories([]);
+        setSelectedAccounts([]);
     };
 
     return (
@@ -167,6 +190,9 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                         selectedCategories={selectedCategories}
                         onCategoriesChange={setSelectedCategories}
                         categories={categories}
+                        selectedAccounts={selectedAccounts}
+                        onAccountsChange={setSelectedAccounts}
+                        accounts={accounts}
                         typeFilter={typeFilter}
                         onTypeFilterChange={setTypeFilter}
                         onClearFilters={handleClearFilters}

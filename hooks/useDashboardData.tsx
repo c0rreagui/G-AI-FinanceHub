@@ -21,6 +21,8 @@ import {
     ScheduledTransactionFrequency,
     DailyMission,
     InvestmentType,
+    Account,
+    TransactionStatus,
 } from '../types';
 import { DashboardDataContext } from '../contexts/DashboardDataContext';
 import { getIconByName } from '../utils/categoryIcons';
@@ -161,7 +163,17 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     const [mutatingIds, setMutatingIds] = useState<Set<string>>(new Set());
 
     const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [accounts, setAccounts] = useState<Account[]>([]);
     const [goals, setGoals] = useState<Goal[]>([]);
+
+    const generateMockAccounts = (userId: string): Account[] => {
+        return [
+            { id: 'acc_1', name: 'Nubank', type: 'bank', balance: 1500.00, color: '#820AD1', user_id: userId },
+            { id: 'acc_2', name: 'Itaú', type: 'bank', balance: 3200.50, color: '#EC7000', user_id: userId },
+            { id: 'acc_3', name: 'Carteira', type: 'wallet', balance: 150.00, color: '#10B981', user_id: userId },
+            { id: 'acc_4', name: 'Investimentos', type: 'investment', balance: 10000.00, color: '#3B82F6', user_id: userId },
+        ];
+    };
     const [debts, setDebts] = useState<Debt[]>([]);
     const [scheduledTransactions, setScheduledTransactions] = useState<ScheduledTransaction[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -181,10 +193,10 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     const getGuestData = useCallback(() => {
         try {
             const data = localStorage.getItem(GUEST_DATA_KEY);
-            return data ? JSON.parse(data) : { transactions: [], goals: [], debts: [], scheduledTransactions: [], categories: [] };
+            return data ? JSON.parse(data) : { transactions: [], accounts: [], goals: [], debts: [], scheduledTransactions: [], categories: [] };
         } catch (e) {
             logger.error("Erro ao ler dados do visitante do localStorage", { error: e });
-            return { transactions: [], goals: [], debts: [], scheduledTransactions: [], categories: [] };
+            return { transactions: [], accounts: [], goals: [], debts: [], scheduledTransactions: [], categories: [] };
         }
     }, []);
 
@@ -271,6 +283,9 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
                 categoriesData = newCategories;
             }
 
+            // Generate Mock Accounts (since we don't have a table yet)
+            const generatedAccounts = generateMockAccounts(user.id);
+            setAccounts(generatedAccounts);
 
             const populatedCategories: Category[] = categoriesData.map(c => ({...c, icon: getIconByName(c.icon) }));
             setCategories(populatedCategories);
@@ -295,7 +310,12 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             if (debtsError) throw debtsError;
             if (scheduledError) throw scheduledError;
 
-            setTransactions(transactionsData?.map(tx => ({...tx, category: categoryMap.get(tx.category_id) || fallbackCategory })) || []);
+            setTransactions(transactionsData?.map(tx => ({
+                ...tx, 
+                category: categoryMap.get(tx.category_id) || fallbackCategory,
+                account_id: tx.account_id || generatedAccounts[0].id,
+                status: tx.status || TransactionStatus.COMPLETED
+            })) || []);
             setGoals(goalsData || []);
             setDebts(debtsData || []);
             setScheduledTransactions(scheduledData?.map(stx => ({...stx, category: categoryMap.get(stx.category_id) || fallbackCategory })) || []);
@@ -489,7 +509,14 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         }
         // FIX: Destructure categoryId to avoid sending it to Supabase, which expects category_id.
         const { categoryId, ...txData } = tx;
-        const { error } = await supabase.from('transactions').insert({ ...txData, category_id: categoryId, user_id: user!.id });
+        const { error } = await supabase.from('transactions').insert({ 
+            ...txData, 
+            category_id: categoryId, 
+            user_id: user!.id, 
+            notes: tx.notes,
+            account_id: tx.account_id,
+            status: tx.status
+        });
         if (error) throw error;
         await fetchData();
         showToast('Transação Adicionada!', { type: 'success' });
@@ -510,7 +537,13 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         }
         // FIX: Destructure categoryId to avoid sending it to Supabase, which expects category_id.
         const { categoryId, ...txData } = tx;
-        const { error } = await supabase.from('transactions').update({ ...txData, category_id: categoryId }).eq('id', tx.id);
+        const { error } = await supabase.from('transactions').update({ 
+            ...txData, 
+            category_id: categoryId, 
+            notes: tx.notes,
+            account_id: tx.account_id,
+            status: tx.status
+        }).eq('id', tx.id);
         if (error) throw error;
         await fetchData();
         showToast('Transação Atualizada!', { type: 'success' });
@@ -1109,6 +1142,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const value: DashboardDataContextType = useMemo(() => ({
         transactions,
+        accounts,
         goals,
         debts,
         scheduledTransactions,

@@ -10,6 +10,7 @@ import {
   getFilteredRowModel,
   ColumnFiltersState,
   RowSelectionState,
+  VisibilityState,
 } from '@tanstack/react-table';
 import {
   Table,
@@ -18,12 +19,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableFooter,
 } from './Table';
 import { Button } from './Button';
 import { Input } from './Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './Select';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown } from 'lucide-react';
 import { Flex } from './AppLayout';
+import { DataTableViewOptions } from './DataTableViewOptions';
+import { LayoutList, Maximize2, Minimize2, SearchX } from 'lucide-react';
+import { EmptyState } from './EmptyState';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -33,6 +38,8 @@ interface DataTableProps<TData, TValue> {
   rowSelection?: RowSelectionState;
   setRowSelection?: React.Dispatch<React.SetStateAction<RowSelectionState>>;
   maxHeight?: string;
+  showFooter?: boolean;
+  enableZebraStriping?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -43,9 +50,13 @@ export function DataTable<TData, TValue>({
   rowSelection = {},
   setRowSelection,
   maxHeight = "600px",
+  showFooter = false,
+  enableZebraStriping = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [density, setDensity] = useState<'normal' | 'compact'>('normal');
 
   const table = useReactTable({
     data,
@@ -61,14 +72,16 @@ export function DataTable<TData, TValue>({
       sorting,
       columnFilters,
       rowSelection,
+      columnVisibility,
     },
     enableRowSelection: true,
+    onColumnVisibilityChange: setColumnVisibility,
   });
 
   return (
     <div className="space-y-4">
       {searchKey && (
-        <div className="flex items-center py-4">
+        <div className="flex items-center justify-between py-4">
           <Input
             placeholder="Filtrar..."
             value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
@@ -77,6 +90,19 @@ export function DataTable<TData, TValue>({
             }
             className="max-w-sm bg-background/50"
           />
+          <div className="flex items-center gap-2">
+             <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setDensity(density === 'normal' ? 'compact' : 'normal')}
+                className="hidden h-8 lg:flex"
+                title={density === 'normal' ? "Modo Compacto" : "Modo Confortável"}
+             >
+                {density === 'normal' ? <Minimize2 className="h-4 w-4 mr-2" /> : <Maximize2 className="h-4 w-4 mr-2" />}
+                {density === 'normal' ? 'Compacto' : 'Confortável'}
+             </Button>
+             <DataTableViewOptions table={table} />
+          </div>
         </div>
       )}
       
@@ -90,13 +116,13 @@ export function DataTable<TData, TValue>({
               <TableRow key={headerGroup.id} className="hover:bg-transparent border-b border-border">
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} className="h-10">
+                    <TableHead key={header.id} className={`h-10 ${density === 'compact' ? 'py-1' : 'py-3'}`}>
                       {header.isPlaceholder
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
                             header.getContext()
-                          )}
+                           )}
                     </TableHead>
                   );
                 })}
@@ -110,10 +136,10 @@ export function DataTable<TData, TValue>({
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                   onClick={() => onRowClick && onRowClick(row.original)}
-                  className={`border-b border-border transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted ${onRowClick ? 'cursor-pointer' : ''}`}
+                  className={`group border-b border-border transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted ${onRowClick ? 'cursor-pointer' : ''} ${enableZebraStriping ? 'even:bg-muted/30' : ''}`}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="py-3">
+                    <TableCell key={cell.id} className={`${density === 'compact' ? 'py-1' : 'py-3'}`}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
@@ -121,12 +147,35 @@ export function DataTable<TData, TValue>({
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
-                  Nenhum resultado encontrado.
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  <EmptyState 
+                    title="Nenhum resultado encontrado"
+                    description="Tente ajustar os filtros ou sua busca."
+                    icon={SearchX}
+                  />
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
+
+          {showFooter && (
+             <TableFooter className="bg-muted/50 sticky bottom-0 z-10 font-medium">
+               {table.getFooterGroups().map((footerGroup) => (
+                 <TableRow key={footerGroup.id}>
+                   {footerGroup.headers.map((header) => (
+                     <TableCell key={header.id} className="p-2">
+                       {header.isPlaceholder
+                         ? null
+                         : flexRender(
+                             header.column.columnDef.footer,
+                             header.getContext()
+                           )}
+                     </TableCell>
+                   ))}
+                 </TableRow>
+               ))}
+             </TableFooter>
+          )}
         </Table>
       </div>
 

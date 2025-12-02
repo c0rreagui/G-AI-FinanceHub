@@ -4,7 +4,7 @@ import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { DateRangePicker } from '../ui/DateRangePicker';
 import { MultiSelect, Option } from '../ui/MultiSelect';
-import { Category } from '../../types';
+import { Category, Account } from '../../types';
 import { Card, CardContent } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, format } from 'date-fns';
@@ -18,6 +18,9 @@ interface FilterBarProps {
     selectedCategories: string[];
     onCategoriesChange: (categories: string[]) => void;
     categories: Category[];
+    selectedAccounts?: string[];
+    onAccountsChange?: (accounts: string[]) => void;
+    accounts?: Account[];
     typeFilter: string;
     onTypeFilterChange: (type: string) => void;
     onClearFilters: () => void;
@@ -32,6 +35,9 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     selectedCategories,
     onCategoriesChange,
     categories,
+    selectedAccounts = [],
+    onAccountsChange,
+    accounts = [],
     typeFilter,
     onTypeFilterChange,
     onClearFilters
@@ -41,7 +47,12 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         value: c.id
     }));
 
-    const hasActiveFilters = startDate || endDate || selectedCategories.length > 0 || typeFilter !== 'all';
+    const accountOptions: Option[] = accounts.map(a => ({
+        label: a.name,
+        value: a.id
+    }));
+
+    const hasActiveFilters = startDate || endDate || selectedCategories.length > 0 || selectedAccounts.length > 0 || typeFilter !== 'all';
 
     const applyQuickFilter = (type: 'today' | 'week' | 'month') => {
         const now = new Date();
@@ -128,6 +139,19 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                             className="bg-background/50"
                         />
                     </div>
+
+                    {/* Accounts */}
+                    {accounts.length > 0 && onAccountsChange && (
+                        <div className="flex-grow xl:max-w-xs w-full">
+                            <MultiSelect
+                                options={accountOptions}
+                                selected={selectedAccounts}
+                                onChange={onAccountsChange}
+                                placeholder="Filtrar por contas"
+                                className="bg-background/50"
+                            />
+                        </div>
+                    )}
 
                     {/* Type Toggles */}
                     <div className="flex bg-background/50 p-1 rounded-lg border border-input h-10 items-center w-full sm:w-auto justify-center sm:justify-start">
