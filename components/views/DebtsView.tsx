@@ -13,7 +13,7 @@ import { GenericViewSkeleton } from './skeletons/GenericViewSkeleton';
 import { motion } from 'framer-motion';
 import { AnimatedCurrency } from '../ui/AnimatedCurrency';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/Card';
-import { Flex, Box, Grid } from '../ui/Layout';
+import { Flex, Box, Grid } from '../ui/AppLayout';
 import { Text } from '../ui/Typography';
 
 const DebtCard: React.FC<{ debt: Debt }> = ({ debt }) => {

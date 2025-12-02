@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/Dialog"
-import { Box, Flex, Grid, Container } from '../ui/Layout';
+import { Box, Flex, Grid, Container } from '../ui/AppLayout';
 import { Heading, Text, Paragraph, Code } from '../ui/Typography';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../ui/Select';
 import { Switch } from '../ui/Switch';

@@ -10,7 +10,7 @@ import { useDialog } from '../../hooks/useDialog';
 // import { motion } from 'framer-motion';
 // import { AnimatedCurrency } from '../ui/AnimatedCurrency';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/Card';
-import { Flex, Box } from '../ui/Layout';
+import { Flex, Box } from '../ui/AppLayout';
 import { Text } from '../ui/Typography';
 import { triggerConfetti } from '../ui/Confetti';
 
