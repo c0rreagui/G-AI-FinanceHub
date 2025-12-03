@@ -69,7 +69,7 @@ export const HealthScoreGauge: React.FC<HealthScoreGaugeProps> = ({ score }) => 
             <CardContent className="flex-1 flex flex-col items-center justify-center pt-4 z-10">
                 <div className="relative w-48 h-24 overflow-hidden">
                     {/* Background Arc */}
-                    <div className="absolute top-0 left-0 w-full h-48 rounded-full border-[12px] border-muted/20 border-b-0 box-border" style={{ clipPath: 'inset(0 0 50% 0)' }}></div>
+                    <div className="absolute top-0 left-0 w-full h-48 rounded-full border-[12px] border-muted/20 border-b-0 box-border [clip-path:inset(0_0_50%_0)]"></div>
                     
                     <svg viewBox="0 0 100 50" className="w-full h-full absolute top-0 left-0">
                         <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="currentColor" strokeWidth="12" className="text-muted/20" />

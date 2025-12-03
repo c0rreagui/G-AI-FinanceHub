@@ -5,6 +5,7 @@ export type ViewType = 'home' | 'transactions' | 'insights' | 'goals' | 'debts' 
 export enum TransactionType {
   RECEITA = 'receita',
   DESPESA = 'despesa',
+  TRANSFER = 'transfer',
 }
 
 export interface Category {
@@ -46,6 +47,12 @@ export interface Transaction {
   notes?: string | null;
   account_id: string;
   status: TransactionStatus;
+  exclude_from_reports?: boolean;
+  reconciled?: boolean;
+  location?: { latitude: number; longitude: number; address?: string; } | null;
+  transfer_id?: string | null;
+  from_account_id?: string | null;
+  to_account_id?: string | null;
 }
 
 export enum GoalStatus {
@@ -222,6 +229,7 @@ export interface FamilyInvite {
 export interface DashboardDataContextType {
   // Data
   transactions: Transaction[];
+  accounts: Account[];
   goals: Goal[];
   debts: Debt[];
   scheduledTransactions: ScheduledTransaction[];
@@ -244,6 +252,7 @@ export interface DashboardDataContextType {
   // Functions
   addTransaction: (tx: Omit<Transaction, 'id' | 'category' | 'user_id' | 'category_id'> & { categoryId: string }) => Promise<boolean>;
   updateTransaction: (tx: Omit<Transaction, 'category' | 'user_id' | 'category_id'> & { categoryId: string }) => Promise<boolean>;
+  addTransfer: (fromAccountId: string, toAccountId: string, amount: number, description: string, date: string, notes?: string) => Promise<boolean>;
   deleteTransaction: (id: string) => Promise<boolean>;
   updateTransactionsCategory: (transactionIds: string[], newCategoryId: string) => Promise<boolean>;
   checkForDuplicates: (transaction: Partial<Transaction>) => Transaction[];

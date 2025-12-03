@@ -44,8 +44,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs
   return (
     <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-md transition-all duration-300 relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-5 mb-6 flex-shrink-0 pt-4 -mx-6 px-6">
       <div 
-        className="absolute bottom-[-1px] left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary to-transparent"
-        style={{ animation: 'pulse-border 3s ease-in-out infinite' }}
+        className="absolute bottom-[-1px] left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary to-transparent [animation:pulse-border_3s_ease-in-out_infinite]"
       />
       <div>
         <div className="flex items-center gap-3">
@@ -87,7 +86,10 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs
 
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <button className="relative w-10 h-10 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors border border-border">
+                    <button 
+                        title="Notificações"
+                        className="relative w-10 h-10 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors border border-border"
+                    >
                         <Bell className="w-5 h-5" />
                         <span className="absolute top-2 right-2 w-2 h-2 bg-destructive rounded-full animate-pulse" />
                     </button>

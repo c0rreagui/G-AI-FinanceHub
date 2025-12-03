@@ -550,6 +550,30 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         return true;
     }, tx.id);
 
+    const addTransfer = async (fromAccountId: string, toAccountId: string, amount: number, description: string, date: string, notes?: string): Promise<boolean> => {
+        if (!user || isGuest) return false;
+        setIsMutating(true);
+        try {
+            const transferId = `transfer_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            const transferCat = categories.find(c => c.name.toLowerCase().includes('transferência'))?.id || categories[0].id;
+            const debitTx = { description: `Transferência: ${description}`, amount: -Math.abs(amount), date: new Date(date).toISOString(), type: TransactionType.TRANSFER, category_id: transferCat, notes: notes || `Para: ${accounts.find(a => a.id === toAccountId)?.name}`, user_id: user.id, account_id: fromAccountId, status: TransactionStatus.COMPLETED, transfer_id: transferId, from_account_id: fromAccountId, to_account_id: toAccountId, exclude_from_reports: true };
+            const creditTx = { ...debitTx, amount: Math.abs(amount), account_id: toAccountId, notes: notes || `De: ${accounts.find(a => a.id === fromAccountId)?.name}` };
+            const { error: e1 } = await supabase.from('transactions').insert(debitTx);
+            if (e1) throw e1;
+            const { error: e2 } = await supabase.from('transactions').insert(creditTx);
+            if (e2) throw e2;
+            await fetchData();
+            showToast('Transferência Realizada!', { type: 'success' });
+            return true;
+        } catch (error) {
+            console.error('Error adding transfer:', error);
+            showToast('Erro ao realizar transferência', { type: 'error' });
+            return false;
+        } finally {
+            setIsMutating(false);
+        }
+    };
+
     const deleteTransaction = (id: string) => withMutation(async () => {
         const txToDelete = transactions.find(t => t.id === id);
         if (!txToDelete) return false;
@@ -1162,6 +1186,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         clearError,
         addTransaction,
         updateTransaction,
+        addTransfer,
         deleteTransaction,
         updateTransactionsCategory,
         addGoal,
@@ -1192,6 +1217,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     return (
         <DashboardDataContext.Provider value={{
             transactions,
+            accounts,
             goals,
             debts,
             scheduledTransactions,
@@ -1210,6 +1236,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             error,
             addTransaction,
             updateTransaction,
+            addTransfer,
             deleteTransaction,
             updateTransactionsCategory,
             addGoal,
