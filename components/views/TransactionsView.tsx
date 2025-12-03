@@ -9,6 +9,7 @@ import { TransactionsViewSkeleton } from './skeletons/TransactionsViewSkeleton';
 import { EmptyState } from '../ui/EmptyState';
 import { TransactionsTable } from '../transactions/TransactionsTable';
 import { FilterBar } from '../transactions/FilterBar';
+import { BulkActionsBar } from '../transactions/BulkActionsBar';
 import { groupTransactionsByDate, GroupBy } from '../../utils/dateGrouping';
 
 import { Input } from '../ui/Input';
@@ -294,6 +295,8 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                     <PlusCircle className="h-6 w-6 text-primary-foreground" />
                 </Button>
             </div>
+            
+            <BulkActionsBar selectedIds={selectedIds} onClearSelection={() => setSelectedIds([])} />
         </Flex>
     );
 };

@@ -45,7 +45,7 @@ const getDefaultCategories = (userId: string | 'guest'): Omit<Category, 'id'>[] 
     { user_id: userId, name: 'Outros', icon: getIconByName('Gift'), color: '#6b7280' },
 ];
 
-const generateMockData = (userId: string, categories: Category[]) => {
+const generateMockData = (userId: string, categories: Category[], accounts: Account[]) => {
     const now = new Date();
     const goals: Omit<Goal, 'id'>[] = [];
     const debts: Omit<Debt, 'id'>[] = [];
@@ -58,6 +58,8 @@ const generateMockData = (userId: string, categories: Category[]) => {
         if (type === 'receita') return catMap.get('Salário')!;
         return catMap.get(despesaCats[Math.floor(Math.random() * despesaCats.length)])!;
     };
+
+    const defaultAccountId = accounts[0]?.id || 'mock_account_id';
 
     // 1. Metas
     const goal1: Omit<Goal, 'id'> = {
@@ -81,6 +83,8 @@ const generateMockData = (userId: string, categories: Category[]) => {
         category_id: catMap.get('Investimentos')!,
         user_id: userId,
         goal_contribution_id: 'mock_goal_1', // Placeholder ID
+        status: TransactionStatus.COMPLETED,
+        account_id: defaultAccountId,
     });
 
 
@@ -103,6 +107,8 @@ const generateMockData = (userId: string, categories: Category[]) => {
         category_id: catMap.get('Transporte')!,
         user_id: userId,
         debt_payment_id: 'mock_debt_1', // Placeholder ID
+        status: TransactionStatus.COMPLETED,
+        account_id: defaultAccountId,
     });
 
     // 3. Transações Recorrentes
@@ -115,6 +121,8 @@ const generateMockData = (userId: string, categories: Category[]) => {
             date: date.toISOString(),
             category_id: catMap.get('Salário')!,
             user_id: userId,
+            status: TransactionStatus.COMPLETED,
+            account_id: defaultAccountId,
         });
         
         for (let j = 0; j < 15; j++) {
@@ -125,6 +133,8 @@ const generateMockData = (userId: string, categories: Category[]) => {
                 date: new Date(now.getFullYear(), now.getMonth() - i, Math.floor(Math.random() * 28) + 1).toISOString(),
                 category_id: getRandomCatId('despesa'),
                 user_id: userId,
+                status: TransactionStatus.COMPLETED,
+                account_id: defaultAccountId,
             });
         }
     }
@@ -139,6 +149,7 @@ const generateMockData = (userId: string, categories: Category[]) => {
         next_due_date: new Date(now.getFullYear(), now.getMonth() + 1, 10).toISOString(),
         frequency: ScheduledTransactionFrequency.MENSAL,
         user_id: userId,
+        account_id: defaultAccountId,
     });
      scheduledTransactions.push({
         description: 'Aluguel',
@@ -149,6 +160,8 @@ const generateMockData = (userId: string, categories: Category[]) => {
         next_due_date: new Date(now.getFullYear(), now.getMonth() + 1, 5).toISOString(),
         frequency: ScheduledTransactionFrequency.MENSAL,
         user_id: userId,
+        account_id: defaultAccountId,
+
     });
 
     return { goals, debts, transactions, scheduledTransactions };
@@ -618,6 +631,53 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         });
         return true;
     }, id);
+
+    const bulkUpdateTransactions = (ids: string[], updates: Partial<Transaction>) => withMutation(async () => {
+        if (isGuest) {
+            const data = getGuestData();
+            data.transactions = data.transactions.map((t: Transaction) => 
+                ids.includes(t.id) ? { ...t, ...updates } : t
+            );
+            setGuestData(data);
+            await fetchData();
+            showToast(`${ids.length} transações atualizadas!`, { type: 'success' });
+            return true;
+        }
+
+        // Prepare updates for Supabase (remove UI-only fields if any)
+        const { category, ...safeUpdates } = updates as any;
+        
+        const { error } = await supabase
+            .from('transactions')
+            .update(safeUpdates)
+            .in('id', ids);
+
+        if (error) throw error;
+        await fetchData();
+        showToast(`${ids.length} transações atualizadas!`, { type: 'success' });
+        return true;
+    });
+
+    const bulkDeleteTransactions = (ids: string[]) => withMutation(async () => {
+        if (isGuest) {
+            const data = getGuestData();
+            data.transactions = data.transactions.filter((t: Transaction) => !ids.includes(t.id));
+            setGuestData(data);
+            await fetchData();
+            showToast(`${ids.length} transações excluídas!`, { type: 'success' });
+            return true;
+        }
+
+        const { error } = await supabase
+            .from('transactions')
+            .delete()
+            .in('id', ids);
+
+        if (error) throw error;
+        await fetchData();
+        showToast(`${ids.length} transações excluídas!`, { type: 'success' });
+        return true;
+    });
     
     const updateTransactionsCategory = (transactionIds: string[], newCategoryId: string) => withMutation(async () => {
         if (isGuest) {
@@ -1003,7 +1063,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             let { data: fetchedCategories, error: fetchError } = await supabase.from('categories').select('*').eq('user_id', user.id);
             if (fetchError || !fetchedCategories) throw fetchError || new Error("Falha ao buscar categorias após inserção.");
 
-            const mockData = generateMockData(user.id, fetchedCategories as Category[]);
+            const mockData = generateMockData(user.id, fetchedCategories as Category[], accounts);
 
             const { data: insertedGoals, error: goalsError } = await supabase.from('goals').insert(mockData.goals).select();
             if (goalsError) throw goalsError;
@@ -1047,6 +1107,8 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             type: TransactionType.DESPESA,
             date: new Date(now.getFullYear(), now.getMonth(), Math.floor(Math.random() * 28) + 1).toISOString(),
             category_id: getRandomCatId(),
+            status: TransactionStatus.COMPLETED,
+            account_id: accounts[0]?.id || 'mock_account_id',
         }));
 
         if (isGuest) {
@@ -1237,6 +1299,8 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             addTransaction,
             updateTransaction,
             addTransfer,
+            bulkUpdateTransactions,
+            bulkDeleteTransactions,
             deleteTransaction,
             updateTransactionsCategory,
             addGoal,

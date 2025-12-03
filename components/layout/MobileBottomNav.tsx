@@ -24,6 +24,10 @@ import { triggerHapticFeedback } from '../../utils/haptics';
 import { useAuth } from '../../hooks/useAuth';
 import { useScrollDirection } from '../../hooks/useScrollDirection';
 
+// Type workaround for motion components with className
+const MotionDiv = motion.div as any;
+const MotionButton = motion.button as any;
+
 interface MobileBottomNavProps {
   currentView: ViewType;
   setCurrentView: (view: ViewType) => void;
@@ -50,7 +54,7 @@ const NavItem: React.FC<NavItemProps> = ({ name, view, icon: Icon, isActive, onC
       <Icon className={`w-6 h-6 transition-colors ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
       <span className={`transition-colors ${isActive ? 'text-foreground' : 'text-muted-foreground'}`}>{name}</span>
       {isActive && (
-        <motion.div
+        <MotionDiv
           layoutId="mobile-active-nav"
           className="absolute -bottom-2 h-1 w-8 bg-primary rounded-full"
         />
@@ -90,7 +94,7 @@ const SpeedDial: React.FC = () => {
              <AnimatePresence>
                 {isOpen && (
                     <>
-                        <motion.div 
+                        <MotionDiv 
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
@@ -99,7 +103,7 @@ const SpeedDial: React.FC = () => {
                         />
                         <div className="absolute bottom-24 flex flex-col items-center gap-4 z-50">
                             {actions.map((action, index) => (
-                                <motion.div
+                                <MotionDiv
                                     key={action.label}
                                     initial={{ opacity: 0, y: 50 }}
                                     animate={{ opacity: 1, y: 0, transition: { type: 'spring', stiffness: 380, damping: 20, delay: index * 0.06 } }}
@@ -114,13 +118,13 @@ const SpeedDial: React.FC = () => {
                                     >
                                         <action.icon className="w-6 h-6" />
                                     </button>
-                                </motion.div>
+                                </MotionDiv>
                             ))}
                         </div>
                     </>
                 )}
             </AnimatePresence>
-            <motion.button 
+            <MotionButton 
                 onClick={toggleOpen}
                 className="relative z-50 flex items-center justify-center w-14 h-14 bg-gradient-to-r from-primary to-blue-600 rounded-full text-primary-foreground shadow-lg -translate-y-4"
                 whileTap={{ scale: 0.9 }}
@@ -128,10 +132,10 @@ const SpeedDial: React.FC = () => {
                 aria-label={isOpen ? "Fechar ações rápidas" : "Abrir ações rápidas"}
                 aria-expanded={isOpen}
             >
-                <motion.div variants={{ open: { rotate: 45 }, closed: { rotate: 0 } }} transition={{ type: 'spring', stiffness: 400, damping: 17 }}>
+                <MotionDiv variants={{ open: { rotate: 45 }, closed: { rotate: 0 } }} transition={{ type: 'spring', stiffness: 400, damping: 17 }}>
                     <PlusCircle className="w-8 h-8" />
-                </motion.div>
-            </motion.button>
+                </MotionDiv>
+            </MotionButton>
         </div>
     );
 }
@@ -170,7 +174,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ currentView, s
     <>
       <AnimatePresence>
         {isVisible && (
-            <motion.div 
+            <MotionDiv 
                 initial={{ y: 100 }}
                 animate={{ y: 0 }}
                 exit={{ y: 100 }}
@@ -206,7 +210,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ currentView, s
                         }}
                     />
                 </div>
-            </motion.div>
+            </MotionDiv>
         )}
       </AnimatePresence>
       

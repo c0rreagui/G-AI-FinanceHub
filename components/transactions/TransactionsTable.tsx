@@ -406,14 +406,6 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                 showFooter={true}
                 enableZebraStriping={true}
                 rowSelection={selectedIds.reduce((acc, id) => ({ ...acc, [id]: true }), {})}
-                setRowSelection={(updater) => {
-                    // This is a bit of a hack to bridge the gap between TanStack Table's internal state and our parent state
-                    // Ideally we would lift the state up entirely or use the table's state
-                    if (typeof updater === 'function') {
-                        // We can't easily access the old state here without fully controlling the table state
-                        // For now, we'll rely on the individual row checkboxes which call onSelect directly
-                    }
-                }}
             />
         </div>
     </>
