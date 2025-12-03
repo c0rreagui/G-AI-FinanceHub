@@ -408,17 +408,17 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                             <SelectValue placeholder="Selecione a conta" />
                         </SelectTrigger>
                         <SelectContent>
-                            {accounts.map((account) => {
-                                const accountColorStyle = { '--account-color': account.color } as React.CSSProperties;
-                                return (
+                            {accounts.map((account) => (
                                 <SelectItem key={account.id} value={account.id}>
                                     <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-[var(--account-color)]" style={accountColorStyle}></div>
+                                        <div 
+                                            className="w-3 h-3 rounded-full bg-[var(--account-color)]" 
+                                            ref={(el) => { if (el) el.style.setProperty('--account-color', account.color); }}
+                                        ></div>
                                         {account.name}
                                     </div>
                                 </SelectItem>
-                                );
-                            })}
+                            ))}
                         </SelectContent>
                     </Select>
                 </div>

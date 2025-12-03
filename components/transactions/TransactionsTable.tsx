@@ -152,9 +152,12 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                 <Flex align="center" gap="sm">
                     <div 
                         className="w-10 h-10 rounded-full flex items-center justify-center text-xs border border-border bg-[var(--category-bg)]" 
-                        style={{'--category-bg': `${tx.category.color}20`} as React.CSSProperties}
+                        ref={(el) => { if (el) el.style.setProperty('--category-bg', `${tx.category.color}20`); }}
                     >
-                        <tx.category.icon className="w-5 h-5 text-[var(--category-color)]" style={{'--category-color': tx.category.color} as React.CSSProperties} />
+                        <tx.category.icon 
+                            className="w-5 h-5 text-[var(--category-color)]" 
+                            ref={(el: HTMLElement) => { if (el) el.style.setProperty('--category-color', tx.category.color); }}
+                        />
                     </div>
                     <Box>
                         <Text weight="bold" className="truncate max-w-[180px] block">{tx.description}</Text>
@@ -227,16 +230,17 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
       cell: ({ row }) => {
         const tx = row.original;
         const isSystem = !!tx.goal_contribution_id || !!tx.debt_payment_id;
-        const categoryBgStyle = { '--category-bg': `${tx.category.color}20` } as React.CSSProperties;
-        const categoryColorStyle = { '--category-color': tx.category.color } as React.CSSProperties;
 
         return (
             <Flex align="center" gap="sm">
                 <div 
                     className="w-8 h-8 rounded-full flex items-center justify-center text-xs border border-white/10 bg-[var(--category-bg)]" 
-                    style={categoryBgStyle}
+                    ref={(el) => { if (el) el.style.setProperty('--category-bg', `${tx.category.color}20`); }}
                 >
-                    <tx.category.icon className="w-4 h-4 text-[var(--category-color)]" style={categoryColorStyle} />
+                    <tx.category.icon 
+                        className="w-4 h-4 text-[var(--category-color)]" 
+                        ref={(el: HTMLElement) => { if (el) el.style.setProperty('--category-color', tx.category.color); }}
+                    />
                 </div>
                 <Box>
                     <TooltipProvider>

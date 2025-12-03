@@ -58,8 +58,6 @@ export function DataTable<TData, TValue>({
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [density, setDensity] = useState<'normal' | 'compact'>('normal');
 
-  const maxHeightStyle = { '--max-h': typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight } as React.CSSProperties;
-
   const table = useReactTable({
     data,
     columns,
@@ -110,7 +108,7 @@ export function DataTable<TData, TValue>({
       
       <div 
         className="rounded-md border border-border overflow-auto relative max-h-[var(--max-h)]"
-        style={maxHeightStyle}
+        ref={(el) => { if (el) el.style.setProperty('--max-h', typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight); }}
       >
         <Table>
           <TableHeader className="bg-card sticky top-0 z-10 shadow-sm">

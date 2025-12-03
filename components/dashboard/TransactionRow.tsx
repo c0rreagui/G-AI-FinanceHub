@@ -15,18 +15,18 @@ export const TransactionRow: React.FC<TransactionRowProps> = ({ tx }) => {
     const colorClass = isExpense ? 'text-rose-500' : 'text-emerald-500';
     const isPending = new Date(tx.date) > new Date();
 
-    const categoryBgStyle = { '--category-bg': `${tx.category.color}20` } as React.CSSProperties;
-    const categoryColorStyle = { '--category-color': tx.category.color } as React.CSSProperties;
-
     return (
         <div className="flex items-center justify-between p-3 hover:bg-muted/50 rounded-xl transition-colors group cursor-default">
             <div className="flex items-center gap-3">
                 <div 
                     className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110 bg-[var(--category-bg)]" 
-                    style={categoryBgStyle}
+                    ref={(el) => { if (el) el.style.setProperty('--category-bg', `${tx.category.color}20`); }}
                 >
                     {tx.category.icon ? (
-                        <tx.category.icon className="w-5 h-5 text-[var(--category-color)]" style={categoryColorStyle} />
+                        <tx.category.icon 
+                            className="w-5 h-5 text-[var(--category-color)]" 
+                            ref={(el: HTMLElement) => { if (el) el.style.setProperty('--category-color', tx.category.color); }}
+                        />
                     ) : (
                         isExpense ? <ArrowDownLeft className="w-5 h-5 text-rose-500" /> : <ArrowUpRight className="w-5 h-5 text-emerald-500" />
                     )}
