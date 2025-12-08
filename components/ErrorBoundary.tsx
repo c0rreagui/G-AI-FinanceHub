@@ -1,7 +1,7 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { logger } from '../services/loggingService';
 import { Button } from './ui/Button';
-import { Zap, Copy, RefreshCw, AlertTriangle } from './Icons';
+import { Zap, Copy, RefreshCw, AlertTriangle, Trash2 } from './Icons';
 import { useToast } from '../hooks/useToast';
 
 interface ErrorBoundaryAuthProps {
@@ -80,6 +80,17 @@ ${errorInfo?.componentStack}
                     >
                         <RefreshCw className="h-4 w-4" />
                         Atualizar Página
+                    </Button>
+                    <Button 
+                        onClick={() => {
+                            localStorage.clear();
+                            sessionStorage.clear();
+                            window.location.reload();
+                        }} 
+                        className="flex items-center justify-center gap-2 bg-zinc-800 text-red-300 hover:bg-zinc-700 hover:text-red-200 border border-red-900/30"
+                    >
+                        <Trash2 className="h-4 w-4" />
+                        Limpar Cache e Reiniciar
                     </Button>
                     <Button 
                         onClick={this.handleCopyError}
