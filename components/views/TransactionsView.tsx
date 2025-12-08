@@ -10,6 +10,7 @@ import { EmptyState } from '../ui/EmptyState';
 import { TransactionsTable } from '../transactions/TransactionsTable';
 import { FilterBar } from '../transactions/FilterBar';
 import { BulkActionsBar } from '../transactions/BulkActionsBar';
+import { SmartReclassificationDialog } from '../transactions/SmartReclassificationDialog';
 import { groupTransactionsByDate, GroupBy } from '../../utils/dateGrouping';
 
 import { Input } from '../ui/Input';
@@ -49,6 +50,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
     const [groupBy, setGroupBy] = useState<GroupBy>('none');
+    const [isReclassifyOpen, setIsReclassifyOpen] = useState(false);
 
     const filteredTransactions = useMemo(() => {
         return transactions.filter(tx => {
@@ -185,6 +187,10 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                 breadcrumbs={['FinanceHub', 'Transações']}
                 actions={
                     <Flex gap="sm">
+                        <Button variant="outline" onClick={() => setIsReclassifyOpen(true)} title="Reclassificação Inteligente">
+                            <FolderSync className="w-4 h-4 mr-2" />
+                            Reclassificar
+                        </Button>
                         <Button variant="outline" onClick={() => openDialog('import-transactions')}>
                             <Upload className="w-4 h-4 mr-2"/> Importar
                         </Button>
@@ -297,6 +303,14 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
             </div>
             
             <BulkActionsBar selectedIds={selectedIds} onClearSelection={() => setSelectedIds([])} />
+            
+            <SmartReclassificationDialog 
+                isOpen={isReclassifyOpen}
+                onClose={() => setIsReclassifyOpen(false)}
+                onSuccess={() => {
+                    // Optional: refresh data if needed, but bulkUpdateTransactions already does it
+                }}
+            />
         </Flex>
     );
 };

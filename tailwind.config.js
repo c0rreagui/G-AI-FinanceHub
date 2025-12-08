@@ -86,6 +86,7 @@ export default {
                 "fade-in": "fade-in 0.5s ease-out",
                 "slide-up": "slide-up 0.5s ease-out",
                 "slide-in-left": "slide-in-left 0.3s ease-out",
+                "aurora-spin": "aurora-spin 20s linear infinite",
             },
             keyframes: {
                 "accordion-down": {
@@ -111,6 +112,10 @@ export default {
                 "slide-in-left": {
                     from: { transform: "translateX(-20px)", opacity: 0 },
                     to: { transform: "translateX(0)", opacity: 1 },
+                },
+                "aurora-spin": {
+                    from: { transform: "rotate(0deg)" },
+                    to: { transform: "rotate(360deg)" },
                 },
             },
         },

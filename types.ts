@@ -255,6 +255,8 @@ export interface DashboardDataContextType {
   addTransfer: (fromAccountId: string, toAccountId: string, amount: number, description: string, date: string, notes?: string) => Promise<boolean>;
   deleteTransaction: (id: string) => Promise<boolean>;
   updateTransactionsCategory: (transactionIds: string[], newCategoryId: string) => Promise<boolean>;
+  bulkUpdateTransactions: (ids: string[], updates: Partial<Transaction>) => Promise<boolean | null>;
+  bulkDeleteTransactions: (ids: string[]) => Promise<boolean | null>;
   checkForDuplicates: (transaction: Partial<Transaction>) => Transaction[];
 
   addGoal: (goal: Omit<Goal, 'id' | 'current_amount' | 'status' | 'user_id' | 'target_amount' | 'deadline'> & { targetAmount: number; deadline: string; }) => Promise<Goal | null>;

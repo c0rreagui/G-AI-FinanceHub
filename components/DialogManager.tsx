@@ -14,6 +14,7 @@ import { AddInvestmentDrawer } from './forms/AddInvestmentDrawer';
 import { AchievementsDialog } from './dashboard/AchievementsDialog';
 import { ProfileAnalysisQuiz } from './onboarding/ProfileAnalysisQuiz';
 import { ImportTransactionsDialog } from './forms/ImportTransactionsDialog';
+import { TransactionCommentsDialog } from './social/TransactionCommentsDialog';
 
 export const DialogManager: React.FC = () => {
   const { dialogType, closeDialog, dialogProps } = useDialog();

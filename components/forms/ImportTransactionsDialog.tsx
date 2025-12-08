@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Checkbox } from '../ui/Checkbox';
 import { formatCurrency } from '../../utils/formatters';
 import { LoadingSpinner } from '../LoadingSpinner';
-import { Upload, FileText, CheckCircle, AlertCircle } from 'lucide-react';
+import { Upload, FileText, CheckCircle, AlertCircle, AlertTriangle } from 'lucide-react';
 
 interface ImportTransactionsDialogProps {
   isOpen: boolean;
@@ -22,10 +22,13 @@ interface ParsedTransaction {
   amount: number;
   type: TransactionType;
   selected: boolean;
+  isDuplicate?: boolean;
+  duplicateInitialID?: string;
+  categoryId?: string;
 }
 
 export const ImportTransactionsDialog: React.FC<ImportTransactionsDialogProps> = ({ isOpen, onClose }) => {
-  const { addTransaction, categories } = useDashboardData();
+  const { addTransaction, categories, transactions: existingTransactions } = useDashboardData();
   const [step, setStep] = useState<'upload' | 'preview'>('upload');
   const [parsedTransactions, setParsedTransactions] = useState<ParsedTransaction[]>([]);
   const [isImporting, setIsImporting] = useState(false);
@@ -46,13 +49,36 @@ export const ImportTransactionsDialog: React.FC<ImportTransactionsDialogProps> =
         .filter(row => row.length >= 3 && row[0] && row[1] && row[2])
         .map((row, index) => {
             const amount = parseFloat(row[2]);
+            const date = new Date(row[0]).toISOString();
+            const description = row[1].replace(/"/g, '');
+            const type = amount < 0 ? TransactionType.DESPESA : TransactionType.RECEITA;
+            const absAmount = Math.abs(amount);
+
+            // Duplicate Check
+            const isDuplicate = existingTransactions.some(ex => {
+                const exDate = new Date(ex.date).toISOString().split('T')[0];
+                const newDate = date.split('T')[0];
+                return exDate === newDate && 
+                       Math.abs(ex.amount) === absAmount &&
+                       ex.description.toLowerCase() === description.toLowerCase();
+            });
+
+            // Auto-Categorization
+            let categoryId = undefined;
+            const match = existingTransactions.find(ex => ex.description.toLowerCase().includes(description.toLowerCase()));
+            if (match) {
+                categoryId = match.category_id;
+            }
+
             return {
                 id: `import-${index}`,
-                date: new Date(row[0]).toISOString(),
-                description: row[1].replace(/"/g, ''),
-                amount: Math.abs(amount),
-                type: amount < 0 ? TransactionType.DESPESA : TransactionType.RECEITA,
-                selected: true
+                date,
+                description,
+                amount: absAmount,
+                type,
+                selected: !isDuplicate, // Default unselected if duplicate
+                isDuplicate,
+                categoryId
             };
         });
 
@@ -83,7 +109,9 @@ export const ImportTransactionsDialog: React.FC<ImportTransactionsDialogProps> =
                 amount: tx.amount,
                 date: tx.date,
                 type: tx.type,
-                categoryId: defaultCategory.id
+                categoryId: tx.categoryId || defaultCategory.id,
+                account_id: 'acc_1',
+                status: 'completed' as any
             });
         }
         onClose();
@@ -116,7 +144,6 @@ export const ImportTransactionsDialog: React.FC<ImportTransactionsDialogProps> =
                     onUpload={handleFileUpload}
                     maxFiles={1}
                     accept=".csv,.txt"
-                    label="Arraste seu arquivo CSV aqui"
                 />
                 <div className="text-sm text-muted-foreground bg-muted/50 p-4 rounded-md">
                     <p className="font-medium mb-2">Formato esperado (CSV):</p>
@@ -148,12 +175,13 @@ export const ImportTransactionsDialog: React.FC<ImportTransactionsDialogProps> =
                                 </TableHead>
                                 <TableHead>Data</TableHead>
                                 <TableHead>Descrição</TableHead>
+                                <TableHead>Categoria</TableHead>
                                 <TableHead className="text-right">Valor</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {parsedTransactions.map(tx => (
-                                <TableRow key={tx.id}>
+                                <TableRow key={tx.id} className={tx.isDuplicate ? 'bg-yellow-500/10 hover:bg-yellow-500/20' : ''}>
                                     <TableCell>
                                         <Checkbox 
                                             checked={tx.selected}
@@ -161,7 +189,23 @@ export const ImportTransactionsDialog: React.FC<ImportTransactionsDialogProps> =
                                         />
                                     </TableCell>
                                     <TableCell>{new Date(tx.date).toLocaleDateString('pt-BR')}</TableCell>
-                                    <TableCell>{tx.description}</TableCell>
+                                    <TableCell>
+                                        <div className="flex items-center gap-2">
+                                            {tx.description}
+                                            {tx.isDuplicate && (
+                                                <div title="Possível duplicata encontrada" className="text-yellow-600 dark:text-yellow-500">
+                                                    <AlertTriangle className="w-4 h-4" />
+                                                </div>
+                                            )}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <span className="text-xs bg-muted px-2 py-1 rounded">
+                                            {tx.categoryId 
+                                                ? categories.find(c => c.id === tx.categoryId)?.name || 'Outros'
+                                                : 'Outros (Padrão)'}
+                                        </span>
+                                    </TableCell>
                                     <TableCell className={`text-right ${tx.type === TransactionType.DESPESA ? 'text-destructive' : 'text-success'}`}>
                                         {formatCurrency(tx.amount)}
                                     </TableCell>

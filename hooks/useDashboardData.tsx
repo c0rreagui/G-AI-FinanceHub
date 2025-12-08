@@ -149,7 +149,6 @@ const generateMockData = (userId: string, categories: Category[], accounts: Acco
         next_due_date: new Date(now.getFullYear(), now.getMonth() + 1, 10).toISOString(),
         frequency: ScheduledTransactionFrequency.MENSAL,
         user_id: userId,
-        account_id: defaultAccountId,
     });
      scheduledTransactions.push({
         description: 'Aluguel',
@@ -160,7 +159,6 @@ const generateMockData = (userId: string, categories: Category[], accounts: Acco
         next_due_date: new Date(now.getFullYear(), now.getMonth() + 1, 5).toISOString(),
         frequency: ScheduledTransactionFrequency.MENSAL,
         user_id: userId,
-        account_id: defaultAccountId,
 
     });
 
@@ -633,51 +631,116 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     }, id);
 
     const bulkUpdateTransactions = (ids: string[], updates: Partial<Transaction>) => withMutation(async () => {
+        // Snapshot existing state for undo
+        const originalDataMap = ids.reduce((acc, id) => {
+            const tx = transactions.find(t => t.id === id);
+            if (tx) acc[id] = tx;
+            return acc;
+        }, {} as Record<string, Transaction>);
+
         if (isGuest) {
             const data = getGuestData();
             data.transactions = data.transactions.map((t: Transaction) => 
                 ids.includes(t.id) ? { ...t, ...updates } : t
             );
             setGuestData(data);
-            await fetchData();
-            showToast(`${ids.length} transações atualizadas!`, { type: 'success' });
-            return true;
+        } else {
+            // Prepare updates for Supabase (remove UI-only fields if any)
+            const { category, ...safeUpdates } = updates as any;
+            
+            const { error } = await supabase
+                .from('transactions')
+                .update(safeUpdates)
+                .in('id', ids);
+
+            if (error) throw error;
         }
-
-        // Prepare updates for Supabase (remove UI-only fields if any)
-        const { category, ...safeUpdates } = updates as any;
         
-        const { error } = await supabase
-            .from('transactions')
-            .update(safeUpdates)
-            .in('id', ids);
-
-        if (error) throw error;
         await fetchData();
-        showToast(`${ids.length} transações atualizadas!`, { type: 'success' });
+
+        showToast(`${ids.length} transações atualizadas`, {
+            type: 'success',
+            action: {
+                label: 'Desfazer',
+                onClick: async () => {
+                    // Restore logic
+                    if (isGuest) {
+                         const data = getGuestData();
+                         data.transactions = data.transactions.map((t: Transaction) => 
+                             originalDataMap[t.id] ? originalDataMap[t.id] : t
+                         );
+                         setGuestData(data);
+                    } else {
+                        // Restore loop
+                        showToast('Revertendo alterações...', { type: 'info' });
+                        for (const id of ids) {
+                             const original = originalDataMap[id];
+                             if (original) {
+                                 const { id: _, category, ...rest } = original;
+                                 await supabase.from('transactions').update({
+                                     ...rest,
+                                     category_id: category.id
+                                 }).eq('id', id);
+                             }
+                        }
+                    }
+                    await fetchData();
+                    showToast('Alterações desfeitas', { type: 'success' });
+                }
+            }
+        });
         return true;
-    });
+    }, ids.join(','));
 
     const bulkDeleteTransactions = (ids: string[]) => withMutation(async () => {
+        const transactionsToDelete = transactions.filter(t => ids.includes(t.id));
+
         if (isGuest) {
             const data = getGuestData();
             data.transactions = data.transactions.filter((t: Transaction) => !ids.includes(t.id));
             setGuestData(data);
-            await fetchData();
-            showToast(`${ids.length} transações excluídas!`, { type: 'success' });
-            return true;
+        } else {
+            const { error } = await supabase
+                .from('transactions')
+                .delete()
+                .in('id', ids);
+            
+            if (error) throw error;
         }
 
-        const { error } = await supabase
-            .from('transactions')
-            .delete()
-            .in('id', ids);
-
-        if (error) throw error;
         await fetchData();
-        showToast(`${ids.length} transações excluídas!`, { type: 'success' });
+
+        showToast(`${ids.length} transações excluídas`, {
+            type: 'success',
+            action: {
+                label: 'Desfazer',
+                onClick: async () => {
+                    showToast('Restaurando transações...', { type: 'info' });
+                    if (isGuest) {
+                        const data = getGuestData();
+                        data.transactions.push(...transactionsToDelete);
+                        setGuestData(data);
+                    } else {
+                        // Restore to Supabase
+                         const toRestore = transactionsToDelete.map(tx => {
+                             const { id, category, ...rest } = tx;
+                             return {
+                                 ...rest,
+                                 category_id: category.id,
+                                 user_id: user!.id
+                             };
+                         });
+                         
+                         const { error } = await supabase.from('transactions').insert(toRestore);
+                         if (error) console.error("Failed to undo delete", error);
+                    }
+                    await fetchData();
+                    showToast('Transações restauradas', { type: 'success' });
+                }
+            }
+        });
         return true;
-    });
+    }, ids.join(','));
     
     const updateTransactionsCategory = (transactionIds: string[], newCategoryId: string) => withMutation(async () => {
         if (isGuest) {
@@ -737,6 +800,8 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             date: new Date().toISOString(),
             categoryId: categories.find(c => c.name === 'Investimentos')?.id || categories[0].id,
             goal_contribution_id: goalId,
+            account_id: accounts[0]?.id || 'mock_account_id',
+            status: TransactionStatus.COMPLETED
         };
 
         if (isGuest) {
@@ -852,6 +917,8 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             date: new Date().toISOString(),
             categoryId: categories.find(c => c.name === 'Outros')?.id || categories[0].id,
             debt_payment_id: debtId,
+            account_id: accounts[0]?.id || 'mock_account_id',
+            status: TransactionStatus.COMPLETED
         };
 
         if (isGuest) {
@@ -1017,7 +1084,9 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             localStorage.removeItem(GUEST_DATA_KEY);
             const userId = isDeveloper ? 'developer' : 'guest';
             const mockCategories = getDefaultCategories(userId).map(c => ({...c, id: crypto.randomUUID()}));
-            const mockData = generateMockData(userId, mockCategories);
+            // Generate mock accounts for guest mode
+            const mockAccounts = generateMockAccounts(userId);
+            const mockData = generateMockData(userId, mockCategories, mockAccounts);
             
             const goalIdMap = new Map<string, string>();
             const debtIdMap = new Map<string, string>();
@@ -1249,6 +1318,8 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         addTransaction,
         updateTransaction,
         addTransfer,
+        bulkUpdateTransactions,
+        bulkDeleteTransactions,
         deleteTransaction,
         updateTransactionsCategory,
         addGoal,
