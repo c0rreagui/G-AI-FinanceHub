@@ -11,6 +11,7 @@ import { TransactionsTable } from '../transactions/TransactionsTable';
 import { FilterBar } from '../transactions/FilterBar';
 import { BulkActionsBar } from '../transactions/BulkActionsBar';
 import { SmartReclassificationDialog } from '../transactions/SmartReclassificationDialog';
+import { TrashDialog } from '../transactions/TrashDialog';
 import { groupTransactionsByDate, GroupBy } from '../../utils/dateGrouping';
 
 import { Input } from '../ui/Input';
@@ -23,7 +24,7 @@ interface TransactionsViewProps {
 }
 
 export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentView }) => {
-    const { transactions, accounts, loading, deleteTransaction, mutatingIds, categories } = useDashboardData();
+    const { transactions, accounts, loading, deleteTransaction, mutatingIds, categories, toggleTransactionStar } = useDashboardData();
     const { openDialog } = useDialog();
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -50,7 +51,9 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
     const [groupBy, setGroupBy] = useState<GroupBy>('none');
+
     const [isReclassifyOpen, setIsReclassifyOpen] = useState(false);
+    const [isTrashOpen, setIsTrashOpen] = useState(false);
 
     const filteredTransactions = useMemo(() => {
         return transactions.filter(tx => {
@@ -191,6 +194,9 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                             <FolderSync className="w-4 h-4 mr-2" />
                             Reclassificar
                         </Button>
+                        <Button variant="ghost" size="icon" onClick={() => setIsTrashOpen(true)} title="Lixeira">
+                            <Trash2 className="w-5 h-5 text-muted-foreground hover:text-red-500 transition-colors" />
+                        </Button>
                         <Button variant="outline" onClick={() => openDialog('import-transactions')}>
                             <Upload className="w-4 h-4 mr-2"/> Importar
                         </Button>
@@ -273,6 +279,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                                 onDelete={handleDelete}
                                 onComments={(tx) => openDialog('transaction-comments', { transaction: tx })}
                                 isMutating={(id) => mutatingIds.has(id)}
+                                onToggleStar={toggleTransactionStar}
                             />
                         ) : (
                             <EmptyState

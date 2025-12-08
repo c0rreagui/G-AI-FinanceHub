@@ -174,6 +174,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     const [mutatingIds, setMutatingIds] = useState<Set<string>>(new Set());
 
     const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [deletedTransactions, setDeletedTransactions] = useState<Transaction[]>([]);
     const [accounts, setAccounts] = useState<Account[]>([]);
     const [goals, setGoals] = useState<Goal[]>([]);
 
@@ -263,7 +264,11 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             const fallbackCategory = populatedCategories.find((c: any) => c.name === 'Outros') || populatedCategories[0];
             
             setCategories(populatedCategories);
-            setTransactions(data.transactions?.map((tx: any) => ({ ...tx, category: categoryMap.get(tx.category_id) || fallbackCategory })).sort((a: Transaction, b: Transaction) => new Date(b.date).getTime() - new Date(a.date).getTime()) || []);
+            
+            const allTransactions = (data.transactions || []).map((tx: any) => ({ ...tx, category: categoryMap.get(tx.category_id) || fallbackCategory }));
+            setTransactions(allTransactions.filter((tx: Transaction) => !tx.deleted_at).sort((a: Transaction, b: Transaction) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+            setDeletedTransactions(allTransactions.filter((tx: Transaction) => tx.deleted_at).sort((a: Transaction, b: Transaction) => new Date(b.deleted_at!).getTime() - new Date(a.deleted_at!).getTime()));
+
             setGoals(data.goals?.sort((a: Goal, b: Goal) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime()) || []);
             setDebts(data.debts || []);
             setScheduledTransactions(data.scheduledTransactions?.map((stx: any) => ({ ...stx, category: categoryMap.get(stx.category_id) || fallbackCategory })).sort((a: ScheduledTransaction, b: ScheduledTransaction) => new Date(a.next_due_date).getTime() - new Date(b.next_due_date).getTime()) || []);
@@ -321,12 +326,15 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             if (debtsError) throw debtsError;
             if (scheduledError) throw scheduledError;
 
-            setTransactions(transactionsData?.map(tx => ({
+            const mappedTransactions = transactionsData?.map(tx => ({
                 ...tx, 
                 category: categoryMap.get(tx.category_id) || fallbackCategory,
                 account_id: tx.account_id || generatedAccounts[0].id,
                 status: tx.status || TransactionStatus.COMPLETED
-            })) || []);
+            })) || [];
+
+            setTransactions(mappedTransactions.filter(tx => !tx.deleted_at));
+            setDeletedTransactions(mappedTransactions.filter(tx => tx.deleted_at));
             setGoals(goalsData || []);
             setDebts(debtsData || []);
             setScheduledTransactions(scheduledData?.map(stx => ({...stx, category: categoryMap.get(stx.category_id) || fallbackCategory })) || []);
@@ -591,42 +599,21 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
         if (isGuest) {
             const data = getGuestData();
-            data.transactions = data.transactions.filter((t: Transaction) => t.id !== id);
-            setGuestData(data);
-            await fetchData();
+            // Soft delete for guest: just update deleted_at
+            const index = data.transactions.findIndex((t: Transaction) => t.id === id);
+            if (index > -1) {
+                // Keep it in the array but mark as deleted
+                data.transactions[index].deleted_at = new Date().toISOString(); 
+                setGuestData(data);
+                await fetchData();
+            }
         } else {
-            const { error } = await supabase.from('transactions').delete().eq('id', id);
+            // Soft delete for Supabase
+            const { error } = await supabase.from('transactions').update({ deleted_at: new Date().toISOString() }).eq('id', id);
             if (error) throw error;
             await fetchData();
         }
-
-        showToast('Transação Excluída!', { 
-            type: 'success',
-            action: {
-                label: 'Desfazer',
-                onClick: async () => {
-                    if (isGuest) {
-                        const data = getGuestData();
-                        data.transactions.push(txToDelete);
-                        setGuestData(data);
-                    } else {
-                        // Restore to Supabase
-                        // Omit ID to generate a new one, or keep it? Let's omit to be safe with PK constraints if any.
-                        // Actually, if it was deleted, the ID is free. But let's let DB handle it or use the old one.
-                        // We need to strip the 'category' object and ensure 'category_id' is present.
-                        const { id: oldId, category, ...rest } = txToDelete;
-                        const txToRestore = { 
-                            ...rest, 
-                            category_id: category.id, 
-                            user_id: user!.id 
-                        };
-                        await supabase.from('transactions').insert(txToRestore);
-                    }
-                    await fetchData();
-                    showToast('Transação Restaurada!', { type: 'success' });
-                }
-            }
-        });
+        showToast('Transação movida para a lixeira', { type: 'success' });
         return true;
     }, id);
 
@@ -693,16 +680,17 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     }, ids.join(','));
 
     const bulkDeleteTransactions = (ids: string[]) => withMutation(async () => {
-        const transactionsToDelete = transactions.filter(t => ids.includes(t.id));
-
+        // Soft delete implementation
         if (isGuest) {
             const data = getGuestData();
-            data.transactions = data.transactions.filter((t: Transaction) => !ids.includes(t.id));
+            data.transactions = data.transactions.map((t: Transaction) => 
+                ids.includes(t.id) ? { ...t, deleted_at: new Date().toISOString() } : t
+            );
             setGuestData(data);
         } else {
             const { error } = await supabase
                 .from('transactions')
-                .delete()
+                .update({ deleted_at: new Date().toISOString() })
                 .in('id', ids);
             
             if (error) throw error;
@@ -710,7 +698,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
         await fetchData();
 
-        showToast(`${ids.length} transações excluídas`, {
+        showToast(`${ids.length} transações movidas para lixeira`, {
             type: 'success',
             action: {
                 label: 'Desfazer',
@@ -718,20 +706,17 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
                     showToast('Restaurando transações...', { type: 'info' });
                     if (isGuest) {
                         const data = getGuestData();
-                        data.transactions.push(...transactionsToDelete);
+                        data.transactions = data.transactions.map((t: Transaction) => 
+                            ids.includes(t.id) ? { ...t, deleted_at: null } : t
+                        );
                         setGuestData(data);
                     } else {
-                        // Restore to Supabase
-                         const toRestore = transactionsToDelete.map(tx => {
-                             const { id, category, ...rest } = tx;
-                             return {
-                                 ...rest,
-                                 category_id: category.id,
-                                 user_id: user!.id
-                             };
-                         });
+                        // Restore in Supabase
+                         const { error } = await supabase
+                            .from('transactions')
+                            .update({ deleted_at: null })
+                            .in('id', ids);
                          
-                         const { error } = await supabase.from('transactions').insert(toRestore);
                          if (error) console.error("Failed to undo delete", error);
                     }
                     await fetchData();
@@ -741,6 +726,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         });
         return true;
     }, ids.join(','));
+
     
     const updateTransactionsCategory = (transactionIds: string[], newCategoryId: string) => withMutation(async () => {
         if (isGuest) {
@@ -1294,6 +1280,61 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         throw new Error("Erro de teste acionado pelas DevTools.");
     });
 
+    const toggleTransactionStar = (id: string) => withMutation(async () => {
+        const tx = transactions.find(t => t.id === id);
+        if (!tx) return false;
+        
+        const newStarred = !tx.starred;
+        
+        if (isGuest) {
+            const data = getGuestData();
+            const index = data.transactions.findIndex((t: Transaction) => t.id === id);
+            if (index > -1) {
+                data.transactions[index].starred = newStarred;
+                setGuestData(data);
+                await fetchData();
+            }
+            return true;
+        } else {
+            const { error } = await supabase.from('transactions').update({ starred: newStarred }).eq('id', id);
+            if (error) throw error;
+            await fetchData();
+            return true;
+        }
+    });
+
+    const restoreTransaction = (id: string) => withMutation(async () => {
+         if (isGuest) {
+            const data = getGuestData();
+            const index = data.transactions.findIndex((t: Transaction) => t.id === id);
+            if (index > -1) {
+                data.transactions[index].deleted_at = null;
+                setGuestData(data);
+                await fetchData();
+            }
+        } else {
+             const { error } = await supabase.from('transactions').update({ deleted_at: null }).eq('id', id);
+             if (error) throw error;
+             await fetchData();
+        }
+        showToast('Transação restaurada!', { type: 'success' });
+        return true;
+    }, id);
+
+    const permanentDeleteTransaction = (id: string) => withMutation(async () => {
+        if (isGuest) {
+            const data = getGuestData();
+            data.transactions = data.transactions.filter((t: Transaction) => t.id !== id);
+            setGuestData(data);
+            await fetchData();
+        } else {
+            const { error } = await supabase.from('transactions').delete().eq('id', id);
+            if (error) throw error;
+            await fetchData();
+        }
+        showToast('Transação excluída permanentemente', { type: 'success' });
+        return true;
+    }, id);
 
     const value: DashboardDataContextType = useMemo(() => ({
         transactions,
@@ -1341,8 +1382,12 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         addMockInvestments,
         clearTable,
         forceError,
+        toggleTransactionStar,
+        restoreTransaction,
+        permanentDeleteTransaction,
+        deletedTransactions,
     }), [
-        transactions, goals, debts, scheduledTransactions, categories, summary, monthlyChartData, userLevel, achievements,
+        transactions, deletedTransactions, goals, debts, scheduledTransactions, categories, summary, monthlyChartData, userLevel, achievements,
         healthScore, dailyMissions, savingsSuggestion, dueSoonBills, completeMission, checkForDuplicates,
         loading, isMutating, mutatingIds, error, user, isGuest
     ]);
@@ -1381,6 +1426,9 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             addPaymentToDebt,
             deleteDebt,
             addScheduledTransaction,
+            restoreTransaction,
+            permanentDeleteTransaction,
+            deletedTransactions,
             updateScheduledTransaction,
             deleteScheduledTransaction,
             completeMission,
@@ -1393,7 +1441,8 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             addMockDebts,
             addMockInvestments,
             clearTable,
-            forceError
+            forceError,
+            toggleTransactionStar,
         }}>
             {children}
         </DashboardDataContext.Provider>

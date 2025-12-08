@@ -6,8 +6,17 @@ import { formatCurrency } from '../../utils/formatters';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { PencilIcon, TrashIcon, LockClosed } from '../Icons';
-import { MessageSquare, ArrowUpDown } from 'lucide-react';
+import { MessageSquare, ArrowUpDown, MoreHorizontal, Star, Edit2, Copy, Trash2 } from 'lucide-react';
 import { Flex, Box } from '../ui/AppLayout';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/DropdownMenu";
+import { PrivacyMask } from "../ui/PrivacyMask";
 import { Text } from '../ui/AppTypography';
 import { Checkbox } from '../ui/Checkbox';
 import { PrivacyMask } from '../ui/PrivacyMask';
@@ -27,6 +36,7 @@ interface TransactionsTableProps {
   onDelete: (id: string) => void;
   onComments: (transaction: Transaction) => void;
   isMutating: (id: string) => boolean;
+  onToggleStar?: (id: string) => void;
 }
 
 export const TransactionsTable: React.FC<TransactionsTableProps> = ({
@@ -41,6 +51,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
   onDelete,
   onComments,
   isMutating,
+  onToggleStar,
 }) => {
   const allSelected = transactions.length > 0 && selectedIds.length === transactions.length;
 
@@ -101,6 +112,8 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
     const controls = useAnimation();
     const MotionDiv = motion.div as any;
     
+    const [expanded, setExpanded] = useState(false);
+    
     const handleDragEnd = async (event: any, info: PanInfo) => {
         const offset = info.offset.x;
         const velocity = info.velocity.x;
@@ -137,6 +150,100 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                 <TrashIcon className="w-6 h-6 mr-4" />
             </div>
         </div>
+
+        {/* Foreground Card */}
+        <MotionDiv 
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.2}
+            onDragEnd={handleDragEnd}
+            animate={controls}
+            className={`relative p-4 rounded-xl border border-border bg-card ${selectedIds.includes(tx.id) ? 'ring-1 ring-primary bg-primary/5' : ''}`}
+            style={{ touchAction: 'pan-y' }} // Allow vertical scroll
+            onClick={() => setExpanded(!expanded)}
+        >
+            <Flex justify="between" align="start" className="mb-3">
+                <Flex align="center" gap="sm">
+                    <div 
+                        className="w-10 h-10 rounded-full flex items-center justify-center text-xs border border-border bg-[var(--category-bg)]" 
+                        ref={(el) => { if (el) el.style.setProperty('--category-bg', `${tx.category.color}20`); }}
+                    >
+                        <tx.category.icon 
+                            className="w-5 h-5 text-[var(--category-color)]" 
+                            ref={(el: HTMLElement) => { if (el) el.style.setProperty('--category-color', tx.category.color); }}
+                        />
+                    </div>
+                    <Box>
+                        <Flex gap="xs" align="center">
+                            <Text weight="bold" className="truncate max-w-[150px] block">{tx.description}</Text>
+                            {tx.starred && <Star className="w-3 h-3 text-amber-500 fill-amber-500" />}
+                        </Flex>
+                        <Text size="xs" variant="muted">{new Date(tx.date).toLocaleDateString('pt-BR')}</Text>
+                    </Box>
+                </Flex>
+                <Text weight="bold" size="lg" className={isExpense ? 'text-destructive' : 'text-success'}>
+                    <PrivacyMask>
+                        {isExpense ? '-' : '+'} {formatCurrency(Math.abs(tx.amount))}
+                    </PrivacyMask>
+                </Text>
+            </Flex>
+            
+            <Flex justify="between" align="center" className="pt-3 border-t border-white/5">
+                <Badge variant="outline" className="font-normal text-[10px]">
+                    {tx.category.name}
+                </Badge>
+                
+                <Flex gap="xs">
+                     <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => { e.stopPropagation(); if (onToggleStar) onToggleStar(tx.id); }}
+                        className={`h-8 w-8 ${tx.starred ? 'text-amber-500' : 'text-gray-400 hover:text-white'}`}
+                    >
+                        <Star className={`w-4 h-4 ${tx.starred ? 'fill-amber-500' : ''}`} />
+                    </Button>
+                     <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => { e.stopPropagation(); onComments(tx); }}
+                        className="h-8 w-8 text-gray-400 hover:text-white"
+                    >
+                        <MessageSquare className="w-4 h-4" />
+                    </Button>
+                </Flex>
+            </Flex>
+
+            {/* Expanded Details */}
+            <AnimatePresence>
+                {expanded && (
+                    <MotionDiv
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden"
+                    >
+                        <div className="pt-3 mt-3 border-t border-white/5 space-y-2">
+                             {tx.notes && (
+                                <div className="flex gap-2">
+                                    <Text size="xs" variant="muted" className="w-16">Notas:</Text>
+                                    <Text size="xs" className="flex-1">{tx.notes}</Text>
+                                </div>
+                             )}
+                             <div className="flex gap-2">
+                                <Text size="xs" variant="muted" className="w-16">Status:</Text>
+                                <Badge variant="secondary" className="text-[10px] h-5">
+                                    {tx.status === 'completed' ? 'Concluído' : tx.status === 'pending' ? 'Pendente' : 'Agendado'}
+                                </Badge>
+                             </div>
+                             <div className="flex gap-2">
+                                <Text size="xs" variant="muted" className="w-16">Conta:</Text>
+                                <Text size="xs">{tx.account_id}</Text>
+                             </div>
+                        </div>
+                    </MotionDiv>
+                )}
+            </AnimatePresence>
+        </MotionDiv>
 
         {/* Foreground Card */}
         <MotionDiv 
@@ -253,6 +360,9 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
+                    {tx.starred && (
+                        <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                    )}
                     {isSystem && (
                         <Flex align="center" gap="xs" className="text-muted-foreground">
                             <LockClosed className="w-3 h-3" />
@@ -345,34 +455,38 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
         const isSystem = !!tx.goal_contribution_id || !!tx.debt_payment_id;
 
         return (
-          <Flex justify="end" gap="xs" className="opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onComments(tx)}
-                className="h-8 w-8 text-muted-foreground hover:text-foreground"
-            >
-                <MessageSquare className="w-4 h-4" />
-            </Button>
-            <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => onEdit(tx)}
-                disabled={isSystem || isMutating(tx.id)}
-                className="h-8 w-8"
-            >
-                <PencilIcon className="w-4 h-4" />
-            </Button>
-            <Button 
-                variant="ghost" 
-                size="icon" 
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Ações</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => onEdit(tx)} disabled={isSystem}>
+                <Edit2 className="mr-2 h-4 w-4" />
+                Editar
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onComments(tx)}>
+                <MessageSquare className="mr-2 h-4 w-4" />
+                Comentários
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onEdit({ ...tx, id: 'duplicate' } as any)} disabled={isSystem}>
+                <Copy className="mr-2 h-4 w-4" />
+                Duplicar
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
                 onClick={() => onDelete(tx.id)}
                 disabled={isSystem || isMutating(tx.id)}
-                className="h-8 w-8 text-destructive hover:text-destructive"
-            >
-                <TrashIcon className="w-4 h-4" />
-            </Button>
-          </Flex>
+                className="text-destructive focus:text-destructive"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Excluir
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         );
       },
     },

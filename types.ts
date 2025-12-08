@@ -48,11 +48,13 @@ export interface Transaction {
   account_id: string;
   status: TransactionStatus;
   exclude_from_reports?: boolean;
+  starred?: boolean;
   reconciled?: boolean;
   location?: { latitude: number; longitude: number; address?: string; } | null;
   transfer_id?: string | null;
   from_account_id?: string | null;
   to_account_id?: string | null;
+  deleted_at?: string | null; // ISO 8601 for Soft Delete
 }
 
 export enum GoalStatus {
@@ -283,4 +285,8 @@ export interface DashboardDataContextType {
   addMockInvestments: (count: number) => Promise<void>;
   clearTable: (tableName: 'transactions' | 'goals' | 'debts' | 'scheduled_transactions') => Promise<void>;
   forceError: () => Promise<void>;
+  toggleTransactionStar: (id: string) => Promise<boolean>;
+  restoreTransaction: (id: string) => Promise<boolean>;
+  permanentDeleteTransaction: (id: string) => Promise<boolean>;
+  deletedTransactions: Transaction[];
 }
