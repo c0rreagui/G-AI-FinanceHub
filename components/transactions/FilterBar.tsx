@@ -42,6 +42,61 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     onTypeFilterChange,
     onClearFilters
 }) => {
+    // Saved Filters State
+    const [savedFilters, setSavedFilters] = React.useState<{name: string, filter: any}[]>([]);
+    const [selectedSavedFilter, setSelectedSavedFilter] = React.useState<string>("");
+
+    React.useEffect(() => {
+        const saved = localStorage.getItem('financehub_saved_filters');
+        if (saved) {
+            setSavedFilters(JSON.parse(saved));
+        }
+    }, []);
+
+    const handleSaveFilter = () => {
+        const name = prompt("Nome do filtro:");
+        if (!name) return;
+
+        const newFilter = {
+            name,
+            filter: {
+                searchTerm,
+                startDate,
+                endDate,
+                selectedCategories,
+                selectedAccounts,
+                typeFilter
+            }
+        };
+
+        const newSavedFilters = [...savedFilters, newFilter];
+        setSavedFilters(newSavedFilters);
+        localStorage.setItem('financehub_saved_filters', JSON.stringify(newSavedFilters));
+    };
+
+    const handleLoadFilter = (filterName: string) => {
+        const saved = savedFilters.find(f => f.name === filterName);
+        if (saved) {
+            setSelectedSavedFilter(filterName);
+            const { filter } = saved;
+            onSearchChange(filter.searchTerm);
+            onDateChange(filter.startDate, filter.endDate);
+            onCategoriesChange(filter.selectedCategories);
+            if (onAccountsChange) onAccountsChange(filter.selectedAccounts || []);
+            onTypeFilterChange(filter.typeFilter);
+        }
+    };
+
+    const handleDeleteFilter = (e: React.MouseEvent, filterName: string) => {
+        e.stopPropagation();
+        if (confirm(`Excluir filtro "${filterName}"?`)) {
+            const newSavedFilters = savedFilters.filter(f => f.name !== filterName);
+            setSavedFilters(newSavedFilters);
+            localStorage.setItem('financehub_saved_filters', JSON.stringify(newSavedFilters));
+            if (selectedSavedFilter === filterName) setSelectedSavedFilter("");
+        }
+    };
+
     const categoryOptions: Option[] = categories.map(c => ({
         label: c.name,
         value: c.id
@@ -188,6 +243,33 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                         >
                             <X className="h-4 w-4" />
                         </Button>
+                    )}
+                </div>
+
+                <div className="flex gap-2 w-full sm:w-auto items-center">
+                     <Button
+                        variant="outline"
+                        onClick={handleSaveFilter}
+                        className="h-10 w-10 p-0"
+                        title="Salvar Filtro Atual"
+                    >
+                        <Filter className="w-4 h-4" />
+                    </Button>
+
+                    {savedFilters.length > 0 && (
+                        <div className="relative">
+                            <select
+                                className="h-10 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring w-[140px]"
+                                value={selectedSavedFilter}
+                                onChange={(e) => handleLoadFilter(e.target.value)}
+                                title="Carregar filtro salvo"
+                            >
+                                <option value="">Meus Filtros</option>
+                                {savedFilters.map(f => (
+                                    <option key={f.name} value={f.name}>{f.name}</option>
+                                ))}
+                            </select>
+                        </div>
                     )}
                 </div>
                 

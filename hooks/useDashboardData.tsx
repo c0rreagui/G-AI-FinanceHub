@@ -30,6 +30,9 @@ import { getIconByName } from '../utils/categoryIcons';
 import { useToast } from './useToast';
 import { logger } from '../services/loggingService';
 import { triggerConfetti } from '../components/ui/Confetti';
+import { formatCurrency, formatDate } from '../utils/formatters';
+import { format, subMonths, isSameMonth, parseISO, getDaysInMonth, getDate, setDate, setMonth, setYear, isAfter, startOfMonth, endOfMonth } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 const GUEST_DATA_KEY = 'financehub_guest_data';
 
@@ -752,6 +755,176 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         return true;
     }, ...transactionIds);
 
+    const mergeTransactions = (ids: string[], targetDetails: Partial<Transaction>) => withMutation(async () => {
+        // Calculate total amount
+        const txsToMerge = transactions.filter(t => ids.includes(t.id));
+        const totalAmount = txsToMerge.reduce((sum, t) => sum + t.amount, 0);
+        const mergedNotes = txsToMerge.map(t => `${formatDate(t.date)}: ${t.description} (${formatCurrency(t.amount)})`).join('\n');
+        
+        const newTxData = {
+            ...targetDetails,
+            amount: totalAmount,
+            notes: (targetDetails.notes ? targetDetails.notes + '\n\n' : '') + '--- Fusão de Transações ---\n' + mergedNotes
+        };
+
+        if (isGuest) {
+            const data = getGuestData();
+            // Soft delete originals
+            data.transactions = data.transactions.map((t: Transaction) => 
+                ids.includes(t.id) ? { ...t, deleted_at: new Date().toISOString() } : t
+            );
+            // Add new merged transaction
+            const newTx = { 
+                ...newTxData, 
+                id: crypto.randomUUID(), 
+                user_id: 'guest', 
+                category_id: targetDetails.category?.id || categories[0].id, 
+                created_at: new Date().toISOString(),
+                // Use defaults if missing
+                type: totalAmount >= 0 ? TransactionType.RECEITA : TransactionType.DESPESA,
+                date: targetDetails.date || new Date().toISOString(),
+                description: targetDetails.description || 'Transação Unificada',
+                status: targetDetails.status || TransactionStatus.COMPLETED,
+                account_id: targetDetails.account_id || accounts[0]?.id
+            } as any; // Cast to avoid full type check on partial
+
+            data.transactions.push(newTx);
+            setGuestData(data);
+            await fetchData();
+            logAction('create', 'transaction', newTx.id, `Fusão de ${ids.length} transações: ${newTx.description}`);
+            showToast('Transações unificadas com sucesso!', { type: 'success' });
+            return true;
+        } else {
+             // Soft delete originals
+             const { error: deleteError } = await supabase
+                .from('transactions')
+                .update({ deleted_at: new Date().toISOString() })
+                .in('id', ids);
+             if (deleteError) throw deleteError;
+
+             // Insert new transaction
+             const { category, ...safeDetails } = targetDetails as any; // remove expanded category object
+             const { data: insertedTx, error: insertError } = await supabase.from('transactions').insert({
+                 ...safeDetails,
+                 amount: totalAmount,
+                 notes: newTxData.notes,
+                 user_id: user!.id,
+                 // Ensure required fields
+                 category_id: safeDetails.category?.id || categories[0].id,
+                 type: totalAmount >= 0 ? TransactionType.RECEITA : TransactionType.DESPESA,
+                 date: safeDetails.date || new Date().toISOString(),
+                 description: safeDetails.description || 'Transação Unificada',
+                 status: safeDetails.status || TransactionStatus.COMPLETED,
+                 account_id: safeDetails.account_id || accounts[0]?.id
+             }).select().single();
+
+             if (insertError) throw insertError;
+             
+             await fetchData();
+             if (insertedTx) logAction('create', 'transaction', insertedTx.id, `Fusão de ${ids.length} transações: ${insertedTx.description}`);
+             showToast('Transações unificadas com sucesso!', { type: 'success' });
+             return true;
+        }
+    }, ids.join(','));
+
+    const cloneMonth = (sourceDate: Date, targetDate: Date) => withMutation(async () => {
+        const startSource = startOfMonth(sourceDate);
+        const endSource = endOfMonth(sourceDate);
+        
+        // Filter transactions from source month (excluding deleted)
+        // We use the already fetched 'transactions' which should contain data for the source month if we are viewing it,
+        // but to be safe/global, we might need to fetch if not in current view? 
+        // For simplicity in Phase 2, we assume 'transactions' context has the data we need or we fetch it?
+        // Actually 'transactions' only has current filtered view usually? 
+        // dashboardData usually fetches all or a range?
+        // In this app, fetchData gets ALL transactions by default (check fetchData implementation).
+        // Line 690: .select(...) order by date desc. No range filter usually.
+        // So 'transactions' has history.
+
+        const txsToClone = transactions.filter(t => {
+            const tDate = new Date(t.date);
+            return tDate >= startSource && tDate <= endSource && !t.deleted_at;
+        });
+
+        if (txsToClone.length === 0) {
+            showToast('Nenhuma transação encontrada no mês de origem.', { type: 'info' });
+            return false;
+        }
+
+        const newTxs = txsToClone.map(t => {
+            const originalDate = new Date(t.date);
+            const targetYear = targetDate.getFullYear();
+            const targetMonth = targetDate.getMonth();
+            const originalDay = getDate(originalDate);
+            
+            // Handle overflow (e.g. 31st Jan -> Feb)
+            const daysInTarget = getDaysInMonth(targetDate);
+            const newDay = Math.min(originalDay, daysInTarget);
+            
+            const newDate = new Date(targetYear, targetMonth, newDay);
+            // Preserve time? Usually transactions are date-based, maybe keep generic time.
+            
+            return {
+                ...t,
+                id: crypto.randomUUID(),
+                date: newDate.toISOString(),
+                created_at: new Date().toISOString(),
+                description: `${t.description} (Cópia)`,
+                status: TransactionStatus.PENDING, // Reset status to pending for safety
+                reconciled: false,
+                payment_id: null, // Clear implementation references
+                transfer_id: null,
+                deleted_at: null
+            };
+        });
+
+        if (isGuest) {
+            const data = getGuestData();
+            // Need to strip extra fields that might not exist on Guest type validation if we were strict
+            // but here we just push.
+             const guestNewTxs = newTxs.map(t => ({
+                ...t,
+                user_id: 'guest',
+                // ensure we don't carry over ids that conflict or relations
+            }));
+            data.transactions.push(...guestNewTxs);
+            setGuestData(data);
+            await fetchData();
+            logAction('create', 'transaction', 'batch', `Clonado ${newTxs.length} transações de ${format(sourceDate, 'MMM/yyyy')} para ${format(targetDate, 'MMM/yyyy')}`);
+            showToast(`${newTxs.length} transações clonadas com sucesso!`, { type: 'success' });
+            return true;
+        } else {
+             const cleanTxs = newTxs.map(({ id, category, ...rest }) => ({
+                 ...rest, // Supabase will auto-generate ID if we omit, but we generated one.
+                 // Actually better to let Supabase gen ID or use uuid? 
+                 // We defined ID above.
+                 user_id: user!.id,
+             }));
+
+             // We need to map back to what Supabase expects (no 'category' object, just category_id)
+             // and ensure no undefined fields.
+             const dbTxs = cleanTxs.map(t => ({
+                 description: t.description,
+                 amount: t.amount,
+                 type: t.type,
+                 date: t.date,
+                 category_id: t.category_id,
+                 user_id: t.user_id,
+                 account_id: t.account_id,
+                 status: t.status,
+                 notes: t.notes
+             }));
+
+             const { error } = await supabase.from('transactions').insert(dbTxs);
+             if (error) throw error;
+             
+             await fetchData();
+             logAction('create', 'transaction', 'batch', `Clonado ${newTxs.length} transações de ${format(sourceDate, 'MMM/yyyy')} para ${format(targetDate, 'MMM/yyyy')}`);
+             showToast(`${newTxs.length} transações clonadas com sucesso!`, { type: 'success' });
+             return true;
+        }
+    }, `${sourceDate}-${targetDate}`);
+
     const addGoal = (goal: Omit<Goal, 'id' | 'current_amount' | 'status' | 'user_id' | 'target_amount' | 'deadline'> & {targetAmount: number; deadline: string;}) => withMutation(async () => {
         if (isGuest) {
             const data = getGuestData();
@@ -1420,6 +1593,8 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         bulkDeleteTransactions,
         deleteTransaction,
         updateTransactionsCategory,
+        mergeTransactions,
+        cloneMonth,
         addGoal,
         updateGoalValue,
         deleteGoal,
@@ -1443,6 +1618,8 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         restoreTransaction,
         permanentDeleteTransaction,
         deletedTransactions,
+        auditLogs,
+        logAction
     }), [
         transactions, deletedTransactions, auditLogs, goals, debts, scheduledTransactions, categories, summary, monthlyChartData, userLevel, achievements,
         healthScore, dailyMissions, savingsSuggestion, dueSoonBills, completeMission, checkForDuplicates,
@@ -1450,59 +1627,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     ]);
 
     return (
-        <DashboardDataContext.Provider value={{
-            transactions,
-            accounts,
-            goals,
-            debts,
-            scheduledTransactions,
-            categories,
-            summary,
-            monthlyChartData,
-            userLevel,
-            achievements,
-            healthScore,
-            dailyMissions,
-            savingsSuggestion,
-            dueSoonBills,
-            loading,
-            isMutating,
-            mutatingIds,
-            error,
-            addTransaction,
-            updateTransaction,
-            addTransfer,
-            bulkUpdateTransactions,
-            bulkDeleteTransactions,
-            deleteTransaction,
-            updateTransactionsCategory,
-            addGoal,
-            updateGoalValue,
-            deleteGoal,
-            addDebt,
-            addPaymentToDebt,
-            deleteDebt,
-            addScheduledTransaction,
-            restoreTransaction,
-            permanentDeleteTransaction,
-            deletedTransactions,
-            updateScheduledTransaction,
-            deleteScheduledTransaction,
-            completeMission,
-            checkForDuplicates,
-            clearError,
-            addMockData,
-            clearAllUserData,
-            addMockTransactions,
-            addMockGoals,
-            addMockDebts,
-            addMockInvestments,
-            clearTable,
-            forceError,
-            toggleTransactionStar,
-            auditLogs,
-            logAction
-        }}>
+        <DashboardDataContext.Provider value={value}>
             {children}
         </DashboardDataContext.Provider>
     );

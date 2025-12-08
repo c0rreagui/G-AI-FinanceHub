@@ -1,11 +1,12 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { Button } from '../ui/Button';
-import { Trash2, Edit, CheckCircle, X } from 'lucide-react';
+import { Trash2, Edit, CheckCircle, X, Merge } from 'lucide-react';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { BulkEditDialog } from './BulkEditDialog';
+import { MergeDialog } from './MergeDialog';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../ui/Dialog';
+import { TransactionStatus } from '@/types';
 
 interface BulkActionsBarProps {
     selectedIds: string[];
@@ -16,6 +17,7 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({ selectedIds, onC
     const { bulkDeleteTransactions, bulkUpdateTransactions } = useDashboardData();
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+    const [isMergeOpen, setIsMergeOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
     if (selectedIds.length === 0) return null;
@@ -35,18 +37,20 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({ selectedIds, onC
 
     const handleConciliate = async () => {
         try {
-            await bulkUpdateTransactions(selectedIds, { reconciled: true });
+            await bulkUpdateTransactions(selectedIds, { status: TransactionStatus.COMPLETED });
             onClearSelection();
         } catch (error) {
             console.error("Failed to conciliate", error);
         }
     };
+    
+    // Workaround for framer-motion type issue
+    const MotionDiv = motion.div as any;
 
     return (
         <>
             <AnimatePresence>
-                {/* @ts-ignore */}
-                <motion.div
+                <MotionDiv
                     initial={{ y: 100, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: 100, opacity: 0 }}
@@ -62,6 +66,11 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({ selectedIds, onC
                             Editar
                         </Button>
                         
+                        <Button variant="ghost" size="sm" onClick={() => setIsMergeOpen(true)} className="hover:bg-muted/50 text-purple-500 hover:text-purple-600">
+                            <Merge className="w-4 h-4 mr-2" />
+                            Unificar
+                        </Button>
+
                         <Button variant="ghost" size="sm" onClick={handleConciliate} className="hover:bg-muted/50 text-emerald-500 hover:text-emerald-600">
                             <CheckCircle className="w-4 h-4 mr-2" />
                             Conciliar
@@ -76,7 +85,7 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({ selectedIds, onC
                     <Button variant="ghost" size="icon" onClick={onClearSelection} className="ml-2 rounded-full h-8 w-8">
                         <X className="w-4 h-4" />
                     </Button>
-                </motion.div>
+                </MotionDiv>
             </AnimatePresence>
 
             <BulkEditDialog 
@@ -84,6 +93,13 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({ selectedIds, onC
                 onClose={() => setIsEditOpen(false)} 
                 selectedIds={selectedIds}
                 onSuccess={onClearSelection}
+            />
+
+            <MergeDialog 
+                isOpen={isMergeOpen} 
+                onClose={() => setIsMergeOpen(false)} 
+                transactionIds={selectedIds}
+                onComplete={onClearSelection}
             />
 
             <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>

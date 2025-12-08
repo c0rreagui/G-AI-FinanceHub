@@ -298,6 +298,8 @@ export interface DashboardDataContextType {
   toggleTransactionStar: (id: string) => Promise<boolean>;
   restoreTransaction: (id: string) => Promise<boolean>;
   permanentDeleteTransaction: (id: string) => Promise<boolean>;
+  mergeTransactions: (ids: string[], targetDetails: Partial<Transaction>) => Promise<boolean>;
+  cloneMonth: (sourceDate: Date, targetDate: Date) => Promise<boolean>;
   deletedTransactions: Transaction[];
   auditLogs: AuditLog[];
   logAction: (action: 'create' | 'update' | 'delete' | 'restore' | 'permanent_delete', entity: 'transaction' | 'goal' | 'debt' | 'scheduled_transaction', entityId: string, details: string) => Promise<void>;

@@ -12,6 +12,7 @@ import { FilterBar } from '../transactions/FilterBar';
 import { BulkActionsBar } from '../transactions/BulkActionsBar';
 import { SmartReclassificationDialog } from '../transactions/SmartReclassificationDialog';
 import { TrashDialog } from '../transactions/TrashDialog';
+import { CloneMonthDialog } from '../transactions/CloneMonthDialog';
 import { AuditLogDialog } from '../dashboard/AuditLogDialog';
 import { History } from 'lucide-react';
 import { groupTransactionsByDate, GroupBy } from '../../utils/dateGrouping';
@@ -326,8 +327,8 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
             />
 
             <TrashDialog 
-                isOpen={isTrashOpen}
-                onClose={() => setIsTrashOpen(false)}
+                open={isTrashOpen}
+                onOpenChange={setIsTrashOpen}
             />
 
             <AuditLogDialog 
