@@ -88,15 +88,17 @@ export const KPICard: React.FC<{ title: string; value: number; trend: number; ic
                         animate={{ pathLength: 1, opacity: 1 }}
                         transition={{ duration: 1.5, ease: "easeInOut" }}
                     />
-                    <motion.path
-                        d={`${sparklinePath} L 90,50 L 0,50 Z`}
-                        fill="currentColor"
-                        stroke="none"
-                        className={`text-${colorClass}-400`}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 0.2 }}
-                        transition={{ duration: 1.5, delay: 0.5 }}
-                    />
+                    {sparklinePath && (
+                        <motion.path
+                            d={`${sparklinePath} L 90,50 L 0,50 Z`}
+                            fill="currentColor"
+                            stroke="none"
+                            className={`text-${colorClass}-400`}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 0.2 }}
+                            transition={{ duration: 1.5, delay: 0.5 }}
+                        />
+                    )}
                 </svg>
             </div>
         </Card>
