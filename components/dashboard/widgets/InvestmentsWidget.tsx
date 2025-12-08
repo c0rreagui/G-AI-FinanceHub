@@ -1,8 +1,8 @@
 import React from 'react';
-import { Card } from '../ui/Card';
-import { Button } from '../ui/Button';
+import { Card } from '../../ui/Card';
+import { Button } from '../../ui/Button';
 import { ChevronRight, TrendingUp, TrendingDown } from 'lucide-react';
-import { ViewType } from '../../types';
+import { ViewType } from '../../../types';
 
 interface InvestmentsWidgetProps {
   setCurrentView: (view: ViewType) => void;

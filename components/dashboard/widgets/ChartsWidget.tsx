@@ -1,3 +1,4 @@
+import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/Tabs';
 import { MonthlySummaryChart } from '../../ui/charts/MonthlySummaryChart';
 import { FinancialHeatMap } from '../../ui/charts/FinancialHeatMap';
