@@ -12,6 +12,8 @@ import { FilterBar } from '../transactions/FilterBar';
 import { BulkActionsBar } from '../transactions/BulkActionsBar';
 import { SmartReclassificationDialog } from '../transactions/SmartReclassificationDialog';
 import { TrashDialog } from '../transactions/TrashDialog';
+import { AuditLogDialog } from '../dashboard/AuditLogDialog';
+import { History } from 'lucide-react';
 import { groupTransactionsByDate, GroupBy } from '../../utils/dateGrouping';
 
 import { Input } from '../ui/Input';
@@ -54,6 +56,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
 
     const [isReclassifyOpen, setIsReclassifyOpen] = useState(false);
     const [isTrashOpen, setIsTrashOpen] = useState(false);
+    const [isAuditLogOpen, setIsAuditLogOpen] = useState(false);
 
     const filteredTransactions = useMemo(() => {
         return transactions.filter(tx => {
@@ -197,6 +200,9 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                         <Button variant="ghost" size="icon" onClick={() => setIsTrashOpen(true)} title="Lixeira">
                             <Trash2 className="w-5 h-5 text-muted-foreground hover:text-red-500 transition-colors" />
                         </Button>
+                        <Button variant="ghost" size="icon" onClick={() => setIsAuditLogOpen(true)} title="Histórico de Alterações">
+                            <History className="w-5 h-5 text-muted-foreground hover:text-primary transition-colors" />
+                        </Button>
                         <Button variant="outline" onClick={() => openDialog('import-transactions')}>
                             <Upload className="w-4 h-4 mr-2"/> Importar
                         </Button>
@@ -317,6 +323,16 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                 onSuccess={() => {
                     // Optional: refresh data if needed, but bulkUpdateTransactions already does it
                 }}
+            />
+
+            <TrashDialog 
+                isOpen={isTrashOpen}
+                onClose={() => setIsTrashOpen(false)}
+            />
+
+            <AuditLogDialog 
+                isOpen={isAuditLogOpen}
+                onClose={() => setIsAuditLogOpen(false)}
             />
         </Flex>
     );

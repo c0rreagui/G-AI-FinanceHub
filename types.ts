@@ -57,6 +57,16 @@ export interface Transaction {
   deleted_at?: string | null; // ISO 8601 for Soft Delete
 }
 
+export interface AuditLog {
+  id: string;
+  action: 'create' | 'update' | 'delete' | 'restore' | 'permanent_delete';
+  entity: 'transaction' | 'goal' | 'debt' | 'scheduled_transaction';
+  entity_id: string;
+  details: string;
+  created_at: string;
+  user_id: string;
+}
+
 export enum GoalStatus {
   EM_ANDAMENTO = 'EM_ANDAMENTO',
   CONCLUIDO = 'CONCLUIDO',
@@ -289,4 +299,6 @@ export interface DashboardDataContextType {
   restoreTransaction: (id: string) => Promise<boolean>;
   permanentDeleteTransaction: (id: string) => Promise<boolean>;
   deletedTransactions: Transaction[];
+  auditLogs: AuditLog[];
+  logAction: (action: 'create' | 'update' | 'delete' | 'restore' | 'permanent_delete', entity: 'transaction' | 'goal' | 'debt' | 'scheduled_transaction', entityId: string, details: string) => Promise<void>;
 }

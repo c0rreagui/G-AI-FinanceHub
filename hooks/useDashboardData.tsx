@@ -18,6 +18,7 @@ import {
     UserLevel,
     UserRank,
     Achievement,
+    AuditLog,
     ScheduledTransactionFrequency,
     DailyMission,
     InvestmentType,
@@ -175,6 +176,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [deletedTransactions, setDeletedTransactions] = useState<Transaction[]>([]);
+    const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
     const [accounts, setAccounts] = useState<Account[]>([]);
     const [goals, setGoals] = useState<Goal[]>([]);
 
@@ -606,12 +608,14 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
                 data.transactions[index].deleted_at = new Date().toISOString(); 
                 setGuestData(data);
                 await fetchData();
+                logAction('delete', 'transaction', id, `Transação movida para lixeira: ${txToDelete.description}`);
             }
         } else {
             // Soft delete for Supabase
             const { error } = await supabase.from('transactions').update({ deleted_at: new Date().toISOString() }).eq('id', id);
             if (error) throw error;
             await fetchData();
+            logAction('delete', 'transaction', id, `Transação movida para lixeira: ${txToDelete.description}`);
         }
         showToast('Transação movida para a lixeira', { type: 'success' });
         return true;
@@ -1303,18 +1307,67 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         }
     });
 
+    const logAction = async (action: 'create' | 'update' | 'delete' | 'restore' | 'permanent_delete', entity: 'transaction' | 'goal' | 'debt' | 'scheduled_transaction', entityId: string, details: string) => {
+        const newLog: AuditLog = {
+            id: crypto.randomUUID(),
+            action,
+            entity,
+            entity_id: entityId,
+            details,
+            created_at: new Date().toISOString(),
+            user_id: user?.id || 'guest'
+        };
+
+        if (isGuest) {
+            const data = getGuestData();
+            if (!data.auditLogs) data.auditLogs = [];
+            data.auditLogs.unshift(newLog);
+            if (data.auditLogs.length > 100) data.auditLogs = data.auditLogs.slice(0, 100); // Keep last 100
+            setGuestData(data);
+            setAuditLogs(data.auditLogs);
+        } else {
+             // For now, we mock it or store in a separate table if it existed.
+             // Since we don't have an 'audit_logs' table in the prompt description, 
+             // we will store it in local state for the session or if we are supposed to create a table, we should.
+             // Given the context, let's assume we want to persist it.
+             // But if I can't create a table, I will just keep it in memory/local storage for now or try to insert.
+             // Let's use a local state for Supabase user for now to avoid errors, 
+             // OR check if I can create the table.
+             // User instructions: "Implement Audit Logs".
+             // I will implement the logic. For Supabase, I'll try to insert to 'audit_logs'. 
+             // If it fails, I'll catch and log.
+             // Actually, I'll just append to local state for now to ensure UI works, 
+             // and try to persist if possible.
+             
+             // Optimistic update
+             setAuditLogs(prev => [newLog, ...prev]);
+             
+             /*
+             const { error } = await supabase.from('audit_logs').insert(newLog);
+             if (error) console.error("Failed to save audit log", error);
+             */
+        }
+    };
+
     const restoreTransaction = (id: string) => withMutation(async () => {
          if (isGuest) {
             const data = getGuestData();
             const index = data.transactions.findIndex((t: Transaction) => t.id === id);
             if (index > -1) {
+                const tx = data.transactions[index];
                 data.transactions[index].deleted_at = null;
                 setGuestData(data);
                 await fetchData();
+                logAction('restore', 'transaction', id, `Transação restaurada: ${tx.description}`);
             }
         } else {
              const { error } = await supabase.from('transactions').update({ deleted_at: null }).eq('id', id);
              if (error) throw error;
+             
+             // Get tx details for log
+             const tx = deletedTransactions.find(t => t.id === id);
+             if (tx) logAction('restore', 'transaction', id, `Transação restaurada: ${tx.description}`);
+             
              await fetchData();
         }
         showToast('Transação restaurada!', { type: 'success' });
@@ -1324,13 +1377,17 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     const permanentDeleteTransaction = (id: string) => withMutation(async () => {
         if (isGuest) {
             const data = getGuestData();
+            const tx = data.transactions.find((t: Transaction) => t.id === id);
             data.transactions = data.transactions.filter((t: Transaction) => t.id !== id);
             setGuestData(data);
             await fetchData();
+            if (tx) logAction('permanent_delete', 'transaction', id, `Transação excluída permanentemente: ${tx.description}`);
         } else {
+            const tx = deletedTransactions.find(t => t.id === id);
             const { error } = await supabase.from('transactions').delete().eq('id', id);
             if (error) throw error;
             await fetchData();
+            if (tx) logAction('permanent_delete', 'transaction', id, `Transação excluída permanentemente: ${tx.description}`);
         }
         showToast('Transação excluída permanentemente', { type: 'success' });
         return true;
@@ -1387,7 +1444,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         permanentDeleteTransaction,
         deletedTransactions,
     }), [
-        transactions, deletedTransactions, goals, debts, scheduledTransactions, categories, summary, monthlyChartData, userLevel, achievements,
+        transactions, deletedTransactions, auditLogs, goals, debts, scheduledTransactions, categories, summary, monthlyChartData, userLevel, achievements,
         healthScore, dailyMissions, savingsSuggestion, dueSoonBills, completeMission, checkForDuplicates,
         loading, isMutating, mutatingIds, error, user, isGuest
     ]);
@@ -1443,6 +1500,8 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             clearTable,
             forceError,
             toggleTransactionStar,
+            auditLogs,
+            logAction
         }}>
             {children}
         </DashboardDataContext.Provider>

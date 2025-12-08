@@ -6,16 +6,15 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
+} from "@/components/ui/Dialog";
+import { Button } from "@/components/ui/Button";
+import { ScrollArea } from "@/components/ui/ScrollArea";
 import { useDashboardData } from '@/hooks/useDashboardData';
-import { formatCurrency } from '@/utils/formatCurrency';
-import { formatDate } from '@/utils/formatDate';
+import { formatCurrency, formatDate } from '@/utils/formatters';
 import { Trash, RefreshCw, X, AlertTriangle, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Badge } from '@/components/ui/Badge';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils/utils';
 import { TransactionType } from '@/types';
 
 interface TrashDialogProps {
