@@ -304,14 +304,14 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
       header: ({ table }) => (
         <Checkbox
           checked={(table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")) as boolean | "indeterminate"}
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          onCheckedChange={onSelectAll}
           aria-label="Select all"
         />
       ),
       cell: ({ row }) => (
         <Checkbox
           checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          onCheckedChange={() => onSelect(row.original.id)}
           aria-label="Select row"
           disabled={!!row.original.goal_contribution_id || !!row.original.debt_payment_id}
         />
