@@ -285,3 +285,28 @@ Facilitando a entrada de dados em cada contexto.
 159. **TickerSearch**: Input com autocomplete para buscar ativos financeiros (B3, Crypto).
 160. **MerchantLookup**: Componente que identifica e busca o logo do estabelecimento comercial.
 161. **CategoryPredictor**: Sugestão inteligente de categoria baseada no histórico e descrição.
+
+---
+
+## 🎨 Biblioteca de Ícones
+
+Utilizamos a biblioteca `lucide-react` centralizada em `components/ui/Icons.tsx`.
+
+### Importação e Uso
+Sempre importe do nosso wrapper para garantir consistência e facilitar refatorações.
+
+```tsx
+import { Icons } from "@/components/ui/Icons";
+
+// Uso
+<Icons.Add className="w-4 h-4 mr-2" />
+<Icons.Delete />
+<Icons.Dashboard />
+```
+
+### Categorias Principais
+*   **Ações Gerais**: `Add`, `Edit`, `Delete`, `Close`, `Search`, `Filter`.
+*   **Finanças**: `Income` (Receita), `Expense` (Despesa), `Wallet`, `Bank`, `Card`.
+*   **Navegação**: `Home`, `Dashboard`, `Settings`, `User`, `Logout`.
+*   **Feedback**: `Check` (Sucesso), `Warning` (Alerta), `Error` (Erro), `Info`.
+

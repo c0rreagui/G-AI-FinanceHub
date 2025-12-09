@@ -27,6 +27,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/Avatar';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../ui/Table';
 import { List, ListItem } from '../ui/List';
+import { Icons } from '../ui/Icons';
 import { AlertTriangle, Terminal, CreditCard, Settings, User } from 'lucide-react';
 
 export const DesignSystemView: React.FC = () => {
