@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
-import { motion, useAnimation, PanInfo } from 'framer-motion';
+import { motion, useAnimation, PanInfo, AnimatePresence } from 'framer-motion';
 import { Transaction, TransactionType, TransactionStatus } from '../../types';
 import { formatCurrency } from '../../utils/formatters';
 import { Badge } from '../ui/Badge';
@@ -19,7 +19,6 @@ import {
 import { PrivacyMask } from "../ui/PrivacyMask";
 import { Text } from '../ui/AppTypography';
 import { Checkbox } from '../ui/Checkbox';
-import { DataTable } from '../ui/DataTable';
 import { DataTable } from '../ui/DataTable';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
 import { GroupBy, TransactionGroup } from '../../utils/dateGrouping';
