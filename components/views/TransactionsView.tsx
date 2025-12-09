@@ -252,7 +252,9 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                                 </div>
                             </CardContent>
                         </Card>
-                    )}\n\n                    {/* Date Grouping Control (Item 118) */}
+                    )}
+
+                    {/* Date Grouping Control (Item 118) */}
                     <div className="flex items-center gap-3 px-1 mb-2">
                         <label htmlFor="grouping-select" className="text-sm font-medium text-muted-foreground">
                             Agrupar por:

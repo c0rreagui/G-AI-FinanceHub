@@ -80,8 +80,8 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
-      {searchKey && (
-        <div className="flex items-center justify-between py-4">
+      <div className="flex items-center justify-between py-4">
+        {searchKey && (
           <Input
             placeholder="Filtrar..."
             value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
@@ -90,21 +90,21 @@ export function DataTable<TData, TValue>({
             }
             className="max-w-sm bg-background/50"
           />
-          <div className="flex items-center gap-2">
-             <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setDensity(density === 'normal' ? 'compact' : 'normal')}
-                className="hidden h-8 lg:flex"
-                title={density === 'normal' ? "Modo Compacto" : "Modo Confortável"}
-             >
-                {density === 'normal' ? <Minimize2 className="h-4 w-4 mr-2" /> : <Maximize2 className="h-4 w-4 mr-2" />}
-                {density === 'normal' ? 'Compacto' : 'Confortável'}
-             </Button>
-             <DataTableViewOptions table={table} />
-          </div>
+        )}
+        <div className={`flex items-center gap-2 ${!searchKey ? 'ml-auto' : ''}`}>
+           <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setDensity(density === 'normal' ? 'compact' : 'normal')}
+              className="hidden h-8 lg:flex"
+              title={density === 'normal' ? "Modo Compacto" : "Modo Confortável"}
+           >
+              {density === 'normal' ? <Minimize2 className="h-4 w-4 mr-2" /> : <Maximize2 className="h-4 w-4 mr-2" />}
+              {density === 'normal' ? 'Compacto' : 'Confortável'}
+           </Button>
+           <DataTableViewOptions table={table} />
         </div>
-      )}
+      </div>
       
       <div 
         className="rounded-md border border-border overflow-auto relative max-h-[var(--max-h)]"

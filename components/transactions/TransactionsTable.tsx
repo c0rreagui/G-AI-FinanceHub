@@ -515,7 +515,6 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
             <DataTable 
                 columns={columns} 
                 data={transactions} 
-                searchKey="description"
                 showFooter={true}
                 enableZebraStriping={true}
                 rowSelection={selectedIds.reduce((acc, id) => ({ ...acc, [id]: true }), {})}
