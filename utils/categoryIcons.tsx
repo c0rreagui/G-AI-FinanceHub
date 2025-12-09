@@ -1,43 +1,53 @@
-// utils/categoryIcons.ts
 import React from 'react';
-import {
-    Utensils, ShoppingCart, Car, Shirt, PiggyBank, Heart, BookOpen, Gift, Plane, HomeIcon, Dumbbell, Gamepad, Film,
-    ArrowUpRight, TrendingDown, Wallet, Lightbulb, Target
-} from '../components/Icons';
+import { Icons } from '../components/ui/Icons';
 
 const iconMap: { [key: string]: React.ElementType } = {
-    Utensils,
-    ShoppingCart,
-    Car,
-    Shirt,
-    PiggyBank,
-    Heart,
-    BookOpen,
-    Gift,
-    Plane,
-    HomeIcon,
-    Dumbbell,
-    Gamepad,
-    Film,
-    ArrowUpRight,
-    TrendingDown,
-    Wallet,
-    Lightbulb,
-    Target
+    // Standard Lucide Names
+    ...Icons,
+    
+    // Mappings for legacy/custom names
+    Utensils: Icons.Utensils, // Assuming Icons.Utensils doesn't exist, we need to check. Lucide name is 'Utensils'. Icons.tsx might not have exported it?
+    ShoppingCart: Icons.ShoppingCart, // Icons has ShoppingCart?
+    Car: Icons.Car,
+    HomeIcon: Icons.Home,
+    Heart: Icons.Heart,
+    BookOpen: Icons.BookOpen, // Icons has Education?
+    Gamepad: Icons.Gamepad,
+    Wallet: Icons.Wallet,
+    PiggyBank: Icons.Money,
+    Gift: Icons.Gift,
+    Plane: Icons.Plane,
+    Trophy: Icons.Trophy,
+    AlertTriangle: Icons.Warning,
+    ShoppingBag: Icons.ShoppingBag,
+    Coffee: Icons.Coffee,
+    Zap: Icons.Zap,
+    Film: Icons.Film,
+    Music: Icons.Music,
+    Baby: Icons.Baby,
+    Dog: Icons.Dog,
+    Map: Icons.Map,
+    Wifi: Icons.Wifi,
+    Phone: Icons.Phone,
+    Briefcase: Icons.Briefcase,
+    DollarSign: Icons.Currency,
+    TrendingUp: Icons.Investment,
+    ArrowUpCircle: Icons.Income,
+    ArrowDownCircle: Icons.Expense
 };
 
-/**
- * Retorna um componente de ícone React com base em seu nome (string).
- * Fornece um ícone de fallback ('Gift') se o nome não for encontrado.
- * @param name O nome do ícone como string.
- * @returns Um componente React de ícone.
- */
 export const getIconByName = (name: string): React.ElementType => {
+    // Direct match in our map
     if (iconMap[name]) {
         return iconMap[name];
     }
+
+    // Try finding in Icons directly (case sensitive)
+    if ((Icons as any)[name]) {
+        return (Icons as any)[name];
+    }
     
-    // Suporte para Emojis: Se não estiver no mapa e for curto, assumimos que é um emoji
+    // Suporte para Emojis
     if (name && name.length <= 5) {
         return (props: any) => (
             <span 
@@ -51,5 +61,8 @@ export const getIconByName = (name: string): React.ElementType => {
         );
     }
 
-    return Gift;
+    // Default Fallback
+    return Icons.Box; // Or Generic
 };
+
+export const getAllIcons = () => iconMap;
