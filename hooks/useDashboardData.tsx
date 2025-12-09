@@ -286,12 +286,20 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         setLoading(true);
         setError(null);
         try {
-            let { data: categoriesData, error: categoriesError } = await supabase
-                .from('categories')
-                .select('*')
-                .eq('user_id', user.id);
+            // FETCH CATEGORIES & ACCOUNTS
+            const [categoriesResult, accountsResult] = await Promise.all([
+                supabase.from('categories').select('*').eq('user_id', user.id),
+                supabase.from('accounts').select('*').eq('user_id', user.id)
+            ]);
+
+            let categoriesData = categoriesResult.data;
+            const categoriesError = categoriesResult.error;
+            
+            let accountsData = accountsResult.data;
+            const accountsError = accountsResult.error;
 
             if (categoriesError) throw categoriesError;
+            if (accountsError) throw accountsError;
 
             // Se o usuário não tiver categorias, crie as padrão para ele.
             if (!categoriesData || categoriesData.length === 0) {
@@ -304,9 +312,26 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
                 categoriesData = newCategories;
             }
 
-            // Generate Mock Accounts (since we don't have a table yet)
-            const generatedAccounts = generateMockAccounts(user.id);
-            setAccounts(generatedAccounts);
+            // Se o usuário não tiver contas, crie uma padrão (Carteira)
+            if (!accountsData || accountsData.length === 0) {
+                 const defaultAccount = {
+                    user_id: user.id,
+                    name: 'Carteira',
+                    type: 'wallet',
+                    balance: 0,
+                    color: '#10B981' // Emerald-500
+                 };
+                 const { data: newAccount, error: accInsertError } = await supabase
+                    .from('accounts')
+                    .insert(defaultAccount)
+                    .select();
+                 
+                 if (accInsertError) throw accInsertError;
+                 accountsData = newAccount;
+            }
+            
+            setAccounts(accountsData);
+            const generatedAccounts = accountsData; // Keep alias for compatibility with existing logic below
 
             const populatedCategories: Category[] = categoriesData.map(c => ({...c, icon: getIconByName(c.icon) }));
             setCategories(populatedCategories);
