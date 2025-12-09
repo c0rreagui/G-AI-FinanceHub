@@ -152,30 +152,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
         });
     };
 
-    const handleBulkRecategorize = () => {
-        openDialog('bulk-recategorize', {
-            transactionIds: selectedIds,
-            onComplete: () => setSelectedIds([]),
-        });
-    };
 
-    const handleBulkDelete = () => {
-        openDialog('confirmation', {
-            title: 'Excluir Transações',
-            message: `Tem certeza que deseja excluir ${selectedIds.length} transações? Esta ação não pode ser desfeita.`,
-            confirmText: 'Sim, Excluir Tudo',
-            confirmVariant: 'destructive',
-            onConfirm: async () => {
-                // We need to delete one by one or implement a bulk delete API
-                // For now, let's assume we loop (or if deleteTransaction supported array)
-                // Since deleteTransaction takes a string, we loop. Ideally backend supports bulk.
-                for (const id of selectedIds) {
-                    await deleteTransaction(id);
-                }
-                setSelectedIds([]);
-            },
-        });
-    };
 
     const handleClearFilters = () => {
         setSearchTerm('');
@@ -236,23 +213,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                         onClearFilters={handleClearFilters}
                     />
                     
-                    {selectedIds.length > 0 && (
-                        <Card className="bg-primary/5 border-primary/20">
-                            <CardContent className="p-2 flex justify-between items-center">
-                                <span className="text-sm font-medium ml-2">{selectedIds.length} transações selecionadas</span>
-                                <div className="flex gap-2">
-                                    <Button variant="secondary" size="sm" onClick={handleBulkRecategorize}>
-                                        <FolderSync className="w-4 h-4 mr-2" />
-                                        Recategorizar
-                                    </Button>
-                                    <Button variant="destructive" size="sm" onClick={handleBulkDelete}>
-                                        <Trash2 className="w-4 h-4 mr-2" />
-                                        Excluir
-                                    </Button>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    )}
+
 
                     {/* Date Grouping Control (Item 118) */}
                     <div className="flex items-center gap-3 px-1 mb-2">

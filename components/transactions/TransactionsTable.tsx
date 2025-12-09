@@ -303,14 +303,14 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
       id: "select",
       header: ({ table }) => (
         <Checkbox
-          checked={(table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")) as boolean | "indeterminate"}
+          checked={transactions.length > 0 && selectedIds.length === transactions.length}
           onCheckedChange={onSelectAll}
           aria-label="Select all"
         />
       ),
       cell: ({ row }) => (
         <Checkbox
-          checked={row.getIsSelected()}
+          checked={selectedIds.includes(row.original.id)}
           onCheckedChange={() => onSelect(row.original.id)}
           aria-label="Select row"
           disabled={!!row.original.goal_contribution_id || !!row.original.debt_payment_id}
@@ -489,7 +489,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
         );
       },
     },
-  ], [onComments, onEdit, onDelete, isMutating]);
+  ], [onComments, onEdit, onDelete, isMutating, selectedIds, transactions]);
 
   return (
     <>

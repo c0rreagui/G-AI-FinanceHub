@@ -5,7 +5,7 @@ import { useDashboardData } from '../../hooks/useDashboardData';
 import { BulkEditDialog } from './BulkEditDialog';
 import { MergeDialog } from './MergeDialog';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../ui/Dialog';
+import { useDialog } from '../../hooks/useDialog';
 import { TransactionStatus } from '@/types';
 
 interface BulkActionsBarProps {
@@ -15,24 +15,23 @@ interface BulkActionsBarProps {
 
 export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({ selectedIds, onClearSelection }) => {
     const { bulkDeleteTransactions, bulkUpdateTransactions } = useDashboardData();
+    const { openDialog } = useDialog();
     const [isEditOpen, setIsEditOpen] = useState(false);
-    const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [isMergeOpen, setIsMergeOpen] = useState(false);
-    const [isDeleting, setIsDeleting] = useState(false);
 
     if (selectedIds.length === 0) return null;
 
-    const handleDelete = async () => {
-        setIsDeleting(true);
-        try {
-            await bulkDeleteTransactions(selectedIds);
-            onClearSelection();
-            setIsDeleteOpen(false);
-        } catch (error) {
-            console.error("Failed to delete", error);
-        } finally {
-            setIsDeleting(false);
-        }
+    const handleDeleteClick = () => {
+        openDialog('confirmation', {
+            title: `Excluir ${selectedIds.length} transações?`,
+            message: 'Esta ação não pode ser desfeita. As transações serão removidas permanentemente.',
+            confirmText: 'Excluir',
+            confirmVariant: 'destructive',
+            onConfirm: async () => {
+                await bulkDeleteTransactions(selectedIds);
+                onClearSelection();
+            },
+        });
     };
 
     const handleConciliate = async () => {
@@ -76,7 +75,7 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({ selectedIds, onC
                             Conciliar
                         </Button>
 
-                        <Button variant="ghost" size="sm" onClick={() => setIsDeleteOpen(true)} className="hover:bg-red-500/10 text-red-500 hover:text-red-600">
+                        <Button variant="ghost" size="sm" onClick={handleDeleteClick} className="hover:bg-red-500/10 text-red-500 hover:text-red-600">
                             <Trash2 className="w-4 h-4 mr-2" />
                             Excluir
                         </Button>
@@ -102,22 +101,7 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({ selectedIds, onC
                 onComplete={onClearSelection}
             />
 
-            <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Excluir {selectedIds.length} transações?</DialogTitle>
-                        <DialogDescription>
-                            Esta ação não pode ser desfeita. As transações serão removidas permanentemente.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsDeleteOpen(false)}>Cancelar</Button>
-                        <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-                            {isDeleting ? 'Excluindo...' : 'Excluir'}
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+
         </>
     );
 };

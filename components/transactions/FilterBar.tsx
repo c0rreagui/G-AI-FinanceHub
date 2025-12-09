@@ -49,7 +49,12 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     React.useEffect(() => {
         const saved = localStorage.getItem('financehub_saved_filters');
         if (saved) {
-            setSavedFilters(JSON.parse(saved));
+            try {
+                setSavedFilters(JSON.parse(saved));
+            } catch (e) {
+                console.error("Failed to parse saved filters", e);
+                localStorage.removeItem('financehub_saved_filters');
+            }
         }
     }, []);
 
