@@ -42,7 +42,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({ isOpen, onClose, error }
       {isOpen && error && (
         <motion.div
           {...({ 
-            className: "fixed inset-0 z-[60] flex items-center justify-center bg-black/70",
+            className: "fixed inset-0 z-[200] flex items-center justify-center bg-black/70",
             "aria-labelledby": "error-modal-title",
             role: "alertdialog",
             "aria-modal": "true",

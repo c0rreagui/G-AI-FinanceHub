@@ -10,7 +10,7 @@ export const ToastContainer: React.FC = () => {
   return (
     <div
       aria-live="assertive"
-      className="fixed inset-0 z-[100] flex flex-col items-end justify-start p-4 space-y-2 pointer-events-none"
+      className="fixed inset-0 z-[9999] flex flex-col items-end justify-start p-4 space-y-2 pointer-events-none"
     >
       <AnimatePresence>
         {toasts.map((toast) => (

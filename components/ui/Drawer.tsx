@@ -72,12 +72,12 @@ export const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, title, children
                         animate="visible"
                         exit="hidden"
                         variants={overlayVariants}
-                        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50"
+                        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[110]"
                         onClick={onClose}
                     />
 
                     {/* Content */}
-                    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center pointer-events-none">
+                    <div className="fixed inset-0 z-[110] flex items-end md:items-center justify-center pointer-events-none">
                         {isDesktop ? (
                             // Desktop Modal
                             <motion.div
