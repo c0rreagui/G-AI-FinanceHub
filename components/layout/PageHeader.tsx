@@ -17,15 +17,15 @@ interface PageHeaderProps {
 }
 
 export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs = [], actions }) => {
-  const { user, logout } = useAuth();
+  const { user, logout, isDeveloper } = useAuth();
   const { greetingName } = useTheme();
   const [greeting, setGreeting] = useState({ text: 'Bem-vindo', icon: '👋' });
 
   useEffect(() => {
     const updateGreeting = () => {
         const hour = new Date().getHours();
-        if (hour < 12) setGreeting({ text: 'Bom dia', icon: '☀️' });
-        else if (hour < 18) setGreeting({ text: 'Boa tarde', icon: '🌤️' });
+        if (hour >= 5 && hour < 12) setGreeting({ text: 'Bom dia', icon: '☀️' });
+        else if (hour >= 12 && hour < 18) setGreeting({ text: 'Boa tarde', icon: '🌤️' });
         else setGreeting({ text: 'Boa noite', icon: '🌙' });
     };
     updateGreeting();
@@ -33,12 +33,21 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs
     return () => clearInterval(interval);
   }, []);
 
+
+
   const renderIcon = () => {
     if (React.isValidElement(icon)) {
       return icon;
     }
     const Icon = icon as React.ElementType;
     return <Icon className="w-8 h-8 text-cyan-300" />;
+  };
+
+  const getDisplayName = () => {
+      if (greetingName) return greetingName;
+      if (user?.user_metadata?.name) return user.user_metadata.name;
+      if (isDeveloper) return 'Desenvolvedor';
+      return 'Visitante';
   };
 
   return (
@@ -52,7 +61,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs
           <div>
              <h1 className="text-3xl font-bold tracking-tight text-foreground">{title}</h1>
              <p className="text-sm text-muted-foreground flex items-center gap-2">
-                <span>{greeting.icon} {greeting.text}, <span className="text-primary font-medium">{greetingName || user?.user_metadata?.name || 'Visitante'}</span></span>
+                <span>{greeting.icon} {greeting.text}, <span className="text-primary font-medium">{getDisplayName()}</span></span>
              </p>
           </div>
         </div>

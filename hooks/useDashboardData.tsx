@@ -1316,6 +1316,9 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             
             // Add Mock Investments
             await addMockInvestments(5);
+        } else {
+             showToast('Erro: Usuário não autenticado. Tente fazer login novamente.', { type: 'error' });
+             return; // Stop here
         }
 
         
