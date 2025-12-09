@@ -84,6 +84,7 @@ export const Sheet: React.FC<SheetProps> = ({ isOpen, onClose, title, children, 
                                     <button 
                                         onClick={onClose}
                                         className="p-2 hover:bg-secondary rounded-full transition-colors text-muted-foreground hover:text-foreground"
+                                        aria-label="Fechar"
                                     >
                                         <XIcon className="w-5 h-5" />
                                     </button>

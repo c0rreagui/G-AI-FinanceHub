@@ -61,7 +61,8 @@ export const getIconByName = (name: string): React.ElementType => {
     }
 
     // Default Fallback
-    return Icons.Box; // Or Generic
+    console.warn(`Icon not found for: ${name}`);
+    return Icons.LayoutGrid; // Generic Category Icon
 };
 
 export const getAllIcons = () => iconMap;

@@ -11,6 +11,22 @@ interface CategoryGridItemProps {
 
 const CategoryGridItem: React.FC<CategoryGridItemProps> = ({ category, isSelected, onSelect }) => {
     
+    const iconContainerRef = React.useRef<HTMLDivElement>(null);
+    const iconRef = React.useRef<SVGSVGElement>(null);
+    const overlayRef = React.useRef<HTMLDivElement>(null);
+
+    React.useEffect(() => {
+        if (iconContainerRef.current) {
+            iconContainerRef.current.style.setProperty('--category-color', category.color);
+        }
+        if (iconRef.current) {
+             iconRef.current.style.color = isSelected ? 'currentColor' : 'var(--category-color)';
+        }
+        if (overlayRef.current) {
+            overlayRef.current.style.backgroundColor = isSelected ? 'transparent' : `color-mix(in srgb, ${category.color} 20%, transparent)`;
+        }
+    }, [category.color, isSelected]);
+
     const handleSelect = () => {
         triggerHapticFeedback();
         onSelect(category.id);
@@ -21,20 +37,24 @@ const CategoryGridItem: React.FC<CategoryGridItemProps> = ({ category, isSelecte
             {...({
                 type: "button",
                 onClick: handleSelect,
-                className: `relative flex flex-col items-center justify-center gap-1 p-2 rounded-xl border-2 transition-all duration-200 ${
-                    isSelected ? 'border-cyan-500/80 bg-cyan-500/20' : 'border-transparent bg-white/5 hover:bg-white/10'
+                className: `relative flex flex-col items-center justify-between gap-2 p-3 rounded-xl border transition-all duration-200 min-w-[80px] flex-1 ${
+                    isSelected ? 'border-primary bg-primary/20 shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]' : 'border-border bg-card/50 hover:bg-card hover:border-primary/50'
                 }`,
                 title: category.name,
                 "aria-label": `Selecionar categoria: ${category.name}`,
                 "aria-pressed": isSelected,
-                whileHover: { scale: 1.05 },
+                whileHover: { scale: 1.05, y: -2 },
                 whileTap: { scale: 0.95 }
             } as any)}
         >
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${category.color}20` }}>
-                <category.icon className="w-5 h-5" style={{ color: category.color }} />
+            <div 
+                ref={iconContainerRef}
+                className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`} 
+            >
+                <category.icon ref={iconRef} className="w-5 h-5" />
             </div>
-            <span className={`text-xs text-center truncate w-full ${isSelected ? 'text-white font-semibold' : 'text-gray-300'}`}>{category.name}</span>
+            <div ref={overlayRef} className="absolute inset-0 rounded-xl transition-colors pointer-events-none" />
+            <span className={`text-[10px] sm:text-xs font-medium text-center leading-tight line-clamp-2 w-full ${isSelected ? 'text-primary-foreground' : 'text-muted-foreground'}`}>{category.name}</span>
         </motion.button>
     );
 };
@@ -47,7 +67,7 @@ interface CategoryPickerProps {
 
 export const CategoryPicker: React.FC<CategoryPickerProps> = ({ categories, selectedCategoryId, onSelectCategory }) => {
     return (
-        <div className="mt-2 grid grid-cols-4 sm:grid-cols-6 gap-2">
+        <div className="mt-2 flex flex-wrap gap-2">
             {categories.map(cat => (
                 <CategoryGridItem 
                     key={cat.id}

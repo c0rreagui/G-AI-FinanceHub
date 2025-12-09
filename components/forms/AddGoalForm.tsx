@@ -113,7 +113,7 @@ export const AddGoalForm: React.FC<AddGoalFormProps> = ({ isOpen, onClose }) => 
       {isOpen && (
         <motion.div
           {...({
-              className: "fixed inset-0 z-50 flex flex-col bg-[oklch(var(--background-oklch))]",
+              className: "fixed inset-0 z-[110] flex flex-col bg-[oklch(var(--background-oklch))]",
               initial: { y: '100%' },
               animate: { y: '0%' },
               exit: { y: '100%' },
@@ -123,7 +123,7 @@ export const AddGoalForm: React.FC<AddGoalFormProps> = ({ isOpen, onClose }) => 
         >
           <div className="flex items-center justify-between p-4 border-b border-[oklch(var(--border-oklch))] flex-shrink-0">
             <h2 className="text-xl font-semibold text-white">Nova Meta</h2>
-            <button onClick={onClose} className="p-1 text-gray-400"><XIcon className="w-6 h-6" /></button>
+            <button onClick={onClose} className="p-1 text-gray-400" aria-label="Fechar"><XIcon className="w-6 h-6" /></button>
           </div>
           <div className="flex-grow p-4 overflow-y-auto">
             <form id="mobile-goal-form" onSubmit={handleSubmit} className="space-y-6">

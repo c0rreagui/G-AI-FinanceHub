@@ -8,7 +8,7 @@ export const GuestModeBanner: React.FC = () => {
   if (isDeveloper) return null;
 
   return (
-    <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 flex items-center justify-between shadow-md relative z-50">
+    <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 flex items-center justify-between shadow-md relative z-[100]">
       <div className="flex items-center gap-2">
         <span className="font-medium text-sm">Modo Convidado</span>
         <span className="text-xs opacity-80 hidden sm:inline">

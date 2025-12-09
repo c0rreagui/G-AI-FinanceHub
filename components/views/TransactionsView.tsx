@@ -269,7 +269,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
              )}
 
             {/* Mobile FAB */}
-            <div className="md:hidden fixed bottom-24 right-6 z-50">
+            <div className="md:hidden fixed bottom-24 right-6 z-[80]">
                 <Button
                     size="icon"
                     className="h-14 w-14 rounded-full shadow-lg bg-primary hover:bg-primary/90 transition-all active:scale-95"

@@ -98,10 +98,10 @@ const SpeedDial: React.FC = () => {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
-                          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40"
+                          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[80]"
                           onClick={toggleOpen}
                         />
-                        <div className="absolute bottom-24 flex flex-col items-center gap-4 z-50">
+                        <div className="absolute bottom-24 flex flex-col items-center gap-4 z-[90]">
                             {actions.map((action, index) => (
                                 <MotionDiv
                                     key={action.label}
@@ -126,7 +126,7 @@ const SpeedDial: React.FC = () => {
             </AnimatePresence>
             <MotionButton 
                 onClick={toggleOpen}
-                className="relative z-50 flex items-center justify-center w-14 h-14 bg-gradient-to-r from-primary to-blue-600 rounded-full text-primary-foreground shadow-lg -translate-y-4"
+                className="relative z-[90] flex items-center justify-center w-14 h-14 bg-gradient-to-r from-primary to-blue-600 rounded-full text-primary-foreground shadow-lg -translate-y-4"
                 whileTap={{ scale: 0.9 }}
                 animate={isOpen ? "open" : "closed"}
                 aria-label={isOpen ? "Fechar ações rápidas" : "Abrir ações rápidas"}

@@ -4,6 +4,7 @@ import { Button } from '../ui/Button';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { Transaction, TransactionType, ScheduledTransactionFrequency, TransactionStatus } from '../../types';
 import { Input } from '../ui/Input';
+import { Checkbox } from '../ui/Checkbox';
 import { SmartInput } from '../ui/SmartInput';
 import { SmartDatePicker } from '../ui/SmartDatePicker';
 import { TypeToggle } from '../ui/TypeToggle';
@@ -12,7 +13,7 @@ import { LoadingSpinner } from '../LoadingSpinner';
 import { DragDropUpload } from '../ui/DragDropUpload';
 import { motion } from 'framer-motion';
 import type { Variants } from 'framer-motion';
-import { Mic, Repeat, CalendarClock } from 'lucide-react';
+import { Mic, Repeat, CalendarClock, ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
 import { Switch } from '../ui/Switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 import { useToast } from '../../hooks/useToast';
@@ -46,7 +47,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
   const [reconciled, setReconciled] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const [isTransferMode, setIsTransferMode] = useState(false);
+  const [isTransfer, setIsTransfer] = useState(false);
   const [fromAccountId, setFromAccountId] = useState('');
   const [toAccountId, setToAccountId] = useState('');
   const [isListening, setIsListening] = useState(false);
@@ -173,7 +174,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
       const numericAmount = parseFloat(amount.replace(/\./g, '').replace(',', '.'));
 
       // Item 143: Transfer validation
-      if (isTransferMode) {
+      if (isTransfer) {
         if (!fromAccountId || !toAccountId) {
           showToast("Selecione as contas de origem e destino.", { type: "error" });
           return;
@@ -291,28 +292,47 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
         }
     >
         <MotionDiv className="space-y-6" initial="visible" animate="visible" variants={{ visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }}>
-            {/* Type Toggle */}
-            <motion.div variants={itemVariants}>
-                <TypeToggle selectedType={type} onTypeChange={setType} />
-            </motion.div>
+            {/* Type & Transfer */}
+            <motion.div variants={itemVariants} className="space-y-4">
+                 <div className="grid grid-cols-2 gap-1 p-1 bg-muted/50 rounded-lg border border-border">
+                    <Button
+                        type="button"
+                        variant={type === TransactionType.DESPESA ? 'destructive' : 'ghost'}
+                        onClick={() => setType(TransactionType.DESPESA)}
+                        className={`flex items-center justify-center gap-2 h-9 ${type === TransactionType.DESPESA ? 'shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                    >
+                        <ArrowDownCircle className="w-4 h-4" />
+                        Despesa
+                    </Button>
+                    <Button
+                        type="button"
+                        variant={type === TransactionType.RECEITA ? 'default' : 'ghost'}
+                        onClick={() => setType(TransactionType.RECEITA)}
+                        className={`flex items-center justify-center gap-2 h-9 ${type === TransactionType.RECEITA ? 'bg-green-600 hover:bg-green-700 text-white shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                    >
+                        <ArrowUpCircle className="w-4 h-4" />
+                        Receita
+                    </Button>
+                 </div>
 
-            {/* Transfer Mode Toggle - Item 143 */}
-            {/* @ts-ignore */}
-            <motion.div variants={itemVariants} className="flex items-center gap-3 p-4 bg-secondary/20 rounded-xl border border-border">
-                <input
-                    type="checkbox"
-                    id="transfer-mode"
-                    checked={isTransferMode}
-                    onChange={(e) => setIsTransferMode(e.target.checked)}
-                    className="w-4 h-4 rounded border-input text-primary focus:ring-primary"
-                />
-                <label htmlFor="transfer-mode" className="text-sm cursor-pointer">
-                    Transferência entre contas
-                </label>
+                 {type === TransactionType.DESPESA && (
+                     <div className="flex items-center gap-2 px-1">
+                        <Checkbox 
+                            id="is-transfer" 
+                            checked={isTransfer}
+                            onCheckedChange={(checked) => setIsTransfer(checked === true)}
+                        />
+                        <label 
+                            htmlFor="is-transfer" 
+                            className="text-sm font-medium text-muted-foreground cursor-pointer select-none"
+                        >
+                            Transferência entre contas
+                        </label>
+                     </div>
+                 )}
             </motion.div>
-
             {/* Transfer Account Selectors - Item 143 */}
-            {isTransferMode && (
+            {isTransfer && (
                 <>
                 {/* @ts-ignore */}
                 <motion.div variants={itemVariants} className="grid grid-cols-2 gap-4">
