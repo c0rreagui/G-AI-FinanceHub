@@ -57,9 +57,9 @@ export const TourGuide: React.FC<TourGuideProps> = ({ steps, isOpen, onClose }) 
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/50 z-50" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/50 z-[500]" onClick={onClose} />
       <div 
-        className="absolute z-50 transition-all duration-300 ease-in-out"
+        className="absolute z-[500] transition-all duration-300 ease-in-out"
         style={{ top: position.top, left: position.left }}
       >
         <Card className="w-[300px] shadow-2xl border-primary/50 ring-4 ring-primary/20">

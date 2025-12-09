@@ -63,14 +63,15 @@ export const Sheet: React.FC<SheetProps> = ({ isOpen, onClose, title, children, 
                         animate="visible"
                         exit="hidden"
                         variants={overlayVariants}
-                        {...({ className: "fixed inset-0 bg-background/80 backdrop-blur-sm z-50", onClick: onClose } as any)}
+                        {...({ className: "fixed inset-0 bg-background/80 backdrop-blur-sm z-[100]", onClick: onClose } as any)}
                     />
 
                     {/* Content */}
-                    <div className={`fixed inset-0 z-50 flex pointer-events-none ${isDesktop ? (side === 'right' ? 'justify-end' : 'justify-start') : 'items-end justify-center'}`}>
+                    <div className={`fixed inset-0 z-[110] flex pointer-events-none ${isDesktop ? (side === 'right' ? 'justify-end' : 'justify-start') : 'items-end justify-center'}`}>
                         {isDesktop ? (
                             // Desktop Side Sheet
                             <motion.div
+                                key="desktop-sheet"
                                 custom={side}
                                 variants={sheetVariants}
                                 initial="hidden"
@@ -99,6 +100,7 @@ export const Sheet: React.FC<SheetProps> = ({ isOpen, onClose, title, children, 
                         ) : (
                             // Mobile Bottom Sheet (Drawer)
                             <motion.div
+                                key="mobile-drawer"
                                 variants={drawerVariants}
                                 initial="hidden"
                                 animate="visible"

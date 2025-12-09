@@ -31,7 +31,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }
     <AnimatePresence>
       {isOpen && (
         <div
-          className="relative z-50"
+          className="relative z-[140]"
           aria-labelledby="modal-title"
           role="dialog"
           aria-modal="true"

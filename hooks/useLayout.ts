@@ -34,32 +34,29 @@ const DEFAULT_LAYOUT: WidgetConfig[] = [
 const STORAGE_KEY = 'financehub_layout_v2';
 
 export const useLayout = () => {
-    const [layout, setLayout] = useState<WidgetConfig[]>(DEFAULT_LAYOUT);
-    const [isEditMode, setIsEditMode] = useState(false);
-
-    useEffect(() => {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-            try {
+    const [layout, setLayout] = useState<WidgetConfig[]>(() => {
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
                 const parsed = JSON.parse(saved);
-                // Merge with default to ensure all widgets exist (in case of updates)
-                const merged = DEFAULT_LAYOUT.map(def => {
+                return DEFAULT_LAYOUT.map(def => {
                     const found = parsed.find((p: WidgetConfig) => p.id === def.id);
                     return found ? { ...def, ...found } : def;
                 }).sort((a, b) => {
-                    // Sort by the order in the saved layout if possible
                     const idxA = parsed.findIndex((p: WidgetConfig) => p.id === a.id);
                     const idxB = parsed.findIndex((p: WidgetConfig) => p.id === b.id);
                     if (idxA === -1) return 1;
                     if (idxB === -1) return -1;
                     return idxA - idxB;
                 });
-                setLayout(merged);
-            } catch (e) {
-                console.error("Failed to parse layout", e);
             }
+        } catch (e) {
+            console.error("Failed to parse layout", e);
         }
-    }, []);
+        return DEFAULT_LAYOUT;
+    });
+
+    const [isEditMode, setIsEditMode] = useState(false);
 
     const saveLayout = (newLayout: WidgetConfig[]) => {
         setLayout(newLayout);

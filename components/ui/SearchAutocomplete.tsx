@@ -67,7 +67,7 @@ export const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
         )}
       </div>
       {showSuggestions && query && filteredSuggestions.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1 rounded-md border bg-popover shadow-md z-50 overflow-hidden animate-slide-up">
+        <div className="absolute top-full left-0 right-0 mt-1 rounded-md border bg-popover shadow-md z-[150] overflow-hidden animate-slide-up">
           {filteredSuggestions.map((suggestion, i) => (
             <div
               key={i}

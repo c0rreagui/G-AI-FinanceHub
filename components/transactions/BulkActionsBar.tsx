@@ -53,7 +53,7 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({ selectedIds, onC
                     initial={{ y: 100, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: 100, opacity: 0 }}
-                    className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-card border border-border shadow-2xl rounded-full px-6 py-3 flex items-center gap-4 z-50"
+                    className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-card border border-border shadow-2xl rounded-full px-6 py-3 flex items-center gap-4 z-[80]"
                 >
                     <span className="text-sm font-medium text-muted-foreground border-r border-border pr-4">
                         {selectedIds.length} selecionados
