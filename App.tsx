@@ -11,6 +11,7 @@ import { ToolsView } from './components/views/ToolsView';
 import { SettingsView } from './components/views/SettingsView';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { HomeDashboardView } from './components/views/HomeDashboardView';
+import { DialogManager } from './components/DialogManager';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { Transition } from 'framer-motion';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -168,9 +169,11 @@ const AppContent: React.FC = () => {
       </AnimatePresence>
       <GuestModeBanner />
       <ToastContainer />
+      <DialogManager />
     </AppLayout>
   );
 };
+
 
 const App: React.FC = () => {
   return (
