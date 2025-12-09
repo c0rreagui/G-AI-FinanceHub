@@ -27,8 +27,9 @@ interface MergeDialogProps {
 export function MergeDialog({ isOpen, onClose, transactionIds, onComplete }: MergeDialogProps) {
   const { transactions, mergeTransactions, categories } = useDashboardData();
   const [description, setDescription] = useState('');
+
   const [categoryId, setCategoryId] = useState('');
-  const [date, setDate] = useState<Date | undefined>(undefined);
+  const [date, setDate] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
 
   const selectedTransactions = transactions.filter(t => transactionIds.includes(t.id));
@@ -41,7 +42,7 @@ export function MergeDialog({ isOpen, onClose, transactionIds, onComplete }: Mer
       const primary = selectedTransactions[0];
       setDescription(primary.description); // Or maybe 'Fusão: ...'
       setCategoryId(primary.category_id);
-      setDate(new Date(primary.date));
+      setDate(primary.date.split('T')[0]);
     }
   }, [isOpen, transactionIds]);
 
@@ -53,7 +54,7 @@ export function MergeDialog({ isOpen, onClose, transactionIds, onComplete }: Mer
         await mergeTransactions(transactionIds, {
             description,
             category_id: categoryId,
-            date: date.toISOString(),
+            date: new Date(date).toISOString(),
             // type and status will be inferred or defaulted in the hook
         });
         onComplete?.();
@@ -116,16 +117,16 @@ export function MergeDialog({ isOpen, onClose, transactionIds, onComplete }: Mer
                     <div className="space-y-2">
                          <Label>Categoria</Label>
                          <CategoryPicker
+                            categories={categories}
                             selectedCategoryId={categoryId}
-                            onSelect={setCategoryId}
-                            type={totalAmount >= 0 ? TransactionType.RECEITA : TransactionType.DESPESA}
+                            onSelectCategory={setCategoryId}
                          />
                     </div>
                     <div className="space-y-2">
                         <Label>Data</Label>
                          <SmartDatePicker
-                            date={date}
-                            onSelect={setDate}
+                            value={date}
+                            onChange={setDate}
                          />
                     </div>
                 </div>
