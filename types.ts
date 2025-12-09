@@ -117,6 +117,7 @@ export interface ScheduledTransaction {
   next_due_date: string; // ISO 8601 format
   frequency: ScheduledTransactionFrequency;
   user_id: string;
+  account_id?: string;
 }
 
 export interface SummaryData {

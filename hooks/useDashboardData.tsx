@@ -343,18 +343,21 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
                 { data: transactionsData, error: transactionsError },
                 { data: goalsData, error: goalsError },
                 { data: debtsData, error: debtsError },
-                { data: scheduledData, error: scheduledError }
+                { data: scheduledData, error: scheduledError },
+                { data: auditData, error: auditError }
             ] = await Promise.all([
                 supabase.from('transactions').select('*').eq('user_id', user.id).order('date', { ascending: false }),
                 supabase.from('goals').select('*').eq('user_id', user.id).order('deadline', { ascending: true }),
                 supabase.from('debts').select('*').eq('user_id', user.id),
-                supabase.from('scheduled_transactions').select('*').eq('user_id', user.id).order('next_due_date', { ascending: true })
+                supabase.from('scheduled_transactions').select('*').eq('user_id', user.id).order('next_due_date', { ascending: true }),
+                supabase.from('audit_logs').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(50)
             ]);
 
             if (transactionsError) throw transactionsError;
             if (goalsError) throw goalsError;
             if (debtsError) throw debtsError;
             if (scheduledError) throw scheduledError;
+            if (auditError) throw auditError;
 
             const mappedTransactions = transactionsData?.map(tx => ({
                 ...tx, 
@@ -368,6 +371,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             setGoals(goalsData || []);
             setDebts(debtsData || []);
             setScheduledTransactions(scheduledData?.map(stx => ({...stx, category: categoryMap.get(stx.category_id) || fallbackCategory })) || []);
+            setAuditLogs(auditData as AuditLog[] || []);
 
         } catch (e: any) {
             const errorMessage = e.message || "Falha ao carregar os dados.";
@@ -457,6 +461,22 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         
         return { level, xp: currentXp, xpToNextLevel, rank };
     }, [transactions, goals, debts, user, isGuest]);
+
+    // Sync XP/Level to user_profiles for Social features/Leaderboards
+    useEffect(() => {
+        if (user && userLevel && !isGuest) {
+            const syncProfile = async () => {
+                const { error } = await supabase.from('user_profiles').update({ 
+                    xp: userLevel.xp, 
+                    level: userLevel.level,
+                    // monthly_income: summary.monthlyIncome, // Optional: sync financial stats too?
+                    // savings_goal: 0 // We don't have a specific global savings goal field yet
+                }).eq('id', user.id);
+                if (error) console.error("Error syncing profile XP:", error);
+            };
+            syncProfile();
+        }
+    }, [user, userLevel, isGuest]);
 
     const healthScore = useMemo(() => {
         let score = 0;

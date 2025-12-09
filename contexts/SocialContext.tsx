@@ -35,9 +35,10 @@ export const SocialProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 .from('user_families')
                 .select('family_id, role')
                 .eq('user_id', user.id)
-                .single();
+                .eq('user_id', user.id)
+                .maybeSingle();
 
-            if (ufError && ufError.code !== 'PGRST116') { // PGRST116 is "no rows found"
+            if (ufError) {
                 console.error('Error fetching user family:', ufError);
             }
 
@@ -151,7 +152,8 @@ export const SocialProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 .select('*')
                 .eq('token', token)
                 .eq('status', 'pending')
-                .single();
+                .eq('status', 'pending')
+                .maybeSingle();
 
             if (inviteError || !invite) throw new Error('Convite inválido ou expirado.');
 
