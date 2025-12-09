@@ -38,8 +38,10 @@ export const SmartDatePicker: React.FC<SmartDatePickerProps> = ({ value, onChang
                     variant="outline"
                     size="sm"
                     className={cn(
-                        "flex-1 text-xs",
-                        isSameDay(currentDate, subDays(new Date(), 1)) && "bg-primary text-primary-foreground hover:bg-primary/90"
+                        "flex-1 text-xs transition-all duration-200",
+                        isSameDay(currentDate, subDays(new Date(), 1)) 
+                            ? "bg-primary/10 text-primary border-primary/30 font-semibold shadow-sm hover:bg-primary/20" 
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted"
                     )}
                     onClick={() => handleQuickDate(subDays(new Date(), 1))}
                 >
@@ -50,8 +52,10 @@ export const SmartDatePicker: React.FC<SmartDatePickerProps> = ({ value, onChang
                     variant="outline"
                     size="sm"
                     className={cn(
-                        "flex-1 text-xs",
-                        isSameDay(currentDate, new Date()) && "bg-primary text-primary-foreground hover:bg-primary/90"
+                        "flex-1 text-xs transition-all duration-200",
+                        isSameDay(currentDate, new Date()) 
+                            ? "bg-primary/10 text-primary border-primary/30 font-semibold shadow-sm hover:bg-primary/20" 
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted"
                     )}
                     onClick={() => handleQuickDate(new Date())}
                 >
@@ -62,8 +66,10 @@ export const SmartDatePicker: React.FC<SmartDatePickerProps> = ({ value, onChang
                     variant="outline"
                     size="sm"
                     className={cn(
-                        "flex-1 text-xs",
-                        isSameDay(currentDate, addDays(new Date(), 1)) && "bg-primary text-primary-foreground hover:bg-primary/90"
+                        "flex-1 text-xs transition-all duration-200",
+                        isSameDay(currentDate, addDays(new Date(), 1)) 
+                            ? "bg-primary/10 text-primary border-primary/30 font-semibold shadow-sm hover:bg-primary/20" 
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted"
                     )}
                     onClick={() => handleQuickDate(addDays(new Date(), 1))}
                 >

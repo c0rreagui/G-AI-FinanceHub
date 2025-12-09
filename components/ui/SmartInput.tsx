@@ -67,7 +67,7 @@ export const SmartInput: React.FC<SmartInputProps> = ({
         <div className={`space-y-2 ${className}`}>
             {label && <label className="text-sm font-medium text-slate-400">{label}</label>}
             <div className="relative">
-                <span className={`absolute left-4 top-1/2 -translate-y-1/2 font-bold text-lg transition-colors ${isMathMode ? 'text-violet-400' : 'text-gray-500'}`}>
+                <span className={`absolute left-4 top-1/2 -translate-y-1/2 font-bold text-lg transition-colors ${isMathMode ? 'text-violet-400' : 'text-muted-foreground'}`}>
                     {isMathMode ? <Calculator className="w-6 h-6" /> : prefix}
                 </span>
                 <input
@@ -79,10 +79,10 @@ export const SmartInput: React.FC<SmartInputProps> = ({
                     onBlur={handleBlur}
                     placeholder={placeholder}
                     autoFocus={autoFocus}
-                    className={`w-full bg-slate-900/50 border rounded-xl py-4 pl-12 pr-4 text-2xl font-bold text-white placeholder-white/10 focus:outline-none focus:ring-2 transition-all ${
+                    className={`w-full bg-background/50 border rounded-xl py-4 pl-12 pr-4 text-2xl font-bold text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 transition-all ${
                         isMathMode 
                             ? 'border-violet-500/50 focus:ring-violet-500/50 text-violet-200' 
-                            : 'border-white/10 focus:ring-white/20'
+                            : 'border-input bg-secondary/10 focus:ring-primary/50 focus:border-primary'
                     }`}
                 />
                 {isMathMode && (

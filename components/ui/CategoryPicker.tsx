@@ -12,20 +12,26 @@ interface CategoryGridItemProps {
 const CategoryGridItem: React.FC<CategoryGridItemProps> = ({ category, isSelected, onSelect }) => {
     
     const iconContainerRef = React.useRef<HTMLDivElement>(null);
+    const buttonRef = React.useRef<HTMLButtonElement>(null);
     const iconRef = React.useRef<SVGSVGElement>(null);
     const overlayRef = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
         if (iconContainerRef.current) {
             iconContainerRef.current.style.setProperty('--category-color', category.color);
+            // Dynamic background for icon container when selected
+            if (isSelected) {
+                iconContainerRef.current.style.backgroundColor = category.color;
+                iconContainerRef.current.style.color = '#fff';
+            } else {
+                iconContainerRef.current.style.backgroundColor = ''; // Reset to class default (bg-muted)
+                iconContainerRef.current.style.color = category.color; // Apply category color when not selected
+            }
         }
-        if (iconRef.current) {
-             iconRef.current.style.color = isSelected ? 'currentColor' : 'var(--category-color)';
+        if (buttonRef.current) {
+            buttonRef.current.style.borderColor = isSelected ? category.color : ''; // Apply border color directly
         }
-        if (overlayRef.current) {
-            overlayRef.current.style.backgroundColor = isSelected ? 'transparent' : `color-mix(in srgb, ${category.color} 20%, transparent)`;
-        }
-    }, [category.color, isSelected]);
+    }, [isSelected, category.color]);
 
     const handleSelect = () => {
         triggerHapticFeedback();
@@ -34,27 +40,26 @@ const CategoryGridItem: React.FC<CategoryGridItemProps> = ({ category, isSelecte
 
     return (
         <motion.button
-            {...({
-                type: "button",
-                onClick: handleSelect,
-                className: `relative flex flex-col items-center justify-between gap-2 p-3 rounded-xl border transition-all duration-200 min-w-[80px] flex-1 ${
-                    isSelected ? 'border-primary bg-primary/20 shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]' : 'border-border bg-card/50 hover:bg-card hover:border-primary/50'
-                }`,
-                title: category.name,
-                "aria-label": `Selecionar categoria: ${category.name}`,
-                "aria-pressed": isSelected,
-                whileHover: { scale: 1.05, y: -2 },
-                whileTap: { scale: 0.95 }
-            } as any)}
+            ref={buttonRef} // Assign ref to the motion.button
+            type="button"
+            onClick={handleSelect}
+            className={`relative flex flex-col items-center justify-between gap-2 p-3 rounded-xl border transition-all duration-200 ${
+                isSelected ? 'bg-primary/5 shadow-sm' : 'border-border bg-card/50 hover:bg-card hover:border-primary/50'
+            }`}
+            title={category.name}
+            aria-label={`Selecionar categoria: ${category.name}`}
+            aria-pressed={isSelected}
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.95 }}
         >
             <div 
                 ref={iconContainerRef}
-                className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`} 
+                className={`w-11 h-11 rounded-full flex items-center justify-center transition-colors ${!isSelected ? 'bg-muted' : ''}`} 
             >
-                <category.icon ref={iconRef} className="w-5 h-5" />
+                <category.icon className="w-5 h-5" />
             </div>
-            <div ref={overlayRef} className="absolute inset-0 rounded-xl transition-colors pointer-events-none" />
-            <span className={`text-[10px] sm:text-xs font-medium text-center leading-tight line-clamp-2 w-full ${isSelected ? 'text-primary-foreground' : 'text-muted-foreground'}`}>{category.name}</span>
+            
+            <span className={`text-xs font-medium text-center leading-tight line-clamp-2 w-full ${isSelected ? 'text-foreground' : 'text-muted-foreground'}`}>{category.name}</span>
         </motion.button>
     );
 };
@@ -67,7 +72,7 @@ interface CategoryPickerProps {
 
 export const CategoryPicker: React.FC<CategoryPickerProps> = ({ categories, selectedCategoryId, onSelectCategory }) => {
     return (
-        <div className="mt-2 flex flex-wrap gap-2">
+        <div className="mt-2 grid grid-cols-3 sm:grid-cols-4 gap-2">
             {categories.map(cat => (
                 <CategoryGridItem 
                     key={cat.id}

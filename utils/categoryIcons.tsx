@@ -33,7 +33,12 @@ const iconMap: { [key: string]: React.ElementType } = {
     DollarSign: Icons.Currency,
     TrendingUp: Icons.Investment,
     ArrowUpCircle: Icons.Income,
-    ArrowDownCircle: Icons.Expense
+    ArrowDownCircle: Icons.Expense,
+    Investimentos: Icons.Investment, // Fix missing icon
+    Outros: Icons.Menu, // Generic icon for Others
+    Lazer: Icons.Gamepad, // Fix generic match
+    Saude: Icons.Heart, // Fix generic match
+    Educacao: Icons.BookOpen // Fix generic match
 };
 
 export const getIconByName = (name: string): React.ElementType => {

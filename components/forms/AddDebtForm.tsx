@@ -101,11 +101,11 @@ export const AddDebtForm: React.FC<AddDebtFormProps> = ({ isOpen, onClose }) => 
       <Modal isOpen={isOpen} onClose={onClose} title="Adicionar Nova Dívida">
         <form onSubmit={handleSubmit} className="space-y-4">
           {FormFields}
-          <div className="flex justify-end gap-2 pt-4">
-            <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
+          <div className="flex items-center justify-end gap-3 pt-6 border-t border-border/40 mt-4">
+            <Button type="button" variant="ghost" onClick={onClose} disabled={isSubmitting} className="text-muted-foreground hover:text-foreground">
               Cancelar
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting} className="min-w-[140px] rounded-xl">
               {isSubmitting ? <><LoadingSpinner /> Salvando...</> : 'Salvar Dívida'}
             </Button>
           </div>
@@ -119,27 +119,27 @@ export const AddDebtForm: React.FC<AddDebtFormProps> = ({ isOpen, onClose }) => 
       {isOpen && (
         <motion.div
           {...({
-              className: "fixed inset-0 z-[110] flex flex-col bg-[oklch(var(--background-oklch))]",
+              className: "fixed inset-0 z-[110] flex flex-col bg-background",
               initial: { y: '100%' },
               animate: { y: '0%' },
               exit: { y: '100%' },
               transition: { type: 'spring', stiffness: 400, damping: 40 }
           } as any)}
         >
-          <div className="flex items-center justify-between p-4 border-b border-[oklch(var(--border-oklch))] flex-shrink-0">
-            <h2 className="text-xl font-semibold text-white">Nova Meta</h2>
-            <button onClick={onClose} className="p-1 text-gray-400" aria-label="Fechar"><XIcon className="w-6 h-6" /></button>
+          <div className="flex items-center justify-between p-4 border-b border-border/40 flex-shrink-0">
+            <h2 className="text-xl font-semibold text-foreground">Nova Dívida</h2>
+            <button onClick={onClose} className="p-1 text-muted-foreground hover:text-foreground transition-colors" aria-label="Fechar"><XIcon className="w-6 h-6" /></button>
           </div>
           <div className="flex-grow p-4 overflow-y-auto">
             <form id="mobile-debt-form" onSubmit={handleSubmit} className="space-y-6">
               {FormFields}
             </form>
           </div>
-          <div className="flex justify-end gap-2 p-4 border-t border-[oklch(var(--border-oklch))] flex-shrink-0">
-            <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
+          <div className="flex justify-end gap-3 p-4 border-t border-border/40 flex-shrink-0 bg-background/95 backdrop-blur-sm">
+            <Button type="button" variant="ghost" onClick={onClose} disabled={isSubmitting} className="flex-1 text-muted-foreground hover:text-foreground">
               Cancelar
             </Button>
-            <Button type="submit" form="mobile-debt-form" disabled={isSubmitting}>
+            <Button type="submit" form="mobile-debt-form" disabled={isSubmitting} className="flex-1 min-w-[140px] rounded-xl">
               {isSubmitting ? <><LoadingSpinner /> Salvando...</> : 'Salvar Dívida'}
             </Button>
           </div>

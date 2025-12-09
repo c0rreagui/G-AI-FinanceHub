@@ -1,25 +1,26 @@
 # Design System do FinanceHub (Flex-First)
 
-## 🎨 Tokens Globais (Premium)
+## 🎨 Tokens Globais (Premium & Polished)
 
 ### Cores (Paleta "Deep Space" Refinada)
 Focada em profundidade e contraste para interfaces financeiras dark-mode.
 
 **Cores Semânticas**
 *   **Background**: `--background` (`#0B0E14`) - Azul quase preto, evita o cansaço do preto absoluto.
-*   **Primary**: `--primary` (`#00F0FF` → `#00D1FF`) - **Gradiente Cyan**. Usado em botões e CTAs. Passa energia e tecnologia.
+*   **Primary**: `--primary` (`Cyan`) - **Gradiente Cyan**. Usado em ações principais.
+    *   *Tinted Style*: `bg-primary/10 text-primary` para ações secundárias de alto valor.
 *   **Secondary**: `--secondary` (`#1E293B`) - Azul ardósia para elementos de apoio.
-*   **Accent**: `--accent` (`#7C3AED`) - **Violeta Elétrico**. Usado para recursos de IA ou "Premium".
+*   **Accent**: `--accent` (`#7C3AED`) - **Violeta Elétrico**. Usado para recursos de IA.
 
 **Superfícies (Profundidade)**
-*   **Surface-1 (Card)**: `--card` (`rgba(30, 41, 59, 0.4)`) - Vidro fosco base.
-*   **Surface-2 (Modal)**: `--popover` (`rgba(30, 41, 59, 0.7)`) - Mais opaco, flutua sobre a base.
-*   **Surface-3 (Highlight)**: `--muted` (`rgba(255, 255, 255, 0.05)`) - Para hover e estados ativos.
+*   **Surface-1 (Card)**: `--card` - Vidro fosco base (`rounded-2xl` / 16px).
+*   **Surface-2 (Modal)**: `--popover` - Mais opaco (`rounded-3xl` / 24px no topo).
+*   **Surface-3 (Input)**: `--input` - `bg-secondary/10` com `rounded-xl` (12px).
 
 **Status (Funcional)**
-*   **Success**: `#10B981` (Emerald) - Para receitas e metas atingidas.
-*   **Danger**: `#EF4444` (Rose) - Para despesas e erros.
-*   **Warning**: `#F59E0B` (Amber) - Para alertas de orçamento.
+*   **Success**: `#10B981` (Emerald) - Receitas.
+*   **Danger**: `#EF4444` (Rose) - Despesas. *Nota: Usar Rose-500 para fundos suaves.*
+*   **Warning**: `#F59E0B` (Amber) - Alertas.
 
 ### Tipografia (Par Moderno)
 Combinação de legibilidade técnica com personalidade.

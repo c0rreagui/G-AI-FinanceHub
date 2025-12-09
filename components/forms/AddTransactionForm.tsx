@@ -134,7 +134,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
           setType(TransactionType.DESPESA);
           setCategoryId('');
           setAccountId('');
-          setStatus(TransactionStatus.COMPLETED);
+          setStatus(TransactionStatus.PENDING);
           setExcludeFromReports(false);
           setReconciled(false);
           setIsRecurring(false);
@@ -143,10 +143,13 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
       setIsListening(false);
   };
 
+  const recognitionRef = React.useRef<any>(null);
+
   const startListening = () => {
       if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
           const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
           const recognition = new SpeechRecognition();
+          recognitionRef.current = recognition;
           recognition.lang = 'pt-BR';
           recognition.continuous = false;
           recognition.interimResults = false;
@@ -160,6 +163,13 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
           recognition.start();
       } else {
           showToast("Seu navegador não suporta reconhecimento de voz.", { type: "error" });
+      }
+  };
+
+  const stopListening = () => {
+      if (recognitionRef.current) {
+          recognitionRef.current.stop();
+          setIsListening(false);
       }
   };
 
@@ -271,21 +281,34 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
         onClose={onClose} 
         title={isEditing ? "Editar Transação" : (isInvestmentMode ? "Novo Investimento" : (isRecurring ? "Agendar Transação" : "Nova Transação"))}
         footer={
-            <div className="flex justify-end gap-2 w-full">
-                <Button type="button" variant="ghost" onClick={onClose} disabled={isSubmitting}>
-                    Cancelar
-                </Button>
+            <div className="flex justify-end gap-2 w-full pt-4 border-t border-border/40">
+                    <Button 
+                        type="button" 
+                        variant="ghost" 
+                        className="mr-auto text-muted-foreground hover:text-foreground"
+                        onClick={onClose} 
+                        disabled={isSubmitting}
+                    >
+                        Cancelar
+                    </Button>
                 {!isEditing && (
                     <Button 
                         type="button" 
                         variant="outline" 
                         onClick={() => handleSubmit(undefined, false)} 
                         disabled={isSubmitting || !categoryId || !amount || !description || !accountId}
+                        className="md:min-w-[140px]"
                     >
                         Salvar e Novo
                     </Button>
                 )}
-                <Button type="submit" onClick={(e) => handleSubmit(e, true)} disabled={isSubmitting || !categoryId || !amount || !description || !accountId}>
+                <Button 
+                    type="submit" 
+                    variant={type === TransactionType.DESPESA ? 'destructive' : 'default'}
+                    onClick={(e) => handleSubmit(e, true)} 
+                    disabled={isSubmitting || !categoryId || !amount || !description || !accountId}
+                    className={`${type === TransactionType.RECEITA ? 'bg-green-600 hover:bg-green-700' : ''} md:min-w-[100px]`}
+                >
                     {isSubmitting ? <><LoadingSpinner /> Salvando...</> : 'Salvar'}
                 </Button>
             </div>
@@ -297,18 +320,26 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                  <div className="grid grid-cols-2 gap-1 p-1 bg-muted/50 rounded-lg border border-border">
                     <Button
                         type="button"
-                        variant={type === TransactionType.DESPESA ? 'destructive' : 'ghost'}
+                        variant="ghost"
                         onClick={() => setType(TransactionType.DESPESA)}
-                        className={`flex items-center justify-center gap-2 h-9 ${type === TransactionType.DESPESA ? 'shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                        className={`flex items-center justify-center gap-2 h-9 transition-all duration-200 ${
+                            type === TransactionType.DESPESA 
+                                ? 'bg-red-500 hover:bg-red-600 text-white shadow-sm ring-1 ring-red-500/20' 
+                                : 'text-foreground/60 hover:text-foreground hover:bg-muted/50'
+                        }`}
                     >
                         <ArrowDownCircle className="w-4 h-4" />
                         Despesa
                     </Button>
                     <Button
                         type="button"
-                        variant={type === TransactionType.RECEITA ? 'default' : 'ghost'}
+                        variant="ghost"
                         onClick={() => setType(TransactionType.RECEITA)}
-                        className={`flex items-center justify-center gap-2 h-9 ${type === TransactionType.RECEITA ? 'bg-green-600 hover:bg-green-700 text-white shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                        className={`flex items-center justify-center gap-2 h-9 transition-all duration-200 ${
+                            type === TransactionType.RECEITA 
+                                ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm ring-1 ring-emerald-600/20' 
+                                : 'text-foreground/60 hover:text-foreground hover:bg-muted/50'
+                        }`}
                     >
                         <ArrowUpCircle className="w-4 h-4" />
                         Receita
@@ -316,15 +347,16 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                  </div>
 
                  {type === TransactionType.DESPESA && (
-                     <div className="flex items-center gap-2 px-1">
+                     <div className="flex items-center gap-2 px-1 pt-2">
                         <Checkbox 
                             id="is-transfer" 
                             checked={isTransfer}
                             onCheckedChange={(checked) => setIsTransfer(checked === true)}
+                            className="translate-y-[1px]" // Optical alignment
                         />
                         <label 
                             htmlFor="is-transfer" 
-                            className="text-sm font-medium text-muted-foreground cursor-pointer select-none"
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer select-none"
                         >
                             Transferência entre contas
                         </label>
@@ -378,24 +410,24 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
             </motion.div>
 
             {/* Description & Voice */}
-            <motion.div variants={itemVariants}>
-                <div className="flex gap-2 items-end">
-                    <div className="flex-grow">
-                        <Input
-                            label="Descrição *"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            placeholder="Ex: Supermercado, Salário..."
-                        />
-                    </div>
+            <motion.div variants={itemVariants} className="space-y-2">
+                <label className="text-sm font-medium text-muted-foreground block">Descrição *</label>
+                <div className="relative">
+                    <Input
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="Ex: Supermercado, Salário..."
+                        className="pr-12"
+                    />
                     <Button 
                         type="button" 
-                        variant={isListening ? "destructive" : "secondary"} 
-                        className="mb-[2px] h-[42px] w-[42px] p-0 flex items-center justify-center flex-shrink-0"
-                        onClick={startListening}
+                        variant="ghost"
+                        size="icon"
+                        onClick={isListening ? stopListening : startListening}
+                        className={`absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 transition-colors ${isListening ? "text-destructive hover:text-destructive hover:bg-destructive/10" : "text-muted-foreground hover:text-foreground"}`}
                         title="Falar descrição"
                     >
-                        <Mic className={`w-5 h-5 ${isListening ? 'animate-pulse' : ''}`} />
+                        <var className="not-italic">{isListening ? <div className="w-2 h-2 bg-destructive rounded-full animate-pulse" /> : <Mic className="w-4 h-4" />}</var>
                     </Button>
                 </div>
             </motion.div>
@@ -425,7 +457,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                     <label className="text-sm font-medium text-muted-foreground mb-2 block">Conta *</label>
                     <Select value={accountId} onValueChange={setAccountId}>
                         <SelectTrigger>
-                            <SelectValue placeholder="Selecione a conta" />
+                            <SelectValue placeholder="Selecione a conta..." />
                         </SelectTrigger>
                         <SelectContent>
                             {accounts.map((account) => (
@@ -461,7 +493,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
             {!isEditing && !isInvestmentMode && (
                 <>
                 {/* @ts-ignore */}
-                <motion.div variants={itemVariants} className="bg-secondary/20 p-4 rounded-xl border border-border">
+                <motion.div variants={itemVariants} className="bg-muted/30 p-4 rounded-xl">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
                             <div className={`p-2 rounded-lg ${isRecurring ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
@@ -469,7 +501,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                             </div>
                             <div>
                                 <h4 className="font-medium text-sm">Repetir Transação</h4>
-                                <p className="text-xs text-muted-foreground">Criar uma recorrência automática</p>
+                                <p className="text-[13px] text-muted-foreground">Criar uma recorrência automática</p>
                             </div>
                         </div>
                         <Switch checked={isRecurring} onCheckedChange={setIsRecurring} />
@@ -509,7 +541,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
             <motion.div variants={itemVariants}>
                 <label className="text-sm font-medium text-muted-foreground mb-2 block">Observações</label>
                 <textarea
-                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
                     placeholder="Detalhes adicionais..."
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}

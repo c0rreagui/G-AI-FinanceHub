@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { cn } from '@/utils/utils';
-import { Upload, File, X } from 'lucide-react';
+import { CloudUpload, File, X } from 'lucide-react';
 import { Button } from './Button';
 
 interface DragDropUploadProps {
@@ -55,8 +55,8 @@ export const DragDropUpload: React.FC<DragDropUploadProps> = ({
     <div className={cn("w-full", className)}>
       <div
         className={cn(
-          "border-2 border-dashed rounded-xl p-8 text-center transition-colors cursor-pointer",
-          isDragging ? "border-primary bg-primary/10" : "border-muted-foreground/25 hover:border-primary/50",
+          "border border-border/50 bg-secondary/5 rounded-xl p-8 text-center transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md hover:bg-secondary/10 hover:border-primary/30",
+          isDragging ? "border-primary bg-primary/10 ring-2 ring-primary/20" : "",
           files.length >= maxFiles && "opacity-50 cursor-not-allowed"
         )}
         onDragEnter={handleDrag}
@@ -69,6 +69,8 @@ export const DragDropUpload: React.FC<DragDropUploadProps> = ({
           ref={inputRef}
           type="file"
           className="hidden"
+          title="Upload de arquivos"
+          aria-label="Upload de arquivos"
           multiple={maxFiles > 1}
           accept={accept}
           onChange={(e) => {
@@ -76,15 +78,17 @@ export const DragDropUpload: React.FC<DragDropUploadProps> = ({
           }}
           disabled={files.length >= maxFiles}
         />
-        <div className="flex flex-col items-center gap-2">
-          <div className="p-3 rounded-full bg-secondary/50">
-            <Upload className="h-6 w-6 text-muted-foreground" />
+        <div className="flex flex-col items-center gap-3">
+          <div className="p-4 rounded-full bg-primary/10 ring-1 ring-primary/20 transition-transform group-hover:scale-110">
+            <CloudUpload className="h-6 w-6 text-primary" />
           </div>
-          <div className="text-sm font-medium">
-            Arraste arquivos aqui ou clique para upload
-          </div>
-          <div className="text-xs text-muted-foreground">
-            Suporta: {accept || 'Todos os arquivos'} (Max: {maxFiles})
+          <div>
+            <div className="text-sm font-semibold text-foreground">
+                Clique para enviar ou arraste
+            </div>
+            <div className="text-xs text-muted-foreground mt-1">
+                Suporta: {accept || 'Todos os arquivos'} (Max: {maxFiles})
+            </div>
           </div>
         </div>
       </div>
@@ -98,8 +102,8 @@ export const DragDropUpload: React.FC<DragDropUploadProps> = ({
                   <File className="h-4 w-4 text-primary" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-sm font-medium truncate max-w-[200px]">{file.name}</span>
-                  <span className="text-xs text-muted-foreground">{(file.size / 1024).toFixed(1)} KB</span>
+                    <span className="text-sm font-medium truncate max-w-[200px]" title={file.name}>{file.name}</span>
+                    <span className="text-xs text-muted-foreground">{(file.size / 1024).toFixed(1)} KB</span>
                 </div>
               </div>
               <Button variant="ghost" size="icon" onClick={() => removeFile(i)}>
