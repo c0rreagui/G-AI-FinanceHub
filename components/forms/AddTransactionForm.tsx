@@ -290,7 +290,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
             </div>
         }
     >
-        <MotionDiv className="space-y-6" initial="hidden" animate="visible" variants={{ visible: { transition: { staggerChildren: 0.1 } } }}>
+        <MotionDiv className="space-y-6" initial="visible" animate="visible" variants={{ visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }}>
             {/* Type Toggle */}
             <motion.div variants={itemVariants}>
                 <TypeToggle selectedType={type} onTypeChange={setType} />
