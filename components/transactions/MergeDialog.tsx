@@ -113,7 +113,7 @@ export function MergeDialog({ isOpen, onClose, transactionIds, onComplete }: Mer
                     />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-4">
                     <div className="space-y-2">
                          <Label>Categoria</Label>
                          <CategoryPicker
