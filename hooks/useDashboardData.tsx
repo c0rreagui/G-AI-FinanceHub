@@ -63,7 +63,7 @@ const generateMockData = (userId: string, categories: Category[], accounts: Acco
         return catMap.get(despesaCats[Math.floor(Math.random() * despesaCats.length)])!;
     };
 
-    const defaultAccountId = accounts[0]?.id || 'mock_account_id';
+    const defaultAccountId = accounts[0]?.id || '11111111-1111-1111-1111-111111111111';
 
     // 1. Metas
     const goal1: Omit<Goal, 'id'> = {
@@ -185,10 +185,10 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const generateMockAccounts = (userId: string): Account[] => {
         return [
-            { id: 'acc_1', name: 'Nubank', type: 'bank', balance: 1500.00, color: '#820AD1', user_id: userId },
-            { id: 'acc_2', name: 'Itaú', type: 'bank', balance: 3200.50, color: '#EC7000', user_id: userId },
-            { id: 'acc_3', name: 'Carteira', type: 'wallet', balance: 150.00, color: '#10B981', user_id: userId },
-            { id: 'acc_4', name: 'Investimentos', type: 'investment', balance: 10000.00, color: '#3B82F6', user_id: userId },
+            { id: '11111111-1111-1111-1111-111111111111', name: 'Nubank', type: 'bank', balance: 1500.00, color: '#820AD1', user_id: userId },
+            { id: '22222222-2222-2222-2222-222222222222', name: 'Itaú', type: 'bank', balance: 3200.50, color: '#EC7000', user_id: userId },
+            { id: '33333333-3333-3333-3333-333333333333', name: 'Carteira', type: 'wallet', balance: 150.00, color: '#10B981', user_id: userId },
+            { id: '44444444-4444-4444-4444-444444444444', name: 'Investimentos', type: 'investment', balance: 10000.00, color: '#3B82F6', user_id: userId },
         ];
     };
     const [debts, setDebts] = useState<Debt[]>([]);
@@ -1342,7 +1342,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             date: new Date(now.getFullYear(), now.getMonth(), Math.floor(Math.random() * 28) + 1).toISOString(),
             category_id: getRandomCatId(),
             status: TransactionStatus.COMPLETED,
-            account_id: accounts[0]?.id || 'mock_account_id',
+            account_id: accounts[0]?.id || '11111111-1111-1111-1111-111111111111',
         }));
 
         if (isGuest) {
