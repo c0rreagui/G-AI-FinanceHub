@@ -1311,7 +1311,6 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
             await Promise.all([
                 supabase.from('transactions').insert(finalTransactions),
-                supabase.from('transactions').insert(finalTransactions),
                 supabase.from('scheduled_transactions').insert(mockData.scheduledTransactions),
             ]);
             

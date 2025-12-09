@@ -99,6 +99,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
 
             setDeveloperMode(true);
+            if (typeof window !== 'undefined') {
+                sessionStorage.removeItem('guest_mode');
+            }
+            setIsGuest(false);
             return true;
         } catch (e) {
             console.error("Unexpected error during developer login:", e);

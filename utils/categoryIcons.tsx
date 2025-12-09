@@ -51,8 +51,7 @@ export const getIconByName = (name: string): React.ElementType => {
     if (name && name.length <= 5) {
         return (props: any) => (
             <span 
-                className={props.className} 
-                style={{ fontSize: '1.2em', lineHeight: '1', display: 'inline-block', fontStyle: 'normal' }}
+                className={`${props.className} text-[1.2em] leading-none inline-block not-italic`}
                 role="img" 
                 aria-label="category icon"
             >
