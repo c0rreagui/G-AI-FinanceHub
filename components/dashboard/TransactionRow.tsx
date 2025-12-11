@@ -5,6 +5,7 @@ import { ArrowUpRight, ArrowDownLeft, CheckCircle2, Clock } from 'lucide-react';
 import { Text } from '../ui/AppTypography';
 import { PrivacyMask } from '../ui/PrivacyMask';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
+import { MerchantLogo } from '../ui/MerchantLogo';
 
 interface TransactionRowProps {
     tx: Transaction;
@@ -18,18 +19,12 @@ export const TransactionRow: React.FC<TransactionRowProps> = ({ tx }) => {
     return (
         <div className="flex items-center justify-between p-3 hover:bg-muted/50 rounded-xl transition-colors group cursor-default">
             <div className="flex items-center gap-3">
-                <div 
-                    className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110 bg-[var(--category-bg)]" 
-                    ref={(el) => { if (el) el.style.setProperty('--category-bg', `${tx.category.color}20`); }}
-                >
-                    {tx.category.icon ? (
-                        <tx.category.icon 
-                            className="w-5 h-5 text-[var(--category-color)]" 
-                            ref={(el: HTMLElement) => { if (el) el.style.setProperty('--category-color', tx.category.color); }}
-                        />
-                    ) : (
-                        isExpense ? <ArrowDownLeft className="w-5 h-5 text-rose-500" /> : <ArrowUpRight className="w-5 h-5 text-emerald-500" />
-                    )}
+                <div className="flex-shrink-0">
+                    <MerchantLogo 
+                        merchantName={tx.description} 
+                        categoryColor={tx.category.color} 
+                        size="md" 
+                    />
                 </div>
                 <div>
                     <Text size="sm" weight="medium" className="text-foreground group-hover:text-primary transition-colors">{tx.description}</Text>

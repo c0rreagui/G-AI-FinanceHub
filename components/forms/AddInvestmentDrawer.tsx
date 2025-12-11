@@ -4,6 +4,7 @@ import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { SmartInput } from '../ui/SmartInput';
 import { SmartDatePicker } from '../ui/SmartDatePicker';
+import { TickerSearch } from '../ui/TickerSearch';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { TransactionType } from '../../types';
 import { LoadingSpinner } from '../LoadingSpinner';
@@ -84,12 +85,17 @@ export const AddInvestmentDrawer: React.FC<AddInvestmentDrawerProps> = ({ isOpen
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
                     <label className="text-sm font-medium text-violet-400/80">Ativo (Ticker)</label>
-                    <Input
+                    <TickerSearch
                         value={ticker}
-                        onChange={(e) => setTicker(e.target.value.toUpperCase())}
-                        placeholder="Ex: AAPL, PETR4, BTC..."
-                        className="bg-slate-900/50 border-white/10 focus:border-violet-500/50 font-mono uppercase"
+                        onChange={setTicker}
+                        onSelect={(asset) => {
+                            setTicker(asset.ticker);
+                            // Optional: auto-fill price if we had real data
+                            // setPrice('100.00'); 
+                        }}
+                        placeholder="Ex: PETR4, BTC, AAPL..."
                         autoFocus
+                        className="w-full"
                     />
                 </div>
 

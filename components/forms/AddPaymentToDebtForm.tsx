@@ -25,7 +25,7 @@ const QuickValueChip: React.FC<{ value: number; onSelect: (value: number) => voi
           triggerHapticFeedback();
           onSelect(value);
         }}
-        className="px-3 py-1.5 text-sm font-semibold rounded-full bg-white/5 hover:bg-white/10 text-gray-300 transition-colors"
+        className="px-3 py-1.5 text-sm font-medium rounded-full bg-secondary/20 hover:bg-secondary/30 text-muted-foreground hover:text-foreground transition-colors border border-transparent hover:border-primary/20"
     >
         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)}
     </button>
@@ -107,11 +107,11 @@ export const AddPaymentToDebtForm: React.FC<AddPaymentToDebtFormProps> = ({ isOp
       <Modal isOpen={isOpen} onClose={onClose} title={`Realizar Pagamento: ${debt.name}`}>
         <form onSubmit={handleSubmit} className="space-y-4">
           {FormFields}
-          <div className="flex justify-end gap-2 pt-4">
-            <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
+          <div className="flex items-center justify-end gap-3 pt-6 border-t border-border/40 mt-4">
+            <Button type="button" variant="ghost" onClick={onClose} disabled={isSubmitting} className="text-muted-foreground hover:text-foreground">
               Cancelar
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting} className="min-w-[140px] rounded-xl">
               {isSubmitting ? <><LoadingSpinner/> Confirmando...</> : 'Confirmar Pagamento'}
             </Button>
           </div>
@@ -125,27 +125,27 @@ export const AddPaymentToDebtForm: React.FC<AddPaymentToDebtFormProps> = ({ isOp
         {isOpen && (
             <motion.div
                 {...({
-                    className: "fixed inset-0 z-[110] flex flex-col bg-[oklch(var(--background-oklch))]",
+                    className: "fixed inset-0 z-[110] flex flex-col bg-background",
                     initial: { y: '100%' },
                     animate: { y: '0%' },
                     exit: { y: '100%' },
                     transition: { type: 'spring', stiffness: 400, damping: 40 }
                 } as any)}
             >
-                <div className="flex items-center justify-between p-4 border-b border-[oklch(var(--border-oklch))] flex-shrink-0">
-                    <h2 className="text-xl font-semibold text-white truncate max-w-[80%]">{`Pagar: ${debt.name}`}</h2>
-                    <button onClick={onClose} className="p-1 text-gray-400" aria-label="Fechar"><XIcon className="w-6 h-6" /></button>
+                <div className="flex items-center justify-between p-4 border-b border-border/40 flex-shrink-0">
+                    <h2 className="text-xl font-semibold text-foreground truncate max-w-[80%]">{`Pagar: ${debt.name}`}</h2>
+                    <button onClick={onClose} className="p-1 text-muted-foreground hover:text-foreground transition-colors" aria-label="Fechar"><XIcon className="w-6 h-6" /></button>
                 </div>
                 <div className="flex-grow p-4 overflow-y-auto">
                     <form id="mobile-add-payment-debt-form" onSubmit={handleSubmit} className="space-y-6">
                         {FormFields}
                     </form>
                 </div>
-                <div className="flex justify-end gap-2 p-4 border-t border-[oklch(var(--border-oklch))] flex-shrink-0">
-                  <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
+                <div className="flex justify-end gap-3 p-4 border-t border-border/40 flex-shrink-0 bg-background/95 backdrop-blur-sm">
+                  <Button type="button" variant="ghost" onClick={onClose} disabled={isSubmitting} className="flex-1 text-muted-foreground hover:text-foreground">
                     Cancelar
                   </Button>
-                  <Button type="submit" form="mobile-add-payment-debt-form" disabled={isSubmitting}>
+                  <Button type="submit" form="mobile-add-payment-debt-form" disabled={isSubmitting} className="flex-1 min-w-[140px] rounded-xl">
                     {isSubmitting ? <><LoadingSpinner/> Confirmando...</> : 'Confirmar Pagamento'}
                   </Button>
                 </div>

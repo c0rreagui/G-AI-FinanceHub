@@ -6,7 +6,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/Avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
-import { motion } from 'framer-motion';
+import { MicrophoneButton } from '../ui/MicrophoneButton';
 
 interface PageHeaderProps {
   icon: React.ElementType | React.ReactNode;
@@ -80,6 +80,11 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs
       </div>
       
       <div className="flex items-center gap-3 flex-shrink-0">
+         <MicrophoneButton 
+             className="mr-2 hidden sm:flex" 
+             size="sm"
+             onRecordingStop={(text) => console.log('Global voice command:', text)} 
+         />
          <TooltipProvider>
             <Tooltip>
                 <TooltipTrigger asChild>

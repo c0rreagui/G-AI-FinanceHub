@@ -9,6 +9,8 @@ interface SmartInputProps {
     prefix?: string;
     autoFocus?: boolean;
     className?: string;
+    readOnly?: boolean;
+    inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode'];
 }
 
 export const SmartInput: React.FC<SmartInputProps> = ({ 
@@ -18,7 +20,9 @@ export const SmartInput: React.FC<SmartInputProps> = ({
     placeholder = "0,00", 
     prefix = "R$", 
     autoFocus,
-    className 
+    className,
+    readOnly,
+    inputMode
 }) => {
     const [displayValue, setDisplayValue] = useState(value);
     const [isMathMode, setIsMathMode] = useState(false);
@@ -73,7 +77,8 @@ export const SmartInput: React.FC<SmartInputProps> = ({
                 <input
                     ref={inputRef}
                     type="text"
-                    inputMode={isMathMode ? "text" : "decimal"}
+                    inputMode={inputMode || (isMathMode ? "text" : "decimal")}
+                    readOnly={readOnly}
                     value={displayValue}
                     onChange={handleChange}
                     onBlur={handleBlur}

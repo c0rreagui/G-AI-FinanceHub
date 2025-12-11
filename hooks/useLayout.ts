@@ -8,6 +8,7 @@ export type WidgetId =
     | 'quick-actions'
     | 'monthly_chart' 
     | 'wealth_health' 
+    | 'budget_tracker' 
     | 'quick_actions_goals' 
     | 'challenges' 
     | 'recent_transactions';
@@ -24,6 +25,7 @@ export interface WidgetConfig {
 const DEFAULT_LAYOUT: WidgetConfig[] = [
     { id: 'daily_tip', isVisible: true, colSpan: { md: 4, lg: 4 } }, // Full width
     { id: 'balance', isVisible: true, colSpan: { md: 4, lg: 4 } },
+    { id: 'budget_tracker', isVisible: true, colSpan: { md: 2, lg: 2 } }, // New Budget Widget
     { id: 'charts', isVisible: true, colSpan: { md: 4, lg: 4 } },
     { id: 'health', isVisible: true, colSpan: { md: 2, lg: 2 } },
     { id: 'challenges', isVisible: true, colSpan: { md: 2, lg: 2 } },

@@ -26,6 +26,7 @@ import { QuickActionsWidget } from '../dashboard/widgets/QuickActionsWidget';
 import { RecentTransactionsWidget } from '../dashboard/widgets/RecentTransactionsWidget';
 import { GoalsWidget } from '../dashboard/widgets/GoalsWidget';
 import { InvestmentsWidget } from '../dashboard/widgets/InvestmentsWidget';
+import { BudgetWidget } from '../dashboard/widgets/BudgetWidget';
 
 import { ViewType } from '../../types';
 
@@ -138,23 +139,19 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
             case 'quick_actions_goals':
                 return (
                     <GoalsWidget 
+                        hiddenModules={hiddenModules}
+                        goals={goals}
                         setCurrentView={setCurrentView} 
+                        openDialog={openDialog}
+                        containerSpacing={containerSpacing}
                     />
                 );
             case 'challenges':
                 return !hiddenModules.includes('challenges') ? <MonthlyChallengesCard /> : null;
             case 'recent_transactions':
                 return <RecentTransactionsWidget transactions={transactions} setCurrentView={setCurrentView} />;
-            // Assuming 'investments' widget ID might need to be added to WidgetId type, 
-            // but for now let's map it if it exists or reuse a slot.
-            // Since I can't easily change WidgetId type in this turn without seeing it, 
-            // I'll assume 'wealth_health' might be a good place or I need to add a new case if the ID allows.
-            // Let's assume 'investments' is a valid ID or I'll replace 'wealth_health' if it was meant to be that.
-            // Actually, looking at the layout, 'wealth_health' is complex.
-            // I'll add a new case 'investments_widget' if possible, but I need to check useLayout.
-            // For now, I will NOT add it to the switch if I can't verify WidgetId.
-            // Wait, I see 'wealth_health' renders HealthScoreGauge and FinancialHeatMap.
-            // I'll stick to what I can safely change.
+            case 'budget_tracker':
+                return <BudgetWidget />;
             default:
                 return null;
         }
