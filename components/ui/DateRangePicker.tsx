@@ -51,6 +51,7 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
                     {(startDate || endDate) && (
                         <div 
                             role="button" 
+                            title="Limpar datas"
                             onClick={handleClear}
                             className="ml-auto hover:bg-secondary rounded-full p-0.5"
                         >
@@ -90,9 +91,11 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
                         </div>
                     </div>
                     <div className="flex gap-2 justify-end">
+                    <div className="grid grid-cols-2 gap-2">
                         <Button 
-                            variant="ghost" 
+                            variant="outline" 
                             size="sm"
+                            className="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 border-emerald-500/20"
                             onClick={() => {
                                 const today = new Date().toISOString().split('T')[0];
                                 onChange(today, today);
@@ -102,8 +105,9 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
                             Hoje
                         </Button>
                         <Button 
-                            variant="ghost" 
+                            variant="outline" 
                             size="sm"
+                            className="bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 border-blue-500/20"
                             onClick={() => {
                                 const today = new Date();
                                 const firstDay = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
@@ -114,7 +118,22 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
                         >
                             Este Mês
                         </Button>
+                        <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="bg-violet-500/10 hover:bg-violet-500/20 text-violet-500 border-violet-500/20 col-span-2"
+                            onClick={() => {
+                                const today = new Date();
+                                const thirtyDaysAgo = new Date(today);
+                                thirtyDaysAgo.setDate(today.getDate() - 30);
+                                onChange(thirtyDaysAgo.toISOString().split('T')[0], today.toISOString().split('T')[0]);
+                                setIsOpen(false);
+                            }}
+                        >
+                            Últimos 30 Dias
+                        </Button>
                     </div>
+                </div>
                 </div>
             </PopoverContent>
         </Popover>

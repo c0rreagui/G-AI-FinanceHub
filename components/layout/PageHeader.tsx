@@ -14,9 +14,10 @@ interface PageHeaderProps {
   subtitle?: string;
   breadcrumbs?: string[];
   actions?: React.ReactNode;
+  children?: React.ReactNode;
 }
 
-export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs = [], actions }) => {
+export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs = [], actions, children }) => {
   const { user, logout, isDeveloper } = useAuth();
   const { greetingName } = useTheme();
   const [greeting, setGreeting] = useState({ text: 'Bem-vindo', icon: '👋' });
@@ -78,6 +79,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs
             </div>
         )}
       </div>
+      {children}
       
       <div className="flex items-center gap-3 flex-shrink-0">
          <MicrophoneButton 

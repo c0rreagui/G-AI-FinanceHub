@@ -4,7 +4,9 @@ import { useDashboardData } from '../../hooks/useDashboardData';
 import { BalanceEvolutionChart } from '../ui/charts/BalanceEvolutionChart';
 import { LoadingSpinner } from '../LoadingSpinner';
 import { EmptyState } from '../ui/EmptyState';
-import { Lightbulb } from 'lucide-react';
+import { Lightbulb, Download } from 'lucide-react';
+import { Button } from '../ui/Button';
+import { exportToCSV } from '../../utils/export';
 import { 
     ResponsiveContainer, 
     BarChart, 
@@ -19,6 +21,10 @@ import { InvestmentSuggestions } from '../dashboard/InvestmentSuggestions';
 
 import { formatCurrency } from '../../utils/formatters';
 import { TransactionType } from '../../types';
+import { CategoryBreakdownChart } from '../ui/charts/CategoryBreakdownChart';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { DateRangePicker } from '../ui/DateRangePicker';
+import { ReportProvider, useReport } from '../../contexts/ReportContext';
 
 const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -36,12 +42,12 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     return null;
 };
 
-import { CategoryBreakdownChart } from '../ui/charts/CategoryBreakdownChart';
-import { useMediaQuery } from '../../hooks/useMediaQuery';
-
-export const InsightsView: React.FC = () => {
-    const { transactions, categories, loading } = useDashboardData();
+const InsightsContent: React.FC = () => {
+    const { transactions: allTransactions, categories, loading } = useDashboardData();
+    const { dateRange, setDateRange, filterTransactions } = useReport();
     const isMobile = useMediaQuery('(max-width: 768px)');
+
+    const transactions = useMemo(() => filterTransactions(allTransactions), [allTransactions, filterTransactions]);
 
     const categoryAnalysis = useMemo(() => {
         if (!transactions.length) return [];
@@ -67,26 +73,46 @@ export const InsightsView: React.FC = () => {
             .slice(0, 10); // Top 10 categories
     }, [transactions]);
 
+    const handleExport = () => {
+        if (!transactions.length) return;
+        const filename = `relatorio-${dateRange.startDate || 'inicio'}-ate-${dateRange.endDate || 'fim'}.csv`;
+        exportToCSV(transactions, filename);
+    };
+
     return (
         <>
             <PageHeader 
                 icon={Lightbulb} 
                 title="Insights e Análises" 
                 breadcrumbs={['FinanceHub', 'Insights']}
-            />
+            >
+                <div className="w-full md:w-auto mt-4 md:mt-0 flex flex-col md:flex-row gap-3">
+                    <DateRangePicker 
+                        startDate={dateRange.startDate} 
+                        endDate={dateRange.endDate} 
+                        onChange={(start, end) => setDateRange({ startDate: start, endDate: end })} 
+                    />
+                    <Button 
+                        variant="outline" 
+                        onClick={handleExport}
+                        disabled={transactions.length === 0}
+                        className="w-full md:w-auto"
+                    >
+                        <Download className="w-4 h-4 mr-2" />
+                        Exportar CSV
+                    </Button>
+                </div>
+            </PageHeader>
             {loading ? (
                 <div className="flex-grow flex items-center justify-center">
                     <LoadingSpinner />
                 </div>
             ) : (
-
-
-
                 <div className="mt-6 flex-grow flex flex-col overflow-y-auto pr-2 pb-20 space-y-6">
                      {transactions.length > 0 ? (
                         <>
                             <InvestmentSuggestions />
-                            <BalanceEvolutionChart transactions={transactions} />
+                            <BalanceEvolutionChart transactions={allTransactions} dateRange={dateRange} />
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="card h-[400px] p-4 bg-gray-900/50 border border-white/5 rounded-xl">
@@ -137,16 +163,26 @@ export const InsightsView: React.FC = () => {
                             </div>
                         </>
                     ) : (
-                        <div className="flex-grow">
+                        <div className="flex-grow flex flex-col">
                             <EmptyState
                                 icon={Lightbulb}
-                                title="Sem Dados para Análise"
-                                description="Adicione algumas transações para começar a gerar insights sobre seus hábitos financeiros."
+                                title={allTransactions.length === 0 ? "Sem Dados para Análise" : "Nenhum dado neste período"}
+                                description={allTransactions.length === 0 
+                                    ? "Adicione algumas transações para começar a gerar insights sobre seus hábitos financeiros." 
+                                    : "Tente selecionar um intervalo de datas diferente para visualizar seus insights."}
                             />
                         </div>
                     )}
                 </div>
             )}
         </>
+    );
+};
+
+export const InsightsView: React.FC = () => {
+    return (
+        <ReportProvider>
+            <InsightsContent />
+        </ReportProvider>
     );
 };

@@ -7,9 +7,10 @@ import { TrendingUp } from 'lucide-react';
 
 interface BalanceEvolutionChartProps {
     transactions: Transaction[];
+    dateRange?: { startDate: string | null; endDate: string | null; };
 }
 
-export const BalanceEvolutionChart: React.FC<BalanceEvolutionChartProps> = ({ transactions }) => {
+export const BalanceEvolutionChart: React.FC<BalanceEvolutionChartProps> = ({ transactions, dateRange }) => {
     const data = useMemo(() => {
         if (transactions.length === 0) return [];
 
@@ -39,10 +40,15 @@ export const BalanceEvolutionChart: React.FC<BalanceEvolutionChartProps> = ({ tr
             });
         });
 
-        // Limit to last 30 points if too many, or show all if reasonable
-        // For evolution, showing all history is usually better, but maybe aggregate by month if > 1 year
+        // Filter by date range IF provided
+        if (dateRange?.startDate && dateRange?.endDate) {
+            const start = new Date(dateRange.startDate).getTime();
+            const end = new Date(dateRange.endDate).getTime() + (24 * 60 * 60 * 1000) - 1; // End of day
+            return evolution.filter(p => p.rawDate >= start && p.rawDate <= end);
+        }
+
         return evolution;
-    }, [transactions]);
+    }, [transactions, dateRange]);
 
     if (data.length === 0) return null;
 
