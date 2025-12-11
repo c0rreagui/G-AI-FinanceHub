@@ -15,6 +15,7 @@ import { AchievementsDialog } from './dashboard/AchievementsDialog';
 import { ProfileAnalysisQuiz } from './onboarding/ProfileAnalysisQuiz';
 import { ImportTransactionsDialog } from './forms/ImportTransactionsDialog';
 import { TransactionCommentsDialog } from './social/TransactionCommentsDialog';
+import { FinanceHubAIDialog } from './ui/FinanceHubAIDialog';
 
 export const DialogManager: React.FC = () => {
   const { dialogType, closeDialog, dialogProps } = useDialog();
@@ -64,6 +65,8 @@ export const DialogManager: React.FC = () => {
         return <ProfileAnalysisQuiz isOpen={true} onClose={closeDialog} />;
     case 'transaction-comments':
         return <TransactionCommentsDialog isOpen={true} onClose={closeDialog} transaction={dialogProps.transaction} />;
+    case 'ai-chat':
+        return <FinanceHubAIDialog isOpen={true} onClose={closeDialog} />;
     default:
       return null;
   }

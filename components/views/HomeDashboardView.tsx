@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { motion, Reorder } from 'framer-motion';
 import { DailyTipCard } from '../dashboard/DailyTipCard';
+import { ProactiveInsightCard } from '../ui/ProactiveInsightCard';
 import { MonthlySummaryChart } from '../ui/charts/MonthlySummaryChart';
 import { FinancialHeatMap } from '../ui/charts/FinancialHeatMap';
 import { HealthScoreGauge } from '../dashboard/HealthScoreGauge';
@@ -27,6 +28,7 @@ import { RecentTransactionsWidget } from '../dashboard/widgets/RecentTransaction
 import { GoalsWidget } from '../dashboard/widgets/GoalsWidget';
 import { InvestmentsWidget } from '../dashboard/widgets/InvestmentsWidget';
 import { BudgetWidget } from '../dashboard/widgets/BudgetWidget';
+import { Skeleton } from '../ui/Skeleton';
 
 import { ViewType } from '../../types';
 
@@ -36,7 +38,7 @@ interface HomeDashboardViewProps {
 
 export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrentView }) => {
     const { user } = useAuth();
-    const { summary, monthlyChartData, transactions, goals, savingsSuggestion, dueSoonBills, healthScore } = useDashboardData();
+    const { summary, monthlyChartData, transactions, goals, savingsSuggestion, dueSoonBills, healthScore, loading } = useDashboardData();
     const { openDialog } = useDialog();
     const { showToast } = useToast();
     const { layout, setLayout, isEditMode, toggleEditMode, resetLayout } = useLayout();
@@ -108,6 +110,44 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
     }, []);
 
     const renderWidget = (widgetId: WidgetId) => {
+        if (loading) {
+            switch(widgetId) {
+                case 'balance':
+                    return <Skeleton className="h-[140px] w-full rounded-xl bg-card/50" />;
+                case 'charts':
+                    return <Skeleton className="h-[300px] w-full rounded-xl bg-card/50" />;
+                case 'health':
+                    return (
+                        <div className="flex gap-4 h-full">
+                            <Skeleton className="h-[300px] w-full rounded-xl bg-card/50" />
+                        </div>
+                    );
+                case 'quick-actions':
+                    return <Skeleton className="h-[100px] w-full rounded-xl bg-card/50" />;
+                case 'daily_tip':
+                    return !zenMode && !hiddenModules.includes('tips') ? <Skeleton className="h-[160px] w-full rounded-xl bg-card/50" /> : null;
+                case 'monthly_chart':
+                    return !zenMode && !hiddenModules.includes('chart') ? <Skeleton className="h-[320px] w-full rounded-xl bg-card/50" /> : null;
+                case 'wealth_health':
+                    return !zenMode && !hiddenModules.includes('investments') ? (
+                         <div className="flex flex-col gap-4 h-full">
+                            <Skeleton className="h-[200px] w-full rounded-xl bg-card/50" />
+                            <Skeleton className="h-[320px] w-full rounded-xl bg-card/50" />
+                        </div>
+                    ) : null;
+                 case 'quick_actions_goals':
+                    return <Skeleton className="h-[300px] w-full rounded-xl bg-card/50" />;
+                 case 'challenges':
+                    return !hiddenModules.includes('challenges') ? <Skeleton className="h-[200px] w-full rounded-xl bg-card/50" /> : null;
+                 case 'recent_transactions':
+                    return <Skeleton className="h-[400px] w-full rounded-xl bg-card/50" />;
+                 case 'budget_tracker':
+                    return <Skeleton className="h-[250px] w-full rounded-xl bg-card/50" />;
+                default:
+                    return null;
+            }
+        }
+
         switch (widgetId) {
             case 'balance':
                 return <BalanceWidget summary={summary} />;
@@ -192,6 +232,11 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                         Nova Transação
                     </Button>
                 </div>
+            </div>
+
+            {/* PROACTIVE INSIGHTS */}
+            <div className="mb-6">
+                <ProactiveInsightCard setCurrentView={setCurrentView} />
             </div>
 
             {/* ALERTS SECTION */}

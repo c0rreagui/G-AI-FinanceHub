@@ -9,6 +9,7 @@ import { Button } from '../../ui/Button';
 import { formatCurrency } from '../../../utils/formatters';
 import { Goal, ViewType } from '../../../types';
 import { motion } from 'framer-motion';
+import { EmptyState } from '../../ui/EmptyState';
 
 interface GoalsWidgetProps {
     hiddenModules: string[];
@@ -110,12 +111,19 @@ export const GoalsWidget: React.FC<GoalsWidgetProps> = ({ hiddenModules, goals, 
                                 <Plus className="w-4 h-4 mr-2" /> Nova Meta
                             </Button>
                         </div>
+
                     ) : (
-                        <Card className="border-dashed border-muted-foreground/20 flex flex-col items-center justify-center py-8 bg-transparent">
-                            <Target className="w-8 h-8 text-muted-foreground/50 mb-3" />
-                            <Text size="sm" variant="muted" className="mb-3">Nenhuma meta definida</Text>
-                            <Button size="sm" variant="secondary" onClick={() => openDialog('add-goal')}>Criar Meta</Button>
-                        </Card>
+                        <EmptyState 
+                            title="Nenhuma meta definida" 
+                            description="Crie objetivos para organizar seus sonhos financeiros." 
+                            icon={Target}
+                            action={
+                                <Button size="sm" variant="secondary" onClick={() => openDialog('add-goal')}>
+                                    Criar Meta
+                                </Button>
+                            }
+                            className="border-dashed border border-muted-foreground/20 rounded-xl"
+                        />
                     )}
                 </div>
             )}

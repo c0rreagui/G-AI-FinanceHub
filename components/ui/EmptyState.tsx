@@ -1,34 +1,40 @@
-import React from 'react';
-import { cn } from '@/utils/utils';
+import React, { ReactNode } from 'react';
 import { LucideIcon } from 'lucide-react';
+import { cn } from '@/utils/utils';
 
 interface EmptyStateProps {
-  icon?: LucideIcon;
-  title: string;
-  description: string;
-  action?: React.ReactNode;
-  className?: string;
+    title: string;
+    description?: string;
+    icon?: LucideIcon;
+    action?: ReactNode;
+    className?: string;
 }
 
-export const EmptyState: React.FC<EmptyStateProps & { children?: React.ReactNode }> = ({ 
-  icon: Icon, 
-  title, 
-  description, 
-  action, 
-  className,
-  children
+export const EmptyState: React.FC<EmptyStateProps> = ({ 
+    title, 
+    description, 
+    icon: Icon, 
+    action,
+    className 
 }) => {
-  return (
-    <div className={cn("flex flex-col items-center justify-center p-8 text-center animate-fade-in", className)}>
-      {Icon && (
-        <div className="mb-4 rounded-full bg-muted/50 p-4 ring-1 ring-white/10">
-          <Icon className="h-8 w-8 text-muted-foreground" />
+    return (
+        <div className={cn("flex flex-col items-center justify-center p-8 text-center h-full min-h-[200px] animate-in fade-in zoom-in duration-500", className)}>
+            {Icon && (
+                <div className="bg-muted/30 p-4 rounded-full mb-4 ring-1 ring-border/50">
+                    <Icon className="w-8 h-8 text-muted-foreground/50" />
+                </div>
+            )}
+            <h3 className="text-lg font-medium text-foreground">{title}</h3>
+            {description && (
+                <p className="text-sm text-muted-foreground mt-1 max-w-xs">
+                    {description}
+                </p>
+            )}
+            {action && (
+                <div className="mt-6">
+                    {action}
+                </div>
+            )}
         </div>
-      )}
-      <h3 className="mb-2 text-lg font-semibold tracking-tight">{title}</h3>
-      <p className="mb-6 text-sm text-muted-foreground max-w-xs">{description}</p>
-      {action}
-      {children}
-    </div>
-  );
+    );
 };

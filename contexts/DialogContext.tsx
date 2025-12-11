@@ -1,6 +1,6 @@
 import React, { createContext, useState } from 'react';
 
-type DialogType = 'add-goal' | 'add-debt' | 'add-transaction' | 'add-expense' | 'add-income' | 'add-investment' | 'add-scheduling' | 'add-value-to-goal' | 'add-payment-to-debt' | 'confirmation' | 'bulk-recategorize' | 'achievements' | 'profile-quiz' | 'transaction-comments' | 'import-transactions' | null;
+type DialogType = 'add-goal' | 'add-debt' | 'add-transaction' | 'add-expense' | 'add-income' | 'add-investment' | 'add-scheduling' | 'add-value-to-goal' | 'add-payment-to-debt' | 'confirmation' | 'bulk-recategorize' | 'achievements' | 'profile-quiz' | 'transaction-comments' | 'import-transactions' | 'ai-chat' | null;
 
 interface DialogContextType {
   dialogType: DialogType;

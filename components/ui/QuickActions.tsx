@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDialog } from '../../hooks/useDialog';
-import { ArrowDownLeft, ArrowUpRight, Target, Settings, CheckSquare, Square, QrCode, Send, Plus } from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, Target, Settings, CheckSquare, Square, QrCode, Send, Plus, Bot } from 'lucide-react';
 import { TransactionType } from '../../types';
 import { Button } from './Button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './Tooltip';
@@ -138,6 +138,16 @@ export const QuickActions: React.FC = () => {
             isEditing={isEditing}
             isVisible={visibleActions.transfer}
             onToggle={() => toggleAction('transfer')}
+        />
+        <ActionButton
+            title="Assistente IA"
+            ariaLabel="Abrir Assistente Financeiro"
+            icon={Bot}
+            color="bg-gradient-to-br from-indigo-500 to-violet-600"
+            onClick={() => openDialog('ai-chat')}
+            isEditing={isEditing}
+            isVisible={true}
+            onToggle={() => {}} 
         />
         </div>
     </div>

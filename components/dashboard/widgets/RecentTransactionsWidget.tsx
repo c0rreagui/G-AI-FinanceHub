@@ -4,6 +4,8 @@ import { Button } from '../../ui/Button';
 import { TransactionRow } from '../TransactionRow';
 import { Text } from '../../ui/AppTypography';
 import { Transaction, ViewType } from '../../../types';
+import { EmptyState } from '../../ui/EmptyState';
+import { Clock } from 'lucide-react';
 
 interface RecentTransactionsWidgetProps {
     transactions: Transaction[];
@@ -24,7 +26,14 @@ export const RecentTransactionsWidget: React.FC<RecentTransactionsWidgetProps> =
                     {transactions.slice(0, 5).map(tx => (
                         <TransactionRow key={tx.id} tx={tx} />
                     ))}
-                    {transactions.length === 0 && <Text variant="muted" align="center" className="py-4">Sem movimentações recentes.</Text>}
+                    {transactions.length === 0 && (
+                        <EmptyState 
+                            title="Sem movimentações" 
+                            description="Suas transações recentes aparecerão aqui."
+                            icon={Clock}
+                            className="py-8"
+                        />
+                    )}
                 </div>
             </CardContent>
         </Card>

@@ -5,6 +5,7 @@ import { LayoutDashboard, ArrowLeftRight, PieChart, Target, TrendingDown, Calend
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
+import { Gamification } from '../ui/Gamification';
 import { cn } from '../../utils/utils';
 
 interface SidebarProps {
@@ -93,6 +94,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
         </nav>
 
         <div className="p-3 mt-auto mb-4 space-y-2">
+            {!isCollapsed && (
+                <div className="mb-4">
+                     <Gamification level={12} currentXP={8450} nextLevelXP={10000} />
+                </div>
+            )}
             <button 
                 onClick={() => setIsCollapsed(!isCollapsed)}
                 className="w-full flex items-center h-12 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors justify-center"

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Send, Bot, User } from 'lucide-react';
 import { Button } from './Button';
 import { Input } from './Input';
-import { ScrollArea } from './scroll-area';
+import { ScrollArea } from './ScrollArea';
 import { cn } from '@/utils/utils';
 
 interface Message {
