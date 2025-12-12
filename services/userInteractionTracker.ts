@@ -66,7 +66,7 @@ class UserInteractionTracker {
             }, 200) as any;
         }, true);
 
-        console.log('🎯 User Interaction Tracker: ACTIVE');
+        console.log('🎯 User Interaction Tracker: ACTIVE (v2 - SafeClassName Fix)');
     }
 
     /**
@@ -288,7 +288,16 @@ class UserInteractionTracker {
     private getTargetDescription(element: HTMLElement): string {
         if (element.id) return `#${element.id}`;
         if ((element as any).name) return `[name="${(element as any).name}"]`;
-        if (element.className) return `.${element.className.split(' ')[0]}`;
+        
+        // Safe check for className (handles SVGAnimatedString)
+        let classString = '';
+        if (typeof element.className === 'string') {
+            classString = element.className;
+        } else if (element.className && typeof (element.className as any).baseVal === 'string') {
+            classString = (element.className as any).baseVal;
+        }
+
+        if (classString) return `.${classString.split(' ')[0]}`;
         return element.tagName.toLowerCase();
     }
 
@@ -347,7 +356,6 @@ class UserInteractionTracker {
                 
                 case 'input':
                     return `${index + 1}. [${time}] ⌨️ INPUT in ${target}: ${interaction.inputValue}`;
-                
                 case 'focus':
                     return `${index + 1}. [${time}] 🎯 FOCUS on ${target}`;
                 
@@ -362,7 +370,6 @@ class UserInteractionTracker {
                 
                 case 'submit':
                     return `${index + 1}. [${time}] 📤 SUBMIT form ${target}`;
-                
                 case 'scroll':
                     return `${index + 1}. [${time}] 📜 SCROLL to (${interaction.position?.x}, ${interaction.position?.y})`;
                 
