@@ -56,6 +56,52 @@ class TelemetryService {
     constructor() {
         this.sessionId = this.generateSessionId();
         this.initializeSessionTracking();
+        this.setupGlobalErrorHandlers();
+    }
+
+    /**
+     * Configura handlers globais para capturar TODOS os erros
+     */
+    private setupGlobalErrorHandlers(): void {
+        if (typeof window === 'undefined') return;
+
+        // Captura erros síncronos
+        window.addEventListener('error', (event) => {
+            this.track(
+                EventCategory.ERROR,
+                'Uncaught Error',
+                {
+                    severity: EventSeverity.ERROR,
+                    message: event.message,
+                    filename: event.filename,
+                    lineno: event.lineno,
+                    colno: event.colno,
+                    error: event.error?.toString(),
+                },
+                ['uncaught', 'window-error']
+            );
+        });
+
+        // ⚠️ CRITICAL: Captura erros de Promise (Uncaught in promise)
+        window.addEventListener('unhandledrejection', (event) => {
+            const reason = event.reason;
+            this.track(
+                EventCategory.ERROR,
+                'Unhandled Promise Rejection',
+                {
+                    severity: EventSeverity.ERROR,
+                    reason: reason?.toString() || 'Unknown reason',
+                    message: reason?.message || reason?.toString(),
+                    stack: reason?.stack,
+                    promiseValue: JSON.stringify(event.promise),
+                },
+                ['unhandled-promise', 'async-error']
+            );
+
+            console.error('🔴 [Telemetry] Unhandled Promise Rejection:', reason);
+        });
+
+        console.log('✅ [Telemetry] Global error handlers initialized');
     }
 
     /**

@@ -94,6 +94,35 @@ ${report.fullContext.browserState.connection.effectiveType
 - **Previous Route**: ${report.fullContext.appState.previousRoute || 'Unknown'}
 - **Session Duration**: ${(report.fullContext.appState.sessionDuration / 1000).toFixed(1)}s
 
+## 🔄 Process Flow & Dependencies
+
+${report.processFlow.errorFlowChain.length > 0 
+    ? `**Error Flow Chain** (${report.processFlow.errorFlowChain.length} processes):
+\`\`\`
+${report.processFlow.errorFlowChain.map((p, i) => 
+    `${'  '.repeat(p.depth)}${i + 1}. ${p.status === 'error' ? '❌' : '🔄'} ${p.name} (${p.duration ? p.duration.toFixed(0) + 'ms' : 'running'})`
+).join('\n')}
+\`\`\`
+${report.processFlow.errorFlowChain.find(p => p.error) 
+    ? `\n**Failed Process**: ${report.processFlow.errorFlowChain.find(p => p.error)?.name}\n**Error**: ${report.processFlow.errorFlowChain.find(p => p.error)?.error?.message}`
+    : ''}`
+    : 'No error flow chain available'}
+
+**Process Flow Visualization**:
+\`\`\`
+${report.processFlow.flowVisualization}
+\`\`\`
+
+**Process Statistics**:
+- Total Processes: ${report.processFlow.stats.totalProcesses}
+- Errors: ${report.processFlow.stats.errorCount}
+- Avg Duration: ${report.processFlow.stats.avgDuration.toFixed(2)}ms
+- Active Now: ${report.processFlow.activeProcesses.length}
+
+${report.processFlow.activeProcesses.length > 0 
+    ? `**Still Running**:\n${report.processFlow.activeProcesses.map(p => `- ${p.name} (${(Date.now() - p.startTime).toFixed(0)}ms)`).join('\n')}`
+    : ''}
+
 ## Recent Console Activity
 
 **Console Errors**:

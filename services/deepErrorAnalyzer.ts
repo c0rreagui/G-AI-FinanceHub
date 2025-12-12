@@ -5,6 +5,7 @@
 
 import { telemetry, EventCategory, EventSeverity } from './telemetryService';
 import { userInteractionTracker } from './userInteractionTracker';
+import { processFlowTracker, type ProcessFlow } from './processFlowTracker';
 
 interface ErrorContext {
     // Timeline: últimos eventos antes do erro
@@ -103,6 +104,19 @@ interface DeepErrorReport {
         apiFailure?: string;
         stateChange?: string;
         eventSequence: string[];
+    };
+    
+    // NOVO: Process Flow & Dependencies
+    processFlow: {
+        errorFlowChain: ProcessFlow[];
+        activeProcesses: ProcessFlow[];
+        recentProcessHistory: ProcessFlow[];
+        flowVisualization: string;
+        stats: {
+            totalProcesses: number;
+            errorCount: number;
+            avgDuration: number;
+        };
     };
     
     // Contexto completo
@@ -394,8 +408,31 @@ class DeepErrorAnalyzer {
                     errors: [...this.consoleHistory.errors].slice(-10),
                     warnings: [...this.consoleHistory.warnings].slice(-10),
                     logs: [...this.consoleHistory.logs].slice(-10),
-                },
+                 },
             },
+            
+            // NOVO: Process Flow & Dependencies
+            processFlow: (() => {
+                const flowData = processFlowTracker.exportData();
+                const errorChain = processFlowTracker.getErrorFlowChain();
+                
+                // Tenta obter visualização da cadeia de erro
+                let flowViz = 'No process flow data';
+                if (errorChain.length > 0) {
+                    const rootProcess = errorChain[0];
+                    flowViz = processFlowTracker.visualizeProcessTree(rootProcess.id) || processFlowTracker.generateFlowSummary(20);
+                } else if (flowData.history.length > 0) {
+                    flowViz = processFlowTracker.generateFlowSummary(20);
+                }
+                
+                return {
+                    errorFlowChain: errorChain,
+                    activeProcesses: flowData.activeProcesses,
+                    recentProcessHistory: flowData.history.slice(0, 20),
+                    flowVisualization: flowViz,
+                    stats: flowData.stats,
+                };
+            })(),
             
             metadata: {
                 sessionId: telemetry['sessionId'], // Access private field
