@@ -4,6 +4,7 @@
  */
 
 import { telemetry, EventCategory, EventSeverity } from './telemetryService';
+import { userInteractionTracker } from './userInteractionTracker';
 
 interface ErrorContext {
     // Timeline: últimos eventos antes do erro
@@ -523,22 +524,111 @@ ${report.timeline.lastApiCalls.map(a => `  - ${a.name} [${a.metadata?.status || 
      * Gera relatório formatado para LLM
      */
     private generateLLMReport(report: DeepErrorReport): string {
+        // Captura interações do usuário
+        const userInteractions = userInteractionTracker.generateInteractionSummary(15);
+        
         return `
-🐛 ERROR FOR AI: ${report.error.name}
+🐛 BUG REPORT FOR AI DEBUGGING
 
-Message: ${report.error.message}
-File: ${report.context.file}:${report.context.line}
-Trigger: ${report.trigger.directCause}
-Last Action: ${report.trigger.userAction || 'None'}
+## Error Details
 
-Stack:
-${report.error.stack?.split('\n').slice(0, 8).join('\n')}
+**Type**: ${report.error.name}
+**Message**: ${report.error.message}
+**File**: ${report.context.file || 'Unknown'}:${report.context.line || '?'}
+**Component**: ${report.context.component}
+**Error ID**: ${report.errorId}
+**Timestamp**: ${new Date(report.timestamp).toISOString()}
 
-Event Sequence:
+## Stack Trace
+
+\`\`\`
+${report.error.stack || 'No stack trace available'}
+\`\`\`
+
+## What Triggered This Error
+
+**Direct Cause**: ${report.trigger.directCause}
+${report.trigger.userAction ? `**Last User Action**: ${report.trigger.userAction}` : ''}
+${report.trigger.apiFailure ? `**API Failure**: ${report.trigger.apiFailure}` : ''}
+${report.trigger.stateChange ? `**State Change**: ${report.trigger.stateChange}` : ''}
+
+**Event Sequence**:
 ${report.trigger.eventSequence.map((e, i) => `${i + 1}. ${e}`).join('\n')}
 
-Copy this and paste into ChatGPT/Claude with: "Fix this React/TypeScript error"
-Error ID: ${report.errorId}
+## User Interactions (Last 15 Actions)
+
+${userInteractions || 'No interactions recorded'}
+
+## Timeline: Last 10 Events
+
+${report.timeline.last10Events.slice(-10).map((e, i) => `${i + 1}. [${new Date(e.timestamp).toLocaleTimeString()}] ${e.category}: ${e.name}`).join('\n')}
+
+## Last API Calls
+
+${report.timeline.lastApiCalls.length > 0 
+    ? report.timeline.lastApiCalls.map(a => `- ${a.name} [Status: ${a.metadata?.status || '?'}] (${a.metadata?.duration ? a.metadata.duration.toFixed(0) + 'ms' : '?'})`).join('\n')
+    : 'No API calls'}
+
+## Browser State
+
+**Memory**:
+${report.fullContext.browserState.memory 
+    ? `- Used: ${(report.fullContext.browserState.memory.usedJSHeapSize / 1024 / 1024).toFixed(2)} MB
+- Total: ${(report.fullContext.browserState.memory.totalJSHeapSize / 1024 / 1024).toFixed(2)} MB
+- Limit: ${(report.fullContext.browserState.memory.jsHeapSizeLimit / 1024 / 1024).toFixed(2)} MB`
+    : 'Not available'}
+
+**Network**:
+${report.fullContext.browserState.connection.effectiveType 
+    ? `- Type: ${report.fullContext.browserState.connection.effectiveType}
+- Downlink: ${report.fullContext.browserState.connection.downlink} Mbps
+- RTT: ${report.fullContext.browserState.connection.rtt} ms`
+    : 'Not available'}
+
+**Viewport**: ${report.fullContext.browserState.viewport.width}x${report.fullContext.browserState.viewport.height}
+
+**Route**: ${report.fullContext.appState.currentRoute}
+**Session Duration**: ${(report.fullContext.appState.sessionDuration / 1000).toFixed(1)}s
+**Online**: ${report.metadata.onlineStatus ? 'Yes' : 'No'}
+
+## Recent Console Activity
+
+**Errors**:
+${report.fullContext.recentConsoleActivity.errors.length > 0 
+    ? '\`\`\`\n' + report.fullContext.recentConsoleActivity.errors.slice(-3).join('\n') + '\n\`\`\`'
+    : 'None'}
+
+**Warnings**:
+${report.fullContext.recentConsoleActivity.warnings.length > 0 
+    ? '\`\`\`\n' + report.fullContext.recentConsoleActivity.warnings.slice(-3).join('\n') + '\n\`\`\`'
+    : 'None'}
+
+## Tech Stack
+
+- **Framework**: React + TypeScript
+- **State**: React Context + Hooks  
+- **Database**: Supabase
+- **Build**: Vite
+- **Styling**: TailwindCSS
+
+## Environment
+
+- **User Agent**: ${report.metadata.userAgent}
+- **Platform**: ${report.metadata.platform}
+- **Language**: ${report.metadata.language}
+- **Timezone**: ${report.metadata.timeZone}
+
+---
+
+**Instructions for AI**:
+Please analyze this error and provide:
+1. Root cause explanation
+2. Exact code fix (with file paths and line numbers)
+3. Why this error occurred
+4. How to prevent it in the future
+
+**Session ID**: ${report.metadata.sessionId}
+${report.metadata.userId ? `**User ID**: ${report.metadata.userId}` : ''}
         `.trim();
     }
 }
@@ -550,3 +640,6 @@ export const deepErrorAnalyzer = new DeepErrorAnalyzer();
 export const analyzeError = (error: Error, context: string, metadata?: Record<string, any>) => {
     return deepErrorAnalyzer.analyzeError(error, context, metadata);
 };
+
+// Export tipo para uso em outros módulos
+export type { DeepErrorReport };

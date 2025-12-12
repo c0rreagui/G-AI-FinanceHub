@@ -24,6 +24,8 @@ class ErrorBoundaryInner extends Component<ErrorBoundaryAuthProps, ErrorBoundary
     errorInfo: null,
   };
 
+  private deepReportRef: any = null; // Armazena deep report
+
   public static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error, errorInfo: null };
   }
@@ -44,6 +46,9 @@ class ErrorBoundaryInner extends Component<ErrorBoundaryAuthProps, ErrorBoundary
             componentStack: errorInfo.componentStack,
         },
     });
+    
+    // Armazena para copiar depois
+    this.deepReportRef = deepReport;
     
     // Também registra no telemetry básico (para compatibilidade)
     telemetry.trackError(
@@ -89,6 +94,23 @@ ${errorInfo?.componentStack}
     });
   };
 
+  private handleCopyForAI = () => {
+    if (!this.deepReportRef) {
+        this.props.showToast('Report não disponível', { type: 'error' });
+        return;
+    }
+
+    // Usa o LLMErrorReporter para gerar relatório completo
+    const { LLMErrorReporter } = require('../services/llmErrorReporter');
+    const fullReport = LLMErrorReporter.generateLLMReport(this.deepReportRef);
+
+    navigator.clipboard.writeText(fullReport).then(() => {
+        this.props.showToast('📋 Relatório completo copiado! Cole no Antigravity/ChatGPT', { type: 'success' });
+    }).catch(() => {
+        this.props.showToast('Falha ao copiar relatório', { type: 'error' });
+    });
+  };
+
   public render() {
     if (this.state.hasError) {
       return (
@@ -106,32 +128,50 @@ ${errorInfo?.componentStack}
                 </div>
 
                 {/* Actions */}
-                <div className="flex flex-col gap-3 p-6 sm:flex-row sm:justify-center">
-                    <Button 
-                        onClick={() => window.location.reload()} 
-                        className="flex items-center justify-center gap-2 bg-white text-zinc-900 hover:bg-zinc-200"
-                    >
-                        <RefreshCw className="h-4 w-4" />
-                        Atualizar Página
-                    </Button>
-                    <Button 
-                        onClick={() => {
-                            localStorage.clear();
-                            sessionStorage.clear();
-                            window.location.reload();
-                        }} 
-                        className="flex items-center justify-center gap-2 bg-zinc-800 text-red-300 hover:bg-zinc-700 hover:text-red-200 border border-red-900/30"
-                    >
-                        <Trash2 className="h-4 w-4" />
-                        Limpar Cache e Reiniciar
-                    </Button>
-                    <Button 
-                        onClick={this.handleCopyError}
-                        className="flex items-center justify-center gap-2 border border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
-                    >
-                        <Copy className="h-4 w-4" />
-                        Copiar Detalhes
-                    </Button>
+                <div className="flex flex-col gap-3 p-6">
+                    <div className="grid grid-cols-2 gap-3">
+                        <Button 
+                            onClick={() => window.location.reload()} 
+                            className="flex items-center justify-center gap-2 bg-white text-zinc-900 hover:bg-zinc-200"
+                        >
+                            <RefreshCw className="h-4 w-4" />
+                            Atualizar Página
+                        </Button>
+                        <Button 
+                            onClick={() => {
+                                localStorage.clear();
+                                sessionStorage.clear();
+                                window.location.reload();
+                            }} 
+                            className="flex items-center justify-center gap-2 bg-zinc-800 text-red-300 hover:bg-zinc-700 hover:text-red-200 border border-red-900/30"
+                        >
+                            <Trash2 className="h-4 w-4" />
+                            Limpar Cache
+                        </Button>
+                    </div>
+                    
+                    <div className="h-px bg-white10 my-2" />
+                    
+                    <div className="grid grid-cols-2 gap-3">
+                        <Button 
+                            onClick={this.handleCopyError}
+                            className="flex items-center justify-center gap-2 border border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                        >
+                            <Copy className="h-4 w-4" />
+                            Copiar Stack Trace
+                        </Button>
+                        <Button 
+                            onClick={this.handleCopyForAI}
+                            className="flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white hover:from-cyan-500 hover:to-blue-500 border-0"
+                        >
+                            <Copy className="h-4 w-4" />
+                            📋 Copiar para IA
+                        </Button>
+                    </div>
+                    
+                    <p className="text-xs text-center text-zinc-500 mt-2">
+                        💡 O botão "Copiar para IA" gera um relatório completo que você pode colar no Antigravity/ChatGPT para resolver automaticamente
+                    </p>
                 </div>
 
                 {/* Technical Details */}
