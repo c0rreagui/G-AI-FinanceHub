@@ -46,7 +46,7 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
                 {payload.map((entry, index) => {
                     const entryStyle = { color: entry.color };
                     return (
-                        <p key={index} className="text-sm font-medium" 
+                        <p key={entry.name || index} className="text-sm font-medium" 
                             {...{ style: entryStyle }}>
                             {entry.name}: {formatCurrency(entry.value)}
                         </p>

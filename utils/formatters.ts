@@ -8,6 +8,11 @@ export const formatCurrency = (value: number): string => {
   }).format(value);
 };
 
+export const safeFloat = (value: number | string): number => {
+    const num = typeof value === 'string' ? parseFloat(value) : value;
+    return Math.round((num + Number.EPSILON) * 100) / 100;
+};
+
 export const formatCompactCurrency = (value: number): string => {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',

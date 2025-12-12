@@ -33,7 +33,7 @@ import { getIconByName } from '../utils/categoryIcons';
 import { useToast } from './useToast';
 import { logger } from '../services/loggingService';
 import { triggerConfetti } from '../components/ui/Confetti';
-import { formatCurrency, formatDate } from '../utils/formatters';
+import { formatCurrency, formatDate, safeFloat } from '../utils/formatters';
 import { format, subMonths, isSameMonth, parseISO, getDaysInMonth, getDate, setDate, setMonth, setYear, isAfter, startOfMonth, endOfMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -197,6 +197,10 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         ];
     };
     const [debts, setDebts] = useState<Debt[]>([]);
+    const [investmentSummary, setInvestmentSummary] = useState({ totalInvested: 0, currentBalance: 0, yield: 0, percentage: 0 });
+    
+    // Race condition protection
+    const latestFetchId = React.useRef(0);
     const [investments, setInvestments] = useState<Investment[]>([]);
     const [scheduledTransactions, setScheduledTransactions] = useState<ScheduledTransaction[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -260,133 +264,144 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // --- DATA FETCHING ---
     const fetchData = useCallback(async () => {
-        if (isGuest) {
-            setLoading(true);
-            setError(null);
-            
-            let data = getGuestData();
-            if (!data.categories || data.categories.length === 0) {
-                const userId = 'guest';
-                data.categories = getDefaultCategories(userId).map(cat => ({ ...cat, id: crypto.randomUUID() }));
-                setGuestData(data);
-            }
-            const populatedCategories = data.categories.map((c: any) => ({ ...c, icon: getIconByName(c.icon.displayName || c.icon) }));
-            const categoryMap = new Map(populatedCategories.map((c: any) => [c.id, c]));
-            const fallbackCategory = populatedCategories.find((c: any) => c.name === 'Outros') || populatedCategories[0];
-            
-            setCategories(populatedCategories);
-            
-            const allTransactions = (data.transactions || []).map((tx: any) => ({ ...tx, category: categoryMap.get(tx.category_id) || fallbackCategory }));
-            setTransactions(allTransactions.filter((tx: Transaction) => !tx.deleted_at).sort((a: Transaction, b: Transaction) => new Date(b.date).getTime() - new Date(a.date).getTime()));
-            setDeletedTransactions(allTransactions.filter((tx: Transaction) => tx.deleted_at).sort((a: Transaction, b: Transaction) => new Date(b.deleted_at!).getTime() - new Date(a.deleted_at!).getTime()));
-
-            setGoals(data.goals?.sort((a: Goal, b: Goal) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime()) || []);
-            setDebts(data.debts || []);
-            setScheduledTransactions(data.scheduledTransactions?.map((stx: any) => ({ ...stx, category: categoryMap.get(stx.category_id) || fallbackCategory })).sort((a: ScheduledTransaction, b: ScheduledTransaction) => new Date(a.next_due_date).getTime() - new Date(b.next_due_date).getTime()) || []);
-            setLoading(false);
-            return;
-        }
-
-        // Developer Mode now has a mock user, so it will pass this check
-        if (!user) return;
+        const fetchId = ++latestFetchId.current;
         setLoading(true);
         setError(null);
         try {
-            // FETCH CATEGORIES & ACCOUNTS
-            const [categoriesResult, accountsResult] = await Promise.all([
-                supabase.from('categories').select('*').eq('user_id', user.id),
-                supabase.from('accounts').select('*').eq('user_id', user.id)
-            ]);
+            if (isGuest) {
+                if (fetchId !== latestFetchId.current) return;
+                let data = getGuestData();
+                if (!data.categories || data.categories.length === 0) {
+                    const userId = 'guest';
+                    data.categories = getDefaultCategories(userId).map(cat => ({ ...cat, id: crypto.randomUUID() }));
+                    setGuestData(data);
+                }
+                const populatedCategories = data.categories.map((c: any) => ({ ...c, icon: getIconByName(c.icon.displayName || c.icon) }));
+                const categoryMap = new Map(populatedCategories.map((c: any) => [c.id, c]));
+                const fallbackCategory = populatedCategories.find((c: any) => c.name === 'Outros') || populatedCategories[0];
+                
+                setCategories(populatedCategories);
+                
+                const allTransactions = (data.transactions || []).map((tx: any) => ({ ...tx, category: categoryMap.get(tx.category_id) || fallbackCategory }));
+                setTransactions(allTransactions.filter((tx: Transaction) => !tx.deleted_at).sort((a: Transaction, b: Transaction) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+                setDeletedTransactions(allTransactions.filter((tx: Transaction) => tx.deleted_at).sort((a: Transaction, b: Transaction) => new Date(b.deleted_at!).getTime() - new Date(a.deleted_at!).getTime()));
 
-            let categoriesData = categoriesResult.data;
-            const categoriesError = categoriesResult.error;
-            
-            let accountsData = accountsResult.data;
-            const accountsError = accountsResult.error;
-
-            if (categoriesError) throw categoriesError;
-            if (accountsError) throw accountsError;
-
-            // Se o usuário não tiver categorias, crie as padrão para ele.
-            if (!categoriesData || categoriesData.length === 0) {
-                const defaultCategories = getDefaultCategories(user.id);
-                const { data: newCategories, error: insertError } = await supabase
-                    .from('categories')
-                    .insert(defaultCategories)
-                    .select();
-                if (insertError) throw insertError;
-                categoriesData = newCategories;
+                setGoals(data.goals?.sort((a: Goal, b: Goal) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime()) || []);
+                setDebts(data.debts || []);
+                setScheduledTransactions(data.scheduledTransactions?.map((stx: any) => ({ ...stx, category: categoryMap.get(stx.category_id) || fallbackCategory })).sort((a: ScheduledTransaction, b: ScheduledTransaction) => new Date(a.next_due_date).getTime() - new Date(b.next_due_date).getTime()) || []);
+                setLoading(false);
+                return;
             }
 
-            // Se o usuário não tiver contas, crie uma padrão (Carteira)
-            if (!accountsData || accountsData.length === 0) {
-                 const defaultAccount = {
-                    user_id: user.id,
-                    name: 'Carteira',
-                    type: 'wallet',
-                    balance: 0,
-                    color: '#10B981' // Emerald-500
-                 };
-                 const { data: newAccount, error: accInsertError } = await supabase
-                    .from('accounts')
-                    .insert(defaultAccount)
-                    .select();
-                 
-                 if (accInsertError) throw accInsertError;
-                 accountsData = newAccount;
+            // Developer Mode now has a mock user, so it will pass this check
+            if (!user) return;
+            setLoading(true);
+            setError(null);
+            try {
+                // FETCH CATEGORIES & ACCOUNTS
+                const [categoriesResult, accountsResult] = await Promise.all([
+                    supabase.from('categories').select('*').eq('user_id', user.id),
+                    supabase.from('accounts').select('*').eq('user_id', user.id)
+                ]);
+
+                let categoriesData = categoriesResult.data;
+                const categoriesError = categoriesResult.error;
+                
+                let accountsData = accountsResult.data;
+                const accountsError = accountsResult.error;
+
+                if (categoriesError) throw categoriesError;
+                if (accountsError) throw accountsError;
+
+                // Se o usuário não tiver categorias, crie as padrão para ele.
+                if (!categoriesData || categoriesData.length === 0) {
+                    const defaultCategories = getDefaultCategories(user.id);
+                    const { data: newCategories, error: insertError } = await supabase
+                        .from('categories')
+                        .insert(defaultCategories)
+                        .select();
+                    if (insertError) throw insertError;
+                    categoriesData = newCategories;
+                }
+
+                // Se o usuário não tiver contas, crie uma padrão (Carteira)
+                if (!accountsData || accountsData.length === 0) {
+                    const defaultAccount = {
+                        user_id: user.id,
+                        name: 'Carteira',
+                        type: 'wallet',
+                        balance: 0,
+                        color: '#10B981' // Emerald-500
+                    };
+                    const { data: newAccount, error: accInsertError } = await supabase
+                        .from('accounts')
+                        .insert(defaultAccount)
+                        .select();
+                    
+                    if (accInsertError) throw accInsertError;
+                    accountsData = newAccount;
+                }
+                
+                setAccounts(accountsData);
+                const generatedAccounts = accountsData; // Keep alias for compatibility with existing logic below
+
+                const populatedCategories: Category[] = categoriesData.map(c => ({...c, icon: getIconByName(c.icon) }));
+                setCategories(populatedCategories);
+                
+                const categoryMap = new Map(populatedCategories.map(c => [c.id, c]));
+                const fallbackCategory = populatedCategories.find(c => c.name === 'Outros') || populatedCategories[0];
+
+                const [
+                    { data: transactionsData, error: transactionsError },
+                    { data: goalsData, error: goalsError },
+                    { data: debtsData, error: debtsError },
+                    { data: scheduledData, error: scheduledError },
+                    { data: auditData, error: auditError },
+                    { data: budgetsData, error: budgetsError },
+                    { data: investmentsData, error: investmentsError } // Added investments fetching
+                ] = await Promise.all([
+                    supabase.from('transactions').select('*').eq('user_id', user.id).order('date', { ascending: false }),
+                    supabase.from('goals').select('*').eq('user_id', user.id).order('deadline', { ascending: true }),
+                    supabase.from('debts').select('*').eq('user_id', user.id),
+                    supabase.from('scheduled_transactions').select('*').eq('user_id', user.id).order('next_due_date', { ascending: true }),
+                    supabase.from('audit_logs').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(50),
+                    supabase.from('budgets').select('*').eq('user_id', user.id),
+                    supabase.from('investments').select('*').eq('user_id', user.id) // Added investments query
+                ]);
+
+                if (transactionsError) throw transactionsError;
+                if (goalsError) throw goalsError;
+                if (debtsError) throw debtsError;
+                if (scheduledError) throw scheduledError;
+                if (auditError) throw auditError;
+                if (budgetsError) throw budgetsError;
+                if (investmentsError) throw investmentsError; // Added investments error check
+
+                if (fetchId !== latestFetchId.current) return;
+
+                const mappedTransactions = transactionsData?.map(tx => ({
+                    ...tx, 
+                    category: categoryMap.get(tx.category_id) || fallbackCategory,
+                    account_id: tx.account_id || generatedAccounts[0].id,
+                    status: tx.status || TransactionStatus.COMPLETED
+                })) || [];
+
+                setTransactions(mappedTransactions.filter(tx => !tx.deleted_at));
+                setDeletedTransactions(mappedTransactions.filter(tx => tx.deleted_at));
+                setGoals(goalsData || []);
+                setDebts(debtsData || []);
+                setInvestments(investmentsData as Investment[] || []);
+                setBudgets(budgetsData || []);
+                setScheduledTransactions(scheduledData?.map(stx => ({...stx, category: categoryMap.get(stx.category_id) || fallbackCategory })) || []);
+                setAuditLogs(auditData as AuditLog[] || []);
+
+            } catch (e: any) {
+                const errorMessage = e.message || "Falha ao carregar os dados.";
+                logger.error("Erro ao buscar dados do Supabase", { error: e });
+                setError(errorMessage);
+            } finally {
+                setLoading(false);
             }
-            
-            setAccounts(accountsData);
-            const generatedAccounts = accountsData; // Keep alias for compatibility with existing logic below
-
-            const populatedCategories: Category[] = categoriesData.map(c => ({...c, icon: getIconByName(c.icon) }));
-            setCategories(populatedCategories);
-            
-            const categoryMap = new Map(populatedCategories.map(c => [c.id, c]));
-            const fallbackCategory = populatedCategories.find(c => c.name === 'Outros') || populatedCategories[0];
-
-            const [
-                { data: transactionsData, error: transactionsError },
-                { data: goalsData, error: goalsError },
-                { data: debtsData, error: debtsError },
-                { data: scheduledData, error: scheduledError },
-                { data: auditData, error: auditError },
-                { data: budgetsData, error: budgetsError },
-                { data: investmentsData, error: investmentsError } // Added investments fetching
-            ] = await Promise.all([
-                supabase.from('transactions').select('*').eq('user_id', user.id).order('date', { ascending: false }),
-                supabase.from('goals').select('*').eq('user_id', user.id).order('deadline', { ascending: true }),
-                supabase.from('debts').select('*').eq('user_id', user.id),
-                supabase.from('scheduled_transactions').select('*').eq('user_id', user.id).order('next_due_date', { ascending: true }),
-                supabase.from('audit_logs').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(50),
-                supabase.from('budgets').select('*').eq('user_id', user.id),
-                supabase.from('investments').select('*').eq('user_id', user.id) // Added investments query
-            ]);
-
-            if (transactionsError) throw transactionsError;
-            if (goalsError) throw goalsError;
-            if (debtsError) throw debtsError;
-            if (scheduledError) throw scheduledError;
-            if (auditError) throw auditError;
-            if (budgetsError) throw budgetsError;
-            if (investmentsError) throw investmentsError; // Added investments error check
-
-            const mappedTransactions = transactionsData?.map(tx => ({
-                ...tx, 
-                category: categoryMap.get(tx.category_id) || fallbackCategory,
-                account_id: tx.account_id || generatedAccounts[0].id,
-                status: tx.status || TransactionStatus.COMPLETED
-            })) || [];
-
-            setTransactions(mappedTransactions.filter(tx => !tx.deleted_at));
-            setDeletedTransactions(mappedTransactions.filter(tx => tx.deleted_at));
-            setGoals(goalsData || []);
-            setDebts(debtsData || []);
-            setInvestments(investmentsData as Investment[] || []);
-            setBudgets(budgetsData || []);
-            setScheduledTransactions(scheduledData?.map(stx => ({...stx, category: categoryMap.get(stx.category_id) || fallbackCategory })) || []);
-            setAuditLogs(auditData as AuditLog[] || []);
-
         } catch (e: any) {
             const errorMessage = e.message || "Falha ao carregar os dados.";
             logger.error("Erro ao buscar dados do Supabase", { error: e });
@@ -406,6 +421,8 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             const newInvestment: Investment = {
                 id: crypto.randomUUID(),
                 ...investment,
+                amount: safeFloat(investment.amount),
+                current_price: safeFloat(investment.current_price),
                 user_id: 'guest',
             };
             data.investments = data.investments || [];
@@ -417,6 +434,8 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         }
         const { data, error } = await supabase.from('investments').insert({ 
             ...investment,
+            amount: safeFloat(investment.amount),
+            current_price: safeFloat(investment.current_price),
             user_id: user!.id 
         }).select().single();
         if (error) throw error;
@@ -622,24 +641,25 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         // Complete mission
         completeMission('1'); // 'add_transaction' mission
         
+        const amount = safeFloat(tx.amount);
+        
         if (isGuest) {
             const data = getGuestData();
-            const newTx = { ...tx, id: crypto.randomUUID(), user_id: 'guest', category_id: tx.categoryId, created_at: new Date().toISOString() };
+            const newTx = { ...tx, amount, id: crypto.randomUUID(), user_id: 'guest', category_id: tx.categoryId, created_at: new Date().toISOString() };
             data.transactions.push(newTx);
             setGuestData(data);
             await fetchData();
             showToast('Transação Adicionada!', { type: 'success' });
             return true;
         }
-        // FIX: Destructure categoryId to avoid sending it to Supabase, which expects category_id.
-        const { categoryId, ...txData } = tx;
+        
+        const { categoryId, ...rest } = tx;
         const { error } = await supabase.from('transactions').insert({ 
-            ...txData, 
+            ...rest, 
+            amount,
             category_id: categoryId, 
             user_id: user!.id, 
-            notes: tx.notes,
-            account_id: tx.account_id,
-            status: tx.status
+            account_id: tx.account_id || accounts[0]?.id
         });
         if (error) throw error;
         await fetchData();
@@ -648,26 +668,33 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     const updateTransaction = (tx: Omit<Transaction, 'category'|'user_id'|'category_id'> & {categoryId: string}) => withMutation(async () => {
+        const amount = safeFloat(tx.amount);
         if (isGuest) {
             const data = getGuestData();
             const index = data.transactions.findIndex((t: Transaction) => t.id === tx.id);
             if (index > -1) {
-                data.transactions[index] = { ...data.transactions[index], ...tx, category_id: tx.categoryId };
+                // We keep existing fields and merge updates
+                const existing = data.transactions[index];
+                data.transactions[index] = { 
+                    ...existing, 
+                    ...tx, 
+                    amount, 
+                    category_id: tx.categoryId 
+                };
                 setGuestData(data);
             }
             await fetchData();
             showToast('Transação Atualizada!', { type: 'success' });
             return true;
         }
-        // FIX: Destructure categoryId to avoid sending it to Supabase, which expects category_id.
-        const { categoryId, ...txData } = tx;
+        
+        const { categoryId, ...rest } = tx;
         const { error } = await supabase.from('transactions').update({ 
-            ...txData, 
-            category_id: categoryId, 
-            notes: tx.notes,
-            account_id: tx.account_id,
-            status: tx.status
+            ...rest, 
+            amount,
+            category_id: categoryId,
         }).eq('id', tx.id);
+        
         if (error) throw error;
         await fetchData();
         showToast('Transação Atualizada!', { type: 'success' });
@@ -701,7 +728,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         const debitTx = { 
             ...baseTx, 
             description: `Transferência: ${description}`,
-            amount: -Math.abs(amount),
+            amount: -Math.abs(safeFloat(amount)),
             account_id: fromAccountId, 
             notes: notes || `Para: ${accounts.find(a => a.id === toAccountId)?.name || 'Conta Destino'}`
         };
@@ -709,7 +736,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         const creditTx = { 
             ...baseTx, 
             description: `Transferência: ${description}`,
-            amount: Math.abs(amount), 
+            amount: Math.abs(safeFloat(amount)), 
             account_id: toAccountId, 
             notes: notes || `De: ${accounts.find(a => a.id === fromAccountId)?.name || 'Conta Origem'}`
         };
@@ -770,14 +797,14 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
                 data.transactions[index].deleted_at = new Date().toISOString(); 
                 setGuestData(data);
                 await fetchData();
-                logAction('delete', 'transaction', id, `Transação movida para lixeira: ${txToDelete.description}`);
+                // logAction('delete', 'transaction', id, `Transação movida para lixeira: ${txToDelete.description}`);
             }
         } else {
             // Soft delete for Supabase
             const { error } = await supabase.from('transactions').update({ deleted_at: new Date().toISOString() }).eq('id', id);
             if (error) throw error;
             await fetchData();
-            logAction('delete', 'transaction', id, `Transação movida para lixeira: ${txToDelete.description}`);
+            // logAction('delete', 'transaction', id, `Transação movida para lixeira: ${txToDelete.description}`);
         }
         showToast('Transação movida para a lixeira', { type: 'success' });
         return true;
@@ -791,20 +818,22 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             return acc;
         }, {} as Record<string, Transaction>);
 
+        const safeUpdates = { ...updates, amount: updates.amount ? safeFloat(updates.amount) : updates.amount };
+
         if (isGuest) {
             const data = getGuestData();
             data.transactions = data.transactions.map((t: Transaction) => 
-                ids.includes(t.id) ? { ...t, ...updates } : t
+                ids.includes(t.id) ? { ...t, ...safeUpdates } : t
             );
             setGuestData(data);
         } else {
             // Prepare updates for Supabase (remove UI-only fields if any)
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { category, ...safeUpdates } = updates;
+            const { category, ...rest } = safeUpdates;
             
             const { error } = await supabase
                 .from('transactions')
-                .update(safeUpdates)
+                .update(rest)
                 .in('id', ids);
 
             if (error) throw error;
@@ -918,7 +947,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     const mergeTransactions = (ids: string[], targetDetails: Partial<Transaction>) => withMutation(async () => {
         // Calculate total amount
         const txsToMerge = transactions.filter(t => ids.includes(t.id));
-        const totalAmount = txsToMerge.reduce((sum, t) => sum + t.amount, 0);
+        const totalAmount = safeFloat(txsToMerge.reduce((sum, t) => sum + t.amount, 0));
         const mergedNotes = txsToMerge.map(t => `${formatDate(t.date)}: ${t.description} (${formatCurrency(t.amount)})`).join('\n');
         
         const newTxData = {
@@ -1034,7 +1063,8 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
                 reconciled: false,
                 payment_id: null, // Clear implementation references
                 transfer_id: null,
-                deleted_at: null
+                deleted_at: null,
+                amount: safeFloat(t.amount) // Ensure amount is safeFloat
             };
         });
 
@@ -1086,12 +1116,13 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     }, `${sourceDate}-${targetDate}`);
 
     const addGoal = (goal: Omit<Goal, 'id' | 'current_amount' | 'status' | 'user_id' | 'target_amount' | 'deadline'> & {targetAmount: number; deadline: string;}) => withMutation(async () => {
+        const targetAmount = safeFloat(goal.targetAmount);
         if (isGuest) {
             const data = getGuestData();
             const newGoal: Goal = {
                 id: crypto.randomUUID(),
                 name: goal.name,
-                target_amount: goal.targetAmount,
+                target_amount: targetAmount,
                 deadline: goal.deadline,
                 current_amount: 0,
                 status: GoalStatus.EM_ANDAMENTO,
@@ -1103,21 +1134,41 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             showToast('Meta Criada!', { description: 'Agora adicione o primeiro valor!', type: 'success' });
             return newGoal;
         }
-        const { data, error } = await supabase.from('goals').insert({ name: goal.name, target_amount: goal.targetAmount, deadline: goal.deadline, user_id: user!.id }).select().single();
+        const { data, error } = await supabase.from('goals').insert({ name: goal.name, target_amount: targetAmount, deadline: goal.deadline, user_id: user!.id }).select().single();
         if (error) throw error;
         await fetchData();
         showToast('Meta Criada!', { description: 'Agora adicione o primeiro valor!', type: 'success' });
         return data as Goal;
     });
     
+    const updateGoal = (goal: Goal) => withMutation(async () => {
+        const targetAmount = safeFloat(goal.target_amount);
+        const currentAmount = safeFloat(goal.current_amount);
+        if (isGuest) {
+            const data = getGuestData();
+            const index = data.goals.findIndex((g: Goal) => g.id === goal.id);
+            if (index > -1) {
+                data.goals[index] = { ...data.goals[index], ...goal, target_amount: targetAmount, current_amount: currentAmount };
+                setGuestData(data);
+            }
+        } else {
+            const { id, user_id, ...rest } = goal;
+            const { error } = await supabase.from('goals').update({ ...rest, target_amount: targetAmount, current_amount: currentAmount }).eq('id', id);
+            if (error) throw error;
+        }    
+        await fetchData();
+        return true;
+    }, goal.id);
 
 
     const addBudget = (budget: Omit<Budget, 'id' | 'created_at' | 'updated_at' | 'user_id'>) => withMutation(async () => {
+        const amount = safeFloat(budget.amount);
         if (isGuest) {
             const data = getGuestData();
             const newBudget: Budget = {
                 id: crypto.randomUUID(),
                 ...budget,
+                amount,
                 user_id: 'guest',
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
@@ -1134,7 +1185,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         }
         const { data, error } = await supabase.from('budgets').insert({ 
             category_id: budget.category_id, 
-            amount: budget.amount, 
+            amount, 
             period: budget.period, 
             user_id: user!.id 
         }).select().single();
@@ -1145,15 +1196,16 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     const updateBudget = (budget: Partial<Budget> & { id: string }) => withMutation(async () => {
+        const amount = budget.amount ? safeFloat(budget.amount) : budget.amount;
         if (isGuest) {
             const data = getGuestData();
-            data.budgets = (data.budgets || []).map((b: Budget) => b.id === budget.id ? { ...b, ...budget, updated_at: new Date().toISOString() } : b);
+            data.budgets = (data.budgets || []).map((b: Budget) => b.id === budget.id ? { ...b, ...budget, amount, updated_at: new Date().toISOString() } : b);
             setGuestData(data);
             await fetchData();
             showToast('Orçamento Atualizado!', { type: 'success' });
             return true;
         }
-        const { error } = await supabase.from('budgets').update({ ...budget, updated_at: new Date().toISOString() }).eq('id', budget.id);
+        const { error } = await supabase.from('budgets').update({ ...budget, amount, updated_at: new Date().toISOString() }).eq('id', budget.id);
         if (error) throw error;
         await fetchData();
         showToast('Orçamento Atualizado!', { type: 'success' });
@@ -1181,10 +1233,12 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         const goal = (isGuest ? getGuestData().goals : goals).find((g: Goal) => g.id === goalId);
         if (!goal) throw new Error("Meta não encontrada.");
 
+        const safeAmount = safeFloat(amount);
+
         // Cria a transação de contribuição
         const tx: Omit<Transaction, 'id' | 'category'|'user_id'|'category_id'> & {categoryId: string} = {
             description: `Contribuição para a meta: ${goal.name}`,
-            amount: -Math.abs(amount),
+            amount: -Math.abs(safeAmount),
             type: TransactionType.DESPESA,
             date: new Date().toISOString(),
             categoryId: categories.find(c => c.name === 'Investimentos')?.id || categories[0].id,
@@ -1201,7 +1255,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             // Atualiza a meta
             const goalIndex = data.goals.findIndex((g: Goal) => g.id === goalId);
             if (goalIndex > -1) {
-                data.goals[goalIndex].current_amount += Math.abs(amount);
+                data.goals[goalIndex].current_amount += Math.abs(safeAmount);
                 if (data.goals[goalIndex].current_amount >= data.goals[goalIndex].target_amount) {
                     data.goals[goalIndex].status = GoalStatus.CONCLUIDO;
                 }
@@ -1214,7 +1268,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             if (txError) throw txError;
             
             // **FIX**: Atualiza a meta no Supabase
-            const newAmount = goal.current_amount + Math.abs(amount);
+            const newAmount = goal.current_amount + Math.abs(safeAmount);
             const newStatus = newAmount >= goal.target_amount ? GoalStatus.CONCLUIDO : GoalStatus.EM_ANDAMENTO;
             const { error: goalUpdateError } = await supabase
                 .from('goals')
@@ -1270,13 +1324,15 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     }, id);
 
     const addDebt = (debt: Omit<Debt, 'id' | 'paid_amount' | 'status' | 'user_id' | 'total_amount' | 'interest_rate'> & {totalAmount: number; interestRate: number}) => withMutation(async () => {
+        const totalAmount = safeFloat(debt.totalAmount);
+        const interestRate = safeFloat(debt.interestRate);
         if (isGuest) {
             const data = getGuestData();
             const newDebt: Debt = {
                 id: crypto.randomUUID(),
                 name: debt.name,
-                total_amount: debt.totalAmount,
-                interest_rate: debt.interestRate,
+                total_amount: totalAmount,
+                interest_rate: interestRate,
                 category: debt.category,
                 paid_amount: 0,
                 status: DebtStatus.ATIVA,
@@ -1288,7 +1344,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             showToast('Dívida Adicionada!', { type: 'success' });
             return newDebt;
         }
-        const { data, error } = await supabase.from('debts').insert({ name: debt.name, total_amount: debt.totalAmount, interest_rate: debt.interestRate, category: debt.category, user_id: user!.id }).select().single();
+        const { data, error } = await supabase.from('debts').insert({ name: debt.name, total_amount: totalAmount, interest_rate: interestRate, category: debt.category, user_id: user!.id }).select().single();
         if (error) throw error;
         await fetchData();
         showToast('Dívida Adicionada!', { type: 'success' });
@@ -1299,9 +1355,11 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         const debt = (isGuest ? getGuestData().debts : debts).find((d: Debt) => d.id === debtId);
         if (!debt) throw new Error("Dívida não encontrada.");
 
+        const safeAmount = safeFloat(amount);
+
         const tx: Omit<Transaction, 'id' | 'category'|'user_id'|'category_id'> & {categoryId: string} = {
             description: `Pagamento da dívida: ${debt.name}`,
-            amount: -Math.abs(amount),
+            amount: -Math.abs(safeAmount),
             type: TransactionType.DESPESA,
             date: new Date().toISOString(),
             categoryId: categories.find(c => c.name === 'Outros')?.id || categories[0].id,
@@ -1316,7 +1374,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             data.transactions.push(newTx);
             const debtIndex = data.debts.findIndex((d: Debt) => d.id === debtId);
             if (debtIndex > -1) {
-                data.debts[debtIndex].paid_amount += Math.abs(amount);
+                data.debts[debtIndex].paid_amount += Math.abs(safeAmount);
                 if (data.debts[debtIndex].paid_amount >= data.debts[debtIndex].total_amount) {
                     data.debts[debtIndex].status = DebtStatus.PAGA;
                 }
@@ -1328,7 +1386,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             if (txError) throw txError;
 
             // **FIX**: Atualiza a dívida no Supabase
-            const newPaidAmount = debt.paid_amount + Math.abs(amount);
+            const newPaidAmount = debt.paid_amount + Math.abs(safeAmount);
             const newStatus = newPaidAmount >= debt.total_amount ? DebtStatus.PAGA : DebtStatus.ATIVA;
             const { error: debtUpdateError } = await supabase
                 .from('debts')
@@ -1380,8 +1438,9 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const addScheduledTransaction = (item: Omit<ScheduledTransaction, 'id'|'category'|'next_due_date'|'user_id'|'category_id'|'start_date'> & {categoryId: string; startDate: string}) => withMutation(async () => {
         const nextDueDate = calculateNextDueDate(item.startDate, item.frequency);
-        const { categoryId, startDate, ...rest } = item;
-        const newItem = { ...rest, category_id: categoryId, start_date: startDate, next_due_date: nextDueDate, user_id: isGuest ? 'guest' : user!.id };
+        const { categoryId, startDate, amount, ...rest } = item;
+        const safeAmount = safeFloat(amount);
+        const newItem = { ...rest, amount: safeAmount, category_id: categoryId, start_date: startDate, next_due_date: nextDueDate, user_id: isGuest ? 'guest' : user!.id };
 
         if (isGuest) {
             const guestItem = { ...newItem, id: crypto.randomUUID(), created_at: new Date().toISOString() };
@@ -1398,8 +1457,9 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     const updateScheduledTransaction = (item: Omit<ScheduledTransaction, 'category'|'user_id'|'category_id'|'start_date'> & {categoryId: string; startDate: string}) => withMutation(async () => {
-        const { categoryId, startDate, ...rest } = item;
-        const updatedItem = { ...rest, category_id: categoryId, start_date: startDate };
+        const { categoryId, startDate, amount, ...rest } = item;
+        const safeAmount = safeFloat(amount);
+        const updatedItem = { ...rest, amount: safeAmount, category_id: categoryId, start_date: startDate };
         
         if (isGuest) {
             const data = getGuestData();
@@ -1496,6 +1556,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
                 id: crypto.randomUUID(),
                 goal_contribution_id: t.goal_contribution_id ? goalIdMap.get(t.goal_contribution_id) : null,
                 debt_payment_id: t.debt_payment_id ? debtIdMap.get(t.debt_payment_id) : null,
+                amount: safeFloat(t.amount)
             }));
 
             const guestData = {
@@ -1503,7 +1564,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
                 transactions: finalTransactions,
                 goals: finalGoals,
                 debts: finalDebts,
-                scheduledTransactions: mockData.scheduledTransactions.map(st => ({ ...st, id: crypto.randomUUID() })),
+                scheduledTransactions: mockData.scheduledTransactions.map(st => ({ ...st, id: crypto.randomUUID(), amount: safeFloat(st.amount) })),
             };
             setGuestData(guestData);
 
@@ -1523,21 +1584,22 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
             const mockData = generateMockData(user.id, fetchedCategories as Category[], accounts);
 
-            const { data: insertedGoals, error: goalsError } = await supabase.from('goals').insert(mockData.goals).select();
+            const { data: insertedGoals, error: goalsError } = await supabase.from('goals').insert(mockData.goals.map(g => ({...g, target_amount: safeFloat(g.target_amount), current_amount: safeFloat(g.current_amount)}))).select();
             if (goalsError) throw goalsError;
 
-            const { data: insertedDebts, error: debtsError } = await supabase.from('debts').insert(mockData.debts).select();
+            const { data: insertedDebts, error: debtsError } = await supabase.from('debts').insert(mockData.debts.map(d => ({...d, total_amount: safeFloat(d.total_amount), paid_amount: safeFloat(d.paid_amount), interest_rate: safeFloat(d.interest_rate)}))).select();
             if (debtsError) throw debtsError;
             
             const finalTransactions = mockData.transactions.map(t => ({
                 ...t,
                 goal_contribution_id: t.goal_contribution_id ? insertedGoals?.[0].id : null,
                 debt_payment_id: t.debt_payment_id ? insertedDebts?.[0].id : null,
+                amount: safeFloat(t.amount)
             }));
 
             await Promise.all([
                 supabase.from('transactions').insert(finalTransactions),
-                supabase.from('scheduled_transactions').insert(mockData.scheduledTransactions),
+                supabase.from('scheduled_transactions').insert(mockData.scheduledTransactions.map(st => ({...st, amount: safeFloat(st.amount)}))),
             ]);
             
             // Add Mock Investments
@@ -1563,7 +1625,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         const newTransactions = Array.from({ length: count }, () => ({
             user_id: userId,
             description: `Mock Transaction #${Math.floor(Math.random() * 1000)}`,
-            amount: -(Math.random() * 150 + 5),
+            amount: safeFloat(-(Math.random() * 150 + 5)),
             type: TransactionType.DESPESA,
             date: new Date(now.getFullYear(), now.getMonth(), Math.floor(Math.random() * 28) + 1).toISOString(),
             category_id: getRandomCatId(),
@@ -1589,8 +1651,8 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         const newGoals = Array.from({ length: count }, (_, i) => ({
             user_id: userId,
             name: `Meta de Teste ${i + 1}`,
-            target_amount: Math.floor(Math.random() * 10000) + 1000,
-            current_amount: 0,
+            target_amount: safeFloat(Math.floor(Math.random() * 10000) + 1000),
+            current_amount: safeFloat(0),
             deadline: new Date(now.getFullYear() + 1, Math.floor(Math.random() * 12), 1).toISOString(),
             status: GoalStatus.EM_ANDAMENTO,
         }));
@@ -1612,9 +1674,9 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
          const newDebts = Array.from({ length: count }, (_, i) => ({
              user_id: userId,
              name: `Dívida de Teste ${i+1}`,
-             total_amount: Math.floor(Math.random() * 5000) + 500,
-             paid_amount: 0,
-             interest_rate: parseFloat((Math.random() * 20 + 5).toFixed(2)),
+             total_amount: safeFloat(Math.floor(Math.random() * 5000) + 500),
+             paid_amount: safeFloat(0),
+             interest_rate: safeFloat(parseFloat((Math.random() * 20 + 5).toFixed(2))),
              category: 'Teste',
              status: DebtStatus.ATIVA,
          }));
@@ -1650,9 +1712,9 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
                 name,
                 ticker,
                 type,
-                amount: Math.floor(Math.random() * 50000) + 1000,
-                quantity: Math.floor(Math.random() * 100) + 1,
-                current_price: Math.floor(Math.random() * 500) + 10,
+                amount: safeFloat(Math.floor(Math.random() * 50000) + 1000),
+                quantity: safeFloat(Math.floor(Math.random() * 100) + 1),
+                current_price: safeFloat(Math.floor(Math.random() * 500) + 10),
                 purchase_date: new Date(now.getFullYear(), now.getMonth() - Math.floor(Math.random() * 12), 1).toISOString(),
                 sector: 'Financeiro',
             };

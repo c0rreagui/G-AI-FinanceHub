@@ -14,8 +14,11 @@ export const useVoiceCommands = () => {
   const startListening = useCallback(() => {
     if (!isSupported) return;
 
-    const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
-    const recognition = new SpeechRecognition();
+    // @ts-ignore - Speech Recognition API not fully typed in TypeScript
+    const SpeechRecognitionAPI = window.webkitSpeechRecognition || window.SpeechRecognition;
+    if (!SpeechRecognitionAPI) return;
+    
+    const recognition = new SpeechRecognitionAPI();
     
     recognition.lang = 'pt-BR';
     recognition.continuous = false;

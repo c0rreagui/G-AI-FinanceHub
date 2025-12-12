@@ -25,9 +25,10 @@ export function useInvestments() {
       if (error) throw error;
 
       setInvestments(data || []);
-    } catch (err: any) {
-      console.error('Erro ao buscar investimentos:', err);
-      setError(err.message);
+    } catch (err) {
+      const error = err as Error;
+      console.error('Erro ao buscar investimentos:', error);
+      setError(error.message || 'Erro desconhecido');
       showToast('Erro ao carregar investimentos', { type: 'error' });
     } finally {
       setLoading(false);
@@ -49,8 +50,9 @@ export function useInvestments() {
       setInvestments(prev => [...prev, data]);
       showToast('Investimento adicionado com sucesso!', { type: 'success' });
       return true;
-    } catch (err: any) {
-      console.error('Erro ao adicionar investimento:', err);
+    } catch (err) {
+      const error = err as Error;
+      console.error('Erro ao adicionar investimento:', error);
       showToast('Erro ao adicionar investimento', { type: 'error' });
       return false;
     }
@@ -68,8 +70,9 @@ export function useInvestments() {
       setInvestments(prev => prev.map(inv => inv.id === id ? { ...inv, ...updates } : inv));
       showToast('Investimento atualizado!', { type: 'success' });
       return true;
-    } catch (err: any) {
-      console.error('Erro ao atualizar investimento:', err);
+    } catch (err) {
+      const error = err as Error;
+      console.error('Erro ao atualizar investimento:', error);
       showToast('Erro ao atualizar investimento', { type: 'error' });
       return false;
     }
@@ -87,8 +90,9 @@ export function useInvestments() {
       setInvestments(prev => prev.filter(inv => inv.id !== id));
       showToast('Investimento removido!', { type: 'success' });
       return true;
-    } catch (err: any) {
-      console.error('Erro ao remover investimento:', err);
+    } catch (err) {
+      const error = err as Error;
+      console.error('Erro ao remover investimento:', error);
       showToast('Erro ao remover investimento', { type: 'error' });
       return false;
     }

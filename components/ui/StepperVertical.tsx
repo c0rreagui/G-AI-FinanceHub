@@ -17,7 +17,7 @@ export const StepperVertical: React.FC<StepperVerticalProps> = ({ steps, classNa
   return (
     <div className={cn("space-y-4", className)}>
       {steps.map((step, index) => (
-        <div key={index} className="relative flex gap-4">
+        <div key={step.title} className="relative flex gap-4">
           {index !== steps.length - 1 && (
             <div 
               className={cn(

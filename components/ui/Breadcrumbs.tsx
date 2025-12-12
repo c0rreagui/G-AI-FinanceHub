@@ -39,12 +39,13 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items, maxItems = 3, c
         const isEllipsis = item.label === '...';
 
         return (
-          <React.Fragment key={index}>
+          <React.Fragment key={item.label}>
             <ChevronRight className="h-4 w-4 mx-2 opacity-50" />
             {isEllipsis ? (
               <button
                 onClick={() => setIsExpanded(true)}
                 className="hover:text-foreground transition-colors p-1 rounded hover:bg-muted"
+                aria-label="Show more items"
               >
                 <MoreHorizontal className="h-4 w-4" />
               </button>
