@@ -54,47 +54,83 @@ test.describe('Fluxos Funcionais Críticos (CRUD)', () => {
         await test.step('💰 Transações: Fluxo Completo', async () => {
             console.log('💰 Iniciando Transações...');
             await page.getByRole('button', { name: 'Transações' }).first().click();
-            await page.waitForTimeout(500);
+            await page.waitForTimeout(1000);
             
-            // CREATE Receita
+            // --- CREATE Receita ---
             await page.getByRole('button', { name: 'Nova Transação' }).click();
-            await page.locator('input[name="description"]').fill('Salário Teste Full');
-            await page.locator('input[name="amount"]').fill('500000');
-            // Tentar selecionar Receita
-            try { await page.getByText('Receita').click(); } catch(e) {}
+            
+            // Preencher Valor (SmartInput)
+            await page.getByLabel('Valor *').click();
+            await page.getByLabel('Valor *').fill('5000,00');
+
+            // Preencher Descrição
+            await page.getByLabel('Descrição *').fill('Salário Teste Full');
+            
+            // Selecionar Conta (Obrigatório)
+            await page.getByText('Selecione a conta...').click();
+            // Esperar opções e clicar na primeira
+            await page.getByRole('option').first().click();
+
+            // Selecionar Tipo Receita
+            await page.getByRole('button', { name: 'Receita' }).click();
+
+            // Tentar selecionar categoria 'Salário' se houver, ou clicar na primeira disponível
+            // CategoryPicker usa botões com title
+            const salaryCat = page.getByTitle('Salário').or(page.getByRole('button', { name: 'Salário' }));
+            if (await salaryCat.isVisible()) {
+                await salaryCat.click();
+            } else {
+                // Fallback para primeira categoria da lista
+                await page.locator('.grid button').first().click();
+            }
+
             await page.getByRole('button', { name: 'Salvar' }).click();
+            
+            // Validar criação
             await expect(page.getByText('Salário Teste Full')).toBeVisible();
             console.log('✅ Receita criada');
 
-            // CREATE Despesa
+
+            // --- CREATE Despesa ---
             await page.getByRole('button', { name: 'Nova Transação' }).click();
-            await page.locator('input[name="description"]').fill('Despesa Temp');
-            await page.locator('input[name="amount"]').fill('5000');
-             try { await page.getByText('Despesa').click(); } catch(e) {}
+            
+            await page.getByLabel('Valor *').fill('50,00');
+            await page.getByLabel('Descrição *').fill('Despesa Temp');
+            
+            // Conta
+            await page.getByText('Selecione a conta...').click();
+            await page.getByRole('option').first().click();
+
+            // Categoria (Alimentação ou similar)
+            const foodCat = page.getByTitle(/Alimentação|Mercado/i).or(page.getByRole('button', { name: /Alimentação|Mercado/i }));
+             if (await foodCat.isVisible()) {
+                await foodCat.click();
+            } else {
+                await page.locator('.grid button').nth(1).click(); // Segundo item
+            }
+
             await page.getByRole('button', { name: 'Salvar' }).click();
             console.log('✅ Despesa criada');
 
             // EDIT (Despesa Temp -> Despesa Editada)
-            // Assumindo menu de ações ou clique na transação
             const row = page.getByText('Despesa Temp').first();
             await row.click();
-            // Buscar botão de editar se abrir modal ou se estiver na linha
             const editBtn = page.getByRole('button', { name: /Editar|Edit/i }).first();
             if (await editBtn.isVisible()) {
                 await editBtn.click();
-                await page.locator('input[name="description"]').fill('Despesa Editada');
+                await page.waitForTimeout(500); 
+                // Limpar e preencher descrição
+                await page.getByLabel('Descrição *').fill('Despesa Editada');
                 await page.getByRole('button', { name: 'Salvar' }).click();
                 await expect(page.getByText('Despesa Editada')).toBeVisible();
                 console.log('✅ Transação editada');
             }
 
             // DELETE
-            // Reabrir ou usar menu de contexto da 'Despesa Editada'
             await page.getByText('Despesa Editada').first().click();
             const deleteBtn = page.getByRole('button', { name: /Excluir|Remover|Delete/i }).first();
             if (await deleteBtn.isVisible()) {
                 await deleteBtn.click();
-                // Confirmar se houver dialog
                 const confirmBtn = page.getByRole('button', { name: /Confirmar|Sim/i });
                 if (await confirmBtn.isVisible()) await confirmBtn.click();
                 console.log('✅ Transação excluída');
