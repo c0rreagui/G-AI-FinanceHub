@@ -58,58 +58,64 @@ test.describe('Fluxos Funcionais Críticos (CRUD)', () => {
             
             // --- CREATE Receita ---
             await page.getByRole('button', { name: 'Nova Transação' }).click();
+            await page.waitForTimeout(1000); // Wait for modal animation
             
-            // Preencher Valor (SmartInput)
-            await page.getByLabel('Valor *').click();
-            await page.getByLabel('Valor *').fill('5000,00');
+            // Preencher Valor (SmartInput - usar Placeholder pois Label não tem associação direta)
+            const amountInput = page.getByPlaceholder('0,00');
+            await amountInput.click();
+            await amountInput.fill('5000,00');
 
             // Preencher Descrição
-            await page.getByLabel('Descrição *').fill('Salário Teste Full');
+            await page.getByPlaceholder('Ex: Supermercado, Salário...').fill('Salário Teste Full');
             
-            // Selecionar Conta (Obrigatório)
-            await page.getByText('Selecione a conta...').click();
-            // Esperar opções e clicar na primeira
+            // Selecionar Conta (SelectTrigger do Shadcn é um button)
+            // Clicar exato no texto ou no trigger
+            await page.locator('button', { hasText: 'Selecione a conta...' }).click();
+            // Esperar opções aparecerem e clicar na primeira
+            await expect(page.getByRole('option').first()).toBeVisible();
             await page.getByRole('option').first().click();
 
             // Selecionar Tipo Receita
-            await page.getByRole('button', { name: 'Receita' }).click();
+            await page.getByRole('button', { name: 'Receita', exact: true }).click();
 
-            // Tentar selecionar categoria 'Salário' se houver, ou clicar na primeira disponível
-            // CategoryPicker usa botões com title
-            const salaryCat = page.getByTitle('Salário').or(page.getByRole('button', { name: 'Salário' }));
-            if (await salaryCat.isVisible()) {
-                await salaryCat.click();
+            // Categoria: Tentar clicar pelo título ou aria-label, ou fallback para o primeiro botão da grid
+            const salaryCat = page.locator('button[title*="Salário"]').or(page.locator('button[aria-label*="Salário"]'));
+            if (await salaryCat.count() > 0) {
+                await salaryCat.first().click();
             } else {
-                // Fallback para primeira categoria da lista
+                // Fallback para primeira categoria da lista (botões dentro de .grid)
                 await page.locator('.grid button').first().click();
             }
 
-            await page.getByRole('button', { name: 'Salvar' }).click();
+            await page.getByRole('button', { name: 'Salvar', exact: true }).click();
             
-            // Validar criação
-            await expect(page.getByText('Salário Teste Full')).toBeVisible();
+            // Validar criação (Aumentar timeout caso backend demore)
+            await expect(page.getByText('Salário Teste Full').first()).toBeVisible({ timeout: 5000 });
             console.log('✅ Receita criada');
 
 
             // --- CREATE Despesa ---
             await page.getByRole('button', { name: 'Nova Transação' }).click();
+            await page.waitForTimeout(1000);
             
-            await page.getByLabel('Valor *').fill('50,00');
-            await page.getByLabel('Descrição *').fill('Despesa Temp');
+            await page.getByPlaceholder('0,00').click();
+            await page.getByPlaceholder('0,00').fill('50,00');
+            
+            await page.getByPlaceholder('Ex: Supermercado, Salário...').fill('Despesa Temp');
             
             // Conta
-            await page.getByText('Selecione a conta...').click();
+            await page.locator('button', { hasText: 'Selecione a conta...' }).click();
             await page.getByRole('option').first().click();
 
-            // Categoria (Alimentação ou similar)
-            const foodCat = page.getByTitle(/Alimentação|Mercado/i).or(page.getByRole('button', { name: /Alimentação|Mercado/i }));
-             if (await foodCat.isVisible()) {
-                await foodCat.click();
+            // Categoria
+            const foodCat = page.locator('button[title*="Alimentação"]').or(page.locator('button[title*="Mercado"]'));
+             if (await foodCat.count() > 0) {
+                await foodCat.first().click();
             } else {
-                await page.locator('.grid button').nth(1).click(); // Segundo item
+                await page.locator('.grid button').nth(1).click();
             }
 
-            await page.getByRole('button', { name: 'Salvar' }).click();
+            await page.getByRole('button', { name: 'Salvar', exact: true }).click();
             console.log('✅ Despesa criada');
 
             // EDIT (Despesa Temp -> Despesa Editada)
@@ -118,11 +124,11 @@ test.describe('Fluxos Funcionais Críticos (CRUD)', () => {
             const editBtn = page.getByRole('button', { name: /Editar|Edit/i }).first();
             if (await editBtn.isVisible()) {
                 await editBtn.click();
-                await page.waitForTimeout(500); 
+                await page.waitForTimeout(1000); 
                 // Limpar e preencher descrição
-                await page.getByLabel('Descrição *').fill('Despesa Editada');
-                await page.getByRole('button', { name: 'Salvar' }).click();
-                await expect(page.getByText('Despesa Editada')).toBeVisible();
+                await page.getByPlaceholder('Ex: Supermercado, Salário...').fill('Despesa Editada');
+                await page.getByRole('button', { name: 'Salvar', exact: true }).click();
+                await expect(page.getByText('Despesa Editada').first()).toBeVisible();
                 console.log('✅ Transação editada');
             }
 
