@@ -6,7 +6,7 @@ import { SmartInput } from '../ui/SmartInput';
 import { SmartDatePicker } from '../ui/SmartDatePicker';
 import { TickerSearch } from '../ui/TickerSearch';
 import { useDashboardData } from '../../hooks/useDashboardData';
-import { TransactionType } from '../../types';
+import { TransactionType, TransactionStatus } from '../../types';
 import { LoadingSpinner } from '../LoadingSpinner';
 import { useToast } from '../../hooks/useToast';
 import { triggerHapticFeedback } from '../../utils/haptics';
@@ -18,13 +18,13 @@ interface AddInvestmentDrawerProps {
 }
 
 export const AddInvestmentDrawer: React.FC<AddInvestmentDrawerProps> = ({ isOpen, onClose }) => {
-    const { addTransaction, categories } = useDashboardData();
+    const { addTransaction, categories, accounts } = useDashboardData();
     const { showToast } = useToast();
     
     const [ticker, setTicker] = useState('');
     const [quantity, setQuantity] = useState('');
     const [price, setPrice] = useState('');
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+    const [date, setDate] = useState(new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split('T')[0]);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Calculate total automatically
@@ -40,10 +40,12 @@ export const AddInvestmentDrawer: React.FC<AddInvestmentDrawerProps> = ({ isOpen
 
             await addTransaction({
                 description: `Compra: ${ticker.toUpperCase()} (${quantity}x)`,
-                amount: parseFloat(total),
+                amount: -Math.abs(parseFloat(total)),
                 date: new Date(date).toISOString(),
                 type: TransactionType.DESPESA, // Investments are technically outflows initially
-                categoryId: investCat.id
+                categoryId: investCat.id,
+                account_id: accounts[0]?.id || '11111111-1111-1111-1111-111111111111',
+                status: TransactionStatus.COMPLETED
             });
             
             showToast('Investimento registrado!', { type: 'success' });

@@ -22,12 +22,12 @@ interface AddExpenseDrawerProps {
 }
 
 export const AddExpenseDrawer: React.FC<AddExpenseDrawerProps> = ({ isOpen, onClose }) => {
-    const { addTransaction, categories } = useDashboardData();
+    const { addTransaction, categories, accounts } = useDashboardData();
     const { showToast } = useToast();
     
     const [description, setDescription] = useState('');
     const [amount, setAmount] = useState('');
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+    const [date, setDate] = useState(new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split('T')[0]);
     const [categoryId, setCategoryId] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showScanner, setShowScanner] = useState(false);
@@ -51,12 +51,12 @@ export const AddExpenseDrawer: React.FC<AddExpenseDrawerProps> = ({ isOpen, onCl
         try {
             await addTransaction({
                 description,
-                amount: parseFloat(amount),
+                amount: -Math.abs(parseFloat(amount)),
                 date: new Date(date).toISOString(),
                 type: TransactionType.DESPESA,
                 categoryId,
                 status: TransactionStatus.COMPLETED,
-                account_id: 'default'
+                account_id: accounts[0]?.id || '11111111-1111-1111-1111-111111111111'
             });
             
             showToast('Despesa registrada!', { type: 'success' });

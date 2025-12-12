@@ -26,13 +26,23 @@ import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { DateRangePicker } from '../ui/DateRangePicker';
 import { ReportProvider, useReport } from '../../contexts/ReportContext';
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+interface CustomTooltipProps {
+    active?: boolean;
+    payload?: Array<{
+        name: string;
+        value: number;
+        color: string;
+    }>;
+    label?: string;
+}
+
+const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
         return (
             <div className="bg-black/90 border border-white/10 backdrop-blur-xl p-3 rounded-xl shadow-xl">
                 <p className="font-bold text-white mb-2">{label}</p>
-                {payload.map((entry: any, index: number) => (
-                    <p key={index} style={{ color: entry.color }} className="text-sm font-medium">
+                {payload.map((entry, index) => (
+                    <p key={index} className="text-sm font-medium" style={{ color: entry.color }}>
                         {entry.name}: {formatCurrency(entry.value)}
                     </p>
                 ))}

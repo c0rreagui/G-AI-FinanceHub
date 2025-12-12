@@ -37,7 +37,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
   
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split('T')[0]);
   const [notes, setNotes] = useState('');
   const [type, setType] = useState<TransactionType>(TransactionType.DESPESA);
   const [categoryId, setCategoryId] = useState('');
@@ -229,9 +229,11 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
               });
           } else {
               // Add Regular Transaction
+              const finalAmount = type === TransactionType.DESPESA ? -Math.abs(numericAmount) : Math.abs(numericAmount);
+              
               const txData = {
                   description,
-                  amount: numericAmount,
+                  amount: finalAmount,
                   date: new Date(date).toISOString(),
                   type,
                   categoryId,
@@ -366,7 +368,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
             {/* Transfer Account Selectors - Item 143 */}
             {isTransfer && (
                 <>
-                {/* @ts-ignore */}
+
                 <motion.div variants={itemVariants} className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <label htmlFor="from-account" className="text-sm font-medium">Conta Origem *</label>
@@ -433,7 +435,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
             </motion.div>
 
             {/* Date & Category */}
-            {/* @ts-ignore */}
+
             <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <SmartDatePicker
                     label={isRecurring ? "Data de Início *" : "Data *"}
@@ -451,7 +453,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
             </motion.div>
 
             {/* Account & Status */}
-            {/* @ts-ignore */}
+
             <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label className="text-sm font-medium text-muted-foreground mb-2 block">Conta *</label>
@@ -492,7 +494,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
             {/* Recurrence Toggle */}
             {!isEditing && !isInvestmentMode && (
                 <>
-                {/* @ts-ignore */}
+
                 <motion.div variants={itemVariants} className="bg-muted/30 p-4 rounded-xl">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
@@ -527,7 +529,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
             )}
 
             {/* Attachments */}
-            {/* @ts-ignore */}
+
             <motion.div variants={itemVariants}>
                 <label className="text-sm font-medium text-muted-foreground mb-2 block">Anexos</label>
                 <DragDropUpload 

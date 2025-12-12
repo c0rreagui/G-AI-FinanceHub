@@ -6,7 +6,7 @@ import { SmartInput } from '../ui/SmartInput';
 import { SmartDatePicker } from '../ui/SmartDatePicker';
 import { CategoryPicker } from '../ui/CategoryPicker';
 import { useDashboardData } from '../../hooks/useDashboardData';
-import { TransactionType } from '../../types';
+import { TransactionType, TransactionStatus } from '../../types';
 import { LoadingSpinner } from '../LoadingSpinner';
 import { useToast } from '../../hooks/useToast';
 import { triggerHapticFeedback } from '../../utils/haptics';
@@ -18,12 +18,12 @@ interface AddIncomeDrawerProps {
 }
 
 export const AddIncomeDrawer: React.FC<AddIncomeDrawerProps> = ({ isOpen, onClose }) => {
-    const { addTransaction, categories } = useDashboardData();
+    const { addTransaction, categories, accounts } = useDashboardData();
     const { showToast } = useToast();
     
     const [description, setDescription] = useState('');
     const [amount, setAmount] = useState('');
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+    const [date, setDate] = useState(new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split('T')[0]);
     const [categoryId, setCategoryId] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -34,10 +34,12 @@ export const AddIncomeDrawer: React.FC<AddIncomeDrawerProps> = ({ isOpen, onClos
         try {
             await addTransaction({
                 description,
-                amount: parseFloat(amount),
+                amount: Math.abs(parseFloat(amount)),
                 date: new Date(date).toISOString(),
                 type: TransactionType.RECEITA,
-                categoryId
+                categoryId,
+                account_id: accounts[0]?.id || '11111111-1111-1111-1111-111111111111',
+                status: TransactionStatus.COMPLETED
             });
             
             showToast('Receita registrada!', { type: 'success' });

@@ -60,8 +60,9 @@ const generateMockData = (userId: string, categories: Category[], accounts: Acco
     const catMap = new Map(categories.map(c => [c.name, c.id]));
     const getRandomCatId = (type: 'receita' | 'despesa') => {
         const despesaCats = ['Alimentação', 'Compras', 'Transporte', 'Moradia', 'Lazer'];
-        if (type === 'receita') return catMap.get('Salário')!;
-        return catMap.get(despesaCats[Math.floor(Math.random() * despesaCats.length)])!;
+        if (type === 'receita') return catMap.get('Salário') || categories[0]?.id;
+        const randomCat = despesaCats[Math.floor(Math.random() * despesaCats.length)];
+        return catMap.get(randomCat) || categories[0]?.id;
     };
 
     const defaultAccountId = accounts[0]?.id || '11111111-1111-1111-1111-111111111111';
@@ -85,7 +86,7 @@ const generateMockData = (userId: string, categories: Category[], accounts: Acco
         amount: -7500,
         type: TransactionType.DESPESA,
         date: new Date(now.getFullYear(), now.getMonth() - 2, 15).toISOString(),
-        category_id: catMap.get('Investimentos')!,
+        category_id: catMap.get('Investimentos') || categories[0]?.id,
         user_id: userId,
         goal_contribution_id: 'mock_goal_1', // Placeholder ID
         status: TransactionStatus.COMPLETED,
@@ -410,7 +411,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         
         // FIX: Simplificado o cálculo do saldo total para somar diretamente os valores,
         // garantindo que os valores de despesa sejam negativos.
-        const totalBalance = transactions.reduce((sum, t) => sum + t.amount, 0);
+        const totalBalance = Number(transactions.reduce((sum, t) => sum + t.amount, 0).toFixed(2));
 
         return { totalBalance, monthlyIncome, monthlyExpenses };
     }, [transactions]);
@@ -631,8 +632,8 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         try {
             const transferId = `transfer_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
             const transferCat = categories.find(c => c.name.toLowerCase().includes('transferência'))?.id || categories[0].id;
-            const debitTx = { description: `Transferência: ${description}`, amount: -Math.abs(amount), date: new Date(date).toISOString(), type: TransactionType.TRANSFER, category_id: transferCat, notes: notes || `Para: ${accounts.find(a => a.id === toAccountId)?.name}`, user_id: user.id, account_id: fromAccountId, status: TransactionStatus.COMPLETED, transfer_id: transferId, from_account_id: fromAccountId, to_account_id: toAccountId, exclude_from_reports: true };
-            const creditTx = { ...debitTx, amount: Math.abs(amount), account_id: toAccountId, notes: notes || `De: ${accounts.find(a => a.id === fromAccountId)?.name}` };
+            const debitTx = { description: `Transferência: ${description}`, amount: -Math.abs(amount), date: new Date(date).toISOString(), type: TransactionType.TRANSFER, category_id: transferCat, notes: notes || `Para: ${accounts.find(a => a.id === toAccountId)?.name || 'Conta Destino'}`, user_id: user.id, account_id: fromAccountId, status: TransactionStatus.COMPLETED, transfer_id: transferId, from_account_id: fromAccountId, to_account_id: toAccountId, exclude_from_reports: true };
+            const creditTx = { ...debitTx, amount: Math.abs(amount), account_id: toAccountId, notes: notes || `De: ${accounts.find(a => a.id === fromAccountId)?.name || 'Conta Origem'}` };
             const { error: e1 } = await supabase.from('transactions').insert(debitTx);
             if (e1) throw e1;
             const { error: e2 } = await supabase.from('transactions').insert(creditTx);
@@ -691,7 +692,8 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             setGuestData(data);
         } else {
             // Prepare updates for Supabase (remove UI-only fields if any)
-            const { category, ...safeUpdates } = updates as any;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { category, ...safeUpdates } = updates;
             
             const { error } = await supabase
                 .from('transactions')
@@ -1498,7 +1500,8 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     const addMockDebts = (count: number) => withMutation(async () => {
-         const userId = isGuest ? 'guest' : user!.id;
+         if (!isGuest && !user) return;
+         const userId = isGuest ? 'guest' : user.id;
          const newDebts = Array.from({ length: count }, (_, i) => ({
              user_id: userId,
              name: `Dívida de Teste ${i+1}`,
@@ -1715,7 +1718,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         updateTransactionsCategory,
         mergeTransactions,
         cloneMonth,
-        cloneMonth,
+
         addBudget,
         updateBudget,
         deleteBudget,

@@ -131,7 +131,7 @@ export const BudgetManager: React.FC = () => {
                                             {categories.filter(c => !budgets.some(b => b.category_id === c.id)).map(category => (
                                                 <SelectItem key={category.id} value={category.id}>
                                                     <div className="flex items-center gap-2">
-                                                        <span style={{ color: category.color }}>{category.icon && React.createElement(category.icon, { size: 16 })}</span>
+                                                        <span style={{ color: category.color || 'currentColor' }}>{category.icon && React.createElement(category.icon, { size: 16 })}</span>
                                                         {category.name}
                                                     </div>
                                                 </SelectItem>
@@ -176,7 +176,7 @@ export const BudgetManager: React.FC = () => {
                             <Card className="relative overflow-hidden border-none shadow-md hover:shadow-lg transition-shadow bg-card">
                                 <div 
                                     className="absolute top-0 left-0 w-1 h-full" 
-                                    style={{ backgroundColor: budget.categoryColor }} 
+                                    style={{ backgroundColor: budget.categoryColor || 'transparent' }} 
                                 />
                                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                                     <div className="flex items-center gap-2">
@@ -206,7 +206,7 @@ export const BudgetManager: React.FC = () => {
                                         <div className="relative h-2 w-full bg-secondary rounded-full overflow-hidden">
                                             <div 
                                                 className={`absolute top-0 left-0 h-full transition-all duration-500 ${getProgressColor(budget.percentage)}`} 
-                                                style={{ width: `${budget.percentage}%` }}
+                                                style={{ width: `${Math.min(budget.percentage, 100)}%` }}
                                             />
                                         </div>
                                         {budget.percentage >= 80 && (
