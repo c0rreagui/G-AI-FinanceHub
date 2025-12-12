@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { useToast } from '../../hooks/useToast';
+import { useNotifications } from '../../contexts/NotificationContext';
 import { Button } from '../ui/Button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/Card';
 import { Input } from '../ui/Input';
@@ -60,6 +61,7 @@ export const DevToolsView: React.FC<DevToolsViewProps> = ({ setCurrentView }) =>
     
     const { openDialog } = useDialog();
     const { showToast } = useToast();
+    const { addNotification } = useNotifications();
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [isOnline, setIsOnline] = useState(navigator.onLine);
 
