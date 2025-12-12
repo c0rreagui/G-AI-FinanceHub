@@ -97,7 +97,8 @@ class TelemetryService {
         this.notifyListeners(event);
 
         // Log no console em desenvolvimento
-        if (typeof import.meta !== 'undefined' && import.meta.env?.DEV) {
+        const isDev = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+        if (isDev) {
             this.consoleLog(event);
         }
 

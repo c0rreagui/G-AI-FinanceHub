@@ -155,6 +155,7 @@ export const TelemetryDashboard: React.FC = () => {
                     value={selectedCategory || ''}
                     onChange={(e) => setSelectedCategory(e.target.value as EventCategory || null)}
                     className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-sm text-white"
+                    aria-label="Filtrar por categoria"
                 >
                     <option value="">Todas Categorias</option>
                     {Object.values(EventCategory).map(cat => (
@@ -166,6 +167,7 @@ export const TelemetryDashboard: React.FC = () => {
                     value={selectedSeverity || ''}
                     onChange={(e) => setSelectedSeverity(e.target.value as EventSeverity || null)}
                     className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-sm text-white"
+                    aria-label="Filtrar por severidade"
                 >
                     <option value="">Todas Severidades</option>
                     {Object.values(EventSeverity).map(sev => (
