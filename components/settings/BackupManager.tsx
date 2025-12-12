@@ -48,7 +48,6 @@ export const BackupManager: React.FC = () => {
                 if (json.version && json.transactions) {
                     // TODO: Implement actual restore logic (complex due to IDs/Backend)
                     // For now, just show success simulation or log it.
-                    console.log('Imported data:', json);
                     showToast('Arquivo Válido', { description: 'Funcionalidade de restauração completa em breve.', type: 'info' });
                 } else {
                     throw new Error('Formato inválido');
@@ -90,6 +89,8 @@ export const BackupManager: React.FC = () => {
                         onChange={handleFileChange} 
                         accept=".json" 
                         className="hidden" 
+                        aria-label="Importar Backup JSON"
+                        title="Importar Backup JSON"
                     />
                 </div>
             </CardContent>

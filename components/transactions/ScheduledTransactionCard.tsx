@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScheduledTransaction, TransactionType } from '../../types';
+import { ScheduledTransaction, TransactionType, TransactionStatus } from '../../types';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { useDialog } from '../../hooks/useDialog';
 import { formatDate, formatCurrency } from '../../utils/formatters';
@@ -14,10 +14,6 @@ import { useMediaQuery } from '../../hooks/useMediaQuery';
 export const ScheduledTransactionCard: React.FC<{ item: ScheduledTransaction }> = ({ item }) => {
     const { deleteScheduledTransaction, mutatingIds, addTransaction } = useDashboardData();
     const { openDialog } = useDialog();
-    // const deleteScheduledTransaction = (id: string) => console.log('delete', id);
-    // const mutatingIds = new Set();
-    // const addTransaction = (t: any) => console.log('add', t);
-    // const openDialog = (type: string, data?: any) => console.log('open', type, data);
 
     const isMutating = mutatingIds.has(item.id);
     const isDesktop = useMediaQuery('(min-width: 1024px)');
@@ -63,8 +59,10 @@ export const ScheduledTransactionCard: React.FC<{ item: ScheduledTransaction }> 
                     description: item.description,
                     amount: item.amount,
                     type: item.amount < 0 ? TransactionType.DESPESA : TransactionType.RECEITA,
-                    date: new Date().toISOString(),
+                    date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString(),
                     categoryId: item.category.id,
+                    account_id: item.account_id || 'default', // Fallback if not physically present, though interface requires it
+                    status: TransactionStatus.COMPLETED,
                 });
             },
         });
@@ -83,9 +81,17 @@ export const ScheduledTransactionCard: React.FC<{ item: ScheduledTransaction }> 
 
             <div className="p-4 flex items-center gap-4">
                 {/* Icon */}
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg`} style={{backgroundColor: `${item.category.color}20`, boxShadow: `0 0 15px ${item.category.color}10`}}>
-                    <item.category.icon className="w-6 h-6" style={{color: item.category.color}} />
-                </div>
+                {(() => {
+                    const iconContainerStyle = { backgroundColor: `${item.category.color}20`, boxShadow: `0 0 15px ${item.category.color}10` };
+                    const iconStyle = { color: item.category.color };
+                    return (
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg`} 
+                            {...{ style: iconContainerStyle }}>
+                            <item.category.icon className="w-6 h-6" 
+                                {...{ style: iconStyle }} />
+                        </div>
+                    );
+                })()}
 
                 {/* Content */}
                 <div className="flex-grow min-w-0">

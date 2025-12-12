@@ -258,6 +258,7 @@ export interface DashboardDataContextType {
   goals: Goal[];
   budgets: Budget[];
   debts: Debt[];
+  investments: Investment[];
   scheduledTransactions: ScheduledTransaction[];
   categories: Category[];
   summary: SummaryData;
@@ -292,6 +293,9 @@ export interface DashboardDataContextType {
   addDebt: (debt: Omit<Debt, 'id' | 'paid_amount' | 'status' | 'user_id' | 'total_amount' | 'interest_rate'> & { totalAmount: number; interestRate: number }) => Promise<Debt | null>;
   addPaymentToDebt: (debtId: string, amount: number) => Promise<boolean>;
   deleteDebt: (id: string) => Promise<boolean>;
+
+  addInvestment: (investment: NewInvestment) => Promise<Investment | null>;
+  deleteInvestment: (id: string) => Promise<boolean>;
 
   addBudget: (budget: Omit<Budget, 'id' | 'created_at' | 'updated_at' | 'user_id'>) => Promise<Budget | null>;
   updateBudget: (budget: Partial<Budget> & { id: string }) => Promise<boolean>;

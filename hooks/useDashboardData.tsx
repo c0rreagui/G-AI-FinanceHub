@@ -13,6 +13,8 @@ import {
     SummaryData,
     GoalStatus,
     DebtStatus,
+    Investment,
+    NewInvestment,
     TransactionType,
     MonthlyChartData,
     UserLevel,
@@ -195,6 +197,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         ];
     };
     const [debts, setDebts] = useState<Debt[]>([]);
+    const [investments, setInvestments] = useState<Investment[]>([]);
     const [scheduledTransactions, setScheduledTransactions] = useState<ScheduledTransaction[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [dailyMissions, setDailyMissions] = useState<DailyMission[]>([
@@ -348,14 +351,16 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
                 { data: debtsData, error: debtsError },
                 { data: scheduledData, error: scheduledError },
                 { data: auditData, error: auditError },
-                { data: budgetsData, error: budgetsError }
+                { data: budgetsData, error: budgetsError },
+                { data: investmentsData, error: investmentsError } // Added investments fetching
             ] = await Promise.all([
                 supabase.from('transactions').select('*').eq('user_id', user.id).order('date', { ascending: false }),
                 supabase.from('goals').select('*').eq('user_id', user.id).order('deadline', { ascending: true }),
                 supabase.from('debts').select('*').eq('user_id', user.id),
                 supabase.from('scheduled_transactions').select('*').eq('user_id', user.id).order('next_due_date', { ascending: true }),
                 supabase.from('audit_logs').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(50),
-                supabase.from('budgets').select('*').eq('user_id', user.id)
+                supabase.from('budgets').select('*').eq('user_id', user.id),
+                supabase.from('investments').select('*').eq('user_id', user.id) // Added investments query
             ]);
 
             if (transactionsError) throw transactionsError;
@@ -364,6 +369,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             if (scheduledError) throw scheduledError;
             if (auditError) throw auditError;
             if (budgetsError) throw budgetsError;
+            if (investmentsError) throw investmentsError; // Added investments error check
 
             const mappedTransactions = transactionsData?.map(tx => ({
                 ...tx, 
@@ -376,6 +382,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             setDeletedTransactions(mappedTransactions.filter(tx => tx.deleted_at));
             setGoals(goalsData || []);
             setDebts(debtsData || []);
+            setInvestments(investmentsData as Investment[] || []);
             setBudgets(budgetsData || []);
             setScheduledTransactions(scheduledData?.map(stx => ({...stx, category: categoryMap.get(stx.category_id) || fallbackCategory })) || []);
             setAuditLogs(auditData as AuditLog[] || []);
@@ -392,6 +399,47 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     useEffect(() => {
         fetchData();
     }, [fetchData]);
+
+    const addInvestment = (investment: NewInvestment) => withMutation(async () => {
+        if (isGuest) {
+            const data = getGuestData();
+            const newInvestment: Investment = {
+                id: crypto.randomUUID(),
+                ...investment,
+                user_id: 'guest',
+            };
+            data.investments = data.investments || [];
+            data.investments.push(newInvestment);
+            setGuestData(data);
+            await fetchData();
+            showToast('Investimento Adicionado!', { type: 'success' });
+            return newInvestment;
+        }
+        const { data, error } = await supabase.from('investments').insert({ 
+            ...investment,
+            user_id: user!.id 
+        }).select().single();
+        if (error) throw error;
+        await fetchData();
+        showToast('Investimento Adicionado!', { type: 'success' });
+        return data as Investment;
+    });
+
+    const deleteInvestment = (id: string) => withMutation(async () => {
+        if (isGuest) {
+            const data = getGuestData();
+            data.investments = (data.investments || []).filter((i: Investment) => i.id !== id);
+            setGuestData(data);
+            await fetchData();
+            showToast('Investimento Removido!', { type: 'success' });
+            return true;
+        }
+        const { error } = await supabase.from('investments').delete().eq('id', id);
+        if (error) throw error;
+        await fetchData();
+        showToast('Investimento Removido!', { type: 'success' });
+        return true;
+    }, id);
 
     const clearError = () => setError(null);
 
@@ -627,17 +675,76 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     }, tx.id);
 
     const addTransfer = async (fromAccountId: string, toAccountId: string, amount: number, description: string, date: string, notes?: string): Promise<boolean> => {
-        if (!user || isGuest) return false;
         setIsMutating(true);
+        const transferId = `transfer_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const transferCat = categories.find(c => c.name.toLowerCase().includes('transferência'))?.id || categories[0].id;
+        const userId = isGuest ? 'guest' : user?.id;
+
+        if (!userId) {
+             setIsMutating(false);
+             return false;
+        }
+
+        // Prepare Transaction Objects
+        const baseTx = {
+             date: new Date(date).toISOString(),
+             type: TransactionType.TRANSFER,
+             category_id: transferCat,
+             user_id: userId,
+             status: TransactionStatus.COMPLETED,
+             transfer_id: transferId,
+             from_account_id: fromAccountId,
+             to_account_id: toAccountId,
+             exclude_from_reports: true
+        };
+
+        const debitTx = { 
+            ...baseTx, 
+            description: `Transferência: ${description}`,
+            amount: -Math.abs(amount),
+            account_id: fromAccountId, 
+            notes: notes || `Para: ${accounts.find(a => a.id === toAccountId)?.name || 'Conta Destino'}`
+        };
+        
+        const creditTx = { 
+            ...baseTx, 
+            description: `Transferência: ${description}`,
+            amount: Math.abs(amount), 
+            account_id: toAccountId, 
+            notes: notes || `De: ${accounts.find(a => a.id === fromAccountId)?.name || 'Conta Origem'}`
+        };
+
+        if (isGuest) {
+             const data = getGuestData();
+             const now = new Date().toISOString();
+             // Determine IDs for guest mode
+             const debitId = crypto.randomUUID();
+             const creditId = crypto.randomUUID();
+             
+             data.transactions.push({ ...debitTx, id: debitId, created_at: now } as any);
+             data.transactions.push({ ...creditTx, id: creditId, created_at: now } as any);
+             
+             setGuestData(data);
+             await fetchData();
+             showToast('Transferência Realizada!', { type: 'success' });
+             setIsMutating(false);
+             return true;
+        }
+
         try {
-            const transferId = `transfer_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-            const transferCat = categories.find(c => c.name.toLowerCase().includes('transferência'))?.id || categories[0].id;
-            const debitTx = { description: `Transferência: ${description}`, amount: -Math.abs(amount), date: new Date(date).toISOString(), type: TransactionType.TRANSFER, category_id: transferCat, notes: notes || `Para: ${accounts.find(a => a.id === toAccountId)?.name || 'Conta Destino'}`, user_id: user.id, account_id: fromAccountId, status: TransactionStatus.COMPLETED, transfer_id: transferId, from_account_id: fromAccountId, to_account_id: toAccountId, exclude_from_reports: true };
-            const creditTx = { ...debitTx, amount: Math.abs(amount), account_id: toAccountId, notes: notes || `De: ${accounts.find(a => a.id === fromAccountId)?.name || 'Conta Origem'}` };
-            const { error: e1 } = await supabase.from('transactions').insert(debitTx);
+            // 1. Execute Debit (Source)
+            const { data: insertedDebit, error: e1 } = await supabase.from('transactions').insert(debitTx).select().single();
             if (e1) throw e1;
+
+            // 2. Execute Credit (Destination)
             const { error: e2 } = await supabase.from('transactions').insert(creditTx);
-            if (e2) throw e2;
+            if (e2) {
+                // COMPENSATING TRANSACTION (Rollback) - Critical Integrity Check
+                console.warn("Transfer credit failed. Rolling back debit transaction to maintain consistency...");
+                await supabase.from('transactions').delete().eq('id', insertedDebit.id);
+                throw e2;
+            }
+            
             await fetchData();
             showToast('Transferência Realizada!', { type: 'success' });
             return true;
@@ -1524,7 +1631,8 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     const addMockInvestments = (count: number) => withMutation(async () => {
-        const userId = isGuest ? 'guest' : user!.id;
+        if (!isGuest && !user) return;
+        const userId = isGuest ? 'guest' : user.id;
         const now = new Date();
         const types = [InvestmentType.ACOES, InvestmentType.FIIS, InvestmentType.RENDA_FIXA, InvestmentType.CRIPTO, InvestmentType.EXTERIOR];
         
@@ -1694,6 +1802,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         goals,
         budgets,
         debts,
+        investments,
         scheduledTransactions,
         categories,
         summary,
@@ -1728,6 +1837,8 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         addDebt,
         addPaymentToDebt,
         deleteDebt,
+        addInvestment,
+        deleteInvestment,
         addScheduledTransaction,
         updateScheduledTransaction,
         deleteScheduledTransaction,

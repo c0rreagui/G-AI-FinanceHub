@@ -85,7 +85,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs
          <MicrophoneButton 
              className="mr-2 hidden sm:flex" 
              size="sm"
-             onRecordingStop={(text) => console.log('Global voice command:', text)} 
+             onRecordingStop={() => {}} 
          />
          <TooltipProvider>
             <Tooltip>

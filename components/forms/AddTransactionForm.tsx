@@ -214,7 +214,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
       try {
           // TODO: Implement attachment upload logic when backend supports it
           if (files.length > 0) {
-              console.log("Attachments to upload:", files);
+              // Upload logic will go here
           }
 
           if (isRecurring) {

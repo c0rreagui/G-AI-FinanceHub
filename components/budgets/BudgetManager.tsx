@@ -128,14 +128,18 @@ export const BudgetManager: React.FC = () => {
                                             <SelectValue placeholder="Selecione uma categoria" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {categories.filter(c => !budgets.some(b => b.category_id === c.id)).map(category => (
+                                            {categories.filter(c => !budgets.some(b => b.category_id === c.id)).map(category => {
+                                                const iconStyle = { color: category.color || 'currentColor' };
+                                                return (
                                                 <SelectItem key={category.id} value={category.id}>
                                                     <div className="flex items-center gap-2">
-                                                        <span style={{ color: category.color || 'currentColor' }}>{category.icon && React.createElement(category.icon, { size: 16 })}</span>
+                                                        <span 
+                                                            {...{ style: iconStyle }}>{category.icon && React.createElement(category.icon, { size: 16 })}</span>
                                                         {category.name}
                                                     </div>
                                                 </SelectItem>
-                                            ))}
+                                                );
+                                            })}
                                             {categories.filter(c => !budgets.some(b => b.category_id === c.id)).length === 0 && (
                                                 <div className="p-2 text-sm text-center text-muted-foreground">Todas as categorias já possuem orçamento.</div>
                                             )}
@@ -173,14 +177,21 @@ export const BudgetManager: React.FC = () => {
                             exit={{ opacity: 0, scale: 0.9 }}
                             layout
                         >
-                            <Card className="relative overflow-hidden border-none shadow-md hover:shadow-lg transition-shadow bg-card">
+                            {(() => {
+                                const stripeStyle = { backgroundColor: budget.categoryColor || 'transparent' };
+                                const iconContainerStyle = { backgroundColor: `${budget.categoryColor}20`, color: budget.categoryColor };
+                                const progressBarStyle = { width: `${Math.min(budget.percentage, 100)}%` };
+                                
+                                return (
+                                <Card className="relative overflow-hidden border-none shadow-md hover:shadow-lg transition-shadow bg-card">
                                 <div 
                                     className="absolute top-0 left-0 w-1 h-full" 
-                                    style={{ backgroundColor: budget.categoryColor || 'transparent' }} 
+                                    {...{ style: stripeStyle }} 
                                 />
                                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                                     <div className="flex items-center gap-2">
-                                        <div className="p-2 rounded-full" style={{ backgroundColor: `${budget.categoryColor}20`, color: budget.categoryColor }}>
+                                        <div className="p-2 rounded-full" 
+                                            {...{ style: iconContainerStyle }}>
                                             {budget.categoryIcon && React.createElement(budget.categoryIcon, { size: 20 })}
                                         </div>
                                         <div>
@@ -206,7 +217,7 @@ export const BudgetManager: React.FC = () => {
                                         <div className="relative h-2 w-full bg-secondary rounded-full overflow-hidden">
                                             <div 
                                                 className={`absolute top-0 left-0 h-full transition-all duration-500 ${getProgressColor(budget.percentage)}`} 
-                                                style={{ width: `${Math.min(budget.percentage, 100)}%` }}
+                                                {...{ style: progressBarStyle }}
                                             />
                                         </div>
                                         {budget.percentage >= 80 && (
@@ -220,9 +231,12 @@ export const BudgetManager: React.FC = () => {
                                                 Restam {formatCurrency(Math.max(0, budget.amount - budget.spent))}
                                             </div>
                                         )}
+
                                     </div>
                                 </CardContent>
                             </Card>
+                            );
+                            })()}
                         </motion.div>
                     ))}
                 </AnimatePresence>

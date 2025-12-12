@@ -38,14 +38,20 @@ interface CustomTooltipProps {
 
 const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
+        const containerStyle = { borderColor: payload[0].color };
         return (
-            <div className="bg-black/90 border border-white/10 backdrop-blur-xl p-3 rounded-xl shadow-xl">
+            // eslint-disable-next-line
+            <div className="bg-background/95 backdrop-blur-sm border rounded-xl shadow-xl p-4 min-w-[200px]" {...{ style: containerStyle }}>
                 <p className="font-bold text-white mb-2">{label}</p>
-                {payload.map((entry, index) => (
-                    <p key={index} className="text-sm font-medium" style={{ color: entry.color }}>
-                        {entry.name}: {formatCurrency(entry.value)}
-                    </p>
-                ))}
+                {payload.map((entry, index) => {
+                    const entryStyle = { color: entry.color };
+                    return (
+                        <p key={index} className="text-sm font-medium" 
+                            {...{ style: entryStyle }}>
+                            {entry.name}: {formatCurrency(entry.value)}
+                        </p>
+                    );
+                })}
             </div>
         );
     }

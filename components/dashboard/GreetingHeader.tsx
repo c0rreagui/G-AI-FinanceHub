@@ -88,7 +88,6 @@ export const GreetingHeader: React.FC<GreetingHeaderProps> = ({ user, setCurrent
                                 className="relative text-muted-foreground hover:text-foreground"
                                 onClick={() => {
                                     // TODO: Implement notifications panel
-                                    console.log('Abrindo notificações...');
                                 }}
                             >
                                 <Bell className="w-5 h-5" />
