@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { useToast } from '../../hooks/useToast';
 import { useNotifications } from '../../contexts/NotificationContext';
+import { useAuth } from '../../hooks/useAuth';
+import { TelemetryDashboard } from '../telemetry/TelemetryDashboard';
 import { Button } from '../ui/Button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/Card';
 import { Input } from '../ui/Input';
@@ -59,11 +61,13 @@ export const DevToolsView: React.FC<DevToolsViewProps> = ({ setCurrentView }) =>
         addMockDebts, addMockInvestments, clearTable, forceError, loading 
     } = useDashboardData();
     
+    const { isDeveloper } = useAuth();
     const { openDialog } = useDialog();
     const { showToast } = useToast();
     const { addNotification } = useNotifications();
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [isOnline, setIsOnline] = useState(navigator.onLine);
+    const [activeTab, setActiveTab] = useState<'devtools' | 'telemetry'>('devtools');
 
     useEffect(() => {
         const handleOnline = () => setIsOnline(true);
@@ -102,6 +106,39 @@ export const DevToolsView: React.FC<DevToolsViewProps> = ({ setCurrentView }) =>
                     </Badge>
                 }
             />
+
+            {/* Tabs (only show if developer) */}
+            {isDeveloper && (
+                <div className="flex gap-2 border-b border-white/10">
+                    <button
+                        onClick={() => setActiveTab('devtools')}
+                        className={`px-4 py-2 text-sm font-medium transition-colors ${
+                            activeTab === 'devtools'
+                                ? 'text-cyan-400 border-b-2 border-cyan-400'
+                                : 'text-gray-400 hover:text-white'
+                        }`}
+                    >
+                        🛠️ DevTools
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('telemetry')}
+                        className={`px-4 py-2 text-sm font-medium transition-colors ${
+                            activeTab === 'telemetry'
+                                ? 'text-cyan-400 border-b-2 border-cyan-400'
+                                : 'text-gray-400 hover:text-white'
+                        }`}
+                    >
+                        🔍 Telemetria
+                    </button>
+                </div>
+            )}
+
+            {/* Render based on active tab */}
+            {activeTab === 'telemetry' && isDeveloper ? (
+                <TelemetryDashboard />
+            ) : (
+                <>
+                    {/* Original DevTools content */}
 
             {/* System Status Section */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -290,6 +327,8 @@ export const DevToolsView: React.FC<DevToolsViewProps> = ({ setCurrentView }) =>
                     </CardContent>
                 </Card>
             </div>
+                </>
+            )}
         </div>
     );
 };

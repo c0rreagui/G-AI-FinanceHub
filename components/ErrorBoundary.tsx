@@ -1,4 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { telemetry, EventSeverity } from '../services/telemetryService';
+import { analyzeError } from '../services/deepErrorAnalyzer';
 import { logger } from '../services/loggingService';
 import { Button } from './ui/Button';
 import { Zap, Copy, RefreshCw, AlertTriangle, Trash2 } from './Icons';
@@ -27,6 +29,36 @@ class ErrorBoundaryInner extends Component<ErrorBoundaryAuthProps, ErrorBoundary
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    // Log to console
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    
+    // 🔍 DEEP ANALYSIS - Captura TODOS os detalhes possíveis
+    const deepReport = analyzeError(error, 'ErrorBoundary', {
+        componentStack: errorInfo.componentStack,
+        errorInfo: {
+            ...errorInfo,
+            digest: (errorInfo as any).digest, // React 18+
+        },
+        react: {
+            errorBoundary: true,
+            componentStack: errorInfo.componentStack,
+        },
+    });
+    
+    // Também registra no telemetry básico (para compatibilidade)
+    telemetry.trackError(
+      error,
+      'ErrorBoundary',
+      {
+        errorId: deepReport.errorId,
+        deepAnalysisAvailable: true,
+        summary: `Erro em ${deepReport.context.file}:${deepReport.context.line}`,
+      },
+      EventSeverity.CRITICAL
+    );
+
+    // You could also send this to an external error tracking service
+    // Example: Sentry.captureException(error, { contexts: { react: { componentStack: errorInfo.componentStack } } });
     this.setState({ errorInfo });
     logger.error('Erro de renderização capturado pelo ErrorBoundary', {
       error: {
@@ -34,6 +66,7 @@ class ErrorBoundaryInner extends Component<ErrorBoundaryAuthProps, ErrorBoundary
         stack: error.stack,
       },
       errorInfo,
+      deepReportId: deepReport.errorId,
     });
   }
 
