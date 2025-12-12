@@ -212,7 +212,12 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
         >
             <div className="flex justify-between items-center mb-8">
                 <div className="w-full">
-                    <GreetingHeader user={user} setCurrentView={setCurrentView} />
+                    <GreetingHeader 
+                        user={user} 
+                        setCurrentView={setCurrentView}
+                        onNotificationClick={onNotificationClick}
+                        unreadCount={unreadCount}
+                    />
                 </div>
                 <div className="flex gap-2">
                     <Button 

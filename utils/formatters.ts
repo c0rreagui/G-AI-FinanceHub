@@ -10,6 +10,8 @@ export const formatCurrency = (value: number): string => {
 
 export const safeFloat = (value: number | string): number => {
     const num = typeof value === 'string' ? parseFloat(value) : value;
+    // Validate NaN to prevent invalid calculations
+    if (isNaN(num)) return 0;
     return Math.round((num + Number.EPSILON) * 100) / 100;
 };
 

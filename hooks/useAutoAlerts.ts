@@ -11,8 +11,16 @@ export const useAutoAlerts = () => {
     const { budgets, scheduledTransactions, goals, transactions, categories } = useDashboardData();
     const { addNotification } = useNotifications();
     
-    // Ref para rastrear notificações já enviadas (evita duplicatas)
-    const sentAlerts = useRef<Set<string>>(new Set());
+    // Load persisted sent alerts from localStorage
+    const loadSentAlerts = () => {
+        try {
+            const saved = localStorage.getItem('financehub_sent_alerts');
+            return saved ? new Set<string>(JSON.parse(saved)) : new Set<string>();
+        } catch {
+            return new Set<string>();
+        }
+    };
+    const sentAlerts = useRef<Set<string>>(loadSentAlerts());
 
     // Auto-Alert para Orçamentos > 80%
     useEffect(() => {
@@ -48,7 +56,10 @@ export const useAutoAlerts = () => {
                 sentAlerts.current.add(alertKey);
             }
         });
-    }, [budgets, transactions, addNotification]);
+        
+        // Persist sent alerts
+        localStorage.setItem('financehub_sent_alerts', JSON.stringify(Array.from(sentAlerts.current)));
+    }, [budgets, transactions, categories, addNotification]);
 
     // Auto-Alert para Transações Agendadas (próximos 3 dias)
     useEffect(() => {
@@ -77,6 +88,9 @@ export const useAutoAlerts = () => {
                 sentAlerts.current.add(alertKey);
             }
         });
+        
+        // Persist sent alerts
+        localStorage.setItem('financehub_sent_alerts', JSON.stringify(Array.from(sentAlerts.current)));
     }, [scheduledTransactions, addNotification]);
 
     // Auto-Alert para Milestones de Metas (25%, 50%, 75%, 100%)
@@ -105,13 +119,30 @@ export const useAutoAlerts = () => {
                 }
             });
         });
+        
+        // Persist sent alerts
+        localStorage.setItem('financehub_sent_alerts', JSON.stringify(Array.from(sentAlerts.current)));
     }, [goals, addNotification]);
 
-    // Limpa alerts antigos (1x por dia)
+    // Limpa alerts antigos (1x por dia) com timestamp check
     useEffect(() => {
+        const CLEANUP_INTERVAL = 24 * 60 * 60 * 1000; // 24 horas
+        const lastClear = localStorage.getItem('alerts_last_clear');
+        const now = Date.now();
+        
+        // Clear on mount if >24h since last clear
+        if (!lastClear || now - parseInt(lastClear) > CLEANUP_INTERVAL) {
+            sentAlerts.current.clear();
+            localStorage.setItem('alerts_last_clear', now.toString());
+            localStorage.removeItem('financehub_sent_alerts');
+        }
+        
+        // Schedule periodic cleanup
         const cleanup = setInterval(() => {
             sentAlerts.current.clear();
-        }, 24 * 60 * 60 * 1000); // 24 horas
+            localStorage.setItem('alerts_last_clear', Date.now().toString());
+            localStorage.removeItem('financehub_sent_alerts');
+        }, CLEANUP_INTERVAL);
 
         return () => clearInterval(cleanup);
     }, []);

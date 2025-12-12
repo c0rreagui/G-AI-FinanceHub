@@ -671,7 +671,6 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             account_id: accountId
         };
         
-        console.log('💾 Inserting transaction:', transactionData);
         
         const { data: insertedData, error } = await supabase
             .from('transactions')
@@ -685,7 +684,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             throw error;
         }
         
-        console.log('✅ Transaction inserted successfully:', insertedData);
+        
         await fetchData();
         showToast('Transação Adicionada!', { type: 'success' });
         return true;

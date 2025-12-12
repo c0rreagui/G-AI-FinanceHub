@@ -8,18 +8,18 @@ import { EmptyState } from './EmptyState';
 // import { ScrollArea } from './ScrollArea'; // Removed as per new Sheet structure
 
 interface NotificationSheetProps {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
+    isOpen: boolean;
+    onClose: () => void;
 }
 
-export const NotificationSheet: React.FC<NotificationSheetProps> = ({ open, onOpenChange }) => {
+export const NotificationSheet: React.FC<NotificationSheetProps> = ({ isOpen, onClose }) => {
     const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification } = useNotifications();
 
     const unreadNotifications = notifications.filter(n => !n.read);
     const readNotifications = notifications.filter(n => n.read);
 
     return (
-        <Sheet isOpen={open} onClose={() => onOpenChange(false)} title="Notificações">
+        <Sheet isOpen={isOpen} onClose={onClose} title="Notificações">
             <div className="space-y-4">
                 {/* Header info */}
                 <div className="flex items-center justify-between pb-3 border-b border-border">

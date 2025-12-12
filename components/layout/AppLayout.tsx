@@ -62,7 +62,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, currentView, set
       </div>
       <DialogManager />
       <ErrorModal isOpen={!!error} error={error} onClose={clearError} />
-      <NotificationSheet open={notificationSheetOpen} onOpenChange={setNotificationSheetOpen} />
+      <NotificationSheet isOpen={notificationSheetOpen} onClose={() => setNotificationSheetOpen(false)} />
     </>
   );
 };

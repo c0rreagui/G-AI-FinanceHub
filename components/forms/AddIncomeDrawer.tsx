@@ -29,16 +29,29 @@ export const AddIncomeDrawer: React.FC<AddIncomeDrawerProps> = ({ isOpen, onClos
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        // Validate account exists
+        if (!accounts || accounts.length === 0) {
+            showToast('Erro: Nenhuma conta disponível. Crie uma conta primeiro.', { type: 'error' });
+            return;
+        }
+        
+        const numericAmount = parseFloat(amount);
+        if (isNaN(numericAmount) || numericAmount <= 0) {
+            showToast('Valor inválido. Insira um valor maior que zero.', { type: 'error' });
+            return;
+        }
+        
         setIsSubmitting(true);
 
         try {
             await addTransaction({
                 description,
-                amount: Math.abs(parseFloat(amount)),
+                amount: Math.abs(numericAmount),
                 date: new Date(date).toISOString(),
                 type: TransactionType.RECEITA,
                 categoryId,
-                account_id: accounts[0]?.id || '11111111-1111-1111-1111-111111111111',
+                account_id: accounts[0].id,
                 status: TransactionStatus.COMPLETED
             });
             

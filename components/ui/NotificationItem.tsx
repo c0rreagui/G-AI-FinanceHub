@@ -101,6 +101,8 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
                         <a 
                             href={notification.actionLink}
                             className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary/80 transition-colors mt-2"
+                            aria-label={`${notification.actionLabel} (abre em nova aba)`}
+                            rel="noopener noreferrer"
                         >
                             {notification.actionLabel}
                             <ExternalLink className="w-3 h-3" />

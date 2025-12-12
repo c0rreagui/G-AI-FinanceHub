@@ -32,6 +32,19 @@ export const AddInvestmentDrawer: React.FC<AddInvestmentDrawerProps> = ({ isOpen
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        // Validate account exists
+        if (!accounts || accounts.length === 0) {
+            showToast('Erro: Nenhuma conta disponível. Crie uma conta primeiro.', { type: 'error' });
+            return;
+        }
+        
+        const numericTotal = parseFloat(total);
+        if (isNaN(numericTotal) || numericTotal <= 0) {
+            showToast('Valor inválido. Verifique quantidade e preço.', { type: 'error' });
+            return;
+        }
+        
         setIsSubmitting(true);
 
         try {
@@ -40,11 +53,11 @@ export const AddInvestmentDrawer: React.FC<AddInvestmentDrawerProps> = ({ isOpen
 
             await addTransaction({
                 description: `Compra: ${ticker.toUpperCase()} (${quantity}x)`,
-                amount: -Math.abs(parseFloat(total)),
+                amount: -Math.abs(numericTotal),
                 date: new Date(date).toISOString(),
                 type: TransactionType.DESPESA, // Investments are technically outflows initially
                 categoryId: investCat.id,
-                account_id: accounts[0]?.id || '11111111-1111-1111-1111-111111111111',
+                account_id: accounts[0].id,
                 status: TransactionStatus.COMPLETED
             });
             

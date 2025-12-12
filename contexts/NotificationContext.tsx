@@ -47,6 +47,21 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
     }, []);
 
+    // Listen for storage changes from other tabs
+    useEffect(() => {
+        const handleStorageChange = (e: StorageEvent) => {
+            if (e.key === 'financehub_notifications' && e.newValue) {
+                try {
+                    setNotifications(JSON.parse(e.newValue));
+                } catch (err) {
+                    console.error('Failed to sync notifications from other tab', err);
+                }
+            }
+        };
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, []);
+
     // Save to local storage whenever changes happen
     useEffect(() => {
         localStorage.setItem('financehub_notifications', JSON.stringify(notifications));
@@ -61,7 +76,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             read: false,
             created_at: new Date().toISOString()
         };
-        setNotifications(prev => [newNotification, ...prev]);
+        // Limit to max 100 notifications to prevent memory leak
+        setNotifications(prev => [newNotification, ...prev].slice(0, 100));
         
         // Sound effect or toast could go here
     }, []);

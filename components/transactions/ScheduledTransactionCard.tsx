@@ -61,7 +61,7 @@ export const ScheduledTransactionCard: React.FC<{ item: ScheduledTransaction }> 
                     type: item.amount < 0 ? TransactionType.DESPESA : TransactionType.RECEITA,
                     date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString(),
                     categoryId: item.category.id,
-                    account_id: item.account_id || 'default', // Fallback if not physically present, though interface requires it
+                    account_id: item.account_id, // Already required by interface
                     status: TransactionStatus.COMPLETED,
                 });
             },

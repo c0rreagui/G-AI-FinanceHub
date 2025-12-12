@@ -23,10 +23,11 @@ export const BudgetRing: React.FC<BudgetRingProps> = ({
     const radius = (size - strokeWidth) / 2;
     const circumference = 2 * Math.PI * radius;
     
-    const percentage = Math.min((spent / limit) * 100, 100);
+    // Prevent division by zero
+    const percentage = limit > 0 ? Math.min((spent / limit) * 100, 100) : 0;
     const strokeDashoffset = circumference - (percentage / 100) * circumference;
     
-    const isOverBudget = spent > limit;
+    const isOverBudget = limit > 0 && spent > limit;
     const finalColor = isOverBudget ? '#EF4444' : color; // Switch to red if over budget
 
     return (
@@ -71,7 +72,7 @@ export const BudgetRing: React.FC<BudgetRingProps> = ({
             {showLabel && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                     <span className="text-2xl font-bold text-white tracking-tighter">
-                        {Math.round((spent / limit) * 100)}%
+                        {limit > 0 ? Math.round((spent / limit) * 100) : 0}%
                     </span>
                     <span className={`text-[10px] uppercase font-bold tracking-wider ${isOverBudget ? 'text-red-400' : 'text-slate-400'}`}>
                         {isOverBudget ? 'Excedido' : 'Usado'}
