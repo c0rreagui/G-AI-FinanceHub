@@ -32,11 +32,17 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { SocialProvider } from './contexts/SocialContext';
 import { SocialView } from './components/views/SocialView';
 import { InvestmentsView } from './components/views/InvestmentsView';
+import { useAutoAlerts } from './hooks/useAutoAlerts';
+import { NotificationProvider } from './contexts/NotificationContext';
 
 const AppContent: React.FC = () => {
   const { user, loading, isGuest, isDeveloper } = useAuth();
   const { openDialog } = useDialog();
   const { showToast } = useToast();
+  
+  // Ativa auto-alerts (budgets, scheduled, goals)
+  useAutoAlerts();
+  
   const [currentView, setCurrentView] = useState<ViewType>('home');
   const [onboardingComplete, setOnboardingComplete] = useState<boolean>(() => {
     try {
@@ -177,19 +183,21 @@ const App: React.FC = () => {
   return (
     <AuthProvider>
       <ToastProvider>
-        <DashboardDataProvider>
-          <PrivacyProvider>
-            <ThemeProvider>
-              <SocialProvider>
-                <DialogProvider>
-                <ErrorBoundary>
-                    <AppContent />
-                </ErrorBoundary>
-                </DialogProvider>
-              </SocialProvider>
-            </ThemeProvider>
-          </PrivacyProvider>
-        </DashboardDataProvider>
+        <NotificationProvider>
+          <DashboardDataProvider>
+            <PrivacyProvider>
+              <ThemeProvider>
+                <SocialProvider>
+                  <DialogProvider>
+                  <ErrorBoundary>
+                      <AppContent />
+                  </ErrorBoundary>
+                  </DialogProvider>
+                </SocialProvider>
+              </ThemeProvider>
+            </PrivacyProvider>
+          </DashboardDataProvider>
+        </NotificationProvider>
       </ToastProvider>
     </AuthProvider>
   );
