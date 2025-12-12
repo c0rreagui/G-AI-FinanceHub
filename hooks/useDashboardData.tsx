@@ -31,6 +31,7 @@ import {
 import { DashboardDataContext } from '../contexts/DashboardDataContext';
 import { getIconByName } from '../utils/categoryIcons';
 import { useToast } from './useToast';
+import { useNotifications } from '../contexts/NotificationContext';
 import { logger } from '../services/loggingService';
 import { triggerConfetti } from '../components/ui/Confetti';
 import { formatCurrency, formatDate, safeFloat } from '../utils/formatters';

@@ -15,9 +15,11 @@ interface PageHeaderProps {
   breadcrumbs?: string[];
   actions?: React.ReactNode;
   children?: React.ReactNode;
+  onNotificationClick?: () => void;
+  unreadCount?: number;
 }
 
-export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs = [], actions, children }) => {
+export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs = [], actions, children, onNotificationClick, unreadCount = 0 }) => {
   const { user, logout, isDeveloper } = useAuth();
   const { greetingName } = useTheme();
   const [greeting, setGreeting] = useState({ text: 'Bem-vindo', icon: '👋' });
@@ -103,14 +105,19 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs
             <Tooltip>
                 <TooltipTrigger asChild>
                     <button 
+                        onClick={onNotificationClick}
                         title="Notificações"
                         className="relative w-10 h-10 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors border border-border"
                     >
                         <Bell className="w-5 h-5" />
-                        <span className="absolute top-2 right-2 w-2 h-2 bg-destructive rounded-full animate-pulse" />
+                        {unreadCount > 0 && (
+                            <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-lg">
+                                {unreadCount > 9 ? '9+' : unreadCount}
+                            </span>
+                        )}
                     </button>
                 </TooltipTrigger>
-                <TooltipContent>Notificações</TooltipContent>
+                <TooltipContent>Notificações {unreadCount > 0 && `(${unreadCount})`}</TooltipContent>
             </Tooltip>
          </TooltipProvider>
 
