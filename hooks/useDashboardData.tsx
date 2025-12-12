@@ -24,6 +24,7 @@ import {
     InvestmentType,
     Account,
     TransactionStatus,
+    Budget,
 } from '../types';
 import { DashboardDataContext } from '../contexts/DashboardDataContext';
 import { getIconByName } from '../utils/categoryIcons';
@@ -182,6 +183,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
     const [accounts, setAccounts] = useState<Account[]>([]);
     const [goals, setGoals] = useState<Goal[]>([]);
+    const [budgets, setBudgets] = useState<Budget[]>([]);
 
     const generateMockAccounts = (userId: string): Account[] => {
         return [
@@ -344,13 +346,15 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
                 { data: goalsData, error: goalsError },
                 { data: debtsData, error: debtsError },
                 { data: scheduledData, error: scheduledError },
-                { data: auditData, error: auditError }
+                { data: auditData, error: auditError },
+                { data: budgetsData, error: budgetsError }
             ] = await Promise.all([
                 supabase.from('transactions').select('*').eq('user_id', user.id).order('date', { ascending: false }),
                 supabase.from('goals').select('*').eq('user_id', user.id).order('deadline', { ascending: true }),
                 supabase.from('debts').select('*').eq('user_id', user.id),
                 supabase.from('scheduled_transactions').select('*').eq('user_id', user.id).order('next_due_date', { ascending: true }),
-                supabase.from('audit_logs').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(50)
+                supabase.from('audit_logs').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(50),
+                supabase.from('budgets').select('*').eq('user_id', user.id)
             ]);
 
             if (transactionsError) throw transactionsError;
@@ -358,6 +362,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             if (debtsError) throw debtsError;
             if (scheduledError) throw scheduledError;
             if (auditError) throw auditError;
+            if (budgetsError) throw budgetsError;
 
             const mappedTransactions = transactionsData?.map(tx => ({
                 ...tx, 
@@ -370,6 +375,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             setDeletedTransactions(mappedTransactions.filter(tx => tx.deleted_at));
             setGoals(goalsData || []);
             setDebts(debtsData || []);
+            setBudgets(budgetsData || []);
             setScheduledTransactions(scheduledData?.map(stx => ({...stx, category: categoryMap.get(stx.category_id) || fallbackCategory })) || []);
             setAuditLogs(auditData as AuditLog[] || []);
 
@@ -995,6 +1001,72 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         return data as Goal;
     });
     
+
+
+    const addBudget = (budget: Omit<Budget, 'id' | 'created_at' | 'updated_at' | 'user_id'>) => withMutation(async () => {
+        if (isGuest) {
+            const data = getGuestData();
+            const newBudget: Budget = {
+                id: crypto.randomUUID(),
+                ...budget,
+                user_id: 'guest',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+            data.budgets = data.budgets || [];
+            // Remove existing budget for same category if any, to enforce uniqueness logic if needed, 
+            // but strict uniqueness is (user_id, category_id, period).
+            // Let's assume frontend checks or we just push.
+            data.budgets.push(newBudget);
+            setGuestData(data);
+            await fetchData();
+            showToast('Orçamento Definido!', { type: 'success' });
+            return newBudget;
+        }
+        const { data, error } = await supabase.from('budgets').insert({ 
+            category_id: budget.category_id, 
+            amount: budget.amount, 
+            period: budget.period, 
+            user_id: user!.id 
+        }).select().single();
+        if (error) throw error;
+        await fetchData();
+        showToast('Orçamento Definido!', { type: 'success' });
+        return data as Budget;
+    });
+
+    const updateBudget = (budget: Partial<Budget> & { id: string }) => withMutation(async () => {
+        if (isGuest) {
+            const data = getGuestData();
+            data.budgets = (data.budgets || []).map((b: Budget) => b.id === budget.id ? { ...b, ...budget, updated_at: new Date().toISOString() } : b);
+            setGuestData(data);
+            await fetchData();
+            showToast('Orçamento Atualizado!', { type: 'success' });
+            return true;
+        }
+        const { error } = await supabase.from('budgets').update({ ...budget, updated_at: new Date().toISOString() }).eq('id', budget.id);
+        if (error) throw error;
+        await fetchData();
+        showToast('Orçamento Atualizado!', { type: 'success' });
+        return true;
+    }, budget.id);
+
+    const deleteBudget = (id: string) => withMutation(async () => {
+        if (isGuest) {
+            const data = getGuestData();
+            data.budgets = (data.budgets || []).filter((b: Budget) => b.id !== id);
+            setGuestData(data);
+            await fetchData();
+            showToast('Orçamento Removido!', { type: 'success' });
+            return true;
+        }
+        const { error } = await supabase.from('budgets').delete().eq('id', id);
+        if (error) throw error;
+        await fetchData();
+        showToast('Orçamento Removido!', { type: 'success' });
+        return true;
+    }, id);
+    
     const updateGoalValue = (goalId: string, amount: number) => withMutation(async () => {
         // Encontra a meta no estado atual para obter os valores
         const goal = (isGuest ? getGuestData().goals : goals).find((g: Goal) => g.id === goalId);
@@ -1617,6 +1689,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         transactions,
         accounts,
         goals,
+        budgets,
         debts,
         scheduledTransactions,
         categories,
@@ -1642,6 +1715,10 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         updateTransactionsCategory,
         mergeTransactions,
         cloneMonth,
+        cloneMonth,
+        addBudget,
+        updateBudget,
+        deleteBudget,
         addGoal,
         updateGoalValue,
         deleteGoal,
@@ -1668,7 +1745,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
         auditLogs,
         logAction
     }), [
-        transactions, deletedTransactions, auditLogs, goals, debts, scheduledTransactions, categories, summary, monthlyChartData, userLevel, achievements,
+        transactions, deletedTransactions, auditLogs, goals, budgets, debts, scheduledTransactions, categories, summary, monthlyChartData, userLevel, achievements,
         healthScore, dailyMissions, savingsSuggestion, dueSoonBills, completeMission, checkForDuplicates,
         loading, isMutating, mutatingIds, error, user, isGuest
     ]);

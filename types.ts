@@ -98,6 +98,18 @@ export interface Debt {
   user_id: string;
 }
 
+export type BudgetPeriod = 'monthly' | 'weekly' | 'yearly';
+
+export interface Budget {
+  id: string;
+  user_id: string;
+  category_id: string;
+  amount: number;
+  period: BudgetPeriod;
+  created_at: string;
+  updated_at: string;
+}
+
 export enum ScheduledTransactionFrequency {
   DIARIO = 'Diário',
   SEMANAL = 'Semanal',
@@ -244,6 +256,7 @@ export interface DashboardDataContextType {
   transactions: Transaction[];
   accounts: Account[];
   goals: Goal[];
+  budgets: Budget[];
   debts: Debt[];
   scheduledTransactions: ScheduledTransaction[];
   categories: Category[];
@@ -279,6 +292,10 @@ export interface DashboardDataContextType {
   addDebt: (debt: Omit<Debt, 'id' | 'paid_amount' | 'status' | 'user_id' | 'total_amount' | 'interest_rate'> & { totalAmount: number; interestRate: number }) => Promise<Debt | null>;
   addPaymentToDebt: (debtId: string, amount: number) => Promise<boolean>;
   deleteDebt: (id: string) => Promise<boolean>;
+
+  addBudget: (budget: Omit<Budget, 'id' | 'created_at' | 'updated_at' | 'user_id'>) => Promise<Budget | null>;
+  updateBudget: (budget: Partial<Budget> & { id: string }) => Promise<boolean>;
+  deleteBudget: (id: string) => Promise<boolean>;
 
   addScheduledTransaction: (transaction: Omit<ScheduledTransaction, 'id' | 'category' | 'next_due_date' | 'user_id' | 'category_id' | 'start_date'> & { categoryId: string; startDate: string }) => Promise<boolean>;
   updateScheduledTransaction: (transaction: Omit<ScheduledTransaction, 'category' | 'user_id' | 'category_id' | 'start_date'> & { categoryId: string; startDate: string } & { id: string }) => Promise<boolean>;

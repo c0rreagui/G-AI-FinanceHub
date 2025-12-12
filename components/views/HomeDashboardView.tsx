@@ -38,7 +38,7 @@ interface HomeDashboardViewProps {
 
 export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrentView }) => {
     const { user } = useAuth();
-    const { summary, monthlyChartData, transactions, goals, savingsSuggestion, dueSoonBills, healthScore, loading } = useDashboardData();
+    const { summary, monthlyChartData, transactions, goals, budgets, categories, savingsSuggestion, dueSoonBills, healthScore, loading } = useDashboardData();
     const { openDialog } = useDialog();
     const { showToast } = useToast();
     const { layout, setLayout, isEditMode, toggleEditMode, resetLayout } = useLayout();
@@ -278,6 +278,52 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                         </button>
                     </div>
                 )}
+
+                {/* Budget Alerts */}
+                {budgets.length > 0 && (() => {
+                    const now = new Date();
+                    const currentMonth = now.getMonth();
+                    const currentYear = now.getFullYear();
+                    const currentMonthExpenses = transactions.filter(t => 
+                        t.type === 'despesa' && 
+                        new Date(t.date).getMonth() === currentMonth && 
+                        new Date(t.date).getFullYear() === currentYear &&
+                        !t.deleted_at
+                    );
+                    const spendingByCategory = currentMonthExpenses.reduce((acc, t) => {
+                        acc[t.category.id] = (acc[t.category.id] || 0) + Math.abs(t.amount);
+                        return acc;
+                    }, {} as Record<string, number>);
+
+                    const criticalBudgets = budgets.filter(b => {
+                        const spent = spendingByCategory[b.category_id] || 0;
+                        return spent >= b.amount * 0.9;
+                    });
+
+                    if (criticalBudgets.length === 0) return null;
+
+                    return (
+                        <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 flex items-start justify-between">
+                            <div className="flex gap-3">
+                                <Info className="w-5 h-5 text-amber-400 mt-0.5" />
+                                <div>
+                                    <h4 className="text-sm font-semibold text-amber-400">Atenção ao Orçamento</h4>
+                                    <p className="text-sm text-amber-300/80 mt-1">
+                                        Você atingiu 90% ou mais do limite em {criticalBudgets.length} categorias:
+                                        <br />
+                                        <span className="text-xs opacity-70">
+                                            {criticalBudgets.map(b => {
+                                                const catName = categories.find(c => c.id === b.category_id)?.name || 'Categoria';
+                                                return `${catName}`;
+                                            }).join(', ')}
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                            {/* Dismiss button logic could be added here state-wise if needed */}
+                        </div>
+                    );
+                })()}
             </div>
 
             {/* DRAGGABLE GRID */}
