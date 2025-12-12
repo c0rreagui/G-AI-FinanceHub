@@ -654,15 +654,38 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             return true;
         }
         
+        // DEBUG: Log transaction data before insert
+        const accountId = tx.account_id || accounts[0]?.id;
+        if (!accountId) {
+            console.error('❌ CRITICAL: No account_id available!', { tx, accounts });
+            showToast('Erro: Nenhuma conta disponível. Crie uma conta primeiro.', { type: 'error' });
+            return false;
+        }
+        
         const { categoryId, ...rest } = tx;
-        const { error } = await supabase.from('transactions').insert({ 
+        const transactionData = { 
             ...rest, 
             amount,
             category_id: categoryId, 
             user_id: user!.id, 
-            account_id: tx.account_id || accounts[0]?.id
-        });
-        if (error) throw error;
+            account_id: accountId
+        };
+        
+        console.log('💾 Inserting transaction:', transactionData);
+        
+        const { data: insertedData, error } = await supabase
+            .from('transactions')
+            .insert(transactionData)
+            .select()
+            .single();
+            
+        if (error) {
+            console.error('❌ Supabase Insert Error:', error);
+            showToast(`Erro ao salvar transação: ${error.message}`, { type: 'error' });
+            throw error;
+        }
+        
+        console.log('✅ Transaction inserted successfully:', insertedData);
         await fetchData();
         showToast('Transação Adicionada!', { type: 'success' });
         return true;

@@ -224,6 +224,18 @@ export const DevToolsView: React.FC<DevToolsViewProps> = ({ setCurrentView }) =>
                                 Toast Aviso
                             </Button>
                         </div>
+
+                        <div className="h-px bg-white/10 my-4" />
+
+                        <p className="text-xs text-muted-foreground mb-2">Teste de Notificações:</p>
+                        <div className="grid grid-cols-2 gap-2">
+                            <Button variant="outline" size="sm" onClick={() => addNotification({title: 'Orçamento Atenção', message: 'Você usou 85% do orçamento de Alimentação', type: 'warning'})} className="text-amber-400">⚠️ Warning</Button>
+                            <Button variant="outline" size="sm" onClick={() => addNotification({title: 'Orçamento Excedido!', message: 'Você ultrapassou 100% do orçamento mensal', type: 'alert'})} className="text-red-400">🚨 Alert</Button>
+                            <Button variant="outline" size="sm" onClick={() => addNotification({title: 'Meta Atingida!', message: 'Parabéns! Você completou a meta Viagem', type: 'success'})} className="text-emerald-400">✅ Success</Button>
+                            <Button variant="outline" size="sm" onClick={() => addNotification({title: 'Pagamento Agendado', message: 'Aluguel vence em 2 dias (R$ 2.500)', type: 'info'})} className="text-blue-400">ℹ️ Info</Button>
+                            <Button variant="outline" size="sm" onClick={() => addNotification({title: 'Dica de Economia', message: 'Reduza 10% nos gastos', type: 'tip'})} className="text-violet-400">💡 Tip</Button>
+                            <Button variant="default" size="sm" onClick={() => {addNotification({title:'T1',message:'Warning',type:'warning'});setTimeout(()=>addNotification({title:'T2',message:'Info',type:'info'}),500);setTimeout(()=>addNotification({title:'T3',message:'Success',type:'success'}),1000);}} className="bg-gradient-to-r from-violet-600 to-pink-600">🎯 Múltiplas</Button>
+                        </div>
                     </CardContent>
                 </Card>
             </div>
