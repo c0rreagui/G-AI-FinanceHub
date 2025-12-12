@@ -264,8 +264,30 @@ export const DevToolsView: React.FC<DevToolsViewProps> = ({ setCurrentView }) =>
 
                         <div className="h-px bg-white/10 my-4" />
 
-                        <p className="text-xs text-muted-foreground mb-2">Teste de Notificações:</p>
+                        <p className="text-xs text-muted-foreground mb-2">🐛 Debug & Notificações:</p>
                         <div className="grid grid-cols-2 gap-2">
+                            <Button 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={() => {
+                                    console.log('🔔 DEBUG: Botão clicado');
+                                    console.log('🔔 addNotification type:', typeof addNotification);
+                                    try {
+                                        addNotification({
+                                            title: '🐛 DEBUG Test',
+                                            message: 'Se você vê isso, funciona!',
+                                            type: 'success'
+                                        });
+                                        console.log('✅ addNotification executou');
+                                        showToast('Debug notification sent!', { type: 'success' });
+                                    } catch (e) {
+                                        console.error('❌ Erro:', e);
+                                    }
+                                }} 
+                                className="text-orange-400"
+                            >
+                                🐛 Debug Test
+                            </Button>
                             <Button variant="outline" size="sm" onClick={() => addNotification({title: 'Orçamento Atenção', message: 'Você usou 85% do orçamento de Alimentação', type: 'warning'})} className="text-amber-400">⚠️ Warning</Button>
                             <Button variant="outline" size="sm" onClick={() => addNotification({title: 'Orçamento Excedido!', message: 'Você ultrapassou 100% do orçamento mensal', type: 'alert'})} className="text-red-400">🚨 Alert</Button>
                             <Button variant="outline" size="sm" onClick={() => addNotification({title: 'Meta Atingida!', message: 'Parabéns! Você completou a meta Viagem', type: 'success'})} className="text-emerald-400">✅ Success</Button>
