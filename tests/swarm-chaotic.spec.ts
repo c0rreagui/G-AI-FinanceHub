@@ -1,43 +1,45 @@
 import { test } from '@playwright/test';
 import { SwarmHelpers } from './utils/SwarmHelpers';
+import { fakerPT_BR as faker } from '@faker-js/faker';
 
-test('🐒 Agent Chaotic: Monkey Testing', async ({ page }) => {
+test('🐒 Agent Chaotic: O Estagiário Desastrado (Humanized)', async ({ page }) => {
     const agent = new SwarmHelpers(page, 'Chaotic', '🐒');
     await agent.setupInterceptor();
     await agent.login();
+    
+    agent.log('💬 "Click click... O que esse botão faz?"');
 
-    agent.log('Iniciando caos controlado...');
+    const loops = 5;
 
-    // 1. Cliques Aleatórios (Monkey Patch)
-    // Clica em lugares aleatórios da tela para ver se algo quebra ou abre
-    for (let i = 0; i < 15; i++) {
-        const x = Math.floor(Math.random() * 1000);
-        const y = Math.floor(Math.random() * 800);
-        
-        await page.mouse.click(x, y);
-        
-        // Pequeno delay randômico
-        if (Math.random() > 0.7) await page.waitForTimeout(200);
-    }
+    for (let i = 1; i <= loops; i++) {
+        const chaos = faker.helpers.arrayElement(['rage_click', 'cat_on_keyboard', 'lost_navigation']);
 
-    // 2. Navegação Rápida
-    const routes = ['/', '/transactions', '/insights', '/settings', '/goals'];
-    const randomRoute = routes[Math.floor(Math.random() * routes.length)];
-    agent.log(`Navegação súbita para: ${randomRoute}`);
-    await page.goto(randomRoute);
+        try {
+            if (chaos === 'rage_click') {
+                agent.log('💬 "Por que não carregaaa?! (Clicks frenéticos)"');
+                const x = faker.number.int({ min: 100, max: 1000 });
+                const y = faker.number.int({ min: 100, max: 800 });
+                await page.mouse.click(x, y, { clickCount: 3 });
+            }
 
-    // 3. Input Spam
-    // Tenta digitar em qualquer input visível
-    const inputs = await page.getByRole('textbox').all();
-    if (inputs.length > 0) {
-        const randomInput = inputs[Math.floor(Math.random() * inputs.length)];
-        if (await randomInput.isVisible()) {
-            try {
-                await randomInput.fill('🐒🍌🍌🍌');
-            } catch {}
+            if (chaos === 'cat_on_keyboard') {
+                agent.log('💬 "Miau! (Gato pulou no teclado)"');
+                const keys = ['F5', 'Escape', 'Enter', 'Space', 'Tab'];
+                await page.keyboard.press(faker.helpers.arrayElement(keys));
+            }
+
+            if (chaos === 'lost_navigation') {
+                // Tenta navegar para qualquer lugar
+                const randomNav = faker.helpers.arrayElement(['Dashboard', 'Transações', 'Metas', 'Settings']);
+                agent.navigate(randomNav).catch(() => {});
+            }
+        } catch (e) {
+            agent.log('💬 "Ops! Quebrei algo? Acho que não."');
         }
+
+        await page.waitForTimeout(faker.number.int({min: 100, max: 400}));
     }
 
-    agent.log('Sessão de caos finalizada. O sistema sobreviveu?');
-    await page.waitForTimeout(2000);
+    agent.log('💬 "Vou ali tomar um café antes que percebam."');
+    await page.waitForTimeout(5000);
 });

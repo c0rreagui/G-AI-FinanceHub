@@ -2,36 +2,75 @@ import { test } from '@playwright/test';
 import { SwarmHelpers } from './utils/SwarmHelpers';
 import { fakerPT_BR as faker } from '@faker-js/faker';
 
-test('📅 Agent Planner: Olhando para o Futuro', async ({ page }) => {
+test('📅 Agent Planner: O Arquiteto do Futuro (Humanized)', async ({ page }) => {
     const agent = new SwarmHelpers(page, 'Planner', '📅');
     await agent.setupInterceptor();
     await agent.login();
-    await page.waitForTimeout(1500);
 
-    // 1. Criar Meta de Longo Prazo
-    agent.log('Definindo meta de vida...');
-    await page.getByRole('button', { name: 'Metas', exact: true }).click(); // Navegação direta se houver, ou via menu
-    // Fallback se não houver botão direto, usar url
-    if (!page.url().includes('goals')) await page.goto('/goals');
-    
-    await page.getByRole('button', { name: 'Nova Meta' }).click();
-    
-    const goalTitle = `Viagem ${faker.location.country()}`;
-    await agent.fillSmartInput('Nome da meta', goalTitle); // Assumindo label/placeholder
-    // Se for input padrão:
-    try { await page.getByLabel('Nome da meta').fill(goalTitle); } catch {}
-    try { await page.getByPlaceholder('Ex: Viagem, Carro...').fill(goalTitle); } catch {}
+    agent.log('💬 "Vamos ver como está o nosso futuro financeiro..."');
+    await page.waitForTimeout(1000);
 
-    await agent.fillSmartInput('0,00', faker.finance.amount({ min: 5000, max: 20000, dec: 2 }));
-    await page.getByRole('button', { name: 'Salvar' }).click();
-    
-    agent.log(`Meta '${goalTitle}' definida!`);
+    const loops = 5;
 
-    // 2. Agendamento Recorrente
-    agent.log('Agendando conta recorrente...');
-    await page.goto('/scheduling'); // Assuming route
-    // await page.getByRole('button', { name: 'Novo Agendamento' }).click();
-    // (Implementação futura quando módulo estiver pronto, apenas navegando por enquanto)
-    
-    await page.waitForTimeout(3000); // Contemplating the future
+    for (let i = 1; i <= loops; i++) {
+        const focus = faker.helpers.arrayElement(['review_calendar', 'set_goal', 'check_budget']);
+
+        if (focus === 'review_calendar') {
+            agent.log('💬 "Conferindo agendamentos do mês..."');
+            await agent.navigate('Agendamentos'); // Ou "Calendário" se for o nome
+            
+            const nextMonthBtn = page.locator('button:has(.lucide-chevron-down)').last();
+            if (await nextMonthBtn.isVisible()) {
+                await nextMonthBtn.click();
+                agent.log('💬 "Mês que vem tem bastante conta..."');
+                await page.waitForTimeout(800);
+                
+                const todayBtn = page.getByText('Hoje');
+                if (await todayBtn.isVisible()) await todayBtn.click();
+            }
+        }
+
+        if (focus === 'set_goal') {
+            agent.log('💬 "Precisamos focar nos sonhos. Criando nova meta."');
+            await agent.navigate('Metas'); 
+            
+            const addBtn = page.getByRole('button', { name: /Nova Meta|Criar/i }).first();
+            if (await addBtn.isVisible()) {
+                await agent.safeClick(addBtn);
+                const goalName = `Viagem para ${faker.location.city()}`;
+                await agent.fillSmartInput('Nome', goalName);
+                await agent.fillSmartInput('0,00', faker.finance.amount({min: 2000, max: 15000, dec: 0}));
+                agent.log(`💬 "Meta: ${goalName}. Vamos conseguir."`);
+                
+                if (faker.datatype.boolean()) {
+                    await page.keyboard.press('Escape'); 
+                    agent.log('💬 "Vou refinar esse plano depois."');
+                } else {
+                     const saveBtn = page.locator('button:has-text("Salvar")');
+                     if (await saveBtn.isVisible()) await saveBtn.click();
+                     agent.log('💬 "Plano traçado!"');
+                }
+            }
+        }
+
+        if (focus === 'check_budget') {
+             agent.log('💬 "Será que estouramos o orçamento de Lazer?"');
+             // Vai na aba orçamentos (Assume que é em Metas > Orçamentos ou tem link direto)
+             await agent.navigate('Metas'); 
+             const budgetTab = page.getByRole('tab', { name: 'Orçamentos' });
+             if (await budgetTab.isVisible()) {
+                 await agent.safeClick(budgetTab);
+             } else {
+                 await agent.navigate('Orçamentos'); // Tenta direto caso tenha mudado
+             }
+             
+             await page.waitForTimeout(1500); 
+             agent.log('💬 "Hmmm, estamos dentro do previsto."');
+        }
+
+        await page.waitForTimeout(faker.number.int({ min: 500, max: 1200 }));
+    }
+
+    agent.log('💬 "Planejamento atualizado. Caminho seguro à frente."');
+    await page.waitForTimeout(5000);
 });

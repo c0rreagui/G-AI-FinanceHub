@@ -1,0 +1,94 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - generic: FinanceHub
+      - navigation [ref=e9]:
+        - button "Início" [ref=e10] [cursor=pointer]:
+          - img [ref=e12]
+          - generic: Início
+        - button "Transações" [ref=e17] [cursor=pointer]:
+          - img [ref=e19]
+          - generic: Transações
+        - button "Metas" [ref=e22] [cursor=pointer]:
+          - img [ref=e25]
+          - generic: Metas
+        - button "Dívidas" [ref=e29] [cursor=pointer]:
+          - img [ref=e31]
+          - generic: Dívidas
+        - button "Investimentos" [ref=e34] [cursor=pointer]:
+          - img [ref=e36]
+          - generic: Investimentos
+        - button "Agenda" [ref=e39] [cursor=pointer]:
+          - img [ref=e41]
+          - generic: Agenda
+        - button "Insights" [ref=e43] [cursor=pointer]:
+          - img [ref=e45]
+          - generic: Insights
+        - button "Tools" [ref=e47] [cursor=pointer]:
+          - img [ref=e49]
+          - generic: Tools
+        - button "Família" [ref=e51] [cursor=pointer]:
+          - img [ref=e53]
+          - generic: Família
+      - generic [ref=e58]:
+        - button [ref=e59] [cursor=pointer]:
+          - img [ref=e60]
+        - button "DevTools" [ref=e63] [cursor=pointer]:
+          - img [ref=e65]
+          - generic: DevTools
+        - button "Ajustes" [ref=e67] [cursor=pointer]:
+          - img [ref=e69]
+          - generic: Ajustes
+        - generic [ref=e72]: v4.0.0 Neon Genesis
+    - main [ref=e73]:
+      - generic [ref=e76]:
+        - generic [ref=e77]:
+          - generic [ref=e79]:
+            - generic [ref=e80]:
+              - img [ref=e81]
+              - generic [ref=e85]:
+                - heading "Planejamento Financeiro" [level=1] [ref=e86]
+                - paragraph [ref=e87]:
+                  - generic [ref=e88]: 🌙 Boa noite, Desenvolvedor
+            - generic [ref=e89]:
+              - generic [ref=e90]: FinanceHub
+              - img [ref=e91]
+              - generic [ref=e93]: Metas e Orçamentos
+          - generic [ref=e94]:
+            - button "Iniciar gravação de voz" [ref=e95] [cursor=pointer]:
+              - img [ref=e98]
+            - button "K" [ref=e101] [cursor=pointer]:
+              - img [ref=e102]
+              - generic [ref=e105]:
+                - img [ref=e106]
+                - text: K
+            - button "Notificações" [ref=e108] [cursor=pointer]:
+              - img [ref=e109]
+            - button [ref=e113] [cursor=pointer]:
+              - img [ref=e114]
+            - button "U" [ref=e117] [cursor=pointer]:
+              - generic [ref=e119]: U
+        - generic [ref=e121]:
+          - tablist [ref=e122]:
+            - tab "Metas" [ref=e123] [cursor=pointer]
+            - tab "Orçamentos" [active] [selected] [ref=e124] [cursor=pointer]
+          - tabpanel "Orçamentos" [ref=e125]:
+            - generic [ref=e126]:
+              - generic [ref=e127]:
+                - generic [ref=e128]:
+                  - heading "Orçamentos Mensais" [level=2] [ref=e129]
+                  - paragraph [ref=e130]: Planeje seus gastos e controle suas finanças.
+                - button "Novo Orçamento" [ref=e131] [cursor=pointer]:
+                  - img [ref=e132]
+                  - text: Novo Orçamento
+              - generic [ref=e134]:
+                - img [ref=e136]
+                - heading "Sem orçamentos definidos" [level=3] [ref=e139]
+                - paragraph [ref=e140]: Crie orçamentos para suas categorias de gastos e assuma o controle de suas finanças.
+                - button "Começar Agora" [ref=e141] [cursor=pointer]
+  - generic [ref=e142]: R$0k
+```

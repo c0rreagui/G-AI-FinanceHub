@@ -1,0 +1,326 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - generic: FinanceHub
+      - navigation [ref=e9]:
+        - button "Início" [ref=e10] [cursor=pointer]:
+          - img [ref=e12]
+          - generic: Início
+        - button "Transações" [active] [ref=e17] [cursor=pointer]:
+          - img [ref=e20]
+          - generic: Transações
+        - button "Metas" [ref=e23] [cursor=pointer]:
+          - img [ref=e25]
+          - generic: Metas
+        - button "Dívidas" [ref=e29] [cursor=pointer]:
+          - img [ref=e31]
+          - generic: Dívidas
+        - button "Investimentos" [ref=e34] [cursor=pointer]:
+          - img [ref=e36]
+          - generic: Investimentos
+        - button "Agenda" [ref=e39] [cursor=pointer]:
+          - img [ref=e41]
+          - generic: Agenda
+        - button "Insights" [ref=e43] [cursor=pointer]:
+          - img [ref=e45]
+          - generic: Insights
+        - button "Tools" [ref=e47] [cursor=pointer]:
+          - img [ref=e49]
+          - generic: Tools
+        - button "Família" [ref=e51] [cursor=pointer]:
+          - img [ref=e53]
+          - generic: Família
+      - generic [ref=e58]:
+        - button [ref=e59] [cursor=pointer]:
+          - img [ref=e60]
+        - button "DevTools" [ref=e63] [cursor=pointer]:
+          - img [ref=e65]
+          - generic: DevTools
+        - button "Ajustes" [ref=e67] [cursor=pointer]:
+          - img [ref=e69]
+          - generic: Ajustes
+        - generic [ref=e72]: v4.0.0 Neon Genesis
+    - main [ref=e73]:
+      - generic [ref=e76]:
+        - generic [ref=e77]:
+          - generic [ref=e79]:
+            - generic [ref=e80]:
+              - img [ref=e81]
+              - generic [ref=e84]:
+                - heading "Transações" [level=1] [ref=e85]
+                - paragraph [ref=e86]:
+                  - generic [ref=e87]: 🌙 Boa noite, Desenvolvedor
+            - generic [ref=e88]:
+              - generic [ref=e89]: FinanceHub
+              - img [ref=e90]
+              - generic [ref=e92]: Transações
+          - generic [ref=e93]:
+            - button "Iniciar gravação de voz" [ref=e94] [cursor=pointer]:
+              - img [ref=e97]
+            - button "K" [ref=e100] [cursor=pointer]:
+              - img [ref=e101]
+              - generic [ref=e104]:
+                - img [ref=e105]
+                - text: K
+            - button "Notificações" [ref=e107] [cursor=pointer]:
+              - img [ref=e108]
+            - button [ref=e112] [cursor=pointer]:
+              - img [ref=e113]
+            - generic [ref=e116]:
+              - button "Reclassificar" [ref=e117] [cursor=pointer]:
+                - img [ref=e118]
+                - text: Reclassificar
+              - button "Lixeira" [ref=e122] [cursor=pointer]:
+                - img [ref=e123]
+              - button "Histórico de Alterações" [ref=e125] [cursor=pointer]:
+                - img [ref=e126]
+              - button "Importar" [ref=e130] [cursor=pointer]:
+                - img [ref=e131]
+                - text: Importar
+              - button "Nova Transação" [ref=e134] [cursor=pointer]:
+                - img [ref=e135]
+                - text: Nova Transação
+            - button "U" [ref=e137] [cursor=pointer]:
+              - generic [ref=e139]: U
+        - generic [ref=e140]:
+          - generic [ref=e142]:
+            - generic [ref=e143]:
+              - generic [ref=e144]:
+                - img [ref=e145]
+                - textbox "Buscar transações..." [ref=e149]
+              - generic [ref=e150]:
+                - generic [ref=e151]:
+                  - button "Hoje" [ref=e152] [cursor=pointer]
+                  - button "Semana" [ref=e154] [cursor=pointer]
+                  - button "Mês" [ref=e156] [cursor=pointer]
+                - button "Filtrar por data" [ref=e157] [cursor=pointer]:
+                  - img [ref=e158]
+                  - generic [ref=e160]: Filtrar por data
+              - combobox [ref=e162] [cursor=pointer]:
+                - generic [ref=e164]: Filtrar por categorias
+                - img [ref=e165]
+              - combobox [ref=e169] [cursor=pointer]:
+                - generic [ref=e171]: Filtrar por contas
+                - img [ref=e172]
+              - generic [ref=e175]:
+                - button "Todas" [ref=e176] [cursor=pointer]
+                - button "Receitas" [ref=e178] [cursor=pointer]
+                - button "Despesas" [ref=e180] [cursor=pointer]
+            - button "Salvar Filtro Atual" [ref=e182] [cursor=pointer]:
+              - img [ref=e183]
+          - generic [ref=e185]:
+            - generic [ref=e186]: "Agrupar por:"
+            - combobox "Agrupar por:" [ref=e187]:
+              - option "Sem agrupamento" [selected]
+              - option "Dia"
+              - option "Semana"
+              - option "Mês"
+          - generic [ref=e190]:
+            - generic [ref=e192]:
+              - button "Compacto" [ref=e193] [cursor=pointer]:
+                - img [ref=e194]
+                - text: Compacto
+              - button "Visualização" [ref=e199] [cursor=pointer]:
+                - img [ref=e200]
+                - text: Visualização
+            - table [ref=e205]:
+              - rowgroup [ref=e206]:
+                - row "Select all Transação Categoria Data Valor" [ref=e207]:
+                  - columnheader "Select all" [ref=e208]:
+                    - checkbox "Select all" [ref=e209] [cursor=pointer]
+                  - columnheader "Transação" [ref=e210]:
+                    - button "Transação" [ref=e211] [cursor=pointer]:
+                      - text: Transação
+                      - img [ref=e212]
+                  - columnheader "Categoria" [ref=e215]
+                  - columnheader "Data" [ref=e216]:
+                    - button "Data" [ref=e217] [cursor=pointer]:
+                      - text: Data
+                      - img [ref=e218]
+                  - columnheader "Valor" [ref=e221]:
+                    - button "Valor" [ref=e223] [cursor=pointer]:
+                      - text: Valor
+                      - img [ref=e224]
+                  - columnheader [ref=e227]
+              - rowgroup [ref=e228]:
+                - row "Select row teste 2 Salário 12/12/2025 + R$ 50.000,00 Open menu" [ref=e229]:
+                  - cell "Select row" [ref=e230]:
+                    - checkbox "Select row" [ref=e231] [cursor=pointer]
+                  - cell "teste 2" [ref=e232]:
+                    - generic [ref=e233]:
+                      - img [ref=e235]
+                      - generic [ref=e241]: teste 2
+                  - cell "Salário" [ref=e242]:
+                    - generic [ref=e243]: Salário
+                  - cell "12/12/2025" [ref=e244]
+                  - cell "+ R$ 50.000,00" [ref=e245]:
+                    - generic [ref=e247]: + R$ 50.000,00
+                  - cell "Open menu" [ref=e248]:
+                    - button "Open menu" [ref=e249] [cursor=pointer]:
+                      - generic [ref=e250]: Open menu
+                      - img [ref=e251]
+                - 'row "Select row Recebimento: Carvalho, Moraes e Oliveira Salário 11/12/2025 + R$ 1.539.680,00 Open menu" [ref=e255]':
+                  - cell "Select row" [ref=e256]:
+                    - checkbox "Select row" [ref=e257] [cursor=pointer]
+                  - 'cell "Recebimento: Carvalho, Moraes e Oliveira" [ref=e258]':
+                    - generic [ref=e259]:
+                      - img [ref=e261]
+                      - generic [ref=e267]: "Recebimento: Carvalho, Moraes e Oliveira"
+                  - cell "Salário" [ref=e268]:
+                    - generic [ref=e269]: Salário
+                  - cell "11/12/2025" [ref=e270]
+                  - cell "+ R$ 1.539.680,00" [ref=e271]:
+                    - generic [ref=e273]: + R$ 1.539.680,00
+                  - cell "Open menu" [ref=e274]:
+                    - button "Open menu" [ref=e275] [cursor=pointer]:
+                      - generic [ref=e276]: Open menu
+                      - img [ref=e277]
+                - 'row "Select row Recebimento: Batista-Franco Salário 11/12/2025 + R$ 1.868.040,00 Open menu" [ref=e281]':
+                  - cell "Select row" [ref=e282]:
+                    - checkbox "Select row" [ref=e283] [cursor=pointer]
+                  - 'cell "Recebimento: Batista-Franco" [ref=e284]':
+                    - generic [ref=e285]:
+                      - img [ref=e287]
+                      - generic [ref=e293]: "Recebimento: Batista-Franco"
+                  - cell "Salário" [ref=e294]:
+                    - generic [ref=e295]: Salário
+                  - cell "11/12/2025" [ref=e296]
+                  - cell "+ R$ 1.868.040,00" [ref=e297]:
+                    - generic [ref=e299]: + R$ 1.868.040,00
+                  - cell "Open menu" [ref=e300]:
+                    - button "Open menu" [ref=e301] [cursor=pointer]:
+                      - generic [ref=e302]: Open menu
+                      - img [ref=e303]
+                - row "Select row Almoço Melo, Nogueira e Melo Alimentação 11/12/2025 - R$ 27.706,00 Open menu" [ref=e307]:
+                  - cell "Select row" [ref=e308]:
+                    - checkbox "Select row" [ref=e309] [cursor=pointer]
+                  - cell "Almoço Melo, Nogueira e Melo" [ref=e310]:
+                    - generic [ref=e311]:
+                      - img [ref=e313]
+                      - generic [ref=e319]: Almoço Melo, Nogueira e Melo
+                  - cell "Alimentação" [ref=e320]:
+                    - generic [ref=e321]: Alimentação
+                  - cell "11/12/2025" [ref=e322]
+                  - cell "- R$ 27.706,00" [ref=e323]:
+                    - generic [ref=e325]: "- R$ 27.706,00"
+                  - cell "Open menu" [ref=e326]:
+                    - button "Open menu" [ref=e327] [cursor=pointer]:
+                      - generic [ref=e328]: Open menu
+                      - img [ref=e329]
+                - row "Select row Salário Teste Full Salário 11/12/2025 + R$ 5.000,00 Open menu" [ref=e333]:
+                  - cell "Select row" [ref=e334]:
+                    - checkbox "Select row" [ref=e335] [cursor=pointer]
+                  - cell "Salário Teste Full" [ref=e336]:
+                    - generic [ref=e337]:
+                      - img [ref=e339]
+                      - generic [ref=e345]: Salário Teste Full
+                  - cell "Salário" [ref=e346]:
+                    - generic [ref=e347]: Salário
+                  - cell "11/12/2025" [ref=e348]
+                  - cell "+ R$ 5.000,00" [ref=e349]:
+                    - generic [ref=e351]: + R$ 5.000,00
+                  - cell "Open menu" [ref=e352]:
+                    - button "Open menu" [ref=e353] [cursor=pointer]:
+                      - generic [ref=e354]: Open menu
+                      - img [ref=e355]
+                - row "Select row teste Salário 11/12/2025 + R$ 15.000,00 Open menu" [ref=e359]:
+                  - cell "Select row" [ref=e360]:
+                    - checkbox "Select row" [ref=e361] [cursor=pointer]
+                  - cell "teste" [ref=e362]:
+                    - generic [ref=e363]:
+                      - img [ref=e365]
+                      - generic [ref=e371]: teste
+                  - cell "Salário" [ref=e372]:
+                    - generic [ref=e373]: Salário
+                  - cell "11/12/2025" [ref=e374]
+                  - cell "+ R$ 15.000,00" [ref=e375]:
+                    - generic [ref=e377]: + R$ 15.000,00
+                  - cell "Open menu" [ref=e378]:
+                    - button "Open menu" [ref=e379] [cursor=pointer]:
+                      - generic [ref=e380]: Open menu
+                      - img [ref=e381]
+                - 'row "Select row Recebimento: Xavier, Xavier e Moreira Salário 11/12/2025 + R$ 1.378.860,00 Open menu" [ref=e385]':
+                  - cell "Select row" [ref=e386]:
+                    - checkbox "Select row" [ref=e387] [cursor=pointer]
+                  - 'cell "Recebimento: Xavier, Xavier e Moreira" [ref=e388]':
+                    - generic [ref=e389]:
+                      - img [ref=e391]
+                      - generic [ref=e397]: "Recebimento: Xavier, Xavier e Moreira"
+                  - cell "Salário" [ref=e398]:
+                    - generic [ref=e399]: Salário
+                  - cell "11/12/2025" [ref=e400]
+                  - cell "+ R$ 1.378.860,00" [ref=e401]:
+                    - generic [ref=e403]: + R$ 1.378.860,00
+                  - cell "Open menu" [ref=e404]:
+                    - button "Open menu" [ref=e405] [cursor=pointer]:
+                      - generic [ref=e406]: Open menu
+                      - img [ref=e407]
+                - row "Select row Aporte AMHG4 Investimentos 11/12/2025 - R$ 499.258,00 Open menu" [ref=e411]:
+                  - cell "Select row" [ref=e412]:
+                    - checkbox "Select row" [ref=e413] [cursor=pointer]
+                  - cell "Aporte AMHG4" [ref=e414]:
+                    - generic [ref=e415]:
+                      - img [ref=e417]
+                      - generic [ref=e423]: Aporte AMHG4
+                  - cell "Investimentos" [ref=e424]:
+                    - generic [ref=e425]: Investimentos
+                  - cell "11/12/2025" [ref=e426]
+                  - cell "- R$ 499.258,00" [ref=e427]:
+                    - generic [ref=e429]: "- R$ 499.258,00"
+                  - cell "Open menu" [ref=e430]:
+                    - button "Open menu" [ref=e431] [cursor=pointer]:
+                      - generic [ref=e432]: Open menu
+                      - img [ref=e433]
+                - row "Select row Projeto Reis, Moraes e Braga Salário 11/12/2025 + R$ 473.883,00 Open menu" [ref=e437]:
+                  - cell "Select row" [ref=e438]:
+                    - checkbox "Select row" [ref=e439] [cursor=pointer]
+                  - cell "Projeto Reis, Moraes e Braga" [ref=e440]:
+                    - generic [ref=e441]:
+                      - img [ref=e443]
+                      - generic [ref=e449]: Projeto Reis, Moraes e Braga
+                  - cell "Salário" [ref=e450]:
+                    - generic [ref=e451]: Salário
+                  - cell "11/12/2025" [ref=e452]
+                  - cell "+ R$ 473.883,00" [ref=e453]:
+                    - generic [ref=e455]: + R$ 473.883,00
+                  - cell "Open menu" [ref=e456]:
+                    - button "Open menu" [ref=e457] [cursor=pointer]:
+                      - generic [ref=e458]: Open menu
+                      - img [ref=e459]
+              - rowgroup [ref=e463]:
+                - row "R$ 4.803.499,00" [ref=e464]:
+                  - cell [ref=e465]
+                  - cell [ref=e466]
+                  - cell [ref=e467]
+                  - cell [ref=e468]
+                  - cell "R$ 4.803.499,00" [ref=e469]:
+                    - generic [ref=e470]: R$ 4.803.499,00
+                  - cell [ref=e471]
+            - generic [ref=e472]:
+              - generic [ref=e473]: 0 de 9 linha(s) selecionada(s).
+              - generic [ref=e474]:
+                - generic [ref=e475]:
+                  - paragraph [ref=e476]: Linhas por página
+                  - combobox [ref=e477] [cursor=pointer]:
+                    - generic: "10"
+                    - img [ref=e478]
+                - generic [ref=e480]: Página 1 de 1
+                - generic [ref=e481]:
+                  - button "Primeira página" [disabled]:
+                    - generic: Primeira página
+                    - img
+                  - button "Página anterior" [disabled]:
+                    - generic: Página anterior
+                    - img
+                  - button "Próxima página" [disabled]:
+                    - generic: Próxima página
+                    - img
+                  - button "Última página" [disabled]:
+                    - generic: Última página
+                    - img
+  - generic [ref=e482]: R$0k
+```

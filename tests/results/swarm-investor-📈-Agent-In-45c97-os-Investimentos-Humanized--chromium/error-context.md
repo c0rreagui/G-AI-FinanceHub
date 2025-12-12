@@ -1,0 +1,169 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - generic: FinanceHub
+      - navigation [ref=e9]:
+        - button "Início" [ref=e10] [cursor=pointer]:
+          - img [ref=e12]
+          - generic: Início
+        - button "Transações" [ref=e17] [cursor=pointer]:
+          - img [ref=e19]
+          - generic: Transações
+        - button "Metas" [ref=e22] [cursor=pointer]:
+          - img [ref=e24]
+          - generic: Metas
+        - button "Dívidas" [ref=e28] [cursor=pointer]:
+          - img [ref=e30]
+          - generic: Dívidas
+        - button "Investimentos" [active] [ref=e33] [cursor=pointer]:
+          - img [ref=e36]
+          - generic: Investimentos
+        - button "Agenda" [ref=e39] [cursor=pointer]:
+          - img [ref=e41]
+          - generic: Agenda
+        - button "Insights" [ref=e43] [cursor=pointer]:
+          - img [ref=e45]
+          - generic: Insights
+        - button "Tools" [ref=e47] [cursor=pointer]:
+          - img [ref=e49]
+          - generic: Tools
+        - button "Família" [ref=e51] [cursor=pointer]:
+          - img [ref=e53]
+          - generic: Família
+      - generic [ref=e58]:
+        - button [ref=e59] [cursor=pointer]:
+          - img [ref=e60]
+        - button "DevTools" [ref=e63] [cursor=pointer]:
+          - img [ref=e65]
+          - generic: DevTools
+        - button "Ajustes" [ref=e67] [cursor=pointer]:
+          - img [ref=e69]
+          - generic: Ajustes
+        - generic [ref=e72]: v4.0.0 Neon Genesis
+    - main [ref=e73]:
+      - generic [ref=e76]:
+        - generic [ref=e77]:
+          - generic [ref=e78]:
+            - generic [ref=e81]:
+              - img [ref=e82]
+              - generic [ref=e85]:
+                - heading "Investimentos" [level=1] [ref=e86]
+                - paragraph [ref=e87]:
+                  - generic [ref=e88]: 🌙 Boa noite, Desenvolvedor
+            - generic [ref=e89]:
+              - button "Iniciar gravação de voz" [ref=e90] [cursor=pointer]:
+                - img [ref=e93]
+              - button "K" [ref=e96] [cursor=pointer]:
+                - img [ref=e97]
+                - generic [ref=e100]:
+                  - img [ref=e101]
+                  - text: K
+              - button "Notificações" [ref=e103] [cursor=pointer]:
+                - img [ref=e104]
+              - button [ref=e108] [cursor=pointer]:
+                - img [ref=e109]
+              - button "U" [ref=e112] [cursor=pointer]:
+                - generic [ref=e114]: U
+          - button "Novo Aporte" [ref=e115] [cursor=pointer]:
+            - img [ref=e116]
+            - text: Novo Aporte
+        - generic [ref=e117]:
+          - generic [ref=e118]:
+            - img [ref=e120]
+            - heading "Total Investido" [level=3] [ref=e122]
+            - paragraph [ref=e123]: R$ 0,00
+            - generic [ref=e124]:
+              - img [ref=e125]
+              - generic [ref=e128]: +0% (Este mês)
+          - generic [ref=e129]:
+            - img [ref=e131]
+            - heading "Total de Ativos" [level=3] [ref=e134]
+            - paragraph [ref=e135]: "0"
+            - paragraph [ref=e136]: Diversificado em 0 classes
+          - generic [ref=e137]:
+            - img [ref=e139]
+            - heading "Maior Posição" [level=3] [ref=e142]
+            - paragraph [ref=e143]: "-"
+            - paragraph [ref=e144]: R$ 0,00
+        - generic [ref=e145]:
+          - generic [ref=e147]:
+            - generic [ref=e148]:
+              - heading "Meus Ativos" [level=3] [ref=e149]
+              - generic [ref=e150]:
+                - button "Todos" [ref=e151] [cursor=pointer]
+                - button "Renda Fixa" [ref=e152] [cursor=pointer]
+                - button "Ações" [ref=e153] [cursor=pointer]
+                - button "FIIs" [ref=e154] [cursor=pointer]
+                - button "Cripto" [ref=e155] [cursor=pointer]
+            - generic [ref=e156]: Nenhum investimento encontrado. Comece aportando!
+          - generic [ref=e158]:
+            - heading "Alocação" [level=3] [ref=e159]
+            - generic [ref=e160]: Sem dados para exibir
+        - generic [ref=e162]:
+          - heading "Calculadora de Juros Compostos" [level=3] [ref=e164]:
+            - img [ref=e165]
+            - text: Calculadora de Juros Compostos
+          - generic [ref=e168]:
+            - generic [ref=e169]:
+              - generic [ref=e170]:
+                - text: Aporte Inicial (R$)
+                - spinbutton [ref=e172]: "1000"
+              - generic [ref=e173]:
+                - text: Aporte Mensal (R$)
+                - spinbutton [ref=e175]: "500"
+              - generic [ref=e176]:
+                - text: Taxa de Juros Anual (%)
+                - spinbutton [ref=e178]: "10"
+              - generic [ref=e179]:
+                - text: Período (Anos)
+                - spinbutton [ref=e181]: "10"
+            - generic [ref=e182]:
+              - generic [ref=e183]:
+                - generic [ref=e184]:
+                  - paragraph [ref=e185]: Total Investido
+                  - paragraph [ref=e186]: R$ 61.000,00
+                - generic [ref=e187]:
+                  - paragraph [ref=e188]: Total em Juros
+                  - paragraph [ref=e189]: R$ 44.130,00
+                - generic [ref=e190]:
+                  - paragraph [ref=e191]: Montante Final
+                  - paragraph [ref=e192]: R$ 105.130,00
+              - generic [ref=e195]:
+                - img [ref=e196]:
+                  - generic [ref=e198]:
+                    - generic [ref=e200]: "0"
+                    - generic [ref=e202]: "1"
+                    - generic [ref=e204]: "2"
+                    - generic [ref=e206]: "3"
+                    - generic [ref=e208]: "4"
+                    - generic [ref=e210]: "5"
+                    - generic [ref=e212]: "6"
+                    - generic [ref=e214]: "7"
+                    - generic [ref=e216]: "8"
+                    - generic [ref=e218]: "9"
+                    - generic [ref=e220]: "10"
+                  - generic [ref=e222]:
+                    - generic [ref=e224]: R$ 0k
+                    - generic [ref=e226]: R$ 30k
+                    - generic [ref=e228]: R$ 60k
+                    - generic [ref=e230]: R$ 90k
+                    - generic [ref=e232]: R$ 120k
+                - list [ref=e253]:
+                  - listitem [ref=e254]:
+                    - img [ref=e255]
+                    - text: Montante Total
+                  - listitem [ref=e257]:
+                    - img [ref=e258]
+                    - text: Total Investido
+                - generic:
+                  - generic:
+                    - paragraph: "5"
+                    - list:
+                      - listitem: "Montante Total : R$ 40.364,00"
+                      - listitem: "Total Investido : R$ 31.000,00"
+  - generic [ref=e260]: R$ 0k
+```

@@ -77,7 +77,11 @@ export const Sheet: React.FC<SheetProps> = ({ isOpen, onClose, title, children, 
                                 initial="hidden"
                                 animate="visible"
                                 exit="exit"
-                                {...({ className: `pointer-events-auto w-full max-w-md h-full bg-background border-l border-border shadow-2xl flex flex-col` } as any)}
+                                {...({ 
+                                    className: `pointer-events-auto w-full max-w-md h-full bg-background border-l border-border shadow-2xl flex flex-col`,
+                                    role: "dialog",
+                                    "aria-modal": "true"
+                                } as any)}
                             >
                                 <div className="flex items-center justify-between p-6 border-b border-border/60 shadow-sm">
                                     <h2 className="text-xl font-semibold">{title}</h2>
@@ -112,7 +116,11 @@ export const Sheet: React.FC<SheetProps> = ({ isOpen, onClose, title, children, 
                                 onDragEnd={(_, info) => {
                                     if (info.offset.y > 100) onClose();
                                 }}
-                                {...({ className: `pointer-events-auto w-full bg-background border-t border-border rounded-t-3xl shadow-2xl flex flex-col max-h-[95vh]` } as any)}
+                                {...({ 
+                                    className: `pointer-events-auto w-full bg-background border-t border-border rounded-t-3xl shadow-2xl flex flex-col max-h-[95vh]`,
+                                    role: "dialog",
+                                    "aria-modal": "true"
+                                } as any)}
                             >
                                 {/* Handle */}
                                 <div className="w-full flex justify-center pt-3 pb-1">

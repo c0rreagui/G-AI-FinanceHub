@@ -12,7 +12,10 @@ export const Brain = {
     selectors: {
         login: {
             authCheck: 'text=Saldo Total',
-            signInBtn: 'button:has-text("Sign In")',
+            // Prioriza o Login de Desenvolvedor para bypass rápido
+            signInBtn: 'button:has-text("Login de Desenvolvedor")',
+            pinInput: 'input[type="password"], input[name="pin"], input[placeholder*="PIN"], input[type="tel"], input[type="number"], input[inputmode="numeric"]',
+            pinCode: '2609',
             fallbackDashboard: '[data-testid="dashboard-view"]'
         },
         modal: {

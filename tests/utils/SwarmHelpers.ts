@@ -74,8 +74,39 @@ export class SwarmHelpers {
                 } catch (e) {
                     // Se falhar, checa se caiu no login
                     if (await loginBtn.isVisible()) {
-                        this.log('🔒 Tela de Login detectada. Tentando acesso...');
-                        await loginBtn.click();
+                        this.log('🔒 Tela de Login detectada. Acessando área Dev...');
+                        
+                        // Mobile Fix: Scroll para encontrar o botão se estiver hidden
+                        const devBtn = this.page.locator('button:has-text("Login de Desenvolvedor")');
+                        if (await devBtn.count() > 0) {
+                             await devBtn.scrollIntoViewIfNeeded();
+                             await this.safeClick(devBtn);
+                        } else {
+                             // Fallback padrão
+                             await loginBtn.click();
+                        }
+                        
+                        // Lógica de PIN (Se houver input de senha/pin aparecendo)
+                        try {
+                            // Espera input específico
+                            const pinInput = this.page.locator(Brain.selectors.login.pinInput).first();
+                            await pinInput.waitFor({ state: 'visible', timeout: 3000 });
+                            this.log(`🔑 Inserindo PIN (${Brain.selectors.login.pinCode})...`);
+                            await pinInput.fill(Brain.selectors.login.pinCode);
+                        } catch {
+                            this.log('⚠️ Input de PIN específico não achado, procurando qualquer input visível...');
+                            const anyInput = this.page.locator('input:visible').first();
+                            if (await anyInput.count() > 0) {
+                                await anyInput.fill(Brain.selectors.login.pinCode);
+                                this.log('🔑 PIN inserido em input genérico.');
+                            } else {
+                                this.log('❌ Nenhum input encontrado para o PIN.');
+                            }
+                        }
+                        
+                        // Mobile Fix: Tap no Enter se keyboard virtual estiver ativo (simulado)
+                        await this.page.keyboard.press('Enter');
+
                         await dashboardIndicator.waitFor({ state: 'visible', timeout: Brain.timeouts.long });
                         return;
                     }
@@ -123,6 +154,48 @@ export class SwarmHelpers {
             await option.waitFor();
             await option.click();
         }
+    }
+
+    async navigate(target: string) {
+        this.log(`🧭 Navegando para: ${target}...`);
+        
+        // Mobile Handling: Se menu hamburguer estiver visível e nav links não, abra o menu
+        const menuBtn = this.page.locator('button[aria-label="Menu"], button .lucide-menu').first();
+        const drawer = this.page.locator('[role="dialog"], [data-radix-collection-item], nav.mobile-nav'); // Tenta identificar drawer aberto
+
+        if (await menuBtn.isVisible()) {
+             // Se o drawer não estiver visível (ou não conseguirmos confirmar), clica no menu
+             // Assumindo que nav standard está escondida
+             await menuBtn.click();
+             await this.page.waitForTimeout(300);
+        }
+
+        // Tenta achar link com o texto exato ou parcial na sidebar/drawer
+        // Adicionado 'text=${target}' para ser mais específico
+        const navLink = this.page.locator(`nav a, nav button, aside a, aside button`).filter({ hasText: target });
+        
+        // Fallback para title/aria-label (ícones)
+        const iconLink = this.page.locator(`nav [title="${target}"], nav [aria-label="${target}"], aside [title="${target}"], aside [aria-label="${target}"]`);
+
+        if (await navLink.count() > 0) {
+            // Tenta clicar no primeiro visível
+             const visibleLink = navLink.first(); // Em mobile pode ter duplicatas, pega a do drawer
+             if (await visibleLink.isVisible()) {
+                 await visibleLink.click();
+             } else {
+                 await navLink.last().click(); // As vezes o do drawer é o último
+             }
+        } else if (await iconLink.count() > 0) {
+            await iconLink.first().click();
+        } else {
+             // Fallback final: tenta achar qualquer coisa com esse texto na tela que pareça um link
+             this.log(`⚠️ Link exato não encontrado na nav, procurando genericamente...`);
+             await this.safeClick(this.page.getByRole('link', { name: target }).first());
+        }
+
+        // Fechar menu se for mobile e ele não fechar sozinho? Normalmente navegação fecha.
+        // Aguarda estabilização
+        await this.page.waitForTimeout(500);
     }
 
     async createTransaction({ description, amount, type, categoryMatch }: { description: string, amount: string, type: 'Receita' | 'Despesa', categoryMatch: string }) {

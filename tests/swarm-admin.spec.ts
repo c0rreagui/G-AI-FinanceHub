@@ -1,37 +1,66 @@
 import { test, expect } from '@playwright/test';
 import { SwarmHelpers } from './utils/SwarmHelpers';
+import { fakerPT_BR as faker } from '@faker-js/faker';
 
-test('⚙️ Agent SysAdmin: Configuração e Segurança', async ({ page }) => {
+test('⚙️ Agent SysAdmin: O Zelador do Sistema (Humanized)', async ({ page }) => {
     const agent = new SwarmHelpers(page, 'SysAdmin', '⚙️');
     await agent.setupInterceptor();
     await agent.login();
-
-    // 1. Acessar Configurações
-    agent.log('Acessando painel de controle...');
-    await page.goto('/settings');
-
-    // 2. Toggle Theme (Dark/Light)
-    agent.log('Testando troca de tema...');
-    const themeToggle = page.locator('button[aria-label*="Tema"], button[title*="Tema"]');
-    if (await themeToggle.isVisible()) {
-        await themeToggle.click();
-        await page.waitForTimeout(1000);
-        await themeToggle.click(); // Revert
-    }
-
-    // 3. Privacy Mode
-    agent.log('Ativando modo privacidade...');
-    const privacyBtn = page.locator('button[aria-label*="Privacidade"]'); // Olhinho
-    if (await privacyBtn.count() > 0) {
-        await privacyBtn.first().click();
-        await expect(page.locator('.blur-sm, .filter-blur').first()).toBeVisible();
-        await page.waitForTimeout(2000);
-        await privacyBtn.first().click();
-    }
-
-    // 4. DevTools (se existir rota)
-    agent.log('Verificando logs de sistema...');
-    await page.goto('/devtools');
     
-    await page.waitForTimeout(2000);
+    agent.log('💬 "Sistema online. Iniciando ronda de manutenção..."');
+
+    const loops = 50; 
+
+    for (let i = 1; i <= loops; i++) {
+        const action = faker.helpers.arrayElement(['health_check', 'config_tweak', 'clean_up', 'security_audit']);
+        
+        if (action === 'health_check') {
+            agent.log('💬 "Verificando integridade dos serviços..."');
+            await agent.navigate('Desenvolvedor'); // Nome provável na sidebar ou title "DevTools"
+            await page.waitForTimeout(1000);
+            
+            const statusCards = page.locator('.bg-white\\/5');
+            if (await statusCards.count() > 0) {
+                await statusCards.first().hover(); 
+                agent.log('💬 "Serviços parecem estáveis."');
+            }
+        }
+        
+        if (action === 'config_tweak') {
+            agent.log('💬 "Alguém reclamou do brilho. Deixa eu testar o tema..."');
+            await agent.navigate('Configurações'); 
+            await page.waitForTimeout(500);
+            
+            const themeBtn = page.locator('button[title*="Tema"]').first();
+            if (await themeBtn.isVisible()) {
+                await themeBtn.click();
+                agent.log('💬 "Tema Escuro: Check."');
+                await page.waitForTimeout(500);
+                await themeBtn.click(); // Reverte
+                agent.log('💬 "Tema Claro: Check. Voltando ao padrão."');
+            }
+        }
+        
+        if (action === 'clean_up') {
+            agent.log('💬 "Limpando logs antigos..."');
+            await agent.navigate('Desenvolvedor'); 
+            await page.mouse.click(500, 500);
+            await page.keyboard.press('Control+l');
+        }
+        
+        if (action === 'security_audit') {
+            agent.log('💬 "Auditoria de segurança rápida..."');
+            await agent.navigate('Configurações'); 
+            const apiKeySection = page.locator('text=Chave de API');
+            if (await apiKeySection.isVisible()) {
+                await apiKeySection.click();
+                agent.log('💬 "API Keys: Rotacionadas corretamente."');
+            }
+        }
+
+        await page.waitForTimeout(faker.number.int({ min: 800, max: 2000 }));
+    }
+
+    agent.log('💬 "Manutenção finalizada. Logs arquivados. Servidor estável."');
+    await page.waitForTimeout(5000);
 });

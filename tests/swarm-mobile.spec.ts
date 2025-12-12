@@ -1,34 +1,51 @@
-import { test, devices } from '@playwright/test';
+import { test } from '@playwright/test';
 import { SwarmHelpers } from './utils/SwarmHelpers';
+import { fakerPT_BR as faker } from '@faker-js/faker';
 
-test.use({ ...devices['iPhone 14'] });
+test('📱 Agent Mobile: O Commuter (Humanized)', async ({ page }) => {
+    // iPhone 13 aspect ratio
+    await page.setViewportSize({ width: 375, height: 812 }); 
 
-test('📱 Agent Mobile: Teste de Campo (iPhone 14)', async ({ page }) => {
-    const agent = new SwarmHelpers(page, 'MobileQA', '📱');
+    const agent = new SwarmHelpers(page, 'Mobile', '📱');
     await agent.setupInterceptor();
+    await agent.login();
     
-    agent.log('Iniciando app mobile...');
-    await page.goto('/');
-    
-    // 1. Verificar Menu Hamburger
-    agent.log('Testando navegação mobile...');
-    const menuBtn = page.getByRole('button', { name: /menu|navigation/i }).first();
-    if (await menuBtn.isVisible()) {
-        await menuBtn.tap(); // Tap no mobile
-        await page.waitForTimeout(500);
-        await page.getByRole('button', { name: /fechar|close/i }).first().tap().catch(() => page.keyboard.press('Escape'));
+    agent.log('💬 "No ônibus, rapidinho conferindo o saldo..."');
+
+    const loops = 5;
+
+    for (let i = 1; i <= loops; i++) {
+        const gesture = faker.helpers.arrayElement(['thumb_scroll', 'open_menu', 'miss_click', 'rotate_phone']);
+
+        if (gesture === 'thumb_scroll') {
+            await page.evaluate(() => window.scrollBy({ top: 350, behavior: 'smooth' }));
+            await page.waitForTimeout(300);
+            agent.log('💬 "Scrolando feed..."');
+        }
+
+        if (gesture === 'open_menu') {
+            // Tenta abrir menu e navegar pra algo
+            const target = faker.helpers.arrayElement(['Transações', 'Metas', 'Dashboard']);
+            // navigate agora lida com menu hamburguer!
+            await agent.navigate(target);
+        }
+
+        if (gesture === 'miss_click') {
+            await page.mouse.click(10, 200); 
+        }
+
+        if (gesture === 'rotate_phone') {
+            if (i % 25 === 0) {
+                 agent.log('💬 "Virando a tela pra ver melhor..."');
+                 await page.setViewportSize({ width: 812, height: 375 });
+                 await page.waitForTimeout(1000);
+                 await page.setViewportSize({ width: 375, height: 812 });
+            }
+        }
+
+        await page.waitForTimeout(faker.number.int({min: 200, max: 500}));
     }
 
-    // 2. Scroll Infinito
-    // 2. Scroll Infinito (Touch emulation)
-    agent.log('Testando scroll touch...');
-    await page.evaluate(() => window.scrollBy(0, 500));
-    await page.waitForTimeout(1000);
-    await page.evaluate(() => window.scrollBy(0, -500));
-
-    // 3. Teste de Toque em Cards
-    agent.log('Interagindo com widgets...');
-    await page.locator('.card, .widget').first().click();
-
-    await page.waitForTimeout(3000);
+    agent.log('💬 "Cheguei no ponto. Guardando o celular."');
+    await page.waitForTimeout(5000);
 });

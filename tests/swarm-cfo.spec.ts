@@ -2,47 +2,57 @@ import { test } from '@playwright/test';
 import { SwarmHelpers } from './utils/SwarmHelpers';
 import { fakerPT_BR as faker } from '@faker-js/faker';
 
-test('👔 Agent CFO: Gestão Financeira Intensiva', async ({ page }) => {
+test('👔 Agent CFO: O Guardião do Caixa (Humanized)', async ({ page }) => {
     const agent = new SwarmHelpers(page, 'CFO', '👔');
     
-    // Setup
     await agent.setupInterceptor();
     await agent.login();
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(1500); 
 
-    // 1. Receita Variável (Freelance/Vendas)
-    const incomeDesc = `Projeto ${faker.company.name()}`;
-    const incomeValue = faker.finance.amount({ min: 1000, max: 15000, dec: 2 });
-    
-    await agent.createTransaction({
-        description: incomeDesc,
-        amount: incomeValue,
-        type: 'Receita',
-        categoryMatch: 'Salário' // ou Outras Receitas
-    });
+    const loops = 5;
+    agent.log(`💬 "Bom dia, equipe. Iniciando auditoria e gestão de caixa. Faremos ${loops} verificações hoje."`);
 
-    // 2. Despesa Corporativa
-    const expenseDesc = `Almoço ${faker.company.name()}`;
-    const expenseValue = faker.finance.amount({ min: 50, max: 300, dec: 2 });
+    for (let i = 1; i <= loops; i++) {
+        agent.log(`🔄 [Turno ${i}] Analisando situação...`);
 
-    await agent.createTransaction({
-        description: expenseDesc,
-        amount: expenseValue,
-        type: 'Despesa',
-        categoryMatch: 'Alimentação'
-    });
+        // Comportamento humano: Checar saldo (Dashboard)
+        await agent.navigate('Dashboard'); 
+        await page.waitForTimeout(faker.number.int({ min: 500, max: 1500 })); 
+        
+        const mood = faker.helpers.arrayElement(['otimista', 'preocupado', 'neutro']);
 
-    // 3. Pagamento de Dívida (Simulado via Despesa por enquanto)
-    const debtDesc = `Fatura ${faker.finance.creditCardIssuer()}`;
-    await agent.createTransaction({
-        description: debtDesc,
-        amount: faker.finance.amount({ min: 500, max: 2000, dec: 2 }),
-        type: 'Despesa',
-        categoryMatch: 'Casa' // Fallback
-    });
+        if (mood === 'otimista') {
+            agent.log('💬 "O fluxo está bom. Vou registrar aquela receita pendente."');
+            await agent.createTransaction({
+                description: `Recebimento: ${faker.company.name()}`,
+                amount: faker.finance.amount({ min: 5000, max: 20000, dec: 2 }),
+                type: 'Receita',
+                categoryMatch: 'Salário'
+            });
+        } else if (mood === 'preocupado') {
+            agent.log('💬 "Muitas saídas previstas. Preciso lançar as despesas operacionais agora."');
+            // Lança 2 despesas seguidas
+            for (let j = 0; j < 2; j++) {
+                 await agent.createTransaction({
+                    description: `Pagamento: ${faker.commerce.department()}`,
+                    amount: faker.finance.amount({ min: 100, max: 1500, dec: 2 }),
+                    type: 'Despesa',
+                    categoryMatch: faker.helpers.arrayElement(['Alimentação', 'Transporte', 'Casa'])
+                });
+                await page.waitForTimeout(500);
+            }
+        } else {
+            agent.log('💬 "Dia calmo. Vou apenas conferir os relatórios."');
+            await agent.navigate('Transações'); 
+            await page.mouse.wheel(0, 300);
+            await page.waitForTimeout(800);
+            await page.mouse.wheel(0, -300);
+        }
 
-    // 4. Validação de Saldo (Visual)
-    agent.log('Validando impacto financeiro no Dashboard...');
-    await page.goto('/');
-    await page.waitForTimeout(2000); // Admiring the work
+        await page.mouse.move(faker.number.int({min:100, max:500}), faker.number.int({min:100, max:500}));
+        await page.waitForTimeout(300);
+    }
+
+    agent.log('💬 "Fechamento do dia concluído. Caixa conciliado."');
+    await page.waitForTimeout(5000);
 });
