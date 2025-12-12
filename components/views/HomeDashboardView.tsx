@@ -34,9 +34,11 @@ import { ViewType } from '../../types';
 
 interface HomeDashboardViewProps {
     setCurrentView: (view: ViewType) => void;
+    onNotificationClick?: () => void;
+    unreadCount?: number;
 }
 
-export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrentView }) => {
+export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrentView, onNotificationClick, unreadCount }) => {
     const { user } = useAuth();
     const { summary, monthlyChartData, transactions, goals, budgets, categories, savingsSuggestion, dueSoonBills, healthScore, loading } = useDashboardData();
     const { openDialog } = useDialog();

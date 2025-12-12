@@ -27,11 +27,13 @@ const TypingEffect: React.FC<{ text: string }> = ({ text }) => {
 interface GreetingHeaderProps {
     user: any;
     setCurrentView?: (view: ViewType) => void;
+    onNotificationClick?: () => void;
+    unreadCount?: number;
 }
 
 import { useTheme } from '../../contexts/ThemeContext';
 
-export const GreetingHeader: React.FC<GreetingHeaderProps> = ({ user, setCurrentView }) => {
+export const GreetingHeader: React.FC<GreetingHeaderProps> = ({ user, setCurrentView, onNotificationClick, unreadCount = 0 }) => {
     const { greetingName } = useTheme();
     const [greeting, setGreeting] = useState('');
     const [icon, setIcon] = useState<React.ReactNode>(null);
@@ -86,13 +88,15 @@ export const GreetingHeader: React.FC<GreetingHeaderProps> = ({ user, setCurrent
                                 variant="ghost" 
                                 size="icon" 
                                 className="relative text-muted-foreground hover:text-foreground"
-                                onClick={() => {
-                                    // TODO: Implement notifications panel
-                                }}
+                                onClick={onNotificationClick}
                             >
                                 <Bell className="w-5 h-5" />
-                                <span className="absolute top-2 right-2 w-2 h-2 bg-destructive rounded-full animate-ping" />
-                                <span className="absolute top-2 right-2 w-2 h-2 bg-destructive rounded-full" />
+                                {unreadCount > 0 && (
+                                    <>
+                                        <span className="absolute top-2 right-2 w-2 h-2 bg-destructive rounded-full animate-ping" />
+                                        <span className="absolute top-2 right-2 w-2 h-2 bg-destructive rounded-full" />
+                                    </>
+                                )}
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>Notificações</TooltipContent>
