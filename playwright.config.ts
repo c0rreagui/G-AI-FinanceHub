@@ -15,6 +15,7 @@ export default defineConfig({
     headless: false,
     launchOptions: {
       slowMo: 1000,
+      args: ['--window-position=2000,50'], // Tentativa de abrir no 2º monitor (Direita)
     },
   },
   projects: [
