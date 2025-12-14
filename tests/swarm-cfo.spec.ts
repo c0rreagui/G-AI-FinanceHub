@@ -15,8 +15,8 @@ test('👔 Agent CFO: O Guardião do Caixa (Humanized)', async ({ page }) => {
     for (let i = 1; i <= loops; i++) {
         agent.log(`🔄 [Turno ${i}] Analisando situação...`);
 
-        // Comportamento humano: Checar saldo (Dashboard)
-        await agent.navigate('Dashboard'); 
+        // Comportamento humano: Checar Inicio
+        await agent.navigate('Início');  // Ou Inicio sem acento, dependendo da sidebar. User disse "Inicio" (sem acento no prompt), mas sidebar tem "Início"? Sidebar.tsx tem "Início". Vou usar "Início".
         await page.waitForTimeout(faker.number.int({ min: 500, max: 1500 })); 
         
         const mood = faker.helpers.arrayElement(['otimista', 'preocupado', 'neutro']);
@@ -31,7 +31,6 @@ test('👔 Agent CFO: O Guardião do Caixa (Humanized)', async ({ page }) => {
             });
         } else if (mood === 'preocupado') {
             agent.log('💬 "Muitas saídas previstas. Preciso lançar as despesas operacionais agora."');
-            // Lança 2 despesas seguidas
             for (let j = 0; j < 2; j++) {
                  await agent.createTransaction({
                     description: `Pagamento: ${faker.commerce.department()}`,

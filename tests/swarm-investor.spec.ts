@@ -24,12 +24,18 @@ test('📈 Agent Investor: O Lobo dos Investimentos (Humanized)', async ({ page 
             }
             // Filtros - tenta clicar nos tabs/botões da view
             const stocksBtn = page.getByRole('button', { name: 'Ações' });
-            if (await stocksBtn.isVisible()) await agent.safeClick(stocksBtn);
+            if (await stocksBtn.isVisible()) {
+                 await agent.safeClick(stocksBtn);
+            } else {
+                 agent.log('⚠️ Tab Ações não visível.');
+            }
             
             await page.waitForTimeout(800);
             
             const cryptoBtn = page.getByRole('button', { name: 'Cripto' });
-             if (await cryptoBtn.isVisible()) await agent.safeClick(cryptoBtn);
+             if (await cryptoBtn.isVisible()) {
+                 await agent.safeClick(cryptoBtn);
+             }
              
             agent.log('💬 "Cripto está lateralizando..."');
             await page.waitForTimeout(800);

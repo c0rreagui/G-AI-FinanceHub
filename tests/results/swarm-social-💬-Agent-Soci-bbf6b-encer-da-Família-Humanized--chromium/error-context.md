@@ -123,7 +123,7 @@
                       - img [ref=e196]
                       - text: 12%
                   - paragraph [ref=e199]: Receitas (Mês)
-                  - heading "R$ 7.169.726,00" [level=3] [ref=e200]
+                  - heading "R$ 7.150.266,96" [level=3] [ref=e200]
                 - generic:
                   - img
               - generic [ref=e201]:
@@ -134,7 +134,7 @@
                       - img [ref=e210]
                       - text: 5%
                   - paragraph [ref=e213]: Despesas (Mês)
-                  - heading "R$ 862.129,29" [level=3] [ref=e214]
+                  - heading "R$ 859.789,42" [level=3] [ref=e214]
                 - generic:
                   - img
           - listitem [ref=e215]:
@@ -187,11 +187,13 @@
                           - generic [ref=e289]: DEZ/25
                         - generic [ref=e291]:
                           - generic [ref=e293]: R$0k
-                          - generic [ref=e295]: R$4000k
-                          - generic [ref=e297]: R$8000k
-                        - generic [ref=e298]:
-                          - 'slider "Min value: JUL/25, Max value: DEZ/25" [ref=e301]'
-                          - 'slider "Min value: JUL/25, Max value: DEZ/25" [ref=e303]'
+                          - generic [ref=e295]: R$2000k
+                          - generic [ref=e297]: R$4000k
+                          - generic [ref=e299]: R$6000k
+                          - generic [ref=e301]: R$8000k
+                        - generic [ref=e302]:
+                          - 'slider "Min value: JUL/25, Max value: DEZ/25" [ref=e305]'
+                          - 'slider "Min value: JUL/25, Max value: DEZ/25" [ref=e307]'
                       - list [ref=e318]:
                         - listitem [ref=e319]:
                           - img [ref=e320]

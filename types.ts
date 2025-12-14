@@ -1,26 +1,27 @@
 import React from 'react';
+import { Database } from './types/database.types';
 
 export type ViewType = 'home' | 'transactions' | 'insights' | 'goals' | 'debts' | 'investments' | 'scheduling' | 'tools' | 'settings' | 'devtools' | 'design-system' | 'social';
 
-export enum TransactionType {
-  RECEITA = 'receita',
-  DESPESA = 'despesa',
-  TRANSFER = 'transfer',
+export type TransactionType = 'receita' | 'despesa' | 'transfer';
+export const TransactionType = {
+  RECEITA: 'receita' as TransactionType,
+  DESPESA: 'despesa' as TransactionType,
+  TRANSFER: 'transfer' as TransactionType,
+};
+
+// Derived from Database
+type CategoryRow = Database['public']['Tables']['categories']['Row'];
+export interface Category extends Omit<CategoryRow, 'icon'> {
+  icon: React.ElementType; 
 }
 
-export interface Category {
-  id: string;
-  name: string;
-  icon: React.ElementType;
-  color: string;
-  user_id: string;
-}
-
-export enum TransactionStatus {
-  PENDING = 'pending',
-  COMPLETED = 'completed',
-  SCHEDULED = 'scheduled',
-}
+export type TransactionStatus = 'pending' | 'completed' | 'scheduled';
+export const TransactionStatus = {
+  PENDING: 'pending' as TransactionStatus,
+  COMPLETED: 'completed' as TransactionStatus,
+  SCHEDULED: 'scheduled' as TransactionStatus,
+};
 
 export interface Account {
   id: string;
@@ -32,29 +33,23 @@ export interface Account {
   user_id: string;
 }
 
-export interface Transaction {
-  id: string;
-  description: string;
-  amount: number;
+type TransactionRow = Database['public']['Tables']['transactions']['Row'];
+export interface Transaction extends Omit<TransactionRow, 'type' | 'starred' | 'deleted_at'> {
   type: TransactionType;
-  date: string; // ISO 8601 format
-  category_id: string;
-  category: Category; // Joined data
-  user_id: string;
-  goal_contribution_id?: string | null;
-  debt_payment_id?: string | null;
-  investment_id?: string | null;
+  category: Category; 
+  status: TransactionStatus; 
+  
   notes?: string | null;
-  account_id: string;
-  status: TransactionStatus;
+  account_id: string; 
+  
   exclude_from_reports?: boolean;
-  starred?: boolean;
+  starred?: boolean | null;
   reconciled?: boolean;
   location?: { latitude: number; longitude: number; address?: string; } | null;
   transfer_id?: string | null;
   from_account_id?: string | null;
   to_account_id?: string | null;
-  deleted_at?: string | null; // ISO 8601 for Soft Delete
+  deleted_at?: string | null;
 }
 
 export interface AuditLog {
@@ -67,35 +62,26 @@ export interface AuditLog {
   user_id: string;
 }
 
-export enum GoalStatus {
-  EM_ANDAMENTO = 'EM_ANDAMENTO',
-  CONCLUIDO = 'CONCLUIDO',
-}
+export type GoalStatus = 'EM_ANDAMENTO' | 'CONCLUIDO';
+export const GoalStatus = {
+  EM_ANDAMENTO: 'EM_ANDAMENTO' as GoalStatus,
+  CONCLUIDO: 'CONCLUIDO' as GoalStatus,
+};
 
-export interface Goal {
-  id: string;
-  name: string;
-  target_amount: number;
-  current_amount: number;
-  deadline: string; // ISO 8601 format
+type GoalRow = Database['public']['Tables']['goals']['Row'];
+export interface Goal extends GoalRow {
   status: GoalStatus;
-  user_id: string;
 }
 
-export enum DebtStatus {
-  ATIVA = 'ATIVA',
-  PAGA = 'PAGA',
-}
+export type DebtStatus = 'ATIVA' | 'PAGA';
+export const DebtStatus = {
+  ATIVA: 'ATIVA' as DebtStatus,
+  PAGA: 'PAGA' as DebtStatus,
+};
 
-export interface Debt {
-  id: string;
-  name: string;
-  total_amount: number;
-  paid_amount: number;
-  interest_rate: number; // Annual percentage rate
-  category: string;
+type DebtRow = Database['public']['Tables']['debts']['Row'];
+export interface Debt extends DebtRow {
   status: DebtStatus;
-  user_id: string;
 }
 
 export type BudgetPeriod = 'monthly' | 'weekly' | 'yearly';
@@ -110,25 +96,19 @@ export interface Budget {
   updated_at: string;
 }
 
-export enum ScheduledTransactionFrequency {
-  DIARIO = 'Diário',
-  SEMANAL = 'Semanal',
-  QUINZENAL = 'Quinzenal',
-  MENSAL = 'Mensal',
-  ANUAL = 'Anual',
-}
+export type ScheduledTransactionFrequency = 'Diário' | 'Semanal' | 'Quinzenal' | 'Mensal' | 'Anual';
+export const ScheduledTransactionFrequency = {
+  DIARIO: 'Diário' as ScheduledTransactionFrequency,
+  SEMANAL: 'Semanal' as ScheduledTransactionFrequency,
+  QUINZENAL: 'Quinzenal' as ScheduledTransactionFrequency,
+  MENSAL: 'Mensal' as ScheduledTransactionFrequency,
+  ANUAL: 'Anual' as ScheduledTransactionFrequency,
+};
 
-export interface ScheduledTransaction {
-  id: string;
-  description: string;
-  amount: number;
+type ScheduledTransactionRow = Database['public']['Tables']['scheduled_transactions']['Row'];
+export interface ScheduledTransaction extends Omit<ScheduledTransactionRow, 'type'> {
   type: TransactionType;
-  category_id: string;
-  category: Category; // Joined data
-  start_date: string; // ISO 8601 format
-  next_due_date: string; // ISO 8601 format
-  frequency: ScheduledTransactionFrequency;
-  user_id: string;
+  category: Category; 
   account_id?: string;
 }
 
@@ -167,29 +147,22 @@ export interface MonthlyChartData {
   despesa: number;
 }
 
-export enum InvestmentType {
-  RENDA_FIXA = 'renda_fixa',
-  ACOES = 'acoes',
-  FIIS = 'fiis',
-  CRIPTO = 'cripto',
-  EXTERIOR = 'exterior',
-  OUTROS = 'outros',
+export type InvestmentType = 'renda_fixa' | 'acoes' | 'fiis' | 'cripto' | 'exterior' | 'outros';
+export const InvestmentType = {
+  RENDA_FIXA: 'renda_fixa' as InvestmentType,
+  ACOES: 'acoes' as InvestmentType,
+  FIIS: 'fiis' as InvestmentType,
+  CRIPTO: 'cripto' as InvestmentType,
+  EXTERIOR: 'exterior' as InvestmentType,
+  OUTROS: 'outros' as InvestmentType,
+};
+
+type InvestmentRow = Database['public']['Tables']['investments']['Row'];
+export interface Investment extends Omit<InvestmentRow, 'type'> {
+  type: InvestmentType;
 }
 
-export interface Investment {
-  id: string;
-  user_id: string;
-  name: string;
-  ticker?: string;
-  type: InvestmentType;
-  amount: number;
-  quantity: number;
-  current_price?: number;
-  purchase_date: string; // ISO 8601
-  color?: string;
-  logo_url?: string;
-  sector?: string;
-}
+
 
 // Omitindo 'category' pois será populada via join
 export type NewTransaction = Omit<Transaction, 'id' | 'category' | 'user_id'>;

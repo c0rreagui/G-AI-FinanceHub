@@ -10,302 +10,306 @@
             - generic [ref=e11]:
               - generic [ref=e15] [cursor=pointer]: D
               - generic [ref=e17]:
-                - heading "Boa noite, Dev!" [level=1] [ref=e18]:
-                  - text: Boa noite, Dev!
+                - heading "Bom dia, Dev!" [level=1] [ref=e18]:
+                  - text: Bom dia, Dev!
                   - img [ref=e19]
-                - generic [ref=e21]:
-                  - generic [ref=e22]: sexta-feira, 12 de dezembro
-                  - generic [ref=e24]:
-                    - img [ref=e25]
+                - generic [ref=e25]:
+                  - generic [ref=e26]: sábado, 13 de dezembro
+                  - generic [ref=e28]:
+                    - img [ref=e29]
                     - text: 24°C
-            - generic [ref=e27]:
-              - button [ref=e28] [cursor=pointer]:
-                - img [ref=e29]
+            - generic [ref=e31]:
               - button [ref=e32] [cursor=pointer]:
                 - img [ref=e33]
-          - generic [ref=e36]:
-            - button "Personalizar" [ref=e37] [cursor=pointer]:
-              - img [ref=e38]
+              - button [ref=e36] [cursor=pointer]:
+                - img [ref=e37]
+          - generic [ref=e40]:
+            - button "Personalizar" [ref=e41] [cursor=pointer]:
+              - img [ref=e42]
               - text: Personalizar
-            - button "Nova Transação" [ref=e43] [cursor=pointer]
-        - generic [ref=e46]:
-          - img [ref=e48]
-          - generic [ref=e50]:
-            - heading "Fique de Olho" [level=3] [ref=e51]
-            - paragraph [ref=e52]: Sua maior despesa este mês foi com Investimentos, totalizando R$ 499.258,00.
-          - button "Analisar Gastos" [ref=e53] [cursor=pointer]
-        - generic [ref=e55]:
+            - button "Nova Transação" [ref=e47] [cursor=pointer]
+        - generic [ref=e50]:
+          - img [ref=e52]
           - generic [ref=e56]:
-            - img [ref=e57]
-            - generic [ref=e61]:
-              - heading "Sugestão de Economia" [level=4] [ref=e62]
-              - paragraph [ref=e63]: Você gastou R$ 499.258,00 em Investimentos este mês. Que tal tentar reduzir 10% na próxima semana?
-          - button "Fechar sugestão de economia" [ref=e64] [cursor=pointer]:
-            - generic [ref=e65]: Fechar
+            - heading "Foco na Meta!" [level=3] [ref=e57]
+            - paragraph [ref=e58]: Sua meta Meta de Teste 2 está com o prazo apertado. 19 dias restantes!
+          - button "Ver Metas" [ref=e59] [cursor=pointer]
+        - generic [ref=e61]:
+          - generic [ref=e62]:
+            - img [ref=e63]
+            - generic [ref=e67]:
+              - heading "Sugestão de Economia" [level=4] [ref=e68]
+              - paragraph [ref=e69]: Você gastou R$ 499.258,00 em Investimentos este mês. Que tal tentar reduzir 10% na próxima semana?
+          - button "Fechar sugestão de economia" [ref=e70] [cursor=pointer]:
+            - generic [ref=e71]: Fechar
             - text: ×
-        - list [ref=e66]:
-          - listitem [ref=e67]:
-            - generic [ref=e69]:
-              - generic [ref=e70]:
-                - button "Nova dica" [ref=e71] [cursor=pointer]:
-                  - img [ref=e72]
-                - button "Compartilhar" [ref=e77] [cursor=pointer]:
+        - list [ref=e72]:
+          - listitem [ref=e73]:
+            - generic [ref=e75]:
+              - generic [ref=e76]:
+                - button "Nova dica" [ref=e77] [cursor=pointer]:
                   - img [ref=e78]
-                - button "Fechar" [ref=e84] [cursor=pointer]:
-                  - img [ref=e85]
-              - generic [ref=e88]:
-                - img [ref=e90]
-                - generic [ref=e92]:
-                  - heading "Dica do Dia" [level=4] [ref=e93]
-                  - paragraph [ref=e94]: Diversifique seus investimentos para reduzir riscos.
-          - listitem [ref=e95]:
-            - generic [ref=e96]:
-              - generic [ref=e97]:
-                - generic:
-                  - img
+                - button "Compartilhar" [ref=e83] [cursor=pointer]:
+                  - img [ref=e84]
+                - button "Fechar" [ref=e90] [cursor=pointer]:
+                  - img [ref=e91]
+              - generic [ref=e94]:
+                - img [ref=e96]
                 - generic [ref=e98]:
-                  - heading "Saldo Total" [level=3] [ref=e99]
-                  - button "Ocultar valores" [ref=e100] [cursor=pointer]:
-                    - img [ref=e101]
+                  - heading "Dica do Dia" [level=4] [ref=e99]
+                  - paragraph [ref=e100]: Acompanhe seus pequenos gastos diários, eles somam muito no final do mês.
+          - listitem [ref=e101]:
+            - generic [ref=e102]:
+              - generic [ref=e103]:
+                - generic:
+                  - img
                 - generic [ref=e104]:
-                  - generic "R$ 4.803.499,00" [ref=e105]
-                  - generic [ref=e106]:
-                    - generic [ref=e107]:
-                      - img [ref=e108]
+                  - heading "Saldo Total" [level=3] [ref=e105]
+                  - button "Ocultar valores" [ref=e106] [cursor=pointer]:
+                    - img [ref=e107]
+                - generic [ref=e110]:
+                  - generic "R$ 6.307.596,71" [ref=e111]
+                  - generic [ref=e112]:
+                    - generic [ref=e113]:
+                      - img [ref=e114]
                       - text: 12.5%
-                    - generic [ref=e111]: vs. mês anterior
-              - generic [ref=e112]:
-                - generic [ref=e114]:
-                  - generic [ref=e115]:
-                    - img [ref=e117]
-                    - generic [ref=e120]:
-                      - img [ref=e121]
+                    - generic [ref=e117]: vs. mês anterior
+              - generic [ref=e118]:
+                - generic [ref=e120]:
+                  - generic [ref=e121]:
+                    - img [ref=e123]
+                    - generic [ref=e126]:
+                      - img [ref=e127]
                       - text: 12%
-                  - paragraph [ref=e124]: Receitas (Mês)
-                  - heading "R$ 5.330.463,00" [level=3] [ref=e125]
+                  - paragraph [ref=e130]: Receitas (Mês)
+                  - heading "R$ 7.161.782,90" [level=3] [ref=e131]
                 - generic:
                   - img
-              - generic [ref=e126]:
-                - generic [ref=e128]:
-                  - generic [ref=e129]:
-                    - img [ref=e131]
-                    - generic [ref=e134]:
-                      - img [ref=e135]
+              - generic [ref=e132]:
+                - generic [ref=e134]:
+                  - generic [ref=e135]:
+                    - img [ref=e137]
+                    - generic [ref=e140]:
+                      - img [ref=e141]
                       - text: 5%
-                  - paragraph [ref=e138]: Despesas (Mês)
-                  - heading "R$ 526.964,00" [level=3] [ref=e139]
+                  - paragraph [ref=e144]: Despesas (Mês)
+                  - heading "R$ 861.174,17" [level=3] [ref=e145]
                 - generic:
                   - img
-          - listitem [ref=e140]:
-            - generic [ref=e141]:
-              - heading "Orçamento Mensal" [level=3] [ref=e143]
-              - generic [ref=e144]:
-                - generic [ref=e145]:
-                  - generic [ref=e146]:
-                    - text: "-R$ 526.964,00"
-                    - paragraph [ref=e147]: de R$ 5.000,00
-                  - img [ref=e149]
-                - generic [ref=e152]:
-                  - generic [ref=e153]:
-                    - generic [ref=e154]: Top Categorias
-                    - generic [ref=e155]: Parcial
-                  - generic [ref=e157]:
-                    - generic [ref=e158]: Investimentos
-                    - generic [ref=e160]: Alimentação
-          - listitem [ref=e162]:
-            - generic [ref=e163]:
-              - generic [ref=e165]:
-                - tablist [ref=e167]:
-                  - tab "Resumo" [selected] [ref=e168] [cursor=pointer]
-                  - tab "Fluxo" [ref=e169] [cursor=pointer]
-                  - tab "Despesas" [ref=e170] [cursor=pointer]
-                  - tab "Saldo Diário" [ref=e171] [cursor=pointer]
-                - tabpanel "Resumo" [ref=e173]:
-                  - generic [ref=e174]:
-                    - generic [ref=e175]:
-                      - heading "Fluxo Financeiro" [level=3] [ref=e176]: Fluxo Financeiro
-                      - generic [ref=e179]:
-                        - button "7D" [ref=e180] [cursor=pointer]
-                        - button "30D" [ref=e181] [cursor=pointer]
-                        - button "3M" [ref=e182] [cursor=pointer]
-                        - button "YTD" [ref=e183] [cursor=pointer]
+          - listitem [ref=e146]:
+            - generic [ref=e147]:
+              - heading "Orçamento Mensal" [level=3] [ref=e149]
+              - generic [ref=e150]:
+                - generic [ref=e151]:
+                  - generic [ref=e152]:
+                    - text: "-R$ 862.129,29"
+                    - paragraph [ref=e153]: de R$ 5.000,00
+                  - img [ref=e155]
+                - generic [ref=e158]:
+                  - generic [ref=e159]:
+                    - generic [ref=e160]: Top Categorias
+                    - generic [ref=e161]: Parcial
+                  - generic [ref=e163]:
+                    - generic [ref=e164]: Investimentos
+                    - generic [ref=e166]: Transporte
+                    - generic [ref=e168]: Alimentação
+                    - generic [ref=e170]: Compras
+          - listitem [ref=e172]:
+            - generic [ref=e173]:
+              - generic [ref=e175]:
+                - tablist [ref=e177]:
+                  - tab "Resumo" [selected] [ref=e178] [cursor=pointer]
+                  - tab "Fluxo" [ref=e179] [cursor=pointer]
+                  - tab "Despesas" [ref=e180] [cursor=pointer]
+                  - tab "Saldo Diário" [ref=e181] [cursor=pointer]
+                - tabpanel "Resumo" [ref=e183]:
+                  - generic [ref=e184]:
                     - generic [ref=e185]:
-                      - generic [ref=e186]: Taxa de Poupança
-                      - generic [ref=e187]: 90.1%
-                    - progressbar [ref=e189]
-                    - generic [ref=e193]:
-                      - img [ref=e194]:
-                        - generic [ref=e198]:
-                          - generic [ref=e200]: JUL/25
-                          - generic [ref=e202]: AGO/25
-                          - generic [ref=e204]: SET/25
-                          - generic [ref=e206]: OUT/25
-                          - generic [ref=e208]: NOV/25
-                          - generic [ref=e210]: DEZ/25
-                        - generic [ref=e212]:
-                          - generic [ref=e214]: R$0k
-                          - generic [ref=e216]: R$3000k
-                          - generic [ref=e218]: R$6000k
-                        - generic [ref=e219]:
-                          - 'slider "Min value: JUL/25, Max value: DEZ/25" [ref=e222]'
-                          - 'slider "Min value: JUL/25, Max value: DEZ/25" [ref=e224]'
-                      - list [ref=e239]:
-                        - listitem [ref=e240]:
-                          - img [ref=e241]
+                      - heading "Fluxo Financeiro" [level=3] [ref=e186]: Fluxo Financeiro
+                      - generic [ref=e189]:
+                        - button "7D" [ref=e190] [cursor=pointer]
+                        - button "30D" [ref=e191] [cursor=pointer]
+                        - button "3M" [ref=e192] [cursor=pointer]
+                        - button "YTD" [ref=e193] [cursor=pointer]
+                    - generic [ref=e195]:
+                      - generic [ref=e196]: Taxa de Poupança
+                      - generic [ref=e197]: 88.0%
+                    - progressbar [ref=e199]
+                    - generic [ref=e203]:
+                      - img [ref=e204]:
+                        - generic [ref=e208]:
+                          - generic [ref=e210]: JUL/25
+                          - generic [ref=e212]: AGO/25
+                          - generic [ref=e214]: SET/25
+                          - generic [ref=e216]: OUT/25
+                          - generic [ref=e218]: NOV/25
+                          - generic [ref=e220]: DEZ/25
+                        - generic [ref=e222]:
+                          - generic [ref=e224]: R$0k
+                          - generic [ref=e226]: R$2000k
+                          - generic [ref=e228]: R$4000k
+                          - generic [ref=e230]: R$6000k
+                          - generic [ref=e232]: R$8000k
+                        - generic [ref=e233]:
+                          - 'slider "Min value: JUL/25, Max value: DEZ/25" [ref=e236]'
+                          - 'slider "Min value: JUL/25, Max value: DEZ/25" [ref=e238]'
+                      - list [ref=e253]:
+                        - listitem [ref=e254]:
+                          - img [ref=e255]
                           - text: Receitas
-                        - listitem [ref=e243]:
-                          - img [ref=e244]
+                        - listitem [ref=e257]:
+                          - img [ref=e258]
                           - text: Despesas
-              - generic [ref=e247]:
-                - generic [ref=e248]:
-                  - heading "Mapa de Gastos" [level=3] [ref=e249]: Mapa de Gastos
-                  - generic [ref=e251]: Últimos 35 dias
-                - generic [ref=e252]:
-                  - generic [ref=e253]:
-                    - generic [ref=e254]: D
-                    - generic [ref=e255]: S
-                    - generic [ref=e256]: T
-                    - generic [ref=e257]: Q
-                    - generic [ref=e258]: Q
-                    - generic [ref=e259]: S
-                    - generic [ref=e260]: S
-                  - generic [ref=e297]:
-                    - generic [ref=e298]: Menos
-                    - generic [ref=e304]: Mais
-          - listitem [ref=e305]:
-            - generic [ref=e306]:
-              - generic [ref=e307]:
-                - heading "Saúde Financeira" [level=3] [ref=e308]
-                - button [ref=e309] [cursor=pointer]:
-                  - img [ref=e310]
-              - generic [ref=e312]:
-                - img [ref=e315]
-                - generic [ref=e319]: 1000Excelente
-                - generic [ref=e320]: 🎉 Continue assim!
-          - listitem [ref=e321]:
-            - generic [ref=e322]:
-              - heading "Desafios do Mês" [level=3] [ref=e324]:
-                - img [ref=e325]
+              - generic [ref=e261]:
+                - generic [ref=e262]:
+                  - heading "Mapa de Gastos" [level=3] [ref=e263]: Mapa de Gastos
+                  - generic [ref=e265]: Últimos 35 dias
+                - generic [ref=e266]:
+                  - generic [ref=e267]:
+                    - generic [ref=e268]: D
+                    - generic [ref=e269]: S
+                    - generic [ref=e270]: T
+                    - generic [ref=e271]: Q
+                    - generic [ref=e272]: Q
+                    - generic [ref=e273]: S
+                    - generic [ref=e274]: S
+                  - generic [ref=e311]:
+                    - generic [ref=e312]: Menos
+                    - generic [ref=e318]: Mais
+          - listitem [ref=e319]:
+            - generic [ref=e320]:
+              - generic [ref=e321]:
+                - heading "Saúde Financeira" [level=3] [ref=e322]
+                - button [ref=e323] [cursor=pointer]:
+                  - img [ref=e324]
+              - generic [ref=e326]:
+                - img [ref=e329]
+                - generic [ref=e333]: 1000Excelente
+                - generic [ref=e334]: 🎉 Continue assim!
+          - listitem [ref=e335]:
+            - generic [ref=e336]:
+              - heading "Desafios do Mês" [level=3] [ref=e338]:
+                - img [ref=e339]
                 - text: Desafios do Mês
-              - generic [ref=e331]:
-                - generic [ref=e332]:
-                  - generic [ref=e334]: Foco na Meta
-                  - paragraph [ref=e335]: Adicione R$ 200 a uma meta.
-                  - progressbar [ref=e336]
-                  - generic [ref=e338]:
-                    - generic [ref=e339]: R$ 0 / R$ 200
-                    - generic [ref=e340]: +100 XP
-                - generic [ref=e341]:
-                  - generic [ref=e343]: Controle de Gastos
-                  - paragraph [ref=e344]: Mantenha as despesas abaixo de R$ 2000.
-                  - progressbar [ref=e345]
-                  - generic [ref=e347]:
-                    - generic [ref=e348]: R$ 0 / R$ 2000
-                    - generic [ref=e349]: +150 XP
-          - listitem [ref=e350]:
-            - generic [ref=e351]:
-              - generic [ref=e352]:
-                - heading "Ações Rápidas" [level=3] [ref=e353]:
-                  - img [ref=e354]
+              - generic [ref=e345]:
+                - generic [ref=e346]:
+                  - generic [ref=e348]: Foco na Meta
+                  - paragraph [ref=e349]: Adicione R$ 200 a uma meta.
+                  - progressbar [ref=e350]
+                  - generic [ref=e352]:
+                    - generic [ref=e353]: R$ 0 / R$ 200
+                    - generic [ref=e354]: +100 XP
+                - generic [ref=e355]:
+                  - generic [ref=e357]: Controle de Gastos
+                  - paragraph [ref=e358]: Mantenha as despesas abaixo de R$ 2000.
+                  - progressbar [ref=e359]
+                  - generic [ref=e361]:
+                    - generic [ref=e362]: R$ 0 / R$ 2000
+                    - generic [ref=e363]: +150 XP
+          - listitem [ref=e364]:
+            - generic [ref=e365]:
+              - generic [ref=e366]:
+                - heading "Ações Rápidas" [level=3] [ref=e367]:
+                  - img [ref=e368]
                   - text: Ações Rápidas
-                - button "Editar" [ref=e355] [cursor=pointer]:
-                  - img [ref=e356]
+                - button "Editar" [ref=e369] [cursor=pointer]:
+                  - img [ref=e370]
                   - text: Editar
-              - generic [ref=e359]:
-                - generic [ref=e360]:
-                  - button "Adicionar nova despesa" [ref=e361] [cursor=pointer]:
-                    - img [ref=e362]
-                  - generic [ref=e365]: Despesa
-                - generic [ref=e366]:
-                  - button "Adicionar nova receita" [ref=e367] [cursor=pointer]:
-                    - img [ref=e368]
-                  - generic [ref=e371]: Receita
-                - generic [ref=e372]:
-                  - button "Criar nova meta financeira" [ref=e373] [cursor=pointer]:
-                    - img [ref=e374]
-                  - generic [ref=e378]: Nova Meta
-                - generic [ref=e379]:
-                  - button "Novo aporte de investimento" [ref=e380] [cursor=pointer]:
-                    - img [ref=e381]
-                  - generic [ref=e387]: Investir
-                - generic [ref=e388]:
-                  - button "Realizar transferência" [ref=e389] [cursor=pointer]:
-                    - img [ref=e390]
-                  - generic [ref=e393]: Transferir
-                - generic [ref=e394]:
-                  - button "Abrir Assistente Financeiro" [ref=e395] [cursor=pointer]:
-                    - img [ref=e396]
-                  - generic [ref=e399]: Assistente IA
-          - listitem [ref=e400]:
-            - generic [ref=e401]:
-              - generic [ref=e402]:
-                - heading "Últimas Atividades" [level=3] [ref=e403]
-                - button "Ver todas" [ref=e404] [cursor=pointer]
-              - generic [ref=e406]:
-                - generic [ref=e407]:
-                  - generic [ref=e408]:
-                    - img "teste 2" [ref=e411]
-                    - generic [ref=e412]:
-                      - text: teste 2
-                      - generic [ref=e413]:
-                        - generic [ref=e414]: em cerca de 2 horas
-                        - button [ref=e415] [cursor=pointer]:
-                          - img [ref=e416]
-                  - generic [ref=e419]: +R$ 50.000,00
-                - generic [ref=e420]:
-                  - generic [ref=e421]:
-                    - 'img "Recebimento: Carvalho, Moraes e Oliveira" [ref=e424]'
-                    - generic [ref=e425]:
-                      - text: "Recebimento: Carvalho, Moraes e Oliveira"
-                      - generic [ref=e426]:
-                        - generic [ref=e427]: há cerca de 22 horas
-                        - button [ref=e428] [cursor=pointer]:
-                          - img [ref=e429]
-                  - generic [ref=e432]: +R$ 1.539.680,00
-                - generic [ref=e433]:
-                  - generic [ref=e434]:
-                    - 'img "Recebimento: Batista-Franco" [ref=e437]'
-                    - generic [ref=e438]:
-                      - text: "Recebimento: Batista-Franco"
-                      - generic [ref=e439]:
-                        - generic [ref=e440]: há cerca de 22 horas
-                        - button [ref=e441] [cursor=pointer]:
-                          - img [ref=e442]
-                  - generic [ref=e445]: +R$ 1.868.040,00
-                - generic [ref=e446]:
-                  - generic [ref=e447]:
-                    - img "Almoço Melo, Nogueira e Melo" [ref=e450]
-                    - generic [ref=e451]:
-                      - text: Almoço Melo, Nogueira e Melo
-                      - generic [ref=e452]:
-                        - generic [ref=e453]: há cerca de 22 horas
-                        - button [ref=e454] [cursor=pointer]:
-                          - img [ref=e455]
-                  - generic [ref=e458]: "-R$ 27.706,00"
-                - generic [ref=e459]:
-                  - generic [ref=e460]:
-                    - img "Salário Teste Full" [ref=e463]
-                    - generic [ref=e464]:
-                      - text: Salário Teste Full
-                      - generic [ref=e465]:
-                        - generic [ref=e466]: há cerca de 22 horas
-                        - button [ref=e467] [cursor=pointer]:
-                          - img [ref=e468]
-                  - generic [ref=e471]: +R$ 5.000,00
-    - generic [ref=e473]:
-      - button "Início" [ref=e474] [cursor=pointer]:
-        - img [ref=e475]
-        - generic [ref=e478]: Início
-      - button "Transações" [ref=e480] [cursor=pointer]:
-        - img [ref=e481]
-        - generic [ref=e484]: Transações
-      - button "Abrir ações rápidas" [ref=e486] [cursor=pointer]:
-        - img [ref=e488]
-      - button "Metas" [ref=e490] [cursor=pointer]:
-        - img [ref=e491]
-        - generic [ref=e495]: Metas
-      - button "Mais" [ref=e496] [cursor=pointer]:
-        - img [ref=e497]
-        - generic [ref=e498]: Mais
-  - generic [ref=e499]: R$0k
+              - generic [ref=e373]:
+                - generic [ref=e374]:
+                  - button "Adicionar nova despesa" [ref=e375] [cursor=pointer]:
+                    - img [ref=e376]
+                  - generic [ref=e379]: Despesa
+                - generic [ref=e380]:
+                  - button "Adicionar nova receita" [ref=e381] [cursor=pointer]:
+                    - img [ref=e382]
+                  - generic [ref=e385]: Receita
+                - generic [ref=e386]:
+                  - button "Criar nova meta financeira" [ref=e387] [cursor=pointer]:
+                    - img [ref=e388]
+                  - generic [ref=e392]: Nova Meta
+                - generic [ref=e393]:
+                  - button "Novo aporte de investimento" [ref=e394] [cursor=pointer]:
+                    - img [ref=e395]
+                  - generic [ref=e401]: Investir
+                - generic [ref=e402]:
+                  - button "Realizar transferência" [ref=e403] [cursor=pointer]:
+                    - img [ref=e404]
+                  - generic [ref=e407]: Transferir
+                - generic [ref=e408]:
+                  - button "Abrir Assistente Financeiro" [ref=e409] [cursor=pointer]:
+                    - img [ref=e410]
+                  - generic [ref=e413]: Assistente IA
+          - listitem [ref=e414]:
+            - generic [ref=e415]:
+              - generic [ref=e416]:
+                - heading "Últimas Atividades" [level=3] [ref=e417]
+                - button "Ver todas" [ref=e418] [cursor=pointer]
+              - generic [ref=e420]:
+                - generic [ref=e421]:
+                  - generic [ref=e422]:
+                    - 'img "Mock Transaction #192" [ref=e425]'
+                    - generic [ref=e426]:
+                      - text: "Mock Transaction #192"
+                      - generic [ref=e427]:
+                        - generic [ref=e428]: em 15 dias
+                        - button [ref=e429] [cursor=pointer]:
+                          - img [ref=e430]
+                  - generic [ref=e433]: "-R$ 10,55"
+                - generic [ref=e434]:
+                  - generic [ref=e435]:
+                    - 'img "Mock Transaction #669" [ref=e438]'
+                    - generic [ref=e439]:
+                      - text: "Mock Transaction #669"
+                      - generic [ref=e440]:
+                        - generic [ref=e441]: em 14 dias
+                        - button [ref=e442] [cursor=pointer]:
+                          - img [ref=e443]
+                  - generic [ref=e446]: "-R$ 105,12"
+                - generic [ref=e447]:
+                  - generic [ref=e448]:
+                    - 'img "Mock Transaction #313" [ref=e451]'
+                    - generic [ref=e452]:
+                      - text: "Mock Transaction #313"
+                      - generic [ref=e453]:
+                        - generic [ref=e454]: em 14 dias
+                        - button [ref=e455] [cursor=pointer]:
+                          - img [ref=e456]
+                  - generic [ref=e459]: "-R$ 12,52"
+                - generic [ref=e460]:
+                  - generic [ref=e461]:
+                    - 'img "Mock Transaction #364" [ref=e464]'
+                    - generic [ref=e465]:
+                      - text: "Mock Transaction #364"
+                      - generic [ref=e466]:
+                        - generic [ref=e467]: em 14 dias
+                        - button [ref=e468] [cursor=pointer]:
+                          - img [ref=e469]
+                  - generic [ref=e472]: "-R$ 146,44"
+                - generic [ref=e473]:
+                  - generic [ref=e474]:
+                    - 'img "Mock Transaction #20" [ref=e477]'
+                    - generic [ref=e478]:
+                      - text: "Mock Transaction #20"
+                      - generic [ref=e479]:
+                        - generic [ref=e480]: em 14 dias
+                        - button [ref=e481] [cursor=pointer]:
+                          - img [ref=e482]
+                  - generic [ref=e485]: "-R$ 80,27"
+    - generic [ref=e487]:
+      - button "Início" [ref=e488] [cursor=pointer]:
+        - img [ref=e489]
+        - generic [ref=e492]: Início
+      - button "Transações" [ref=e494] [cursor=pointer]:
+        - img [ref=e495]
+        - generic [ref=e498]: Transações
+      - button "Abrir ações rápidas" [ref=e500] [cursor=pointer]:
+        - img [ref=e502]
+      - button "Metas" [ref=e504] [cursor=pointer]:
+        - img [ref=e505]
+        - generic [ref=e509]: Metas
+      - button "Mais" [ref=e510] [cursor=pointer]:
+        - img [ref=e511]
+        - generic [ref=e512]: Mais
+  - generic [ref=e513]: R$0k
 ```

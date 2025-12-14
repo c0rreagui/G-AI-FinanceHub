@@ -3,7 +3,7 @@ import { Transaction, TransactionType } from '../types';
 
 // O tipo de dado que será extraído e usado para preencher o formulário ou importar.
 // FIX: Corrected the Omit<> to include user_id and category_id, as these cannot be extracted from OCR text.
-export type ExtractedTransaction = Omit<Transaction, 'id' | 'category' | 'user_id' | 'category_id'>;
+export type ExtractedTransaction = Pick<Transaction, 'description' | 'amount' | 'date' | 'type'>;
 
 /**
  * Analisa o texto bruto de um OCR, linha por linha, e extrai múltiplas transações.

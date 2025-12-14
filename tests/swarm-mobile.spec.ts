@@ -24,9 +24,8 @@ test('📱 Agent Mobile: O Commuter (Humanized)', async ({ page }) => {
         }
 
         if (gesture === 'open_menu') {
-            // Tenta abrir menu e navegar pra algo
-            const target = faker.helpers.arrayElement(['Transações', 'Metas', 'Dashboard']);
-            // navigate agora lida com menu hamburguer!
+            const target = faker.helpers.arrayElement(['Transações', 'Metas', 'Início', 'Agenda', 'Tools']);
+            // navigate agora lida com menu hamburguer e menu "Mais" (Tools e Agenda estão lá)
             await agent.navigate(target);
         }
 

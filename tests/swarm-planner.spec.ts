@@ -17,7 +17,7 @@ test('📅 Agent Planner: O Arquiteto do Futuro (Humanized)', async ({ page }) =
 
         if (focus === 'review_calendar') {
             agent.log('💬 "Conferindo agendamentos do mês..."');
-            await agent.navigate('Agendamentos'); // Ou "Calendário" se for o nome
+            await agent.navigate('Agenda'); 
             
             const nextMonthBtn = page.locator('button:has(.lucide-chevron-down)').last();
             if (await nextMonthBtn.isVisible()) {
@@ -55,13 +55,11 @@ test('📅 Agent Planner: O Arquiteto do Futuro (Humanized)', async ({ page }) =
 
         if (focus === 'check_budget') {
              agent.log('💬 "Será que estouramos o orçamento de Lazer?"');
-             // Vai na aba orçamentos (Assume que é em Metas > Orçamentos ou tem link direto)
+             // Opcional: Navegar para Metas pois Orçamentos costuma estar lá
              await agent.navigate('Metas'); 
-             const budgetTab = page.getByRole('tab', { name: 'Orçamentos' });
+             const budgetTab = page.getByRole('tab', { name: /Orçamentos/i });
              if (await budgetTab.isVisible()) {
                  await agent.safeClick(budgetTab);
-             } else {
-                 await agent.navigate('Orçamentos'); // Tenta direto caso tenha mudado
              }
              
              await page.waitForTimeout(1500); 

@@ -150,9 +150,9 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ currentView, s
     const items: { name: string; view: ViewType; icon: React.ElementType }[] = [
         { name: 'Dívidas', view: 'debts', icon: TrendingDown },
         { name: 'Investimentos', view: 'investments', icon: PiggyBank },
-        { name: 'Agendamentos', view: 'scheduling', icon: Calendar },
+        { name: 'Agenda', view: 'scheduling', icon: Calendar },
         { name: 'Insights', view: 'insights', icon: Lightbulb },
-        { name: 'Ferramentas', view: 'tools', icon: Wrench },
+        { name: 'Tools', view: 'tools', icon: Wrench },
         { name: 'Família', view: 'social', icon: Users },
         { name: 'Ajustes', view: 'settings', icon: Settings },
     ];

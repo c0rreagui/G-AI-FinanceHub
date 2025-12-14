@@ -109,7 +109,7 @@
                   - button "Ocultar valores" [ref=e175] [cursor=pointer]:
                     - img [ref=e176]
                 - generic [ref=e179]:
-                  - generic "R$ 6.307.596,71" [ref=e180]
+                  - generic "R$ 6.307.596,71" [ref=e180]: R$ 5.458.564,22
                   - generic [ref=e181]:
                     - generic [ref=e182]:
                       - img [ref=e183]
@@ -123,7 +123,7 @@
                       - img [ref=e196]
                       - text: 12%
                   - paragraph [ref=e199]: Receitas (Mês)
-                  - heading "R$ 7.169.726,00" [level=3] [ref=e200]
+                  - heading "R$ 6.328.115,47" [level=3] [ref=e200]
                 - generic:
                   - img
               - generic [ref=e201]:
@@ -134,7 +134,7 @@
                       - img [ref=e210]
                       - text: 5%
                   - paragraph [ref=e213]: Despesas (Mês)
-                  - heading "R$ 862.129,29" [level=3] [ref=e214]
+                  - heading "R$ 760.929,18" [level=3] [ref=e214]
                 - generic:
                   - img
           - listitem [ref=e215]:

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent } from './dialog';
+import { Dialog, DialogContent } from './Dialog';
 import { Input } from './Input';
 import { Search, Command, Calculator, Calendar, CreditCard } from 'lucide-react';
 import { cn } from '@/utils/utils';

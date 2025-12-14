@@ -16,7 +16,7 @@ test('🕵️ Agent Auditor: O Detetive de Dados (Humanized)', async ({ page }) 
 
         if (check === 'visual_inspection') {
             agent.log('💬 "Verificando alinhamento visual..."');
-            await agent.navigate('Dashboard');
+            await agent.navigate('Início'); // Corrigido de Dashboard
             await page.waitForTimeout(500);
             
             const cards = page.locator('.card, [data-testid="summary-card"]');
@@ -27,7 +27,6 @@ test('🕵️ Agent Auditor: O Detetive de Dados (Humanized)', async ({ page }) 
         }
 
         if (check === 'value_consistency') {
-            // Navega aleatoriamente para verificar outras pages
              if (faker.datatype.boolean()) await agent.navigate('Transações');
             
             const bodyText = await page.textContent('body');

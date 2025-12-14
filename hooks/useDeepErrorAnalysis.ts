@@ -42,7 +42,7 @@ export const useAsyncErrorHandler = <T extends (...args: any[]) => Promise<any>>
             );
             throw error;
         }
-    }) as any) as T;
+    }) as any, [asyncFn, context]) as T;
 };
 
 /**

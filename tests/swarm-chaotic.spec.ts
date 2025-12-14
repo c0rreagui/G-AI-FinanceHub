@@ -30,7 +30,7 @@ test('🐒 Agent Chaotic: O Estagiário Desastrado (Humanized)', async ({ page }
 
             if (chaos === 'lost_navigation') {
                 // Tenta navegar para qualquer lugar
-                const randomNav = faker.helpers.arrayElement(['Dashboard', 'Transações', 'Metas', 'Settings']);
+                const randomNav = faker.helpers.arrayElement(['Início', 'Transações', 'Metas', 'Ajustes']);
                 agent.navigate(randomNav).catch(() => {});
             }
         } catch (e) {

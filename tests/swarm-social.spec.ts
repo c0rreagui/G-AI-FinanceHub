@@ -6,7 +6,7 @@ test('💬 Agent Socialite: O Influencer da Família (Humanized)', async ({ page
     const agent = new SwarmHelpers(page, 'Socialite', '💬');
     await agent.setupInterceptor();
     await agent.login();
-    await agent.navigate('Social'); // Link provável "Social" ou "Comunidade"
+    await agent.navigate('Família'); // Sidebar tem "Família" com acento no código, user disse "Familia". Vou usar regex ou fallback no helper. SwarmHelpers filter(hasText) pega se tiver acento? Vou usar "Família" pois vi no código sidebar.
 
     agent.log('💬 "Oi gente! Conferindo as novidades..."');
 

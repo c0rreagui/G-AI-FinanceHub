@@ -1,4 +1,4 @@
-import { useToast } from '../contexts/ToastContext';
+import { useToast } from './useToast';
 
 export const useUndo = () => {
   const { showToast } = useToast();

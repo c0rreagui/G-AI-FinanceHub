@@ -9,6 +9,96 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      accounts: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          type: 'bank' | 'wallet' | 'investment' | 'other'
+          balance: number
+          color: string
+          icon: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          type: 'bank' | 'wallet' | 'investment' | 'other'
+          balance: number
+          color: string
+          icon?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          type?: 'bank' | 'wallet' | 'investment' | 'other'
+          balance?: number
+          color?: string
+          icon?: string | null
+          created_at?: string
+        }
+      }
+      audit_logs: {
+        Row: {
+          id: string
+          user_id: string
+          action: 'create' | 'update' | 'delete' | 'restore' | 'permanent_delete'
+          entity: 'transaction' | 'goal' | 'debt' | 'scheduled_transaction'
+          entity_id: string
+          details: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          action: 'create' | 'update' | 'delete' | 'restore' | 'permanent_delete'
+          entity: 'transaction' | 'goal' | 'debt' | 'scheduled_transaction'
+          entity_id: string
+          details: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          action?: 'create' | 'update' | 'delete' | 'restore' | 'permanent_delete'
+          entity?: 'transaction' | 'goal' | 'debt' | 'scheduled_transaction'
+          entity_id?: string
+          details?: string
+          created_at?: string
+        }
+      }
+      budgets: {
+        Row: {
+          id: string
+          user_id: string
+          category_id: string
+          amount: number
+          period: 'monthly' | 'weekly' | 'yearly'
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          category_id: string
+          amount: number
+          period: 'monthly' | 'weekly' | 'yearly'
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          category_id?: string
+          amount?: number
+          period?: 'monthly' | 'weekly' | 'yearly'
+          created_at?: string
+          updated_at?: string
+        }
+      }
       achievements: {
         Row: {
           id: string
@@ -289,6 +379,7 @@ export interface Database {
         Row: {
           id: string
           user_id: string
+          account_id: string
           description: string
           amount: number
           type: 'receita' | 'despesa'
@@ -297,11 +388,14 @@ export interface Database {
           goal_contribution_id: string | null
           debt_payment_id: string | null
           investment_id: string | null
+          starred: boolean | null
+          deleted_at: string | null
           created_at: string
         }
         Insert: {
           id?: string
           user_id: string
+          account_id: string
           description: string
           amount: number
           type: 'receita' | 'despesa'
@@ -310,11 +404,14 @@ export interface Database {
           goal_contribution_id?: string | null
           debt_payment_id?: string | null
           investment_id?: string | null
+          starred?: boolean | null
+          deleted_at?: string | null
           created_at?: string
         }
         Update: {
           id?: string
           user_id?: string
+          account_id?: string
           description?: string
           amount?: number
           type?: 'receita' | 'despesa'
@@ -323,6 +420,8 @@ export interface Database {
           goal_contribution_id?: string | null
           debt_payment_id?: string | null
           investment_id?: string | null
+          starred?: boolean | null
+          deleted_at?: string | null
           created_at?: string
         }
       }

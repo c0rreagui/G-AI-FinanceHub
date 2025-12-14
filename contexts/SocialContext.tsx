@@ -74,7 +74,7 @@ export const SocialProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                     .eq('family_id', userFamily.family_id)
                     .eq('status', 'pending');
                 
-                if (invitesData) setInvites(invitesData);
+                if (invitesData) setInvites(invitesData.map(i => ({...i, status: i.status as 'pending' | 'accepted' | 'expired'})));
 
             } else {
                 setFamily(null);

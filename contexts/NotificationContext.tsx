@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../services/supabaseClient';
 import { v4 as uuidv4 } from 'uuid';
 
 export type NotificationType = 'alert' | 'info' | 'success' | 'warning' | 'tip';
