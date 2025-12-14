@@ -28,7 +28,8 @@
   },
   "Auditor": {
     "successfulNavigations": [
-      "Transações"
+      "Transações",
+      "Início"
     ],
     "failedNavigations": [],
     "lastLoginMethod": "dev_bypass",
@@ -49,7 +50,7 @@
     "experiencedErrors": [],
     "achievements": [],
     "transactionStats": {
-      "success": 0,
+      "success": 2,
       "failure": 0
     }
   },
@@ -92,15 +93,16 @@
   },
   "Mobile": {
     "successfulNavigations": [
-      "Agenda"
+      "Agenda",
+      "Tools"
     ],
     "failedNavigations": [],
     "lastLoginMethod": "dev_bypass",
     "experiencedErrors": [],
     "achievements": [],
     "transactionStats": {
-      "success": 0,
-      "failure": 0
+      "success": 3,
+      "failure": 3
     }
   },
   "Planner": {
@@ -120,6 +122,42 @@
   "Socialite": {
     "successfulNavigations": [
       "Família"
+    ],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Mobile_Spender": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 9,
+      "failure": 0
+    }
+  },
+  "Mobile_Analyzer": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Mobile_Organizer": {
+    "successfulNavigations": [
+      "Agenda",
+      "Dívidas"
     ],
     "failedNavigations": [],
     "lastLoginMethod": "dev_bypass",

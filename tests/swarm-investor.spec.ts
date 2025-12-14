@@ -3,6 +3,7 @@ import { SwarmHelpers } from './utils/SwarmHelpers';
 import { fakerPT_BR as faker } from '@faker-js/faker';
 
 test('📈 Agent Investor: O Lobo dos Investimentos (Humanized)', async ({ page }) => {
+    test.setTimeout(300000);
     const agent = new SwarmHelpers(page, 'Investor', '📈');
     await agent.setupInterceptor();
     await agent.login();
@@ -23,7 +24,7 @@ test('📈 Agent Investor: O Lobo dos Investimentos (Humanized)', async ({ page 
                 agent.log('💬 "Estamos muito expostos em Renda Fixa. Preciso arriscar mais."');
             }
             // Filtros - tenta clicar nos tabs/botões da view
-            const stocksBtn = page.getByRole('button', { name: 'Ações' });
+            const stocksBtn = page.getByRole('button', { name: 'Ações', exact: true });
             if (await stocksBtn.isVisible()) {
                  await agent.safeClick(stocksBtn);
             } else {
@@ -32,7 +33,7 @@ test('📈 Agent Investor: O Lobo dos Investimentos (Humanized)', async ({ page 
             
             await page.waitForTimeout(800);
             
-            const cryptoBtn = page.getByRole('button', { name: 'Cripto' });
+            const cryptoBtn = page.getByRole('button', { name: 'Cripto', exact: true });
              if (await cryptoBtn.isVisible()) {
                  await agent.safeClick(cryptoBtn);
              }

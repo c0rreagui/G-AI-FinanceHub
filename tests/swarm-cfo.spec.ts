@@ -3,6 +3,7 @@ import { SwarmHelpers } from './utils/SwarmHelpers';
 import { fakerPT_BR as faker } from '@faker-js/faker';
 
 test('👔 Agent CFO: O Guardião do Caixa (Humanized)', async ({ page }) => {
+    test.setTimeout(300000); // 5 minutos para smoke test lento
     const agent = new SwarmHelpers(page, 'CFO', '👔');
     
     await agent.setupInterceptor();

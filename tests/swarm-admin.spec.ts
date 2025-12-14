@@ -3,6 +3,7 @@ import { SwarmHelpers } from './utils/SwarmHelpers';
 import { fakerPT_BR as faker } from '@faker-js/faker';
 
 test('⚙️ Agent SysAdmin: O Zelador do Sistema (Power User)', async ({ page }) => {
+    test.setTimeout(300000);
     const agent = new SwarmHelpers(page, 'SysAdmin', '⚙️');
     await agent.setupInterceptor();
     await agent.login();

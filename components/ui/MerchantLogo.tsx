@@ -64,7 +64,10 @@ export const MerchantLogo: React.FC<MerchantLogoProps> = ({
                     src={logoUrl} 
                     alt={merchantName}
                     className="w-full h-full object-cover"
-                    onError={() => setImageError(true)}
+                    onError={(e) => {
+                        e.currentTarget.style.display = 'none'; // Hide broken image immediately
+                        setImageError(true);
+                    }}
                     loading="lazy"
                 />
             ) : (

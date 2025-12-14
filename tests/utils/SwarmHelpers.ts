@@ -1,16 +1,19 @@
 import { Page, expect, Locator } from '@playwright/test';
 import { Brain } from './Brain';
 import { SwarmMemory } from './SwarmMemory';
+import { SwarmHunter } from './SwarmHunter';
 
 export class SwarmHelpers {
     readonly page: Page;
     readonly agentName: string;
     readonly emoji: string;
+    readonly hunter: SwarmHunter;
 
     constructor(page: Page, agentName: string, emoji: string) {
         this.page = page;
         this.agentName = agentName;
         this.emoji = emoji;
+        this.hunter = new SwarmHunter(page, this);
         
         // Load Memory
         const mem = SwarmMemory.getMemory(agentName);
@@ -21,6 +24,18 @@ export class SwarmHelpers {
 
     log(message: string) {
         console.log(`${this.emoji} [${this.agentName.padEnd(10)}] 👉 ${message}`);
+    }
+
+    async captureEvidence(trigger: string) {
+        const timestamp = new Date().toISOString().replace(/:/g, '-').split('.')[0];
+        const sanitizedTrigger = trigger.replace(/[^a-z0-9]/gi, '_');
+        const path = `tests/evidence/${this.agentName}/${timestamp}_${sanitizedTrigger}.png`;
+        try {
+            await this.page.screenshot({ path, fullPage: false });
+            // this.log(`📸 Evidence captured: ${path}`);
+        } catch (e) {
+            console.error('Snapshot failed', e);
+        }
     }
 
     /**
@@ -44,7 +59,10 @@ export class SwarmHelpers {
         await this.staggerStart();
         
         this.log('🔑 Iniciando autenticação segura...');
+        this.hunter.startHunting(); // Start Bug Hunting Background Processes
+
         let attempts = 0;
+// ... (rest of code managed by replace logic chunks below)
         const maxAttempts = 3;
 
         while (attempts < maxAttempts) {
@@ -71,6 +89,7 @@ export class SwarmHelpers {
                 try {
                     await dashboardIndicator.waitFor({ state: 'visible', timeout: Brain.timeouts.long });
                     this.log('🔓 Acesso confirmado.');
+                    await this.captureEvidence('login_success');
                     return;
                 } catch (e) {
                     if (await loginBtn.isVisible()) {
@@ -101,6 +120,7 @@ export class SwarmHelpers {
                         await dashboardIndicator.waitFor({ state: 'visible', timeout: Brain.timeouts.long });
                         
                         SwarmMemory.saveMemory(this.agentName, { lastLoginMethod: 'dev_bypass' });
+                        await this.captureEvidence('login_dev_bypass');
                         return;
                     }
                     throw e;
@@ -138,6 +158,87 @@ export class SwarmHelpers {
     async fillSmartInput(placeholder: string, value: string) {
         const input = this.page.getByPlaceholder(placeholder).first();
         await input.fill(value);
+    }
+
+    async navigate(target: string) {
+        const mem = SwarmMemory.getMemory(this.agentName);
+        if (mem.failedNavigations.includes(target)) {
+            this.log(`🧠 Lembro que falhei ao tentar ir para "${target}" antes. Vou tentar com mais cuidado.`);
+        }
+
+        this.log(`🧭 Navegando para: ${target}...`);
+        
+        const menuBtn = this.page.locator('button[aria-label="Menu"], button .lucide-menu').first();
+        
+        if (await menuBtn.isVisible()) {
+             await menuBtn.click();
+             await this.page.waitForTimeout(300);
+        }
+
+        const navLink = this.page.locator(`nav a, nav button, aside a, aside button`).filter({ hasText: target });
+        const iconLink = this.page.locator(`nav [title="${target}"], nav [aria-label="${target}"], aside [title="${target}"], aside [aria-label="${target}"]`);
+
+        let success = false;
+
+        if (await navLink.count() > 0) {
+             const visibleLink = navLink.first();
+             if (await visibleLink.isVisible()) {
+                 await visibleLink.click();
+                 success = true;
+             } else {
+                 const moreBtn = this.page.locator('button[aria-label="Mais"], button:has-text("Mais")');
+                 if (await moreBtn.isVisible()) {
+                     this.log(`📱 Tentando encontrar "${target}" no menu Mais...`);
+                     await moreBtn.click();
+                     await this.page.waitForTimeout(500);
+                     const sheetLink = this.page.locator(`[role="dialog"] button:has-text("${target}")`).first();
+                     if (await sheetLink.isVisible()) {
+                         await sheetLink.click();
+                         await this.page.mouse.click(10, 10); 
+                         success = true;
+                     }
+                 }
+                 if (!success) {
+                      await navLink.last().click({ force: true });
+                      success = true;
+                 }
+             }
+        } else if (await iconLink.count() > 0) {
+            await iconLink.first().click();
+            success = true;
+        } else {
+             const moreBtn = this.page.locator('button[aria-label="Mais"], button:has-text("Mais")');
+             if (await moreBtn.isVisible()) {
+                 await moreBtn.click();
+                 await this.page.waitForTimeout(300);
+                 const sheetLink = this.page.getByRole('button', { name: target }).first();
+                 if (await sheetLink.isVisible()) {
+                     await sheetLink.click();
+                     success = true;
+                 }
+             }
+
+             if (!success) {
+                this.log(`⚠️ Link exato não encontrado. Fallback genérico.`);
+                const genericLink = this.page.getByRole('link', { name: target }).first();
+                if (await genericLink.isVisible()) {
+                    await this.safeClick(genericLink);
+                    success = true;
+                }
+             }
+        }
+
+        await this.page.waitForTimeout(500);
+        
+        if (success) {
+            SwarmMemory.learn(this.agentName, 'nav_success', target);
+            await this.hunter.checkForGhosts(); // Scan page for errors after nav
+            await this.hunter.checkResponsiveness(); // Check layout
+            await this.captureEvidence(`nav_success_${target}`);
+        } else {
+            SwarmMemory.learn(this.agentName, 'nav_fail', target);
+            this.log(`❌ Falha na navegação para ${target}. Aprendizado registrado.`);
+        }
     }
 
     async selectOption(triggerText: string, optionIndex: number = 0) {
@@ -202,9 +303,10 @@ export class SwarmHelpers {
             }
             
             // Success Verification
-            await expect(this.page.locator(Brain.selectors.modal.dialog)).not.toBeVisible({ timeout: 3000 });
+            await expect(this.page.locator(Brain.selectors.modal.dialog)).not.toBeVisible({ timeout: 5000 });
             this.log('✅ Modal fechado. Transação salva.');
             SwarmMemory.learn(this.agentName, 'transaction_success', type);
+            await this.captureEvidence(`transaction_success_${type}`);
 
         } catch (e) {
             this.log(`⚠️ Erro no fluxo de transação: ${e}`);

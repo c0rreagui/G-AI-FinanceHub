@@ -697,14 +697,16 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             .select()
             .single();
             
+        
         if (error) {
             console.error('❌ Supabase Insert Error:', error);
             showToast(`Erro ao salvar transação: ${error.message}`, { type: 'error' });
             throw error;
         }
         
+        // Optimistic UI: Don't wait for refresh to unlock UI
+        fetchData().catch(e => console.error("Background fetch failed", e));
         
-        await fetchData();
         showToast('Transação Adicionada!', { type: 'success' });
         return true;
     });
