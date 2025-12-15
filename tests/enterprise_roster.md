@@ -45,6 +45,7 @@ Focados em features específicas e complexas.
 ---
 
 ## 🗺️ Mapa de Batalha (Implementação)
+
 - **Fase 1 (Arquitetura):** Criar `swarm-enterprise.spec.ts` estruturado para rodar shards desses departamentos.
 - **Fase 2 (QA & Sec):** Implementar os 4 agentes de QA (mais urgentes para estabilidade).
 - **Fase 3 (Product):** Implementar Onboarding e Family (fluxos complexos).
@@ -64,6 +65,7 @@ Como serei responsável por corrigir tudo que esses 20 bots encontrarem, preciso
 - **Benefício:** Permite que eu "viaje no tempo" e corrija o bug instantaneamente sem precisar reproduzir manualmente.
 
 ### 2. 🧐 Visual Regression (O Jogo dos 7 Erros)
+
 - **Funcionalidade:** O agente **Designer** comparará screenshots atuais com "Golden Masters" (versões aprovadas).
 - **Benefício:** Detecta regressões visuais sutis (ex: botão desalinhou 1px, cor mudou de tom) que quebrariam a "Consistência e Coesão" do Design System.
 
@@ -72,21 +74,25 @@ Como serei responsável por corrigir tudo que esses 20 bots encontrarem, preciso
 - **Benefício:** Cria uma fila de trabalho organizada para mim. Os bots quebram => O sistema relata => Eu conserto => Os bots revalidam.
 
 ### 4. 🧩 Deduplicação Inteligente (Anti-Spam)
+
 - **Problema:** Se a API de Login cair, os 20 bots vão falhar ao mesmo tempo. Eu não quero 20 notificações.
 - **Solução:** O sistema agrupará falhas idênticas em um único "Incidente Pai".
 - **Benefício:** Transforma "200 erros" em "1 Incidente Crítico". Foco no problema raiz.
 
 ### 5. 🧬 Gerador de Repro (Clonagem de Bug)
+
 - **Problema:** As vezes é difícil reproduzir um bug 'flaky'.
 - **Solução:** O bot salvará um mini-script (`repro-fail-123.spec.ts`) contendo **apenas** os passos exatos que levaram à falha naquele momento.
 - **Benefício:** Eu rodo esse script isolado e vejo o bug acontecer na minha frente em segundos, sem rodar a suite toda.
 
 ### 6. ❤️‍🩹 AI Self-Healing (Auto-Correção)
+
 - **Problema:** O desenvolvedor muda o ID de um botão e o teste quebra. Eu tenho que ir lá atualizar o seletor.
 - **Solução:** O bot detecta que o seletor falhou, mas encontra o botão por texto/posição. Ele **sugere a correção do código** automaticamente.
 - **Benefício:** O teste se conserta sozinho em casos simples. Eu só aprovo a mudança.
 
 ### 7. ☣️ The Quarantine Zone (Gestão de Flaky Tests)
+
 - **Problema:** Um teste falha "as vezes". Isso tira minha confiança e me faz perder tempo investigando fantasmas.
 - **Solução:** Se um teste falhar e passar logo em seguida (flaky), ele é movido automaticamente para a "Quarentena".
 - **Benefício:** Testes instáveis não bloqueiam o deploy. Eu os visito na Quarentena quando tiver tempo, sem pressão.

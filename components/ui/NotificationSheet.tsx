@@ -13,7 +13,7 @@ interface NotificationSheetProps {
 }
 
 export const NotificationSheet: React.FC<NotificationSheetProps> = ({ isOpen, onClose }) => {
-    const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification } = useNotifications();
+    const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, clearRead } = useNotifications();
 
     const unreadNotifications = notifications.filter(n => !n.read);
     const readNotifications = notifications.filter(n => n.read);
@@ -79,9 +79,19 @@ export const NotificationSheet: React.FC<NotificationSheetProps> = ({ isOpen, on
                         {/* Read Notifications */}
                         {readNotifications.length > 0 && (
                             <div className="space-y-3">
-                                <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 px-1">
-                                    Anteriores ({readNotifications.length})
-                                </h3>
+                                <div className="flex items-center justify-between px-1">
+                                    <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                                        Anteriores ({readNotifications.length})
+                                    </h3>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={clearRead}
+                                        className="h-6 text-[10px] text-muted-foreground hover:text-destructive"
+                                    >
+                                        Limpar lidas
+                                    </Button>
+                                </div>
                                 <div className="space-y-2">
                                     {readNotifications.map((notification) => (
                                         <NotificationItem
