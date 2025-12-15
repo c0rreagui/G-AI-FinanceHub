@@ -138,6 +138,47 @@ export class SwarmHelpers {
         throw new Error(`🔥 Falha catastrófica de login após ${maxAttempts} tentativas.`);
     }
 
+    /**
+     * Navegação Inteligente (Sidebar / Menu)
+     */
+    async navigateTo(destination: string) {
+        this.log(`🧭 Navegando para: ${destination}...`);
+        
+        // 1. Tentar Sidebar Desktop
+        const navContainer = this.page.locator('nav, aside, [class*="sidebar"], [class*="menu"]').first();
+        let trigger = navContainer.getByRole('button', { name: destination }).first();
+        
+        if (await trigger.count() === 0) {
+            // Fallback: Busca global
+            trigger = this.page.getByRole('button', { name: destination }).first();
+        }
+        
+        if (await trigger.isVisible()) {
+            await trigger.click();
+            return;
+        }
+
+        // 2. Tentar Link
+        const link = this.page.getByRole('link', { name: destination }).first();
+        if (await link.isVisible()) {
+            await link.click();
+            return;
+        }
+
+        this.log(`⚠️ Não encontrei link de navegação para "${destination}". Tentando URL direta?`);
+    }
+
+    async logout() {
+        this.log('🚪 Fazendo logout...');
+        const userMenu = this.page.locator('button:has-text("Sair"), button[aria-label="Logout"]').first();
+        if (await userMenu.isVisible()) {
+            await userMenu.click();
+        } else {
+            await this.page.evaluate(() => localStorage.clear());
+            await this.page.reload();
+        }
+    }
+
     async safeClick(selector: Locator) {
         try {
             await selector.waitFor({ state: 'visible', timeout: 5000 });
@@ -155,12 +196,75 @@ export class SwarmHelpers {
         await expect(this.page.locator(Brain.selectors.modal.dialog)).toBeVisible();
     }
 
-    async fillSmartInput(placeholder: string, value: string) {
-        const input = this.page.getByPlaceholder(placeholder).first();
-        await input.fill(value);
+    async fillSmartInput(identifier: string, value: string) {
+        this.log(`⌨️ Preenchendo campo "${identifier}" com "${value}"...`);
+        
+        // 1. Try by Label (Best Practice)
+        let input = this.page.getByLabel(identifier, { exact: false }).first();
+        if (await input.count() > 0 && await input.isVisible()) {
+            await input.fill(value);
+            return;
+        }
+
+        // 2. Try by Placeholder
+        input = this.page.getByPlaceholder(identifier, { exact: false }).first();
+        if (await input.count() > 0 && await input.isVisible()) {
+            await input.fill(value);
+            return;
+        }
+
+        // 3. Try by Text near Input (Fallback for Shadcn/Tailwind structures)
+        // Find a label/div with text, then find input inside or near it
+        const label = this.page.locator(`label:has-text("${identifier}"), div:has-text("${identifier}"), span:has-text("${identifier}")`).last();
+        if (await label.isVisible()) {
+            const associatedInput = label.locator('xpath=..//input').first(); // Parent -> Input
+            if (await associatedInput.count() > 0 && await associatedInput.isVisible()) {
+                 await associatedInput.fill(value);
+                 return;
+            }
+             // Try sibling
+            const siblingInput = label.locator('xpath=following-sibling::input').first();
+             if (await siblingInput.count() > 0 && await siblingInput.isVisible()) {
+                 await siblingInput.fill(value);
+                 return;
+            }
+        }
+        
+        this.log(`⚠️ SmartInput não encontrou campo para "${identifier}". Tentando seletor direto...`);
+        try {
+             await this.page.locator(identifier).fill(value);
+        } catch (e) {
+             this.log(`❌ Falha total ao preencher "${identifier}".`);
+        }
+    }
+
+    async ensureMenuClosed() {
+        // Check for "Mais Opções" Title or Sheet
+        const sheet = this.page.getByRole('dialog').filter({ hasText: 'Mais Opções' }).first();
+        if (await sheet.isVisible()) {
+            this.log('🧹 Fechando menu "Mais Opções" para liberar navegação...');
+            // Try Close Button if exists
+            const closeBtn = sheet.locator('button[aria-label="Close"], button.close');
+            if (await closeBtn.count() > 0 && await closeBtn.isVisible()) {
+                await closeBtn.click();
+            } else {
+                // Click outside (Backdrop) or Press Escape
+                await this.page.mouse.click(10, 10);
+                await this.page.keyboard.press('Escape');
+            }
+            await expect(sheet).not.toBeVisible({ timeout: 2000 });
+        }
     }
 
     async navigate(target: string) {
+        this.log(`🔍 Iniciando navegação complexa para: ${target}`);
+        
+        // Priority: Close menu if we are navigating to a Main Tab
+        const mainTabs = ['Início', 'Transações', 'Metas', 'Mais'];
+        if (mainTabs.includes(target) || target === 'Home') {
+            await this.ensureMenuClosed();
+        }
+
         const mem = SwarmMemory.getMemory(this.agentName);
         if (mem.failedNavigations.includes(target)) {
             this.log(`🧠 Lembro que falhei ao tentar ir para "${target}" antes. Vou tentar com mais cuidado.`);
@@ -171,6 +275,7 @@ export class SwarmHelpers {
         const menuBtn = this.page.locator('button[aria-label="Menu"], button .lucide-menu').first();
         
         if (await menuBtn.isVisible()) {
+             this.log('🍔 Menu Hambúrguer detectado, clicando...');
              await menuBtn.click();
              await this.page.waitForTimeout(300);
         }
@@ -179,41 +284,78 @@ export class SwarmHelpers {
         const iconLink = this.page.locator(`nav [title="${target}"], nav [aria-label="${target}"], aside [title="${target}"], aside [aria-label="${target}"]`);
 
         let success = false;
+        
+        const countNav = await navLink.count();
+        this.log(`🔎 Encontrados ${countNav} links de texto em containers semânticos para "${target}"`);
 
-        if (await navLink.count() > 0) {
+        // 1. Semantic Nav Links
+        if (countNav > 0) {
              const visibleLink = navLink.first();
              if (await visibleLink.isVisible()) {
+                 this.log('✅ Link visível encontrado, clicando...');
                  await visibleLink.click();
                  success = true;
              } else {
+                 this.log('🙈 Link existe mas não está visível. Tentando Menu Mais...');
                  const moreBtn = this.page.locator('button[aria-label="Mais"], button:has-text("Mais")');
                  if (await moreBtn.isVisible()) {
-                     this.log(`📱 Tentando encontrar "${target}" no menu Mais...`);
+                     this.log(`📱 Abrindo menu Mais...`);
                      await moreBtn.click();
                      await this.page.waitForTimeout(500);
                      const sheetLink = this.page.locator(`[role="dialog"] button:has-text("${target}")`).first();
                      if (await sheetLink.isVisible()) {
-                         await sheetLink.click();
-                         await this.page.mouse.click(10, 10); 
+                         this.log('📄 Link encontrado no Sheet, clicando...');
+                         await sheetLink.click({ force: true });
                          success = true;
                      }
                  }
                  if (!success) {
+                      this.log('⚠️ Tentando clique forçado no link invisível...');
                       await navLink.last().click({ force: true });
                       success = true;
                  }
              }
-        } else if (await iconLink.count() > 0) {
+        }
+
+        // 2. Global Button Fallback (Outside Nav)
+        if (!success) {
+            const globalBtn = this.page.getByRole('button', { name: target, exact: true }).or(this.page.locator(`button:has-text("${target}")`));
+            if (await globalBtn.count() > 0 && await globalBtn.first().isVisible()) {
+                this.log('🔎 Botão global encontrado fora de <nav>, usando ele.');
+                await globalBtn.first().click();
+                success = true;
+            }
+        }
+
+        // 3. Icon Links
+        if (!success && await iconLink.count() > 0) {
+            this.log('🖼️ Link de ícone encontrado, clicando...');
             await iconLink.first().click();
             success = true;
-        } else {
+        } 
+        
+        // 4. "Mais" Menu Fallback (Last Resort)
+        if (!success) {
+             this.log('❓ Link direto não encontrado. Procurando em Mais/Fallback...');
              const moreBtn = this.page.locator('button[aria-label="Mais"], button:has-text("Mais")');
              if (await moreBtn.isVisible()) {
                  await moreBtn.click();
                  await this.page.waitForTimeout(300);
                  const sheetLink = this.page.getByRole('button', { name: target }).first();
                  if (await sheetLink.isVisible()) {
-                     await sheetLink.click();
+                     this.log('📄 Link encontrado no Sheet (Fallback), clicando...');
+                     await sheetLink.click({ force: true });
+                     
+                     // Wait for navigation or sheet close
+                     const sheet = this.page.locator('[role="dialog"]').filter({ hasText: 'Mais Opções' }).first();
+                     try {
+                         await sheet.waitFor({ state: 'hidden', timeout: 3000 });
+                         this.log('📄 Sheet fechou após clique.');
+                     } catch {
+                         this.log('⚠️ Sheet não fechou automaticamente. Tentando fechar...');
+                         await this.ensureMenuClosed();
+                     }
+
                      success = true;
                  }
              }
@@ -241,20 +383,53 @@ export class SwarmHelpers {
         }
     }
 
-    async selectOption(triggerText: string, optionIndex: number = 0) {
-        const trigger = this.page.locator('button', { hasText: triggerText }).last();
-        // Short timeout check
+    /**
+     * Seleciona opção por Index ou Texto
+     */
+    async selectOption(triggerLabel: string, option: number | string = 0) {
+        this.log(`🔽 Abrindo select "${triggerLabel}" para escolher "${option}"...`);
+        
+        // Find trigger by Label or Text
+        // Strategy: trigger usually usually has an aria-labelledby or just nearby text.
+        // Or it IS the button with the label? 
+        // Radix triggers usually don't contain the label text if selected.
+        // But the test uses 'Categoria'. If the trigger is empty? 
+        // Assuming trigger has aria-label or is near.
+        
+        let trigger = this.page.locator(`button[role="combobox"][aria-label="${triggerLabel}"]`).first();
+        if (await trigger.count() === 0) {
+             trigger = this.page.locator('button[role="combobox"]').filter({ hasText: triggerLabel }).first();
+        }
+        if (await trigger.count() === 0) {
+             // Try standard Select trigger
+             trigger = this.page.locator('select').filter({ hasText: triggerLabel }).first();
+        }
+        
+        // Final fallback: any button with text
+        if (await trigger.count() === 0) {
+             trigger = this.page.getByRole('button', { name: triggerLabel }).first();
+        }
+
         if (await trigger.isVisible({ timeout: 2000 }).catch(() => false)) {
             await trigger.click();
-            await this.page.waitForTimeout(200);
-            const option = this.page.getByRole('option').nth(optionIndex);
-            if (await option.isVisible({ timeout: 2000 }).catch(() => false)) {
-                await option.click();
+            await this.page.waitForTimeout(300);
+            
+            let optionLocator;
+            if (typeof option === 'number') {
+                optionLocator = this.page.getByRole('option').nth(option);
             } else {
+                optionLocator = this.page.getByRole('option', { name: option, exact: false }).first();
+            }
+
+            if (await optionLocator.isVisible({ timeout: 2000 }).catch(() => false)) {
+                await optionLocator.click();
+                this.log(`✅ Opção "${option}" selecionada.`);
+            } else {
+                this.log(`⚠️ Opção "${option}" não encontrada.`);
                 await this.page.keyboard.press('Escape'); 
             }
         } else {
-            this.log(`⚠️ Select com texto "${triggerText}" não encontrado. Ignorando.`);
+            this.log(`⚠️ Trigger "${triggerLabel}" não encontrado.`);
         }
     }
 

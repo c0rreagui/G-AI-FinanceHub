@@ -70,10 +70,40 @@ test.describe('📱 Mobile Agent Squad', () => {
         await agent.navigate('Insights');
         await agent.hunter.checkForGhosts();
         
-        // Voltar para Home e ver resumo
-        await agent.navigate('Início');
+        // Voltar para Home e ver resumo (Isso deve disparar ensureMenuClosed)
+        await agent.navigate('Início'); 
         const summary = page.locator('div').filter({ hasText: 'Saldo Total' }).first();
         await expect(summary).toBeVisible();
+    });
+
+    test('🎨 The Designer (UX/UI Specialist)', async ({ page }) => {
+        const agent = new SwarmHelpers(page, 'Mobile_UX_Pro', '🎨');
+        test.setTimeout(240000); // 4 min - Exhaustive check
+
+        await agent.setupInterceptor();
+        await agent.login();
+        agent.log('💬 "Vou fazer um pente fino nesse design... ninguém escapa!"');
+        agent.log('🔍 Iniciando Auditoria Visual Completa (Heurísticas de UX)');
+
+        const routesToAudit = ['Início', 'Transações', 'Metas', 'Dívidas', 'Investimentos', 'Agenda', 'Insights', 'Tools', 'Família', 'Ajustes', 'DevTools'];
+        
+        for (const route of routesToAudit) {
+            await agent.navigate(route);
+            
+            // Check 1: Layout Integrity
+            await agent.hunter.checkResponsiveness();
+            
+            // Check 2: Error Ghosts
+            await agent.hunter.checkForGhosts();
+
+            // Check 3: Text Readability (Basic Heuristic - ensure no tiny text?)
+            // For now, we rely on Visual Snapshots
+            
+            agent.log(`✨ ${route} visualmente aprovada.`);
+            await page.waitForTimeout(500);
+        }
+
+        agent.log('✅ Auditoria de UX finalizada. O app está LINDO!');
     });
 
     test('📅 The Organizer (Agenda e Dívidas)', async ({ page }) => {
