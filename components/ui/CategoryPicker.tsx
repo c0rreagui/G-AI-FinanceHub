@@ -39,18 +39,17 @@ const CategoryGridItem: React.FC<CategoryGridItemProps> = ({ category, isSelecte
     };
 
     return (
-        <motion.button
-            ref={buttonRef} // Assign ref to the motion.button
+        <button
+            ref={buttonRef}
             type="button"
             onClick={handleSelect}
-            className={`relative flex flex-col items-center justify-between gap-2 p-3 rounded-xl border transition-all duration-200 ${
-                isSelected ? 'bg-primary/5 shadow-sm' : 'border-border bg-card/50 hover:bg-card hover:border-primary/50'
+            data-testid={`category-button-${category.id}`}
+            className={`relative flex flex-col items-center justify-between gap-2 p-3 rounded-xl border transition-all duration-200 hover:scale-105 active:scale-95 ${
+                isSelected ? 'bg-primary/5 shadow-sm border-primary' : 'border-border bg-card/50 hover:bg-card hover:border-primary/50'
             }`}
             title={category.name}
             aria-label={`Selecionar categoria: ${category.name}`}
-            aria-pressed={isSelected}
-            whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.95 }}
+            aria-pressed={isSelected ? 'true' : 'false'}
         >
             <div 
                 ref={iconContainerRef}
@@ -60,7 +59,7 @@ const CategoryGridItem: React.FC<CategoryGridItemProps> = ({ category, isSelecte
             </div>
             
             <span className={`text-xs font-medium text-center leading-tight line-clamp-2 w-full ${isSelected ? 'text-foreground' : 'text-muted-foreground'}`}>{category.name}</span>
-        </motion.button>
+        </button>
     );
 };
 

@@ -1,0 +1,130 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - generic: FinanceHub
+      - navigation [ref=e9]:
+        - button "Início" [ref=e10] [cursor=pointer]:
+          - img [ref=e12]
+          - generic: Início
+        - button "Transações" [ref=e17] [cursor=pointer]:
+          - img [ref=e20]
+          - generic: Transações
+        - button "Orçamentos" [ref=e23] [cursor=pointer]:
+          - img [ref=e25]
+          - generic: Orçamentos
+        - button "Metas" [ref=e28] [cursor=pointer]:
+          - img [ref=e30]
+          - generic: Metas
+        - button "Dívidas" [ref=e34] [cursor=pointer]:
+          - img [ref=e36]
+          - generic: Dívidas
+        - button "Investimentos" [ref=e39] [cursor=pointer]:
+          - img [ref=e41]
+          - generic: Investimentos
+        - button "Agenda" [ref=e44] [cursor=pointer]:
+          - img [ref=e46]
+          - generic: Agenda
+        - button "Insights" [ref=e48] [cursor=pointer]:
+          - img [ref=e50]
+          - generic: Insights
+        - button "Tools" [ref=e52] [cursor=pointer]:
+          - img [ref=e54]
+          - generic: Tools
+        - button "Família" [ref=e56] [cursor=pointer]:
+          - img [ref=e58]
+          - generic: Família
+      - generic [ref=e63]:
+        - button [ref=e64] [cursor=pointer]:
+          - img [ref=e65]
+        - button "DevTools" [ref=e68] [cursor=pointer]:
+          - img [ref=e70]
+          - generic: DevTools
+        - button "Ajustes" [ref=e72] [cursor=pointer]:
+          - img [ref=e74]
+          - generic: Ajustes
+        - generic [ref=e77]: v4.0.0 Neon Genesis
+    - main [ref=e78]:
+      - generic [ref=e81]:
+        - generic [ref=e82]:
+          - generic [ref=e84]:
+            - generic [ref=e85]:
+              - img [ref=e86]
+              - generic [ref=e89]:
+                - heading "Transações" [level=1] [ref=e90]
+                - paragraph [ref=e91]:
+                  - generic [ref=e92]: 🌙 Boa noite, Desenvolvedor
+            - generic [ref=e93]:
+              - generic [ref=e94]: FinanceHub
+              - img [ref=e95]
+              - generic [ref=e97]: Transações
+          - generic [ref=e98]:
+            - button "Iniciar gravação de voz" [ref=e99] [cursor=pointer]:
+              - img [ref=e102]
+            - button "K" [ref=e105] [cursor=pointer]:
+              - img [ref=e106]
+              - generic [ref=e109]:
+                - img [ref=e110]
+                - text: K
+            - button "Notificações" [ref=e112] [cursor=pointer]:
+              - img [ref=e113]
+            - button [ref=e118] [cursor=pointer]:
+              - img [ref=e119]
+            - generic [ref=e122]:
+              - button "Reclassificar" [ref=e123] [cursor=pointer]:
+                - img [ref=e124]
+                - text: Reclassificar
+              - button "Lixeira" [ref=e128] [cursor=pointer]:
+                - img [ref=e129]
+              - button "Histórico de Alterações" [ref=e131] [cursor=pointer]:
+                - img [ref=e132]
+              - button "Importar" [ref=e136] [cursor=pointer]:
+                - img [ref=e137]
+                - text: Importar
+              - button "Nova Transação" [ref=e140] [cursor=pointer]:
+                - img [ref=e141]
+                - text: Nova Transação
+            - button "U" [ref=e143] [cursor=pointer]:
+              - generic [ref=e145]: U
+        - generic [ref=e146]:
+          - generic [ref=e148]:
+            - generic [ref=e149]:
+              - generic [ref=e150]:
+                - img [ref=e151]
+                - textbox "Buscar transações..." [active] [ref=e155]: "' OR '1'='1"
+              - generic [ref=e156]:
+                - generic [ref=e157]:
+                  - button "Hoje" [ref=e158] [cursor=pointer]
+                  - button "Semana" [ref=e160] [cursor=pointer]
+                  - button "Mês" [ref=e162] [cursor=pointer]
+                - button "Filtrar por data" [ref=e163] [cursor=pointer]:
+                  - img [ref=e164]
+                  - generic [ref=e166]: Filtrar por data
+              - combobox [ref=e168] [cursor=pointer]:
+                - generic [ref=e170]: Filtrar por categorias
+                - img [ref=e171]
+              - combobox [ref=e175] [cursor=pointer]:
+                - generic [ref=e177]: Filtrar por contas
+                - img [ref=e178]
+              - generic [ref=e181]:
+                - button "Todas" [ref=e182] [cursor=pointer]
+                - button "Receitas" [ref=e184] [cursor=pointer]
+                - button "Despesas" [ref=e186] [cursor=pointer]
+            - button "Salvar Filtro Atual" [ref=e188] [cursor=pointer]:
+              - img [ref=e189]
+          - generic [ref=e191]:
+            - generic [ref=e192]: "Agrupar por:"
+            - combobox "Agrupar por:" [ref=e193]:
+              - option "Sem agrupamento" [selected]
+              - option "Dia"
+              - option "Semana"
+              - option "Mês"
+          - generic [ref=e195]:
+            - img [ref=e197]
+            - heading "Nenhum resultado encontrado" [level=3] [ref=e200]
+            - paragraph [ref=e201]: Tente ajustar seus filtros de busca.
+  - generic [ref=e202]: R$0k
+```

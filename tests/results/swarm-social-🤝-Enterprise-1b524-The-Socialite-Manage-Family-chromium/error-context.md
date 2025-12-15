@@ -1,0 +1,93 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - generic: FinanceHub
+      - navigation [ref=e9]:
+        - button "Início" [ref=e10] [cursor=pointer]:
+          - img [ref=e12]
+          - generic: Início
+        - button "Transações" [ref=e17] [cursor=pointer]:
+          - img [ref=e19]
+          - generic: Transações
+        - button "Orçamentos" [ref=e22] [cursor=pointer]:
+          - img [ref=e24]
+          - generic: Orçamentos
+        - button "Metas" [ref=e27] [cursor=pointer]:
+          - img [ref=e29]
+          - generic: Metas
+        - button "Dívidas" [ref=e33] [cursor=pointer]:
+          - img [ref=e35]
+          - generic: Dívidas
+        - button "Investimentos" [ref=e38] [cursor=pointer]:
+          - img [ref=e40]
+          - generic: Investimentos
+        - button "Agenda" [ref=e43] [cursor=pointer]:
+          - img [ref=e45]
+          - generic: Agenda
+        - button "Insights" [ref=e47] [cursor=pointer]:
+          - img [ref=e49]
+          - generic: Insights
+        - button "Tools" [ref=e51] [cursor=pointer]:
+          - img [ref=e53]
+          - generic: Tools
+        - button "Família" [ref=e55] [cursor=pointer]:
+          - img [ref=e58]
+          - generic: Família
+      - generic [ref=e63]:
+        - button [ref=e64] [cursor=pointer]:
+          - img [ref=e65]
+        - button "DevTools" [ref=e68] [cursor=pointer]:
+          - img [ref=e70]
+          - generic: DevTools
+        - button "Ajustes" [ref=e72] [cursor=pointer]:
+          - img [ref=e74]
+          - generic: Ajustes
+        - generic [ref=e77]: v4.0.0 Neon Genesis
+    - main [ref=e78]:
+      - generic [ref=e81]:
+        - generic [ref=e82]:
+          - generic [ref=e85]:
+            - img [ref=e86]
+            - generic [ref=e91]:
+              - heading "Família & Social" [level=1] [ref=e92]
+              - paragraph [ref=e93]:
+                - generic [ref=e94]: 🌙 Boa noite, Desenvolvedor
+          - generic [ref=e95]:
+            - button "Iniciar gravação de voz" [ref=e96] [cursor=pointer]:
+              - img [ref=e99]
+            - button "K" [ref=e102] [cursor=pointer]:
+              - img [ref=e103]
+              - generic [ref=e106]:
+                - img [ref=e107]
+                - text: K
+            - button "Notificações" [ref=e109] [cursor=pointer]:
+              - img [ref=e110]
+            - button [ref=e115] [cursor=pointer]:
+              - img [ref=e116]
+            - button "U" [ref=e119] [cursor=pointer]:
+              - generic [ref=e121]: U
+        - generic [ref=e123]:
+          - generic [ref=e124]:
+            - img [ref=e126]
+            - heading "Criar nova Família" [level=3] [ref=e131]
+            - paragraph [ref=e132]: Crie um grupo para compartilhar despesas e gerenciar finanças em conjunto.
+            - generic [ref=e133]:
+              - generic [ref=e135]:
+                - generic [ref=e136]: R$
+                - 'textbox "Nome da Família (ex: Família Silva)" [ref=e137]': Família Swarm
+              - button "Criar Família" [active] [ref=e138] [cursor=pointer]
+          - generic [ref=e139]:
+            - img [ref=e141]
+            - heading "Entrar em uma Família" [level=3] [ref=e144]
+            - paragraph [ref=e145]: Recebeu um convite? Cole o token abaixo para entrar no grupo.
+            - generic [ref=e146]:
+              - generic [ref=e148]:
+                - generic [ref=e149]: R$
+                - textbox "Token do convite" [ref=e150]
+              - button "Entrar" [disabled]
+  - generic [ref=e151]: R$0k
+```

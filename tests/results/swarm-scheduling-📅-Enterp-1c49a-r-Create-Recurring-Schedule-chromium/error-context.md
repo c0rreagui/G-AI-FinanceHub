@@ -1,0 +1,270 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - complementary [ref=e4]:
+        - generic [ref=e5]:
+          - generic: FinanceHub
+        - navigation [ref=e9]:
+          - button "Início" [ref=e10] [cursor=pointer]:
+            - img [ref=e12]
+            - generic: Início
+          - button "Transações" [ref=e17] [cursor=pointer]:
+            - img [ref=e19]
+            - generic: Transações
+          - button "Orçamentos" [ref=e22] [cursor=pointer]:
+            - img [ref=e24]
+            - generic: Orçamentos
+          - button "Metas" [ref=e27] [cursor=pointer]:
+            - img [ref=e29]
+            - generic: Metas
+          - button "Dívidas" [ref=e33] [cursor=pointer]:
+            - img [ref=e35]
+            - generic: Dívidas
+          - button "Investimentos" [ref=e38] [cursor=pointer]:
+            - img [ref=e40]
+            - generic: Investimentos
+          - button "Agenda" [ref=e43] [cursor=pointer]:
+            - img [ref=e46]
+            - generic: Agenda
+          - button "Insights" [ref=e48] [cursor=pointer]:
+            - img [ref=e50]
+            - generic: Insights
+          - button "Tools" [ref=e52] [cursor=pointer]:
+            - img [ref=e54]
+            - generic: Tools
+          - button "Família" [ref=e56] [cursor=pointer]:
+            - img [ref=e58]
+            - generic: Família
+        - generic [ref=e63]:
+          - button [ref=e64] [cursor=pointer]:
+            - img [ref=e65]
+          - button "DevTools" [ref=e68] [cursor=pointer]:
+            - img [ref=e70]
+            - generic: DevTools
+          - button "Ajustes" [ref=e72] [cursor=pointer]:
+            - img [ref=e74]
+            - generic: Ajustes
+          - generic [ref=e77]: v4.0.0 Neon Genesis
+      - main [ref=e78]:
+        - generic [ref=e81]:
+          - generic [ref=e82]:
+            - generic [ref=e84]:
+              - generic [ref=e85]:
+                - img [ref=e86]
+                - generic [ref=e88]:
+                  - heading "Agendamentos" [level=1] [ref=e89]
+                  - paragraph [ref=e90]:
+                    - generic [ref=e91]: 🌙 Boa noite, Desenvolvedor
+              - generic [ref=e92]:
+                - generic [ref=e93]: FinanceHub
+                - img [ref=e94]
+                - generic [ref=e96]: Agendamentos
+            - generic [ref=e97]:
+              - button "Iniciar gravação de voz" [ref=e98] [cursor=pointer]:
+                - img [ref=e101]
+              - button "K" [ref=e104] [cursor=pointer]:
+                - img [ref=e105]
+                - generic [ref=e108]:
+                  - img [ref=e109]
+                  - text: K
+              - button "Notificações" [ref=e111] [cursor=pointer]:
+                - img [ref=e112]
+              - button [ref=e117] [cursor=pointer]:
+                - img [ref=e118]
+              - button "Novo Agendamento" [ref=e121] [cursor=pointer]:
+                - img [ref=e122]
+                - text: Novo Agendamento
+              - button "U" [ref=e124] [cursor=pointer]:
+                - generic [ref=e126]: U
+          - generic [ref=e127]:
+            - generic [ref=e129]:
+              - paragraph [ref=e130]: Total Mensal
+              - paragraph [ref=e131]: "-R$ 5.079,80"
+            - generic [ref=e133]:
+              - paragraph [ref=e134]: A Pagar
+              - paragraph [ref=e135]: "-R$ 5.079,80"
+            - generic [ref=e137]:
+              - paragraph [ref=e138]: A Receber
+              - paragraph [ref=e139]: R$ 0,00
+            - generic [ref=e141]:
+              - paragraph [ref=e142]: Vencendo (7d)
+              - paragraph [ref=e144]: "0"
+          - generic [ref=e145]:
+            - generic [ref=e146]:
+              - generic [ref=e147]:
+                - img [ref=e148]
+                - textbox "Buscar agendamento..." [ref=e151]
+              - generic [ref=e152]:
+                - button [ref=e153] [cursor=pointer]:
+                  - img [ref=e154]
+                - button [ref=e155] [cursor=pointer]:
+                  - img [ref=e156]
+            - generic [ref=e161]:
+              - combobox [ref=e162]:
+                - option "Todos" [selected]
+                - option "Receitas"
+                - option "Despesas"
+              - combobox [ref=e163]:
+                - option "Por Data" [selected]
+                - option "Por Valor"
+                - option "Por Nome"
+          - generic [ref=e166]:
+            - heading "Futuro 4" [level=3] [ref=e167]:
+              - text: Futuro
+              - generic [ref=e168]: "4"
+            - generic [ref=e171]:
+              - img [ref=e173]
+              - generic [ref=e178]:
+                - generic [ref=e179]:
+                  - heading "Aluguel" [level=3] [ref=e180]
+                  - generic [ref=e181]:
+                    - generic [ref=e182]: Mensal
+                    - generic [ref=e183]:
+                      - img [ref=e184]
+                      - text: 05/01/2026
+                - generic [ref=e187]:
+                  - generic [ref=e188]: "-R$ 2.500,00"
+                  - text: Despesa
+              - generic [ref=e189]:
+                - button [ref=e190] [cursor=pointer]:
+                  - img [ref=e191]
+                - button [ref=e194] [cursor=pointer]:
+                  - img [ref=e195]
+                - button [ref=e198] [cursor=pointer]:
+                  - img [ref=e199]
+            - generic [ref=e203]:
+              - img [ref=e205]
+              - generic [ref=e210]:
+                - generic [ref=e211]:
+                  - heading "Aluguel" [level=3] [ref=e212]
+                  - generic [ref=e213]:
+                    - generic [ref=e214]: Mensal
+                    - generic [ref=e215]:
+                      - img [ref=e216]
+                      - text: 05/01/2026
+                - generic [ref=e219]:
+                  - generic [ref=e220]: "-R$ 2.500,00"
+                  - text: Despesa
+              - generic [ref=e221]:
+                - button [ref=e222] [cursor=pointer]:
+                  - img [ref=e223]
+                - button [ref=e226] [cursor=pointer]:
+                  - img [ref=e227]
+                - button [ref=e230] [cursor=pointer]:
+                  - img [ref=e231]
+            - generic [ref=e235]:
+              - img [ref=e237]
+              - generic [ref=e242]:
+                - generic [ref=e243]:
+                  - heading "Assinatura Netflix" [level=3] [ref=e244]
+                  - generic [ref=e245]:
+                    - generic [ref=e246]: Mensal
+                    - generic [ref=e247]:
+                      - img [ref=e248]
+                      - text: 10/01/2026
+                - generic [ref=e251]:
+                  - generic [ref=e252]: "-R$ 39,90"
+                  - text: Despesa
+              - generic [ref=e253]:
+                - button [ref=e254] [cursor=pointer]:
+                  - img [ref=e255]
+                - button [ref=e258] [cursor=pointer]:
+                  - img [ref=e259]
+                - button [ref=e262] [cursor=pointer]:
+                  - img [ref=e263]
+            - generic [ref=e267]:
+              - img [ref=e269]
+              - generic [ref=e274]:
+                - generic [ref=e275]:
+                  - heading "Assinatura Netflix" [level=3] [ref=e276]
+                  - generic [ref=e277]:
+                    - generic [ref=e278]: Mensal
+                    - generic [ref=e279]:
+                      - img [ref=e280]
+                      - text: 10/01/2026
+                - generic [ref=e283]:
+                  - generic [ref=e284]: "-R$ 39,90"
+                  - text: Despesa
+              - generic [ref=e285]:
+                - button [ref=e286] [cursor=pointer]:
+                  - img [ref=e287]
+                - button [ref=e290] [cursor=pointer]:
+                  - img [ref=e291]
+                - button [ref=e294] [cursor=pointer]:
+                  - img [ref=e295]
+    - dialog "Novo Agendamento":
+      - generic [ref=e299]:
+        - generic [ref=e300]:
+          - heading "Novo Agendamento" [level=2] [ref=e301]
+          - button "Fechar modal" [ref=e302] [cursor=pointer]:
+            - img [ref=e303]
+        - generic [ref=e307]:
+          - radiogroup "Tipo de transação" [ref=e308]:
+            - generic [ref=e309]: Tipo
+            - generic [ref=e310]:
+              - radio "Despesa" [checked] [ref=e312] [cursor=pointer]:
+                - img [ref=e313]
+                - text: Despesa
+              - radio "Receita" [ref=e316] [cursor=pointer]:
+                - img [ref=e317]
+                - text: Receita
+          - generic [ref=e320]:
+            - text: Descrição
+            - textbox "Descrição" [ref=e321]: Aluguel Base Swarm
+          - generic [ref=e322]:
+            - text: Valor (R$)
+            - spinbutton "Valor (R$)" [ref=e323]: "2500.00"
+          - generic [ref=e324]:
+            - generic [ref=e325]:
+              - text: Data de Início
+              - textbox "Data de Início" [active] [ref=e326]: 2025-12-16
+            - generic [ref=e327]:
+              - generic [ref=e328]: Frequência
+              - combobox "Frequência" [ref=e329]:
+                - option "Diário"
+                - option "Semanal"
+                - option "Quinzenal"
+                - option "Mensal" [selected]
+                - option "Anual"
+              - img
+          - generic [ref=e330]:
+            - generic [ref=e331]: Categoria
+            - generic [ref=e332]:
+              - 'button "Selecionar categoria: Alimentação" [ref=e333] [cursor=pointer]':
+                - img [ref=e335]
+                - generic [ref=e338]: Alimentação
+              - 'button "Selecionar categoria: Compras" [ref=e339] [cursor=pointer]':
+                - img [ref=e341]
+                - generic [ref=e345]: Compras
+              - 'button "Selecionar categoria: Transporte" [ref=e346] [cursor=pointer]':
+                - img [ref=e348]
+                - generic [ref=e352]: Transporte
+              - 'button "Selecionar categoria: Moradia" [ref=e353] [cursor=pointer]':
+                - img [ref=e355]
+                - generic [ref=e358]: Moradia
+              - 'button "Selecionar categoria: Saúde" [ref=e359] [cursor=pointer]':
+                - img [ref=e361]
+                - generic [ref=e363]: Saúde
+              - 'button "Selecionar categoria: Educação" [ref=e364] [cursor=pointer]':
+                - img [ref=e366]
+                - generic [ref=e368]: Educação
+              - 'button "Selecionar categoria: Lazer" [ref=e369] [cursor=pointer]':
+                - img [ref=e371]
+                - generic [ref=e373]: Lazer
+              - 'button "Selecionar categoria: Salário" [ref=e374] [cursor=pointer]':
+                - img [ref=e376]
+                - generic [ref=e379]: Salário
+              - 'button "Selecionar categoria: Investimentos" [ref=e380] [cursor=pointer]':
+                - img [ref=e382]
+                - generic [ref=e385]: Investimentos
+              - 'button "Selecionar categoria: Outros" [ref=e386] [cursor=pointer]':
+                - img [ref=e388]
+                - generic [ref=e392]: Outros
+          - generic [ref=e393]:
+            - button "Cancelar" [ref=e394] [cursor=pointer]
+            - button "Salvar Agendamento" [disabled]
+  - generic [ref=e395]: R$0k
+```

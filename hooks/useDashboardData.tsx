@@ -364,7 +364,13 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
                 setAccounts(accountsData);
                 const generatedAccounts = accountsData; // Keep alias for compatibility with existing logic below
 
-                const populatedCategories: Category[] = categoriesData.map(c => ({...c, icon: getIconByName(c.icon) }));
+                const uniqueCategoriesMap = new Map();
+                categoriesData.forEach(c => {
+                    if (!uniqueCategoriesMap.has(c.name)) { // Dedupe by name or ID
+                        uniqueCategoriesMap.set(c.name, { ...c, icon: getIconByName(c.icon) });
+                    }
+                });
+                const populatedCategories: Category[] = Array.from(uniqueCategoriesMap.values());
                 setCategories(populatedCategories);
                 
                 const categoryMap = new Map(populatedCategories.map(c => [c.id, c]));

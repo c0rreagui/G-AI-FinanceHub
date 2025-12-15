@@ -1,6 +1,6 @@
 export const Brain = {
     routes: {
-        home: '/',
+        home: 'http://localhost:3001/',
         transactions: '/transactions',
         goals: '/goals',
         debts: '/debts',
@@ -30,9 +30,9 @@ export const Brain = {
         }
     },
     timeouts: {
-        short: 5000,
-        medium: 10000,
-        long: 30000,
+        short: 2000,    // Was 5000
+        medium: 5000,   // Was 10000
+        long: 10000,    // Was 30000
         staggerBase: 0
     }
 };

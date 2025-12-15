@@ -42,26 +42,47 @@ test.describe('📅 Enterprise Swarm - Scheduling Squad', () => {
         await page.selectOption('#sch-frequency', 'MENSAL');
 
         // Category needs special handling (CategoryPicker is a Grid of buttons)
-        await agent.log('🔽 Selecionando Categoria (Grid)...');
+        await agent.log('🔽 Selecionando Categoria...');
         
-        // Wait specifically for the picker container
-        const picker = page.locator('.grid.grid-cols-3'); 
-        await picker.waitFor({ state: 'visible', timeout: 5000 }).catch(() => agent.log('⚠️ Grid category picker não visível.'));
-
-        // Try to click the first button found inside the picker
-        const catButtons = picker.locator('button');
-        const count = await catButtons.count();
-        if (count > 0) {
-            await catButtons.first().click();
-            await agent.log(`✅ Categoria 1/${count} selecionada via clique direto.`);
+        // Use data-testid for most reliable selection
+        const categoryButton = page.locator('[data-testid^="category-button-"]').first();
+        
+        if (await categoryButton.isVisible({ timeout: 3000 })) {
+            await agent.log('🖱️ Botão de categoria encontrado via data-testid.');
+            await categoryButton.scrollIntoViewIfNeeded();
+            
+            // Try multiple click methods
+            await categoryButton.click({ force: true });
+            await page.waitForTimeout(200);
+            
+            // Verify selection and retry if needed
+            let debugContent = await page.getByTestId('debug-category-id').textContent().catch(() => null);
+            
+            if (!debugContent || debugContent.startsWith('null')) {
+                await agent.log('⚠️ Primeira tentativa falhou. Tentando dblclick...');
+                await categoryButton.dblclick({ force: true });
+                await page.waitForTimeout(200);
+                debugContent = await page.getByTestId('debug-category-id').textContent().catch(() => null);
+            }
+            
+            if (!debugContent || debugContent.startsWith('null')) {
+                await agent.log('⚠️ Segunda tentativa falhou. Tentando JS click...');
+                await categoryButton.evaluate(el => (el as HTMLButtonElement).click());
+                await page.waitForTimeout(200);
+                debugContent = await page.getByTestId('debug-category-id').textContent().catch(() => null);
+            }
+            
+            if (debugContent && !debugContent.startsWith('null')) {
+                await agent.log(`✅ Categoria selecionada: ${debugContent.split('|')[0].trim()}`);
+            } else {
+                await agent.log(`❌ CategoryId ainda null após múltiplas tentativas.`);
+            }
         } else {
-            await agent.log('❌ Nenhum botão de categoria encontrado no grid.');
-            // Fallback: Try identifying by text if grid class changed
-            await page.getByText('Alimentação').first().click().catch(() => {});
+            await agent.log('❌ Nenhum botão de categoria encontrado.');
         }
 
         // Slight pause for state update
-        await page.waitForTimeout(500);
+        await page.waitForTimeout(300);
 
         // Save
         await agent.safeClick(page.getByRole('button', { name: 'Salvar Agendamento' }));

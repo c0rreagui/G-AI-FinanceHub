@@ -60,6 +60,8 @@ export const AddSchedulingForm: React.FC<AddSchedulingFormProps> = ({ isOpen, on
   }, [isOpen])
 
 
+
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const numericAmount = parseFloat(amount);
@@ -79,7 +81,8 @@ export const AddSchedulingForm: React.FC<AddSchedulingFormProps> = ({ isOpen, on
             categoryId,
             startDate,
             frequency,
-            next_due_date: itemToEdit.next_due_date, // Manter o nextDueDate
+            next_due_date: itemToEdit.next_due_date,
+            created_at: itemToEdit.created_at,
         };
         success = await updateScheduledTransaction(updatedTxData);
     } else {
@@ -91,6 +94,7 @@ export const AddSchedulingForm: React.FC<AddSchedulingFormProps> = ({ isOpen, on
             categoryId,
             startDate,
             frequency,
+            created_at: new Date().toISOString(),
         };
         success = await addScheduledTransaction(scheduledTxData);
     }
@@ -154,7 +158,10 @@ export const AddSchedulingForm: React.FC<AddSchedulingFormProps> = ({ isOpen, on
             <CategoryPicker 
                 categories={categories}
                 selectedCategoryId={categoryId}
-                onSelectCategory={setCategoryId}
+                onSelectCategory={(id) => {
+                    console.error('[DEBUG] onSelectCategory called with:', id);
+                    setCategoryId(id);
+                }}
             />
         </div>
     </>

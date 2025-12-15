@@ -48,12 +48,23 @@ test.describe('Deep Audit & Console Mapping', () => {
         } catch (e) { console.log('ℹ️ Já logado ou skip login'); }
 
         // 2. Definir Views a visitar via Menu Lateral (para garantir carregamento real de componentes)
+        // 2. Definir Views a visitar via Menu Lateral (para garantir carregamento real de componentes)
+        // Mapeamento: Chave = Nome no Menu (Button Text), Valor = Nome Log
         const views = [
-            'Transações', 'Metas', 'Investimentos', 'Dívidas', 'Agendamentos', 'Insights', 'Ferramentas', 'Configurações'
+            { menu: 'Transações', log: 'Transações' },
+            { menu: 'Orçamentos', log: 'Orçamentos' },
+            { menu: 'Metas', log: 'Metas' },
+            { menu: 'Investimentos', log: 'Investimentos' },
+            { menu: 'Dívidas', log: 'Dívidas' },
+            { menu: 'Agenda', log: 'Agendamentos' },
+            { menu: 'Insights', log: 'Insights' },
+            { menu: 'Tools', log: 'Ferramentas' },
+            { menu: 'Família', log: 'Família' },
+            { menu: 'Ajustes', log: 'Configurações' }
         ];
 
-        for (const viewName of views) {
-            console.log(`\n🔍 Auditando View: ${viewName}`);
+        for (const { menu, log } of views) {
+            console.log(`\n🔍 Auditando View: ${log} (Menu: ${menu})`);
             
             // Expandir Sidebar se necessário
             const sidebar = page.locator('aside');
@@ -64,19 +75,16 @@ test.describe('Deep Audit & Console Mapping', () => {
             }
 
             // Navegar
-            // Mapeamento de nomes de menu se necessário (Metas -> Metas, etc)
-            let menuName = viewName;
-            
-            const menuBtn = page.getByRole('button', { name: menuName }).first();
+            const menuBtn = page.getByRole('button', { name: menu, exact: true }).first();
             try {
                 if (await menuBtn.isVisible()) {
                     await menuBtn.click();
                     await page.waitForTimeout(3000); // Aguardar renderização e efeitos
                 } else {
-                    console.log(`   ⚠️ Menu ${viewName} não encontrado/visível.`);
+                    console.log(`   ⚠️ Menu ${menu} não encontrado/visível.`);
                 }
             } catch (e) {
-                console.log(`   ⚠️ Erro ao clicar no menu ${viewName}: ${e}`);
+                console.log(`   ⚠️ Erro ao clicar no menu ${menu}: ${e}`);
             }
 
             // 3. Inventário de UI (Botões)
@@ -91,7 +99,7 @@ test.describe('Deep Audit & Console Mapping', () => {
                 // Check integrity
                 const box = await btn.boundingBox();
                 if (!box || box.width === 0 || box.height === 0) {
-                    consoleErrors.push(`[${viewName}] Botão índice ${i} renderizado com tamanho 0x0.`);
+                    consoleErrors.push(`[${log}] Botão índice ${i} renderizado com tamanho 0x0.`);
                 }
                 
                 // Opcional: Hover para disparar listeners de tooltip e hover effects

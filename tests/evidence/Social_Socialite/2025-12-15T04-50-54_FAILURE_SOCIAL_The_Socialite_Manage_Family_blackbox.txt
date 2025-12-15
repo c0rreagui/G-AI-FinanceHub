@@ -1,0 +1,123 @@
+--- BLACK BOX DUMP ---
+>>> Console Logs:
+[CONSOLE ERROR] Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s XAxis 
+    at XAxis2 (http://localhost:3001/node_modules/.vite/deps/recharts.js?v=d4b33715:28603:22)
+    at svg
+    at Surface (http://localhost:3001/node_modules/.vite/deps/recharts.js?v=d4b33715:5860:25)
+    at div
+    at ChartLayoutContextProvider2 (http://localhost:3001/node_modules/.vite/deps/recharts.js?v=d4b33715:25173:28)
+    at CategoricalChartWrapper (http://localhost:3001/node_modules/.vite/deps/recharts.js?v=d4b33715:29872:7)
+    at div
+    at http://localhost:3001/node_modules/.vite/deps/recharts.js?v=d4b33715:9082:21
+    at div
+    at MotionComponent (http://localhost:3001/node_modules/.vite/deps/framer-motion.js?v=d4b33715:452:40)
+    at div
+    at MonthlySummaryChart (http://localhost:3001/components/ui/charts/MonthlySummaryChart.tsx:66:39)
+    at div
+    at http://localhost:3001/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=d4b33715:168:13
+    at Presence (http://localhost:3001/node_modules/.vite/deps/chunk-ADDHWHR2.js?v=d4b33715:24:11)
+    at http://localhost:3001/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=d4b33715:313:13
+    at _c5 (http://localhost:3001/components/ui/Tabs.tsx:53:12)
+    at div
+    at div
+    at http://localhost:3001/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=d4b33715:168:13
+    at Provider (http://localhost:3001/node_modules/.vite/deps/chunk-VLUY3H6U.js?v=d4b33715:49:15)
+    at http://localhost:3001/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=d4b33715:190:7
+    at div
+    at div
+    at ChartsWidget (http://localhost:3001/components/dashboard/widgets/ChartsWidget.tsx:8:32)
+    at li
+    at MotionComponent (http://localhost:3001/node_modules/.vite/deps/framer-motion.js?v=d4b33715:452:40)
+    at ReorderItem (http://localhost:3001/node_modules/.vite/deps/framer-motion.js?v=d4b33715:8024:24)
+    at ul
+    at MotionComponent (http://localhost:3001/node_modules/.vite/deps/framer-motion.js?v=d4b33715:452:40)
+    at ReorderGroup (http://localhost:3001/node_modules/.vite/deps/framer-motion.js?v=d4b33715:7901:25)
+    at div
+    at MotionComponent (http://localhost:3001/node_modules/.vite/deps/framer-motion.js?v=d4b33715:452:40)
+    at HomeDashboardView (http://localhost:3001/components/views/HomeDashboardView.tsx:29:37)
+    at div
+    at MotionComponent (http://localhost:3001/node_modules/.vite/deps/framer-motion.js?v=d4b33715:452:40)
+    at PresenceChild (http://localhost:3001/node_modules/.vite/deps/framer-motion.js?v=d4b33715:7636:24)
+    at AnimatePresence (http://localhost:3001/node_modules/.vite/deps/framer-motion.js?v=d4b33715:7702:26)
+    at div
+    at main
+    at div
+    at AppLayout (http://localhost:3001/components/layout/AppLayout.tsx?t=1765772272642:12:29)
+    at AppContent (http://localhost:3001/App.tsx?t=1765772272642:39:51)
+    at ErrorBoundaryInner (http://localhost:3001/components/ErrorBoundary.tsx:12:5)
+    at ErrorBoundary (http://localhost:3001/components/ErrorBoundary.tsx:335:33)
+    at DialogProvider (http://localhost:3001/contexts/DialogContext.tsx:5:34)
+    at SocialProvider (http://localhost:3001/contexts/SocialContext.tsx:8:34)
+    at ThemeProvider (http://localhost:3001/contexts/ThemeContext.tsx:13:33)
+    at PrivacyProvider (http://localhost:3001/contexts/PrivacyContext.tsx:6:35)
+    at DashboardDataProvider (http://localhost:3001/hooks/useDashboardData.tsx:157:41)
+    at NotificationProvider (http://localhost:3001/contexts/NotificationContext.tsx:7:40)
+    at ToastProvider (http://localhost:3001/contexts/ToastContext.tsx:5:33)
+    at AuthProvider (http://localhost:3001/hooks/useAuth.ts:4:32)
+    at App
+[CONSOLE ERROR] Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s YAxis 
+    at YAxis2 (http://localhost:3001/node_modules/.vite/deps/recharts.js?v=d4b33715:28664:22)
+    at svg
+    at Surface (http://localhost:3001/node_modules/.vite/deps/recharts.js?v=d4b33715:5860:25)
+    at div
+    at ChartLayoutContextProvider2 (http://localhost:3001/node_modules/.vite/deps/recharts.js?v=d4b33715:25173:28)
+    at CategoricalChartWrapper (http://localhost:3001/node_modules/.vite/deps/recharts.js?v=d4b33715:29872:7)
+    at div
+    at http://localhost:3001/node_modules/.vite/deps/recharts.js?v=d4b33715:9082:21
+    at div
+    at MotionComponent (http://localhost:3001/node_modules/.vite/deps/framer-motion.js?v=d4b33715:452:40)
+    at div
+    at MonthlySummaryChart (http://localhost:3001/components/ui/charts/MonthlySummaryChart.tsx:66:39)
+    at div
+    at http://localhost:3001/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=d4b33715:168:13
+    at Presence (http://localhost:3001/node_modules/.vite/deps/chunk-ADDHWHR2.js?v=d4b33715:24:11)
+    at http://localhost:3001/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=d4b33715:313:13
+    at _c5 (http://localhost:3001/components/ui/Tabs.tsx:53:12)
+    at div
+    at div
+    at http://localhost:3001/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=d4b33715:168:13
+    at Provider (http://localhost:3001/node_modules/.vite/deps/chunk-VLUY3H6U.js?v=d4b33715:49:15)
+    at http://localhost:3001/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=d4b33715:190:7
+    at div
+    at div
+    at ChartsWidget (http://localhost:3001/components/dashboard/widgets/ChartsWidget.tsx:8:32)
+    at li
+    at MotionComponent (http://localhost:3001/node_modules/.vite/deps/framer-motion.js?v=d4b33715:452:40)
+    at ReorderItem (http://localhost:3001/node_modules/.vite/deps/framer-motion.js?v=d4b33715:8024:24)
+    at ul
+    at MotionComponent (http://localhost:3001/node_modules/.vite/deps/framer-motion.js?v=d4b33715:452:40)
+    at ReorderGroup (http://localhost:3001/node_modules/.vite/deps/framer-motion.js?v=d4b33715:7901:25)
+    at div
+    at MotionComponent (http://localhost:3001/node_modules/.vite/deps/framer-motion.js?v=d4b33715:452:40)
+    at HomeDashboardView (http://localhost:3001/components/views/HomeDashboardView.tsx:29:37)
+    at div
+    at MotionComponent (http://localhost:3001/node_modules/.vite/deps/framer-motion.js?v=d4b33715:452:40)
+    at PresenceChild (http://localhost:3001/node_modules/.vite/deps/framer-motion.js?v=d4b33715:7636:24)
+    at AnimatePresence (http://localhost:3001/node_modules/.vite/deps/framer-motion.js?v=d4b33715:7702:26)
+    at div
+    at main
+    at div
+    at AppLayout (http://localhost:3001/components/layout/AppLayout.tsx?t=1765772272642:12:29)
+    at AppContent (http://localhost:3001/App.tsx?t=1765772272642:39:51)
+    at ErrorBoundaryInner (http://localhost:3001/components/ErrorBoundary.tsx:12:5)
+    at ErrorBoundary (http://localhost:3001/components/ErrorBoundary.tsx:335:33)
+    at DialogProvider (http://localhost:3001/contexts/DialogContext.tsx:5:34)
+    at SocialProvider (http://localhost:3001/contexts/SocialContext.tsx:8:34)
+    at ThemeProvider (http://localhost:3001/contexts/ThemeContext.tsx:13:33)
+    at PrivacyProvider (http://localhost:3001/contexts/PrivacyContext.tsx:6:35)
+    at DashboardDataProvider (http://localhost:3001/hooks/useDashboardData.tsx:157:41)
+    at NotificationProvider (http://localhost:3001/contexts/NotificationContext.tsx:7:40)
+    at ToastProvider (http://localhost:3001/contexts/ToastContext.tsx:5:33)
+    at AuthProvider (http://localhost:3001/hooks/useAuth.ts:4:32)
+    at App
+[CONSOLE ERROR] Failed to load resource: the server responded with a status of 403 ()
+[CONSOLE ERROR] {code: 42501, details: null, hint: null, message: new row violates row-level security policy for table "families"}
+
+>>> Network Errors:
+[NETWORK ERROR] 403 https://nblzuljuuuvdzrqakccd.supabase.co/rest/v1/families?select=*
+
+>>> Action History:
+[2025-12-15T04:50:38.042Z] CLICK: Clique seguro
+[2025-12-15T04:50:41.244Z] NAVIGATE: Navegar para Família
+[2025-12-15T04:50:42.400Z] FILL: Preencher "Nome da Família"
+[2025-12-15T04:50:43.449Z] CLICK: Clique seguro

@@ -50,12 +50,14 @@
     "experiencedErrors": [],
     "achievements": [],
     "transactionStats": {
-      "success": 2,
-      "failure": 0
+      "success": 6,
+      "failure": 2
     }
   },
   "Chaotic": {
-    "successfulNavigations": [],
+    "successfulNavigations": [
+      "Metas"
+    ],
     "failedNavigations": [],
     "lastLoginMethod": "dev_bypass",
     "experiencedErrors": [],
@@ -94,14 +96,15 @@
   "Mobile": {
     "successfulNavigations": [
       "Agenda",
-      "Tools"
+      "Tools",
+      "Transações"
     ],
     "failedNavigations": [],
     "lastLoginMethod": "dev_bypass",
     "experiencedErrors": [],
     "achievements": [],
     "transactionStats": {
-      "success": 3,
+      "success": 4,
       "failure": 3
     }
   },
@@ -139,7 +142,7 @@
     "experiencedErrors": [],
     "achievements": [],
     "transactionStats": {
-      "success": 18,
+      "success": 21,
       "failure": 0
     }
   },
@@ -513,6 +516,17 @@
     }
   },
   "Sanity": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Settings_Admin": {
     "successfulNavigations": [],
     "failedNavigations": [],
     "lastLoginMethod": "dev_bypass",
