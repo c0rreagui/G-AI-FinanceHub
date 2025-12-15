@@ -1,0 +1,13 @@
+--- BLACK BOX DUMP ---
+>>> Console Logs:
+[CONSOLE ERROR] Failed to load resource: the server responded with a status of 403 ()
+[CONSOLE ERROR] {code: 42501, details: null, hint: null, message: new row violates row-level security policy for table "families"}
+
+>>> Network Errors:
+[NETWORK ERROR] 403 https://nblzuljuuuvdzrqakccd.supabase.co/rest/v1/families?select=*
+
+>>> Action History:
+[2025-12-15T01:38:05.054Z] CLICK: Clique seguro
+[2025-12-15T01:38:08.615Z] NAVIGATE: Navegar para Família
+[2025-12-15T01:38:09.756Z] FILL: Preencher "Nome da Família"
+[2025-12-15T01:38:10.807Z] CLICK: Clique seguro

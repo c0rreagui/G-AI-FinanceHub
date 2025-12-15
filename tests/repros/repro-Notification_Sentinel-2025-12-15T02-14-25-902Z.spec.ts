@@ -1,0 +1,28 @@
+
+import { test, expect } from '@playwright/test';
+
+// 🐛 AUTO-GENERATED REPRO SCRIPT
+// Agent: Notification_Sentinel
+// Error: Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+Locator: locator('text=Notificações').or(locator('text=Tudo em dia')).first()
+Expected: visible
+Timeout: 10000ms
+Error: element(s) not found
+
+Call log:
+[2m  - Expect "toBeVisible" with timeout 10000ms[22m
+[2m  - waiting for locator('text=Notificações').or(locator('text=Tudo em dia')).first()[22m
+
+// Generated at: 2025-12-15T02:14:25.903Z
+
+test('Reproduce Bug - Notification_Sentinel', async ({ page }) => {
+    // 1. Initial State
+    await page.goto('/');
+
+    // Clique seguro
+    await page.click('button:has-text("Login de Desenvolvedor")');
+
+    // 🛑 The test failed here originally.
+    // Assert expectation manually.
+});

@@ -1,0 +1,88 @@
+--- BLACK BOX DUMP ---
+>>> Console Logs:
+[CONSOLE ERROR] Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s XAxis 
+    at XAxis2 (http://localhost:3000/node_modules/.vite/deps/recharts.js?v=d4b33715:28603:22)
+    at svg
+    at Surface (http://localhost:3000/node_modules/.vite/deps/recharts.js?v=d4b33715:5860:25)
+    at div
+    at ChartLayoutContextProvider2 (http://localhost:3000/node_modules/.vite/deps/recharts.js?v=d4b33715:25173:28)
+    at CategoricalChartWrapper (http://localhost:3000/node_modules/.vite/deps/recharts.js?v=d4b33715:29872:7)
+    at div
+    at http://localhost:3000/node_modules/.vite/deps/recharts.js?v=d4b33715:9082:21
+    at div
+    at div
+    at _c9 (http://localhost:3000/components/ui/Card.tsx:91:12)
+    at div
+    at _c (http://localhost:3000/components/ui/Card.tsx:5:11)
+    at CompoundInterestCalculator (http://localhost:3000/components/tools/CompoundInterestCalculator.tsx:11:37)
+    at div
+    at div
+    at div
+    at div
+    at ToolsView (http://localhost:3000/components/views/ToolsView.tsx?t=1765760298001:15:29)
+    at div
+    at MotionComponent (http://localhost:3000/node_modules/.vite/deps/framer-motion.js?v=d4b33715:452:40)
+    at PresenceChild (http://localhost:3000/node_modules/.vite/deps/framer-motion.js?v=d4b33715:7636:24)
+    at AnimatePresence (http://localhost:3000/node_modules/.vite/deps/framer-motion.js?v=d4b33715:7702:26)
+    at div
+    at main
+    at div
+    at AppLayout (http://localhost:3000/components/layout/AppLayout.tsx?t=1765760335672:15:29)
+    at AppContent (http://localhost:3000/App.tsx?t=1765760353254:39:51)
+    at ErrorBoundaryInner (http://localhost:3000/components/ErrorBoundary.tsx:12:5)
+    at ErrorBoundary (http://localhost:3000/components/ErrorBoundary.tsx:335:33)
+    at DialogProvider (http://localhost:3000/contexts/DialogContext.tsx:5:34)
+    at SocialProvider (http://localhost:3000/contexts/SocialContext.tsx:8:34)
+    at ThemeProvider (http://localhost:3000/contexts/ThemeContext.tsx:13:33)
+    at PrivacyProvider (http://localhost:3000/contexts/PrivacyContext.tsx:6:35)
+    at DashboardDataProvider (http://localhost:3000/hooks/useDashboardData.tsx?t=1765760298001:157:41)
+    at NotificationProvider (http://localhost:3000/contexts/NotificationContext.tsx:7:40)
+    at ToastProvider (http://localhost:3000/contexts/ToastContext.tsx:5:33)
+    at AuthProvider (http://localhost:3000/hooks/useAuth.ts:4:32)
+    at App
+[CONSOLE ERROR] Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s YAxis 
+    at YAxis2 (http://localhost:3000/node_modules/.vite/deps/recharts.js?v=d4b33715:28664:22)
+    at svg
+    at Surface (http://localhost:3000/node_modules/.vite/deps/recharts.js?v=d4b33715:5860:25)
+    at div
+    at ChartLayoutContextProvider2 (http://localhost:3000/node_modules/.vite/deps/recharts.js?v=d4b33715:25173:28)
+    at CategoricalChartWrapper (http://localhost:3000/node_modules/.vite/deps/recharts.js?v=d4b33715:29872:7)
+    at div
+    at http://localhost:3000/node_modules/.vite/deps/recharts.js?v=d4b33715:9082:21
+    at div
+    at div
+    at _c9 (http://localhost:3000/components/ui/Card.tsx:91:12)
+    at div
+    at _c (http://localhost:3000/components/ui/Card.tsx:5:11)
+    at CompoundInterestCalculator (http://localhost:3000/components/tools/CompoundInterestCalculator.tsx:11:37)
+    at div
+    at div
+    at div
+    at div
+    at ToolsView (http://localhost:3000/components/views/ToolsView.tsx?t=1765760298001:15:29)
+    at div
+    at MotionComponent (http://localhost:3000/node_modules/.vite/deps/framer-motion.js?v=d4b33715:452:40)
+    at PresenceChild (http://localhost:3000/node_modules/.vite/deps/framer-motion.js?v=d4b33715:7636:24)
+    at AnimatePresence (http://localhost:3000/node_modules/.vite/deps/framer-motion.js?v=d4b33715:7702:26)
+    at div
+    at main
+    at div
+    at AppLayout (http://localhost:3000/components/layout/AppLayout.tsx?t=1765760335672:15:29)
+    at AppContent (http://localhost:3000/App.tsx?t=1765760353254:39:51)
+    at ErrorBoundaryInner (http://localhost:3000/components/ErrorBoundary.tsx:12:5)
+    at ErrorBoundary (http://localhost:3000/components/ErrorBoundary.tsx:335:33)
+    at DialogProvider (http://localhost:3000/contexts/DialogContext.tsx:5:34)
+    at SocialProvider (http://localhost:3000/contexts/SocialContext.tsx:8:34)
+    at ThemeProvider (http://localhost:3000/contexts/ThemeContext.tsx:13:33)
+    at PrivacyProvider (http://localhost:3000/contexts/PrivacyContext.tsx:6:35)
+    at DashboardDataProvider (http://localhost:3000/hooks/useDashboardData.tsx?t=1765760298001:157:41)
+    at NotificationProvider (http://localhost:3000/contexts/NotificationContext.tsx:7:40)
+    at ToastProvider (http://localhost:3000/contexts/ToastContext.tsx:5:33)
+    at AuthProvider (http://localhost:3000/hooks/useAuth.ts:4:32)
+    at App
+
+>>> Network Errors:
+
+>>> Action History:
+[2025-12-15T01:33:33.900Z] CLICK: Clique seguro
+[2025-12-15T01:33:37.429Z] NAVIGATE: Navegar para Tools

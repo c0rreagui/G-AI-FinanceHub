@@ -31,10 +31,16 @@ interface GreetingHeaderProps {
     unreadCount?: number;
 }
 
+import { useDialog } from '../../hooks/useDialog';
+import { useNotifications } from '../../contexts/NotificationContext';
 import { useTheme } from '../../contexts/ThemeContext';
 
-export const GreetingHeader: React.FC<GreetingHeaderProps> = ({ user, setCurrentView, onNotificationClick, unreadCount = 0 }) => {
+export const GreetingHeader: React.FC<GreetingHeaderProps> = ({ user, setCurrentView, onNotificationClick, unreadCount: propUnreadCount }) => {
     const { greetingName } = useTheme();
+    const { openDialog } = useDialog();
+    const { unreadCount: contextUnreadCount } = useNotifications();
+    const unreadCount = propUnreadCount ?? contextUnreadCount;
+
     const [greeting, setGreeting] = useState('');
     const [icon, setIcon] = useState<React.ReactNode>(null);
     const today = new Date();
@@ -53,6 +59,14 @@ export const GreetingHeader: React.FC<GreetingHeaderProps> = ({ user, setCurrent
             setIcon(<Moon className="w-6 h-6 text-indigo-400" />);
         }
     }, []);
+
+    const handleNotificationClick = () => {
+        if (onNotificationClick) {
+            onNotificationClick();
+        } else {
+            openDialog('notifications');
+        }
+    };
 
     return (
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
@@ -85,10 +99,11 @@ export const GreetingHeader: React.FC<GreetingHeaderProps> = ({ user, setCurrent
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button 
+                                data-testid="notification-bell"
                                 variant="ghost" 
                                 size="icon" 
                                 className="relative text-muted-foreground hover:text-foreground"
-                                onClick={onNotificationClick}
+                                onClick={handleNotificationClick}
                             >
                                 <Bell className="w-5 h-5" />
                                 {unreadCount > 0 && (

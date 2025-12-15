@@ -1,48 +1,52 @@
-import { test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { SwarmHelpers } from './utils/SwarmHelpers';
-import { fakerPT_BR as faker } from '@faker-js/faker';
 
-test('💬 Agent Socialite: O Influencer da Família (Humanized)', async ({ page }) => {
-    const agent = new SwarmHelpers(page, 'Socialite', '💬');
-    await agent.setupInterceptor();
-    await agent.login();
-    await agent.navigate('Família'); // Sidebar tem "Família" com acento no código, user disse "Familia". Vou usar regex ou fallback no helper. SwarmHelpers filter(hasText) pega se tiver acento? Vou usar "Família" pois vi no código sidebar.
+test.describe('🤝 Enterprise Swarm - Social Squad', () => {
+    let agent: SwarmHelpers;
 
-    agent.log('💬 "Oi gente! Conferindo as novidades..."');
+    test.afterEach(async ({}, testInfo) => {
+        if (testInfo.status === 'failed' && agent) {
+            console.log(`🧨 FALHA EM SOCIAL: ${testInfo.title}`);
+            await agent.captureEvidence(`FAILURE_SOCIAL_${testInfo.title.replace(/\s+/g, '_')}`, testInfo.error as Error);
+        }
+    });
 
-    const loops = 5;
+    // The Socialite: Create or Validate Family
+    test('The_Socialite_Manage_Family', async ({ page }) => {
+        agent = new SwarmHelpers(page, 'Social_Socialite', '🤝');
+        await agent.login();
+        await agent.navigateTo('Família');
 
-    for (let i = 1; i <= loops; i++) {
-        const interaction = faker.helpers.arrayElement(['stalking', 'reacting', 'posting']);
+        await agent.log('👨‍👩‍👧‍👦 Acessando Área Social...');
+        
+        // Check Header
+        await expect(page.getByRole('heading', { name: 'Família & Social' })).toBeVisible();
 
-        if (interaction === 'stalking') {
-            await page.evaluate(() => window.scrollBy({ top: 200, behavior: 'smooth' }));
+        // Check State: No Family vs Has Family
+        // If "Criar nova Família" is visible -> Create
+        const createHeader = page.getByRole('heading', { name: 'Criar nova Família' });
+        
+        if (await createHeader.isVisible()) {
+            await agent.log('🆕 Nenhuma família detectada. Criando...');
+            
+            await agent.fillSmartInput('Nome da Família', 'Família Swarm');
+            await agent.safeClick(page.getByRole('button', { name: 'Criar Família' }));
+            
+            // Wait for transition
+            await agent.log('⏳ Aguardando criação...');
+            await expect(page.getByRole('heading', { name: 'Família Swarm' })).toBeVisible({ timeout: 10000 });
+            await agent.log('✅ Família criada com sucesso!');
+        } else {
+            await agent.log('ℹ️ Usuário já tem família. Validando visualização...');
+            const familyName = page.locator('h2.text-3xl.font-bold');
+            await expect(familyName).toBeVisible();
+            await agent.log(`✅ Família detectada: ${await familyName.textContent()}`);
+            
+            // Validate Members section
+            await expect(page.getByText('Membros')).toBeVisible();
+            await expect(page.getByText('Convites')).toBeVisible();
         }
 
-        if (interaction === 'reacting') {
-            agent.log('💬 "Amei! ❤️"');
-            const likeBtn = page.locator('.heart-icon, button[aria-label="Like"]').first();
-            if (await likeBtn.isVisible()) {
-                await likeBtn.click();
-            } else {
-                await page.mouse.click(faker.number.int({min:300, max:500}), faker.number.int({min:300, max:500}));
-            }
-        }
-
-        if (interaction === 'posting') {
-            agent.log('💬 "Vou postar sobre minha economia."');
-            const postInput = page.getByPlaceholder(/No que você está pensando/i);
-            if (await postInput.isVisible()) {
-                await postInput.click();
-                await page.keyboard.type('Economizei muito hoje! #foco', { delay: 100 });
-                await page.waitForTimeout(500);
-                await page.keyboard.press('Escape'); 
-            }
-        }
-
-        await page.waitForTimeout(faker.number.int({min: 300, max: 900}));
-    }
-
-    agent.log('💬 "Por hoje é só, pessoal! Beijos."');
-    await page.waitForTimeout(5000);
+        await agent.captureEvidence('social_view');
+    });
 });

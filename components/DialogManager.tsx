@@ -16,11 +16,14 @@ import { ProfileAnalysisQuiz } from './onboarding/ProfileAnalysisQuiz';
 import { ImportTransactionsDialog } from './forms/ImportTransactionsDialog';
 import { TransactionCommentsDialog } from './social/TransactionCommentsDialog';
 import { FinanceHubAIDialog } from './ui/FinanceHubAIDialog';
+import { NotificationSheet } from './ui/NotificationSheet';
 
 export const DialogManager: React.FC = () => {
   const { dialogType, closeDialog, dialogProps } = useDialog();
 
   switch (dialogType) {
+    case 'notifications':
+        return <NotificationSheet isOpen={true} onClose={closeDialog} />;
     case 'add-goal':
       return <SmartGoalWizard isOpen={true} onClose={closeDialog} {...dialogProps} />;
     case 'add-debt':

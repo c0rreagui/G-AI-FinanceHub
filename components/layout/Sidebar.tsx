@@ -16,6 +16,7 @@ interface SidebarProps {
 const navigation = [
   { name: 'Início', view: 'home', icon: LayoutDashboard },
   { name: 'Transações', view: 'transactions', icon: ArrowLeftRight },
+  { name: 'Orçamentos', view: 'budgets', icon: PieChart },
   { name: 'Metas', view: 'goals', icon: Target },
   { name: 'Dívidas', view: 'debts', icon: TrendingDown },
   { name: 'Investimentos', view: 'investments', icon: PiggyBank },

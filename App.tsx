@@ -11,6 +11,7 @@ import { ToolsView } from './components/views/ToolsView';
 import { SettingsView } from './components/views/SettingsView';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { HomeDashboardView } from './components/views/HomeDashboardView';
+import { BudgetsView } from './components/views/BudgetsView';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { Transition } from 'framer-motion';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -132,6 +133,9 @@ const AppContent: React.FC = () => {
         break;
       case 'investments':
         viewComponent = <InvestmentsView />;
+        break;
+      case 'budgets':
+        viewComponent = <BudgetsView />;
         break;
     }
 

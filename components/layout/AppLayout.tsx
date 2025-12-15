@@ -9,8 +9,7 @@ import { ErrorModal } from '../ui/ErrorModal';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../contexts/ThemeContext';
 import { AuroraBackground } from '../ui/AuroraBackground';
-import { NotificationSheet } from '../ui/NotificationSheet';
-import { useNotifications } from '../../contexts/NotificationContext';
+
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -23,19 +22,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, currentView, set
   const { error, clearError } = useDashboardData();
   const { isGuest } = useAuth();
   const { wallpaper } = useTheme();
-  const { unreadCount } = useNotifications();
-  const [notificationSheetOpen, setNotificationSheetOpen] = useState(false);
-
-  // Pass notification props to children via cloning
-  const childrenWithProps = React.Children.map(children, child => {
-    if (React.isValidElement(child)) {
-      return React.cloneElement(child, { 
-        onNotificationClick: () => setNotificationSheetOpen(true),
-        unreadCount 
-      } as any);
-    }
-    return child;
-  });
+  // Direct children rendering without cloning
+  // Notification logic moved to DialogManager and PageHeader
 
   return (
     <>
@@ -54,7 +42,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, currentView, set
         
         <main className={`flex-1 flex flex-col overflow-hidden ${!isDesktop ? 'pb-20' : ''}`}>
           <div className="p-4 sm:p-6 lg:p-8 flex-grow flex flex-col h-full overflow-y-auto custom-scrollbar">
-              {childrenWithProps}
+              {children}
           </div>
         </main>
 
@@ -62,7 +50,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, currentView, set
       </div>
       <DialogManager />
       <ErrorModal isOpen={!!error} error={error} onClose={clearError} />
-      <NotificationSheet isOpen={notificationSheetOpen} onClose={() => setNotificationSheetOpen(false)} />
     </>
   );
 };

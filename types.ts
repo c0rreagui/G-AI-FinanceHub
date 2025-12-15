@@ -1,7 +1,7 @@
 import React from 'react';
 import { Database } from './types/database.types';
 
-export type ViewType = 'home' | 'transactions' | 'insights' | 'goals' | 'debts' | 'investments' | 'scheduling' | 'tools' | 'settings' | 'devtools' | 'design-system' | 'social';
+export type ViewType = 'home' | 'transactions' | 'budgets' | 'insights' | 'goals' | 'debts' | 'investments' | 'scheduling' | 'tools' | 'settings' | 'devtools' | 'design-system' | 'social';
 
 export type TransactionType = 'receita' | 'despesa' | 'transfer';
 export const TransactionType = {

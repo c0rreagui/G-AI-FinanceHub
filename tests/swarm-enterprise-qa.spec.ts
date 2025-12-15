@@ -3,12 +3,21 @@ import { SwarmHelpers } from './utils/SwarmHelpers';
 import { ChaosHelpers } from './utils/ChaosHelpers';
 
 test.describe('🛡️ Enterprise Swarm - QA & Security Squad', () => {
+    let agent: SwarmHelpers;
+
+    test.afterEach(async ({}, testInfo) => {
+        if (testInfo.status === 'failed' && agent) {
+            console.log(`🧨 DETECTADA FALHA NO TESTE: ${testInfo.title}`);
+            console.log('🤖 Iniciando Protocolo Black Box & Auto-Repro...');
+            await agent.captureEvidence(`FAILURE_${testInfo.title.replace(/\s+/g, '_')}`, testInfo.error as Error);
+        }
+    });
     
     // 🐞 Agent 6: The Bug Hunter
     // Focused on breaking inputs and UI logic with Rage Clicks and Fuzzing.
     test('🐞 The Bug Hunter (Monkey Testing)', async ({ page }) => {
         test.slow(); // Chaos takes time
-        const agent = new SwarmHelpers(page, 'Desktop_BugHunter', '🐞');
+        agent = new SwarmHelpers(page, 'Desktop_BugHunter', '🐞');
         const chaos = new ChaosHelpers(page);
         
         await agent.log('🐞 Hunter Mode ON. Preparando para o caos...');
@@ -54,7 +63,7 @@ test.describe('🛡️ Enterprise Swarm - QA & Security Squad', () => {
     // 🔒 Agent 7: The Security Officer
     // Validates Auth boundaries and session management.
     test('🔒 The Security Officer (Auth & Session)', async ({ page, context }) => {
-        const agent = new SwarmHelpers(page, 'Desktop_SecOfficer', '🔒');
+        agent = new SwarmHelpers(page, 'Desktop_SecOfficer', '🔒');
         const chaos = new ChaosHelpers(page);
         
         await agent.log('🔒 Security Audit Iniciada.');
@@ -84,7 +93,7 @@ test.describe('🛡️ Enterprise Swarm - QA & Security Squad', () => {
     // Tests resilience under poor network conditions.
     test('🐌 The Network Simpson (Slow 3G)', async ({ page }) => {
         test.slow();
-        const agent = new SwarmHelpers(page, 'Desktop_NetSimpson', '🐌');
+        agent = new SwarmHelpers(page, 'Desktop_NetSimpson', '🐌');
         const chaos = new ChaosHelpers(page);
 
         // Ativar Slow 3G ANTES do login
@@ -108,7 +117,7 @@ test.describe('🛡️ Enterprise Swarm - QA & Security Squad', () => {
     // 🚑 Agent 9: The Recovery Specialist
     // Validates error pages and smooth degradation.
     test('🚑 The Recovery Specialist (404 & Errors)', async ({ page }) => {
-        const agent = new SwarmHelpers(page, 'Desktop_Recovery', '🚑');
+        agent = new SwarmHelpers(page, 'Desktop_Recovery', '🚑');
         
         await agent.login();
 

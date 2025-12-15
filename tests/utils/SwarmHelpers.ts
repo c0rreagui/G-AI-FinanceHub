@@ -2,18 +2,22 @@ import { Page, expect, Locator } from '@playwright/test';
 import { Brain } from './Brain';
 import { SwarmMemory } from './SwarmMemory';
 import { SwarmHunter } from './SwarmHunter';
+import { SwarmDebugger } from './SwarmDebugger';
+import * as fs from 'fs';
 
 export class SwarmHelpers {
     readonly page: Page;
     readonly agentName: string;
     readonly emoji: string;
     readonly hunter: SwarmHunter;
+    readonly debugger: SwarmDebugger;
 
     constructor(page: Page, agentName: string, emoji: string) {
         this.page = page;
         this.agentName = agentName;
         this.emoji = emoji;
         this.hunter = new SwarmHunter(page, this);
+        this.debugger = new SwarmDebugger(page, agentName);
         
         // Load Memory
         const mem = SwarmMemory.getMemory(agentName);
@@ -26,13 +30,23 @@ export class SwarmHelpers {
         console.log(`${this.emoji} [${this.agentName.padEnd(10)}] 👉 ${message}`);
     }
 
-    async captureEvidence(trigger: string) {
+    async captureEvidence(trigger: string, error?: Error) {
         const timestamp = new Date().toISOString().replace(/:/g, '-').split('.')[0];
         const sanitizedTrigger = trigger.replace(/[^a-z0-9]/gi, '_');
-        const path = `tests/evidence/${this.agentName}/${timestamp}_${sanitizedTrigger}.png`;
+        const basePath = `tests/evidence/${this.agentName}/${timestamp}_${sanitizedTrigger}`;
+        
         try {
-            await this.page.screenshot({ path, fullPage: false });
-            // this.log(`📸 Evidence captured: ${path}`);
+            await this.page.screenshot({ path: `${basePath}.png`, fullPage: false });
+            
+            if (error) {
+                // Generate Black Box Dump
+                const dump = this.debugger.getBlackBoxDump();
+                fs.writeFileSync(`${basePath}_blackbox.txt`, dump);
+                
+                // Generate Repro Script
+                const reproFile = await this.debugger.generateReproScript(error);
+                this.log(`🔧 REPRO SCRIPT GERADO: tests/repros/${reproFile}`);
+            }
         } catch (e) {
             console.error('Snapshot failed', e);
         }
@@ -143,6 +157,7 @@ export class SwarmHelpers {
      */
     async navigateTo(destination: string) {
         this.log(`🧭 Navegando para: ${destination}...`);
+        this.debugger.logAction('navigate', destination, `Navegar para ${destination}`, destination);
         
         // 1. Tentar Sidebar Desktop
         const navContainer = this.page.locator('nav, aside, [class*="sidebar"], [class*="menu"]').first();
@@ -182,6 +197,7 @@ export class SwarmHelpers {
     async safeClick(selector: Locator) {
         try {
             await selector.waitFor({ state: 'visible', timeout: 5000 });
+            this.debugger.logAction('click', String(selector), 'Clique seguro');
             await selector.click();
         } catch (e) {
             this.log(`⚠️ Forçando clique em: ${selector}`);
@@ -198,6 +214,7 @@ export class SwarmHelpers {
 
     async fillSmartInput(identifier: string, value: string) {
         this.log(`⌨️ Preenchendo campo "${identifier}" com "${value}"...`);
+        this.debugger.logAction('fill', identifier, `Preencher "${identifier}"`, value);
         
         // 1. Try by Label (Best Practice)
         let input = this.page.getByLabel(identifier, { exact: false }).first();
@@ -388,6 +405,7 @@ export class SwarmHelpers {
      */
     async selectOption(triggerLabel: string, option: number | string = 0) {
         this.log(`🔽 Abrindo select "${triggerLabel}" para escolher "${option}"...`);
+        this.debugger.logAction('select', triggerLabel, `Selecionar "${option}" em "${triggerLabel}"`, String(option));
         
         // Find trigger by Label or Text
         // Strategy: trigger usually usually has an aria-labelledby or just nearby text.

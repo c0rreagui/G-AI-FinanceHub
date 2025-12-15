@@ -401,5 +401,126 @@
       "success": 0,
       "failure": 0
     }
+  },
+  "Budget_Planner": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Budget_CFO": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Goal_Planner": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Debt_Debtor": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Scheduling_Organizer": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Insights_Analyst": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Tools_Engineer": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Social_Socialite": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Notification_Sentinel": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Debugger": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Sanity": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
   }
 }

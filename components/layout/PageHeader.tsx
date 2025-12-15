@@ -3,10 +3,12 @@ import { ChevronDown, Bell, Search, User, LogOut, Settings, Command } from 'luci
 import { PrivacyToggle } from '../ui/PrivacyMask';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../contexts/ThemeContext';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
+import { useDialog } from '../../hooks/useDialog';
+import { useNotifications } from '../../contexts/NotificationContext';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/Avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
 import { MicrophoneButton } from '../ui/MicrophoneButton';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
 
 interface PageHeaderProps {
   icon: React.ElementType | React.ReactNode;
@@ -15,14 +17,17 @@ interface PageHeaderProps {
   breadcrumbs?: string[];
   actions?: React.ReactNode;
   children?: React.ReactNode;
-  onNotificationClick?: () => void;
   unreadCount?: number;
 }
 
-export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs = [], actions, children, onNotificationClick, unreadCount = 0 }) => {
+export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs = [], actions, children, unreadCount: propUnreadCount }) => {
   const { user, logout, isDeveloper } = useAuth();
+  const { openDialog } = useDialog();
+  const { unreadCount: contextUnreadCount } = useNotifications();
   const { greetingName } = useTheme();
   const [greeting, setGreeting] = useState({ text: 'Bem-vindo', icon: '👋' });
+
+  const unreadCount = propUnreadCount ?? contextUnreadCount;
 
   useEffect(() => {
     const updateGreeting = () => {
@@ -89,37 +94,26 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs
              size="sm"
              onRecordingStop={() => {}} 
          />
-         <TooltipProvider>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <button className="relative w-10 h-10 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors border border-border overflow-visible">
-                        <Search className="w-5 h-5" />
-                        <span className="absolute -bottom-2 -right-2 bg-popover text-[9px] px-1 rounded border border-border text-muted-foreground flex items-center gap-0.5 shadow-sm z-10">
-                            <Command className="w-2 h-2" />K
-                        </span>
-                    </button>
-                </TooltipTrigger>
-                <TooltipContent>Buscar (Cmd+K)</TooltipContent>
-            </Tooltip>
+         <button className="relative w-10 h-10 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors border border-border overflow-visible">
+            <Search className="w-5 h-5" />
+            <span className="absolute -bottom-2 -right-2 bg-popover text-[9px] px-1 rounded border border-border text-muted-foreground flex items-center gap-0.5 shadow-sm z-10">
+                <Command className="w-2 h-2" />K
+            </span>
+         </button>
 
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <button 
-                        onClick={onNotificationClick}
-                        title="Notificações"
-                        className="relative w-10 h-10 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors border border-border"
-                    >
-                        <Bell className="w-5 h-5" />
-                        {unreadCount > 0 && (
-                            <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-lg">
-                                {unreadCount > 9 ? '9+' : unreadCount}
-                            </span>
-                        )}
-                    </button>
-                </TooltipTrigger>
-                <TooltipContent>Notificações {unreadCount > 0 && `(${unreadCount})`}</TooltipContent>
-            </Tooltip>
-         </TooltipProvider>
+         <button 
+             data-testid="notification-bell"
+             onClick={() => {
+                 openDialog('notifications');
+             }}
+             title="Notificações"
+             className="relative w-10 h-10 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors border border-border"
+         >
+             <Bell className="w-5 h-5" />
+             {unreadCount > 0 && (
+                 <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+             )}
+         </button>
 
          <div className="h-8 w-px bg-border mx-1" />
 
