@@ -52,7 +52,11 @@ export const AddIncomeDrawer: React.FC<AddIncomeDrawerProps> = ({ isOpen, onClos
                 type: TransactionType.RECEITA,
                 categoryId,
                 account_id: accounts[0].id,
-                status: TransactionStatus.COMPLETED
+                status: TransactionStatus.COMPLETED,
+                created_at: new Date().toISOString(),
+                goal_contribution_id: null,
+                debt_payment_id: null,
+                investment_id: null
             });
             
             showToast('Receita registrada!', { type: 'success' });

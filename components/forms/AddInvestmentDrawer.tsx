@@ -58,7 +58,11 @@ export const AddInvestmentDrawer: React.FC<AddInvestmentDrawerProps> = ({ isOpen
                 type: TransactionType.DESPESA, // Investments are technically outflows initially
                 categoryId: investCat.id,
                 account_id: accounts[0].id,
-                status: TransactionStatus.COMPLETED
+                status: TransactionStatus.COMPLETED,
+                created_at: new Date().toISOString(),
+                goal_contribution_id: null,
+                debt_payment_id: null,
+                investment_id: null
             });
             
             showToast('Investimento registrado!', { type: 'success' });

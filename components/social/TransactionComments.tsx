@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { supabase } from '../../services/supabaseClient';
 import { TransactionComment } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
-import { SmartInput } from '../ui/SmartInput';
+import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { Send, MessageSquare } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -142,9 +142,9 @@ export const TransactionComments: React.FC<TransactionCommentsProps> = ({ transa
 
             <div className="flex gap-2 pt-2 border-t border-white/10">
                 <div className="flex-1">
-                    <SmartInput
+                    <Input
                         value={newComment}
-                        onChange={setNewComment}
+                        onChange={(e) => setNewComment(e.target.value)}
                         placeholder="Escreva um comentário..."
                         onKeyDown={(e) => {
                             if (e.key === 'Enter' && !e.shiftKey) {

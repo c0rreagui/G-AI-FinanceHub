@@ -1,6 +1,6 @@
 export const Brain = {
     routes: {
-        home: 'http://localhost:3001/',
+        home: 'http://localhost:3000/',
         transactions: '/transactions',
         goals: '/goals',
         debts: '/debts',

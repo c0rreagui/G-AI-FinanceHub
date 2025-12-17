@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSocial } from '../../contexts/SocialContext';
-import { SmartInput } from '../ui/SmartInput';
+import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { Mail, Copy, Check, Clock } from 'lucide-react';
 import { useToast } from '../../hooks/useToast';
@@ -32,11 +32,11 @@ export const FamilyInvite: React.FC = () => {
                 <h3 className="text-lg font-semibold text-white">Convidar Membro</h3>
                 <div className="flex gap-2">
                     <div className="flex-1">
-                        <SmartInput
+                        <Input
+                            type="email"
                             value={email}
-                            onChange={setEmail}
+                            onChange={(e) => setEmail(e.target.value)}
                             placeholder="Email do membro"
-                            icon={<Mail size={16} />}
                         />
                     </div>
                     <Button 

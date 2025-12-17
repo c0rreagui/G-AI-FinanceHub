@@ -225,7 +225,8 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                   type,
                   categoryId,
                   startDate: new Date(date).toISOString(),
-                  frequency
+                  frequency,
+                  created_at: new Date().toISOString()
               });
           } else {
               // Add Regular Transaction
@@ -242,6 +243,10 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                   status,
                   exclude_from_reports: excludeFromReports,
                   reconciled,
+                  created_at: new Date().toISOString(),
+                  goal_contribution_id: null,
+                  debt_payment_id: null,
+                  investment_id: null
               };
 
               if (!isEditing) {

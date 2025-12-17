@@ -25,7 +25,10 @@ export const AddInvestmentModal: React.FC<AddInvestmentModalProps> = ({ isOpen, 
     quantity: 1,
     purchase_date: new Date().toISOString().split('T')[0],
     sector: '',
-    current_price: 0
+    current_price: 0,
+    color: null,
+    logo_url: null,
+    created_at: new Date().toISOString()
   });
 
   useEffect(() => {
@@ -38,7 +41,10 @@ export const AddInvestmentModal: React.FC<AddInvestmentModalProps> = ({ isOpen, 
             quantity: investmentToEdit.quantity,
             purchase_date: new Date(investmentToEdit.purchase_date).toISOString().split('T')[0],
             sector: investmentToEdit.sector || '',
-            current_price: investmentToEdit.current_price || 0
+            current_price: investmentToEdit.current_price || 0,
+            color: investmentToEdit.color || null,
+            logo_url: investmentToEdit.logo_url || null,
+            created_at: investmentToEdit.created_at
         });
     } else {
         setFormData({
@@ -49,7 +55,10 @@ export const AddInvestmentModal: React.FC<AddInvestmentModalProps> = ({ isOpen, 
             quantity: 1,
             purchase_date: new Date().toISOString().split('T')[0],
             sector: '',
-            current_price: 0
+            current_price: 0,
+            color: null,
+            logo_url: null,
+            created_at: new Date().toISOString()
         });
     }
   }, [investmentToEdit, isOpen]);
@@ -90,7 +99,10 @@ export const AddInvestmentModal: React.FC<AddInvestmentModalProps> = ({ isOpen, 
                 quantity: 1,
                 purchase_date: new Date().toISOString().split('T')[0],
                 sector: '',
-                current_price: 0
+                current_price: 0,
+                color: null,
+                logo_url: null,
+                created_at: new Date().toISOString()
             });
         }
       }

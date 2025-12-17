@@ -45,6 +45,7 @@ export const AddDebtForm: React.FC<AddDebtFormProps> = ({ isOpen, onClose }) => 
         totalAmount: parsedAmount,
         interestRate: parsedRate,
         category: category || 'Outros',
+        created_at: new Date().toISOString()
     };
     
     const newDebt = await addDebt(debtData);

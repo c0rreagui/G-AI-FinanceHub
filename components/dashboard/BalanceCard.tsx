@@ -1,7 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { AnimatedCurrency } from '../ui/AnimatedCurrency';
-import { Heading, Text } from '../ui/Typography';
 import { cn } from '../../utils/utils';
 import { formatCurrency } from '../../utils/formatters';
 import { usePrivacy } from '../../contexts/PrivacyContext';

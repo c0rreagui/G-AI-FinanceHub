@@ -69,7 +69,11 @@ export const AddExpenseDrawer: React.FC<AddExpenseDrawerProps> = ({ isOpen, onCl
                 type: TransactionType.DESPESA,
                 categoryId,
                 status: TransactionStatus.COMPLETED,
-                account_id: accounts[0].id
+                account_id: accounts[0].id,
+                created_at: new Date().toISOString(),
+                goal_contribution_id: null,
+                debt_payment_id: null,
+                investment_id: null
             });
             
             showToast('Despesa registrada!', { type: 'success' });

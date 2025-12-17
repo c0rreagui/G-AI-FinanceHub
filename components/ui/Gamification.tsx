@@ -1,6 +1,6 @@
 import React from 'react';
 import { Trophy, Star } from 'lucide-react';
-import { Progress } from './progress';
+import { Progress } from './Progress';
 
 interface GamificationProps {
   level: number;

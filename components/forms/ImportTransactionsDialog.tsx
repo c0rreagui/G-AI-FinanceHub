@@ -111,7 +111,11 @@ export const ImportTransactionsDialog: React.FC<ImportTransactionsDialogProps> =
                 type: tx.type,
                 categoryId: tx.categoryId || defaultCategory.id,
                 account_id: 'acc_1',
-                status: 'completed' as any
+                status: 'completed' as any,
+                created_at: new Date().toISOString(),
+                goal_contribution_id: null,
+                debt_payment_id: null,
+                investment_id: null
             });
         }
         onClose();

@@ -67,7 +67,8 @@ export const SmartGoalWizard: React.FC<SmartGoalWizardProps> = ({ isOpen, onClos
         await addGoal({
             name: formData.name,
             targetAmount: parseFloat(formData.targetAmount),
-            deadline: formData.deadline
+            deadline: formData.deadline,
+            created_at: new Date().toISOString()
         });
         onClose();
         setStep('type');

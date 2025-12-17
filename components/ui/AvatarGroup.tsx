@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/utils/utils';
-import { Avatar, AvatarFallback, AvatarImage } from './avatar';
+import { Avatar, AvatarFallback, AvatarImage } from './Avatar';
 
 interface AvatarGroupProps {
   users: { name: string; image?: string }[];

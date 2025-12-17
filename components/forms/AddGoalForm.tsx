@@ -46,6 +46,7 @@ export const AddGoalForm: React.FC<AddGoalFormProps> = ({ isOpen, onClose }) => 
         name,
         targetAmount: parsedAmount,
         deadline: utcDeadline.toISOString(),
+        created_at: new Date().toISOString()
     };
 
     const newGoal = await addGoal(goalData);
