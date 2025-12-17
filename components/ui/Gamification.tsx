@@ -1,3 +1,4 @@
+/* eslint-disable react-dom/no-unsafe-inline-style */
 import React from 'react';
 import { Trophy, Star } from 'lucide-react';
 import { Progress } from './Progress';

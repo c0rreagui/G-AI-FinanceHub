@@ -64,13 +64,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
                         onClick={() => setCurrentView(item.view as ViewType)}
                         whileTap={{ scale: 0.95 }}
                         className={cn(
-                            "relative w-full flex items-center h-12 rounded-xl transition-all duration-200 group/item overflow-hidden",
+                            "relative w-full flex items-center h-12 rounded-xl transition-all duration-200 group/item",
                             isActive ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                         )}
                     >
-                        {isActive && <motion.div layoutId="active-indicator" className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full shadow-[0_0_10px_var(--primary)]" />}
-                        <div className="w-14 flex items-center justify-center flex-shrink-0">
-                            <item.icon className={cn("w-6 h-6 transition-transform group-hover/item:scale-110", isActive ? 'text-primary' : '')} />
+                        {isActive && <motion.div layoutId="active-indicator" className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full" />}
+                        <div className={cn(
+                            "w-14 flex items-center justify-center flex-shrink-0",
+                            isActive && "text-primary"
+                        )}>
+                            <item.icon className={cn(
+                                "w-5 h-5 transition-transform group-hover/item:scale-110",
+                                isActive ? 'text-primary drop-shadow-[0_0_8px_hsl(var(--primary))]' : ''
+                            )} />
                         </div>
                         <span className={cn(
                             "transition-all duration-300 font-medium text-sm whitespace-nowrap overflow-hidden",
