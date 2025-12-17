@@ -87,7 +87,7 @@ export const TransactionComments: React.FC<TransactionCommentsProps> = ({ transa
                     transaction_id: transactionId,
                     user_id: user.id,
                     content: newComment.trim()
-                });
+                } as any);
 
             if (error) throw error;
             setNewComment('');

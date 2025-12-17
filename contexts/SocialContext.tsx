@@ -35,8 +35,7 @@ export const SocialProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 .from('user_families')
                 .select('family_id, role')
                 .eq('user_id', user.id)
-                .eq('user_id', user.id)
-                .maybeSingle();
+                .maybeSingle() as { data: { family_id: string; role: string } | null; error: any };
 
             if (ufError) {
                 console.error('Error fetching user family:', ufError);
@@ -74,7 +73,7 @@ export const SocialProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                     .eq('family_id', userFamily.family_id)
                     .eq('status', 'pending');
                 
-                if (invitesData) setInvites(invitesData.map(i => ({...i, status: i.status as 'pending' | 'accepted' | 'expired'})));
+                if (invitesData) setInvites((invitesData as any[]).map(i => ({...i, status: i.status as 'pending' | 'accepted' | 'expired'})));
 
             } else {
                 setFamily(null);
@@ -98,7 +97,7 @@ export const SocialProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             // 1. Create Family
             const { data: familyData, error: familyError } = await supabase
                 .from('families')
-                .insert({ name, created_by: user.id })
+                .insert({ name, created_by: user.id } as any)
                 .select()
                 .single();
 
@@ -109,9 +108,9 @@ export const SocialProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 .from('user_families')
                 .insert({
                     user_id: user.id,
-                    family_id: familyData.id,
+                    family_id: familyData?.id,
                     role: 'admin'
-                });
+                } as any);
 
             if (memberError) throw memberError;
 
@@ -132,7 +131,7 @@ export const SocialProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                     family_id: family.id,
                     email,
                     created_by: user?.id
-                });
+                } as any);
 
             if (error) throw error;
             showToast(`Convite enviado para ${email}!`, { type: 'success' });
@@ -152,8 +151,7 @@ export const SocialProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 .select('*')
                 .eq('token', token)
                 .eq('status', 'pending')
-                .eq('status', 'pending')
-                .maybeSingle();
+                .maybeSingle() as { data: any; error: any };
 
             if (inviteError || !invite) throw new Error('Convite inválido ou expirado.');
 
@@ -164,14 +162,14 @@ export const SocialProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                     user_id: user.id,
                     family_id: invite.family_id,
                     role: 'member'
-                });
+                } as any);
 
             if (joinError) throw joinError;
 
             // 3. Update Invite Status
             await supabase
                 .from('family_invites')
-                .update({ status: 'accepted' })
+                .update({ status: 'accepted' } as any)
                 .eq('id', invite.id);
 
             showToast('Você entrou na família!', { type: 'success' });
