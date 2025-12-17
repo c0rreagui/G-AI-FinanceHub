@@ -23,14 +23,14 @@ export interface WidgetConfig {
 }
 
 const DEFAULT_LAYOUT: WidgetConfig[] = [
-    { id: 'daily_tip', isVisible: true, colSpan: { md: 4, lg: 4 } }, // Full width
-    { id: 'balance', isVisible: true, colSpan: { md: 4, lg: 4 } },
-    { id: 'budget_tracker', isVisible: true, colSpan: { md: 2, lg: 2 } }, // New Budget Widget
-    { id: 'charts', isVisible: true, colSpan: { md: 4, lg: 4 } },
-    { id: 'health', isVisible: true, colSpan: { md: 2, lg: 2 } },
-    { id: 'challenges', isVisible: true, colSpan: { md: 2, lg: 2 } },
-    { id: 'quick-actions', isVisible: true, colSpan: { md: 2, lg: 2 } },
-    { id: 'recent_transactions', isVisible: true, colSpan: { md: 2, lg: 2 } },
+    { id: 'daily_tip', isVisible: true, colSpan: { md: 3, lg: 3 } },
+    { id: 'balance', isVisible: true, colSpan: { md: 3, lg: 3 } }, // Row 1: KPI Summary
+    { id: 'charts', isVisible: true, colSpan: { md: 3, lg: 3 } }, // Row 2: Main Trend Chart (Full Width)
+    { id: 'budget_tracker', isVisible: true, colSpan: { md: 3, lg: 1 } }, // Row 3 Col 1
+    { id: 'health', isVisible: true, colSpan: { md: 3, lg: 1 } }, // Row 3 Col 2
+    { id: 'challenges', isVisible: true, colSpan: { md: 3, lg: 1 } }, // Row 3 Col 3
+    { id: 'quick-actions', isVisible: true, colSpan: { md: 3, lg: 3 } }, // Row 4: Actions (Full Width or split?) - Let's keep it full for now or move to side? Actually user said "charts sense", so recent transactions is better below.
+    { id: 'recent_transactions', isVisible: true, colSpan: { md: 3, lg: 3 } }, // Row 5: Data List
 ];
 
 const STORAGE_KEY = 'financehub_layout_v2';

@@ -208,7 +208,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
             initial="hidden"
             animate="visible"
             variants={variants}
-            className={`p-4 md:p-8 max-w-7xl mx-auto ${containerSpacing}`}
+            className={`p-4 md:p-8 max-w-6xl mx-auto ${containerSpacing}`}
         >
             <div className="flex justify-between items-center mb-8">
                 <div className="w-full">
@@ -338,7 +338,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                 axis="y" 
                 values={layout} 
                 onReorder={setLayout} 
-                className={`grid grid-cols-1 md:grid-cols-4 ${gridGap}`}
+                className={`grid grid-cols-1 md:grid-cols-3 ${gridGap}`}
             >
                 {layout.map((widget) => {
                     const content = renderWidget(widget.id);
