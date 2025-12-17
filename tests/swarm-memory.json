@@ -657,5 +657,16 @@
       "success": 0,
       "failure": 0
     }
+  },
+  "VisualVerifier": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
   }
 }

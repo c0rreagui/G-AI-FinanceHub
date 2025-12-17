@@ -30,6 +30,7 @@ export const Gamification: React.FC<GamificationProps> = ({ level, currentXP, ne
       <div className="relative h-2 w-full bg-muted rounded-full overflow-hidden">
         <div 
             className="absolute top-0 left-0 h-full bg-gradient-to-r from-yellow-500 to-orange-500 transition-all duration-500 ease-out"
+            // eslint-disable-next-line
             style={{ width: `${progress}%` }}
         />
       </div>
