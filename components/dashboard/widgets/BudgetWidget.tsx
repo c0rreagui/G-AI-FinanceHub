@@ -11,7 +11,7 @@ export const BudgetWidget: React.FC = () => {
     
     // Mock Budget Limit (In a real app, this would come from a settings context or API)
     const MONTHLY_LIMIT = 5000;
-    const currentSpent = summary.monthlyExpenses;
+    const currentSpent = Math.abs(summary.monthlyExpenses);
 
     // Calculate spending by category for SpendingBar
     const expenses = transactions.filter(t => t.type === TransactionType.DESPESA);
