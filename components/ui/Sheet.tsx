@@ -19,13 +19,13 @@ const overlayVariants = {
 
 const sheetVariants = {
     hidden: (side: string) => ({ x: side === 'right' ? '100%' : '-100%' }),
-    visible: { x: 0, transition: { type: 'spring', damping: 25, stiffness: 300 } },
+    visible: { x: 0, transition: { type: 'spring' as const, damping: 25, stiffness: 300 } },
     exit: (side: string) => ({ x: side === 'right' ? '100%' : '-100%' })
 };
 
 const drawerVariants = {
     hidden: { y: '100%' },
-    visible: { y: 0, transition: { type: 'spring', damping: 25, stiffness: 300 } },
+    visible: { y: 0, transition: { type: 'spring' as const, damping: 25, stiffness: 300 } },
     exit: { y: '100%' }
 };
 

@@ -21,7 +21,7 @@ const drawerVariants = {
     hidden: { y: '100%' },
     visible: { y: 0, transition: { type: 'spring', damping: 25, stiffness: 300 } },
     exit: { y: '100%' }
-};
+} as const;
 
 const modalVariants = {
     hidden: { opacity: 0, scale: 0.95 },

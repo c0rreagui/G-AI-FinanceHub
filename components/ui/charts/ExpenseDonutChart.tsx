@@ -7,6 +7,7 @@ interface ExpenseCategory {
   name: string;
   value: number;
   color: string;
+  [key: string]: string | number; // Index signature for recharts 3.x
 }
 
 interface ExpenseDonutChartProps {

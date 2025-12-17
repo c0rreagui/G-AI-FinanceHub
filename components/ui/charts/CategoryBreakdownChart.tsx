@@ -104,8 +104,6 @@ export const CategoryBreakdownChart: React.FC<CategoryBreakdownChartProps> = ({ 
             <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                     <Pie
-                        activeIndex={activeIndex}
-                        activeShape={renderActiveShape}
                         data={data}
                         cx="50%"
                         cy="50%"
@@ -114,9 +112,15 @@ export const CategoryBreakdownChart: React.FC<CategoryBreakdownChartProps> = ({ 
                         paddingAngle={2}
                         dataKey="value"
                         onMouseEnter={onPieEnter}
+                        activeShape={renderActiveShape as any}
                     >
                         {data.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} stroke="rgba(0,0,0,0.2)" strokeWidth={2} />
+                            <Cell 
+                                key={`cell-${index}`} 
+                                fill={entry.color} 
+                                stroke="rgba(0,0,0,0.2)" 
+                                strokeWidth={activeIndex === index ? 4 : 2} 
+                            />
                         ))}
                     </Pie>
                     {!isMobile && <Legend layout="vertical" verticalAlign="middle" align="right" />}

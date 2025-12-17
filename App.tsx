@@ -1,27 +1,16 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, Suspense, lazy } from 'react';
 import { AuthView } from './components/views/AuthView';
 import { AppLayout } from './components/layout/AppLayout';
 import { ViewType } from './types';
-import { TransactionsView } from './components/views/TransactionsView';
-import { InsightsView } from './components/views/InsightsView';
-import { GoalsView } from './components/views/GoalsView';
-import { DebtsView } from './components/views/DebtsView';
-import { SchedulingView } from './components/views/SchedulingView';
-import { ToolsView } from './components/views/ToolsView';
-import { SettingsView } from './components/views/SettingsView';
 import { LoadingSpinner } from './components/LoadingSpinner';
-import { HomeDashboardView } from './components/views/HomeDashboardView';
-import { BudgetsView } from './components/views/BudgetsView';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { Transition } from 'framer-motion';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ToastContainer } from './components/ui/ToastContainer';
-import { DesignSystemView } from './components/views/DesignSystemView';
 import { OnboardingView } from './components/views/OnboardingView';
 import { GuestModeBanner } from '@/components/GuestModeBanner';
 import { logger } from './services/loggingService';
 import { APP_VERSION, APP_CODENAME } from './config';
-import { DevToolsView } from './components/views/DevToolsView';
 import { PrivacyProvider } from './contexts/PrivacyContext';
 import { useAuth, AuthProvider } from './hooks/useAuth';
 import { useDialog } from './hooks/useDialog';
@@ -31,10 +20,30 @@ import { DialogProvider } from './contexts/DialogContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { SocialProvider } from './contexts/SocialContext';
-import { SocialView } from './components/views/SocialView';
-import { InvestmentsView } from './components/views/InvestmentsView';
 import { useAutoAlerts } from './hooks/useAutoAlerts';
 import { NotificationProvider } from './contexts/NotificationContext';
+
+// Lazy load all views for code-splitting
+const HomeDashboardView = lazy(() => import('./components/views/HomeDashboardView').then(m => ({ default: m.HomeDashboardView })));
+const TransactionsView = lazy(() => import('./components/views/TransactionsView').then(m => ({ default: m.TransactionsView })));
+const InsightsView = lazy(() => import('./components/views/InsightsView').then(m => ({ default: m.InsightsView })));
+const GoalsView = lazy(() => import('./components/views/GoalsView').then(m => ({ default: m.GoalsView })));
+const DebtsView = lazy(() => import('./components/views/DebtsView').then(m => ({ default: m.DebtsView })));
+const SchedulingView = lazy(() => import('./components/views/SchedulingView').then(m => ({ default: m.SchedulingView })));
+const ToolsView = lazy(() => import('./components/views/ToolsView').then(m => ({ default: m.ToolsView })));
+const SettingsView = lazy(() => import('./components/views/SettingsView').then(m => ({ default: m.SettingsView })));
+const DevToolsView = lazy(() => import('./components/views/DevToolsView').then(m => ({ default: m.DevToolsView })));
+const DesignSystemView = lazy(() => import('./components/views/DesignSystemView').then(m => ({ default: m.DesignSystemView })));
+const SocialView = lazy(() => import('./components/views/SocialView').then(m => ({ default: m.SocialView })));
+const InvestmentsView = lazy(() => import('./components/views/InvestmentsView').then(m => ({ default: m.InvestmentsView })));
+const BudgetsView = lazy(() => import('./components/views/BudgetsView').then(m => ({ default: m.BudgetsView })));
+
+// Loading fallback component
+const ViewLoadingFallback = () => (
+  <div className="flex items-center justify-center h-full min-h-[400px]">
+    <LoadingSpinner />
+  </div>
+);
 
 const AppContent: React.FC = () => {
   const { user, loading, isGuest, isDeveloper } = useAuth();
@@ -149,7 +158,9 @@ const AppContent: React.FC = () => {
         transition={pageTransition}
         {...({ className: "flex flex-col flex-grow h-full" } as any)}
       >
-        {viewComponent}
+        <Suspense fallback={<ViewLoadingFallback />}>
+          {viewComponent}
+        </Suspense>
       </motion.div>
     );
   }, [currentView]);
