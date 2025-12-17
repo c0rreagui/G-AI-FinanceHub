@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { PageHeader } from '../layout/PageHeader';
 import { Target, PlusCircle, Wallet, PieChart } from '../Icons';
 import { useDashboardData } from '../../hooks/useDashboardData';
@@ -11,6 +12,19 @@ import { GoalCard } from '../goals/GoalCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/Tabs';
 import { BudgetManager } from '../budgets/BudgetManager';
 
+// Stagger animation variants
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: { staggerChildren: 0.1, delayChildren: 0.1 }
+    }
+};
+
+const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.3 } }
+};
 export const GoalsView: React.FC = () => {
     const { goals, loading } = useDashboardData();
     const { openDialog } = useDialog();
@@ -64,11 +78,18 @@ export const GoalsView: React.FC = () => {
                         </div>
 
                         {goals.length > 0 ? (
-                            <Grid cols={1} className="md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <motion.div
+                                variants={containerVariants}
+                                initial="hidden"
+                                animate="visible"
+                                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                            >
                                 {goals.map(goal => (
-                                    <GoalCard key={goal.id} goal={goal} />
+                                    <motion.div key={goal.id} variants={itemVariants}>
+                                        <GoalCard goal={goal} />
+                                    </motion.div>
                                 ))}
-                            </Grid>
+                            </motion.div>
                         ) : (
                             <EmptyState
                                 icon={Target}
