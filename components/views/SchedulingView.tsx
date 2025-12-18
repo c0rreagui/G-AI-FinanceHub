@@ -188,12 +188,16 @@ export const SchedulingView: React.FC = () => {
                                 <button 
                                     onClick={() => setViewMode('list')}
                                     className={`p-1.5 rounded-md transition-all ${viewMode === 'list' ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400 hover:text-white'}`}
+                                    aria-label="Mudar para visualização em lista"
+                                    title="Lista"
                                 >
                                     <List className="w-4 h-4" />
                                 </button>
                                 <button 
                                     onClick={() => setViewMode('calendar')}
                                     className={`p-1.5 rounded-md transition-all ${viewMode === 'calendar' ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400 hover:text-white'}`}
+                                    aria-label="Mudar para visualização em calendário"
+                                    title="Calendário"
                                 >
                                     <LayoutGrid className="w-4 h-4" />
                                 </button>
@@ -268,13 +272,21 @@ export const SchedulingView: React.FC = () => {
                                                 {currentMonthName}
                                             </h3>
                                             <div className="flex gap-1 bg-black/20 rounded-lg p-1">
-                                                <button onClick={prevMonth} className="p-2 hover:bg-white/10 rounded-md transition-colors">
+                                                <button 
+                                                    onClick={prevMonth} 
+                                                    className="p-2 hover:bg-white/10 rounded-md transition-colors"
+                                                    aria-label="Mês anterior"
+                                                >
                                                     <ChevronDown className="w-5 h-5 rotate-90" />
                                                 </button>
                                                 <button onClick={() => setCurrentDate(new Date())} className="px-3 text-xs font-medium hover:bg-white/10 rounded-md transition-colors">
                                                     Hoje
                                                 </button>
-                                                <button onClick={nextMonth} className="p-2 hover:bg-white/10 rounded-md transition-colors">
+                                                <button 
+                                                    onClick={nextMonth} 
+                                                    className="p-2 hover:bg-white/10 rounded-md transition-colors"
+                                                    aria-label="Próximo mês"
+                                                >
                                                     <ChevronDown className="w-5 h-5 -rotate-90" />
                                                 </button>
                                             </div>

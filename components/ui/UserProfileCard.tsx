@@ -76,7 +76,7 @@ export const UserProfileCard: React.FC = () => {
                           onClick={() => setIsInfoVisible(!isInfoVisible)}
                           className="p-2 -m-2 rounded-full text-gray-500 hover:bg-white/10"
                           aria-label="Exibir informações sobre como ganhar pontos de experiência (XP)"
-                          aria-expanded={isInfoVisible}
+                          aria-expanded={isInfoVisible ? true : false}
                         >
                           <span className="w-5 h-5 rounded-full border border-dashed border-gray-500 text-xs flex items-center justify-center cursor-help">?</span>
                         </button>

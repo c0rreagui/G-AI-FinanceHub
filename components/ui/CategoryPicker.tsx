@@ -50,8 +50,7 @@ const CategoryGridItem: React.FC<CategoryGridItemProps> = ({ category, isSelecte
             }`}
             title={category.name}
             aria-label={`Selecionar categoria: ${category.name}`}
-            // eslint-disable-next-line
-            aria-pressed={isSelected}
+            aria-pressed={isSelected ? true : false}
         >
             <div 
                 ref={iconContainerRef}
