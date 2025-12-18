@@ -29,7 +29,7 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({ balance, className, tr
       
       {/* Sparkline Background */}
       <div className="absolute bottom-0 left-0 right-0 h-20 opacity-20 pointer-events-none">
-        <svg viewBox="0 0 100 20" className="w-full h-full" preserveAspectRatio="none">
+        <svg viewBox="-2 0 104 20" className="w-full h-full" preserveAspectRatio="none">
           <defs>
             <linearGradient id="sparklineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="hsl(var(--primary))" />
@@ -41,9 +41,11 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({ balance, className, tr
             fill="none" 
             stroke="url(#sparklineGradient)" 
             strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
           <path 
-            d="M0 15 Q 10 10, 20 12 T 40 8 T 60 14 T 80 5 T 100 10 V 20 H 0 Z" 
+            d="M0 15 Q 10 10, 20 12 T 40 8 T 60 14 T 80 5 T 100 10 V 25 H 0 Z" 
             fill="url(#sparklineGradient)"
             fillOpacity="0.3"
           />
