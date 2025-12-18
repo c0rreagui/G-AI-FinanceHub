@@ -17,6 +17,7 @@ import { Input } from '../ui/Input';
 import { PrivacyMask } from '../ui/PrivacyMask';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../ui/Tooltip';
 import { ScheduledTransactionCard } from '@/components/transactions/ScheduledTransactionCard';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 
 // --- SUB-COMPONENTS ---
 
@@ -31,7 +32,7 @@ const SummaryWidget: React.FC<{ items: ScheduledTransaction[] }> = ({ items }) =
 
     return (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <Card className="bg-gradient-to-br from-slate-900 to-slate-800 border-slate-700/50">
+            <Card>
                 <CardContent className="p-4">
                     <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">Total Mensal</p>
                     <PrivacyMask>
@@ -41,7 +42,7 @@ const SummaryWidget: React.FC<{ items: ScheduledTransaction[] }> = ({ items }) =
                     </PrivacyMask>
                 </CardContent>
             </Card>
-            <Card className="bg-gradient-to-br from-slate-900 to-slate-800 border-slate-700/50">
+            <Card>
                 <CardContent className="p-4">
                     <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">A Pagar</p>
                     <PrivacyMask>
@@ -49,7 +50,7 @@ const SummaryWidget: React.FC<{ items: ScheduledTransaction[] }> = ({ items }) =
                     </PrivacyMask>
                 </CardContent>
             </Card>
-            <Card className="bg-gradient-to-br from-slate-900 to-slate-800 border-slate-700/50">
+            <Card>
                 <CardContent className="p-4">
                     <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">A Receber</p>
                     <PrivacyMask>
@@ -57,7 +58,7 @@ const SummaryWidget: React.FC<{ items: ScheduledTransaction[] }> = ({ items }) =
                     </PrivacyMask>
                 </CardContent>
             </Card>
-             <Card className="bg-gradient-to-br from-slate-900 to-slate-800 border-slate-700/50">
+             <Card>
                 <CardContent className="p-4">
                     <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">Vencendo (7d)</p>
                     <div className="flex items-center gap-2">
@@ -177,13 +178,13 @@ export const SchedulingView: React.FC = () => {
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                                 <Input 
                                     placeholder="Buscar agendamento..." 
-                                    className="pl-9 bg-black/20 border-white/10 h-9 text-sm"
+                                    className="pl-9 h-9 text-sm"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                             </div>
                             
-                            <div className="flex bg-black/20 rounded-lg p-1 border border-white/10">
+                            <div className="flex bg-white/5 rounded-lg p-1 border border-white/10">
                                 <button 
                                     onClick={() => setViewMode('list')}
                                     className={`p-1.5 rounded-md transition-all ${viewMode === 'list' ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400 hover:text-white'}`}
@@ -200,25 +201,27 @@ export const SchedulingView: React.FC = () => {
                         </div>
 
                         <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
-                            <select 
-                                className="bg-black/20 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                value={filterType}
-                                onChange={(e) => setFilterType(e.target.value as FilterType)}
-                            >
-                                <option value="all">Todos</option>
-                                <option value="income">Receitas</option>
-                                <option value="expense">Despesas</option>
-                            </select>
+                            <Select value={filterType} onValueChange={(v) => setFilterType(v as FilterType)}>
+                                <SelectTrigger className="w-[140px] h-9">
+                                    <SelectValue placeholder="Tipo" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Todos</SelectItem>
+                                    <SelectItem value="income">Receitas</SelectItem>
+                                    <SelectItem value="expense">Despesas</SelectItem>
+                                </SelectContent>
+                            </Select>
 
-                            <select 
-                                className="bg-black/20 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                value={sortBy}
-                                onChange={(e) => setSortBy(e.target.value as SortOption)}
-                            >
-                                <option value="date">Por Data</option>
-                                <option value="amount">Por Valor</option>
-                                <option value="name">Por Nome</option>
-                            </select>
+                            <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
+                                <SelectTrigger className="w-[140px] h-9">
+                                    <SelectValue placeholder="Ordenar" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="date">Por Data</SelectItem>
+                                    <SelectItem value="amount">Por Valor</SelectItem>
+                                    <SelectItem value="name">Por Nome</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
                     </div>
 

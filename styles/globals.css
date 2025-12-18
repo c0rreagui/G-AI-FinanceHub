@@ -158,6 +158,21 @@
   to { transform: rotate(360deg); }
 }
 
+.logo-spinner {
+  animation: logo-spin 2s linear infinite, logo-dash 1.5s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes logo-spin {
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes logo-dash {
+  0% { stroke-dasharray: 1, 200; stroke-dashoffset: 0; }
+  50% { stroke-dasharray: 89, 200; stroke-dashoffset: -35px; }
+  100% { stroke-dasharray: 89, 200; stroke-dashoffset: -124px; }
+}
+
 /* Float animation for icons */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
@@ -319,6 +334,15 @@ html {
 .stagger-container > *:nth-child(8) { animation-delay: 280ms; }
 
 /* Glow Effect */
+.shadow-glow {
+  box-shadow: 0 0 20px -5px hsl(var(--primary) / 0.6);
+}
+.shadow-glow-sm {
+  box-shadow: 0 0 10px -2px hsl(var(--primary) / 0.4);
+}
+.shadow-glow-lg {
+  box-shadow: 0 0 30px -5px hsl(var(--primary) / 0.6);
+}
 .glow-primary {
   box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
 }

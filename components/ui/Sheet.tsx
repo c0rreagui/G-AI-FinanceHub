@@ -77,15 +77,15 @@ export const Sheet: React.FC<SheetProps> = ({ isOpen, onClose, title, children, 
                                 initial="hidden"
                                 animate="visible"
                                 exit="exit"
-                                className={`pointer-events-auto w-full max-w-md h-full bg-background border-l border-border shadow-2xl flex flex-col`}
+                                className={`pointer-events-auto w-full max-w-md h-full bg-background/95 backdrop-blur-xl border-l border-white/10 shadow-2xl flex flex-col`}
                                 role="dialog"
                                 aria-modal="true"
                             >
-                                <div className="flex items-center justify-between p-6 border-b border-border/60 shadow-sm">
-                                    <h2 className="text-xl font-semibold">{title}</h2>
+                                <div className="flex items-center justify-between p-6 border-b border-white/5 shadow-sm">
+                                    <h2 className="text-xl font-semibold tracking-tight">{title}</h2>
                                     <button 
                                         onClick={onClose}
-                                        className="p-2 hover:bg-secondary rounded-full transition-colors text-muted-foreground hover:text-foreground"
+                                        className="p-2 hover:bg-white/10 rounded-full transition-colors text-muted-foreground hover:text-foreground"
                                         aria-label="Fechar"
                                     >
                                         <XIcon className="w-5 h-5" />
@@ -95,7 +95,7 @@ export const Sheet: React.FC<SheetProps> = ({ isOpen, onClose, title, children, 
                                     {children}
                                 </div>
                                 {footer && (
-                                    <div className="p-6 border-t border-border bg-muted/20">
+                                    <div className="p-6 border-t border-white/5 bg-white/5">
                                         {footer}
                                     </div>
                                 )}
@@ -114,17 +114,17 @@ export const Sheet: React.FC<SheetProps> = ({ isOpen, onClose, title, children, 
                                 onDragEnd={(_, info) => {
                                     if (info.offset.y > 100) onClose();
                                 }}
-                                className={`pointer-events-auto w-full bg-background border-t border-border rounded-t-3xl shadow-2xl flex flex-col max-h-[95vh]`}
+                                className={`pointer-events-auto w-full bg-background/95 backdrop-blur-xl border-t border-white/10 rounded-t-3xl shadow-2xl flex flex-col max-h-[95vh]`}
                                 role="dialog"
                                 aria-modal="true"
                             >
                                 {/* Handle */}
                                 <div className="w-full flex justify-center pt-3 pb-1">
-                                    <div className="w-12 h-1.5 bg-muted rounded-full" />
+                                    <div className="w-12 h-1.5 bg-white/20 rounded-full" />
                                 </div>
 
-                                <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-                                    <h2 className="text-xl font-semibold">{title}</h2>
+                                <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
+                                    <h2 className="text-xl font-semibold tracking-tight">{title}</h2>
                                 </div>
 
                                 <div className="p-6 overflow-y-auto custom-scrollbar flex-grow">
@@ -132,7 +132,7 @@ export const Sheet: React.FC<SheetProps> = ({ isOpen, onClose, title, children, 
                                 </div>
 
                                 {footer && (
-                                    <div className="p-6 border-t border-border bg-muted/20 pb-safe">
+                                    <div className="p-6 border-t border-white/5 bg-white/5 pb-safe">
                                         {footer}
                                     </div>
                                 )}

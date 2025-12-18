@@ -7,6 +7,7 @@ import { Users, UserPlus, LogOut, Shield } from 'lucide-react';
 import { FamilyInvite } from '../social/FamilyInvite';
 import { ActivityFeed } from '../social/ActivityFeed';
 import { motion } from 'framer-motion';
+import { Card, CardContent } from '../ui/Card';
 
 export const SocialView: React.FC = () => {
     const { family, members, createFamily, leaveFamily, joinFamily, loading } = useSocial();
@@ -46,29 +47,32 @@ export const SocialView: React.FC = () => {
                         <MotionDiv 
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-white/5 p-6 rounded-2xl border border-white/10 space-y-4"
                         >
-                            <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary mb-4">
-                                <Users size={24} />
-                            </div>
-                            <h3 className="text-xl font-bold">Criar nova Família</h3>
-                            <p className="text-gray-400 text-sm">
-                                Crie um grupo para compartilhar despesas e gerenciar finanças em conjunto.
-                            </p>
-                            <div className="space-y-3 pt-4">
-                                <SmartInput
-                                    value={familyName}
-                                    onChange={setFamilyName}
-                                    placeholder="Nome da Família (ex: Família Silva)"
-                                />
-                                <Button 
-                                    onClick={handleCreate} 
-                                    disabled={!familyName}
-                                    className="w-full bg-primary hover:bg-primary/90"
-                                >
-                                    Criar Família
-                                </Button>
-                            </div>
+                            <Card className="h-full">
+                                <CardContent className="p-6 space-y-4">
+                                    <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary mb-4">
+                                        <Users size={24} />
+                                    </div>
+                                    <h3 className="text-xl font-bold">Criar nova Família</h3>
+                                    <p className="text-muted-foreground text-sm">
+                                        Crie um grupo para compartilhar despesas e gerenciar finanças em conjunto.
+                                    </p>
+                                    <div className="space-y-3 pt-4">
+                                        <SmartInput
+                                            value={familyName}
+                                            onChange={setFamilyName}
+                                            placeholder="Nome da Família (ex: Família Silva)"
+                                        />
+                                        <Button 
+                                            onClick={handleCreate} 
+                                            disabled={!familyName}
+                                            className="w-full bg-primary hover:bg-primary/90"
+                                        >
+                                            Criar Família
+                                        </Button>
+                                    </div>
+                                </CardContent>
+                            </Card>
                         </MotionDiv>
 
                         {/* Join Family */}
@@ -76,30 +80,33 @@ export const SocialView: React.FC = () => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="bg-white/5 p-6 rounded-2xl border border-white/10 space-y-4"
                         >
-                            <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-500 mb-4">
-                                <UserPlus size={24} />
-                            </div>
-                            <h3 className="text-xl font-bold">Entrar em uma Família</h3>
-                            <p className="text-gray-400 text-sm">
-                                Recebeu um convite? Cole o token abaixo para entrar no grupo.
-                            </p>
-                            <div className="space-y-3 pt-4">
-                                <SmartInput
-                                    value={inviteToken}
-                                    onChange={setInviteToken}
-                                    placeholder="Token do convite"
-                                />
-                                <Button 
-                                    onClick={handleJoin} 
-                                    disabled={!inviteToken}
-                                    variant="outline"
-                                    className="w-full"
-                                >
-                                    Entrar
-                                </Button>
-                            </div>
+                            <Card className="h-full">
+                                <CardContent className="p-6 space-y-4">
+                                    <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-500 mb-4">
+                                        <UserPlus size={24} />
+                                    </div>
+                                    <h3 className="text-xl font-bold">Entrar em uma Família</h3>
+                                    <p className="text-muted-foreground text-sm">
+                                        Recebeu um convite? Cole o token abaixo para entrar no grupo.
+                                    </p>
+                                    <div className="space-y-3 pt-4">
+                                        <SmartInput
+                                            value={inviteToken}
+                                            onChange={setInviteToken}
+                                            placeholder="Token do convite"
+                                        />
+                                        <Button 
+                                            onClick={handleJoin} 
+                                            disabled={!inviteToken}
+                                            variant="outline"
+                                            className="w-full"
+                                        >
+                                            Entrar
+                                        </Button>
+                                    </div>
+                                </CardContent>
+                            </Card>
                         </MotionDiv>
                     </div>
                 ) : (

@@ -103,7 +103,7 @@ export const AddDebtForm: React.FC<AddDebtFormProps> = ({ isOpen, onClose }) => 
             animate="visible"
             exit="exit"
             className={cn(
-              "fixed z-[110] bg-[#0B0E14] flex flex-col overflow-hidden",
+              "fixed z-[110] bg-background/95 backdrop-blur-xl flex flex-col overflow-hidden",
               isDesktop 
                 ? "right-0 top-0 h-full w-[500px] border-l border-white/10 rounded-l-3xl" 
                 : "bottom-0 left-0 right-0 max-h-[95vh] rounded-t-3xl border-t border-white/10"

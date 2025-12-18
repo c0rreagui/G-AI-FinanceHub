@@ -272,7 +272,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
             <div className="md:hidden fixed bottom-24 right-6 z-[80]">
                 <Button
                     size="icon"
-                    className="h-14 w-14 rounded-full shadow-lg bg-primary hover:bg-primary/90 transition-all active:scale-95"
+                    className="h-14 w-14 rounded-full shadow-glow bg-primary hover:bg-primary/90 transition-all active:scale-95"
                     onClick={() => openDialog('add-transaction')}
                 >
                     <PlusCircle className="h-6 w-6 text-primary-foreground" />

@@ -59,7 +59,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs
   };
 
   return (
-    <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-md transition-all duration-300 relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-5 mb-6 flex-shrink-0 pt-4 -mx-6 px-6">
+    <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl transition-all duration-300 relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/10 pb-5 mb-6 flex-shrink-0 pt-4 -mx-6 px-6">
       <div 
         className="absolute bottom-[-1px] left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary to-transparent [animation:pulse-border_3s_ease-in-out_infinite]"
       />
@@ -94,9 +94,9 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs
              size="sm"
              onRecordingStop={() => {}} 
          />
-         <button className="relative w-10 h-10 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors border border-border overflow-visible">
-            <Search className="w-5 h-5" />
-            <span className="absolute -bottom-2 -right-2 bg-popover text-[10px] px-1 rounded border border-border text-muted-foreground flex items-center gap-0.5 shadow-sm z-10">
+         <button className="relative w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-all duration-300 border border-white/10 hover:border-primary/20 overflow-visible group [&_svg]:stroke-[1.5]">
+            <Search className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+            <span className="absolute -bottom-2 -right-2 bg-black/80 backdrop-blur text-[10px] px-1.5 rounded border border-white/10 text-muted-foreground flex items-center gap-0.5 shadow-sm z-10">
                 <Command className="w-2 h-2" />K
             </span>
          </button>
@@ -107,11 +107,11 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs
                  openDialog('notifications');
              }}
              title="Notificações"
-             className="relative w-10 h-10 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors border border-border"
+             className="relative w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-all duration-300 border border-white/10 hover:border-primary/20 [&_svg]:stroke-[1.5]"
          >
              <Bell className="w-5 h-5" />
              {unreadCount > 0 && (
-                 <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                 <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.5)]" />
              )}
          </button>
 

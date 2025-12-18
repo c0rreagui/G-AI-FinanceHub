@@ -85,7 +85,7 @@ export const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, title, children
                                 initial="hidden"
                                 animate="visible"
                                 exit="exit"
-                                className={`pointer-events-auto w-full max-w-2xl bg-[#0B0E14] border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]`}
+                                className={`pointer-events-auto w-full max-w-2xl bg-background/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]`}
                             >
                                 <div className={`flex items-center justify-between p-6 border-b border-white/5 ${getColorClass(themeColor).split(' ')[2]}`}>
                                     <h2 className={`text-xl font-outfit font-semibold ${getColorClass(themeColor).split(' ')[0]}`}>{title}</h2>
@@ -119,11 +119,11 @@ export const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, title, children
                                 onDragEnd={(_, info) => {
                                     if (info.offset.y > 100) onClose();
                                 }}
-                                className={`pointer-events-auto w-full bg-[#0B0E14] border-t border-white/10 rounded-t-3xl shadow-2xl flex flex-col max-h-[95vh]`}
+                                className={`pointer-events-auto w-full bg-background/95 backdrop-blur-xl border-t border-white/10 rounded-t-3xl shadow-2xl flex flex-col max-h-[95vh]`}
                             >
                                 {/* Handle */}
                                 <div className="w-full flex justify-center pt-3 pb-1">
-                                    <div className="w-12 h-1.5 bg-gray-700/50 rounded-full" />
+                                    <div className="w-12 h-1.5 bg-white/20 rounded-full" />
                                 </div>
 
                                 <div className={`flex items-center justify-between px-6 py-4 border-b border-white/5 ${getColorClass(themeColor).split(' ')[2]}`}>

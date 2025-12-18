@@ -124,7 +124,7 @@ export const TickerSearch: React.FC<TickerSearchProps> = ({
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="absolute z-50 w-full mt-2 bg-[#0B0E14] border border-white/10 rounded-xl shadow-xl overflow-hidden"
+                        className="absolute z-50 w-full mt-2 bg-background/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-xl overflow-hidden"
                     >
                         <div className="max-h-60 overflow-y-auto custom-scrollbar">
                             {filteredAssets.map((asset) => (
