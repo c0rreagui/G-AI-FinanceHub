@@ -1,0 +1,105 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - link "Pular para o conteúdo principal" [ref=e4] [cursor=pointer]:
+      - /url: "#main-content"
+    - complementary [ref=e5]:
+      - generic [ref=e10]: FinanceHub
+      - navigation [ref=e11]:
+        - button "Início" [ref=e12] [cursor=pointer]:
+          - img [ref=e14]
+          - generic [ref=e19]: Início
+        - button "Transações" [ref=e20] [cursor=pointer]:
+          - img [ref=e22]
+          - generic [ref=e25]: Transações
+        - button "Orçamentos" [ref=e26] [cursor=pointer]:
+          - img [ref=e28]
+          - generic [ref=e31]: Orçamentos
+        - button "Metas" [ref=e32] [cursor=pointer]:
+          - img [ref=e34]
+          - generic [ref=e38]: Metas
+        - button "Dívidas" [ref=e39] [cursor=pointer]:
+          - img [ref=e41]
+          - generic [ref=e44]: Dívidas
+        - button "Investimentos" [ref=e45] [cursor=pointer]:
+          - img [ref=e47]
+          - generic [ref=e50]: Investimentos
+        - button "Agenda" [ref=e51] [cursor=pointer]:
+          - img [ref=e53]
+          - generic [ref=e55]: Agenda
+        - button "Insights" [ref=e56] [cursor=pointer]:
+          - img [ref=e58]
+          - generic [ref=e60]: Insights
+        - button "Tools" [ref=e61] [cursor=pointer]:
+          - img [ref=e63]
+          - generic [ref=e65]: Tools
+        - button "Família" [active] [ref=e66] [cursor=pointer]:
+          - img [ref=e69]
+          - generic [ref=e74]: Família
+      - generic [ref=e75]:
+        - generic [ref=e77]:
+          - generic [ref=e78]:
+            - generic [ref=e79]:
+              - img [ref=e81]
+              - generic [ref=e87]: Nível 12
+            - generic [ref=e88]:
+              - img [ref=e89]
+              - generic [ref=e91]: 8450 / 10000 XP
+          - paragraph [ref=e94]: Faltam 1550 XP para o próximo nível!
+        - button "Colapsar menu" [ref=e95] [cursor=pointer]:
+          - generic [ref=e96]:
+            - img [ref=e97]
+            - generic [ref=e99]: Colapsar
+        - button "DevTools" [ref=e101] [cursor=pointer]:
+          - img [ref=e103]
+          - generic [ref=e105]: DevTools
+        - button "Ajustes" [ref=e106] [cursor=pointer]:
+          - img [ref=e108]
+          - generic [ref=e111]: Ajustes
+        - generic [ref=e112]: v4.0.0 Neon Genesis
+    - main [ref=e113]:
+      - generic [ref=e116]:
+        - generic [ref=e117]:
+          - generic [ref=e120]:
+            - img [ref=e121]
+            - generic [ref=e126]:
+              - heading "Família & Social" [level=1] [ref=e127]
+              - paragraph [ref=e128]:
+                - generic [ref=e129]: 🌤️ Boa tarde, Desenvolvedor
+          - generic [ref=e130]:
+            - button "Iniciar gravação de voz" [ref=e131] [cursor=pointer]:
+              - img [ref=e134]
+            - button "K" [ref=e137] [cursor=pointer]:
+              - img [ref=e138]
+              - generic [ref=e141]:
+                - img [ref=e142]
+                - text: K
+            - button "Notificações" [ref=e144] [cursor=pointer]:
+              - img [ref=e145]
+            - button "Ocultar valores" [ref=e150] [cursor=pointer]:
+              - img [ref=e151]
+            - button "U" [ref=e154] [cursor=pointer]:
+              - generic [ref=e156]: U
+        - generic [ref=e158]:
+          - generic [ref=e161]:
+            - img [ref=e163]
+            - heading "Criar nova Família" [level=3] [ref=e168]
+            - paragraph [ref=e169]: Crie um grupo para compartilhar despesas e gerenciar finanças em conjunto.
+            - generic [ref=e170]:
+              - generic [ref=e172]:
+                - generic [ref=e173]: R$
+                - 'textbox "Nome da Família (ex: Família Silva)" [ref=e174]'
+              - button "Criar Família" [disabled]
+          - generic [ref=e177]:
+            - img [ref=e179]
+            - heading "Entrar em uma Família" [level=3] [ref=e182]
+            - paragraph [ref=e183]: Recebeu um convite? Cole o token abaixo para entrar no grupo.
+            - generic [ref=e184]:
+              - generic [ref=e186]:
+                - generic [ref=e187]: R$
+                - textbox "Token do convite" [ref=e188]
+              - button "Entrar" [disabled]
+  - generic [ref=e189]: R$0
+```

@@ -28,8 +28,8 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({ balance, className, tr
       <div className="absolute bottom-0 left-0 w-32 h-32 bg-accent/15 rounded-full blur-3xl -ml-10 -mb-10 pointer-events-none" />
       
       {/* Sparkline Background */}
-      <div className="absolute bottom-0 left-0 right-0 h-20 opacity-20 pointer-events-none">
-        <svg viewBox="-2 0 104 20" className="w-full h-full" preserveAspectRatio="none">
+      <div className="absolute bottom-0 left-0 right-0 h-24 opacity-25 pointer-events-none overflow-visible">
+        <svg viewBox="-10 -10 120 40" className="w-full h-full" preserveAspectRatio="none">
           <defs>
             <linearGradient id="sparklineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="hsl(var(--primary))" />
@@ -40,14 +40,15 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({ balance, className, tr
             d="M0 15 Q 10 10, 20 12 T 40 8 T 60 14 T 80 5 T 100 10" 
             fill="none" 
             stroke="url(#sparklineGradient)" 
-            strokeWidth="2"
+            strokeWidth="3"
             strokeLinecap="round"
             strokeLinejoin="round"
+            filter="drop-shadow(0 0 4px rgba(139, 92, 246, 0.5))"
           />
           <path 
-            d="M0 15 Q 10 10, 20 12 T 40 8 T 60 14 T 80 5 T 100 10 V 25 H 0 Z" 
+            d="M0 15 Q 10 10, 20 12 T 40 8 T 60 14 T 80 5 T 100 10 V 30 H 0 Z" 
             fill="url(#sparklineGradient)"
-            fillOpacity="0.3"
+            fillOpacity="0.2"
           />
         </svg>
       </div>
@@ -73,7 +74,7 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({ balance, className, tr
       <CardContent className="relative z-10">
         <div 
             className={cn(
-                "text-4xl md:text-5xl font-extrabold tracking-tight tabular-nums truncate transition-all duration-300",
+                "text-4xl md:text-5xl font-extrabold tracking-tight tabular-nums transition-all duration-300",
                 isPrivacyMode && "blur-md select-none"
             )} 
             title={isPrivacyMode ? undefined : formatCurrency(balance)}
