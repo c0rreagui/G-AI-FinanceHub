@@ -103,7 +103,7 @@ export const ScheduledTransactionCard: React.FC<{ item: ScheduledTransaction }> 
                         <div>
                             <h3 className="text-base font-bold text-white truncate pr-2">{item.description}</h3>
                             <div className="flex items-center gap-2 mt-1">
-                                <Badge variant="outline" className="text-[10px] h-5 px-1.5 border-white/10 bg-white/5">
+                                <Badge variant="outline" className="text-xs h-5 px-1.5 border-white/10 bg-white/5">
                                     {item.frequency}
                                 </Badge>
                                 <span className={`text-xs font-medium flex items-center gap-1 ${
@@ -122,7 +122,7 @@ export const ScheduledTransactionCard: React.FC<{ item: ScheduledTransaction }> 
                                     {formatCurrency(item.amount)}
                                 </span>
                             </PrivacyMask>
-                            <span className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">
+                            <span className="text-xs text-gray-500 uppercase tracking-wider font-semibold">
                                 {item.amount < 0 ? 'Despesa' : 'Receita'}
                             </span>
                         </div>

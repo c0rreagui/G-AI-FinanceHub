@@ -178,7 +178,7 @@ export const AddGoalForm: React.FC<AddGoalFormProps> = ({ isOpen, onClose }) => 
                           className={cn("w-5 h-5", isSelected ? cat.colorClass : "text-gray-400")} 
                         />
                         <span className={cn(
-                          "text-[10px] font-medium text-center leading-tight",
+                          "text-xs font-medium text-center leading-tight",
                           isSelected ? "text-white" : "text-muted-foreground"
                         )}>
                           {cat.label}

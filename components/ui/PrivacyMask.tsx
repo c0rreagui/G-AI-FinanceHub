@@ -16,7 +16,7 @@ export const PrivacyToggle: React.FC<{ className?: string }> = ({ className }) =
         <TooltipProvider>
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" onClick={togglePrivacyMode} className={cn("text-muted-foreground hover:text-foreground", className)}>
+                    <Button variant="ghost" size="icon" onClick={togglePrivacyMode} aria-label={isPrivacyMode ? 'Mostrar valores' : 'Ocultar valores'} className={cn("text-muted-foreground hover:text-foreground", className)}>
                         {isPrivacyMode ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </Button>
                 </TooltipTrigger>

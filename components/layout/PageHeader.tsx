@@ -96,7 +96,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs
          />
          <button className="relative w-10 h-10 rounded-full bg-muted/50 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors border border-border overflow-visible">
             <Search className="w-5 h-5" />
-            <span className="absolute -bottom-2 -right-2 bg-popover text-[9px] px-1 rounded border border-border text-muted-foreground flex items-center gap-0.5 shadow-sm z-10">
+            <span className="absolute -bottom-2 -right-2 bg-popover text-[10px] px-1 rounded border border-border text-muted-foreground flex items-center gap-0.5 shadow-sm z-10">
                 <Command className="w-2 h-2" />K
             </span>
          </button>

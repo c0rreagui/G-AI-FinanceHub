@@ -146,7 +146,7 @@ export const TickerSearch: React.FC<TickerSearchProps> = ({
                                             </div>
                                         </div>
                                     </div>
-                                    <span className="text-[10px] font-medium px-2 py-1 rounded-full bg-white/5 text-slate-400 border border-white/5">
+                                    <span className="text-xs font-medium px-2 py-1 rounded-full bg-white/5 text-slate-400 border border-white/5">
                                         {getTypeLabel(asset.type)}
                                     </span>
                                 </button>

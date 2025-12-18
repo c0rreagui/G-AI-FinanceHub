@@ -37,7 +37,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             className={cn(
-                "hidden lg:flex flex-col h-full bg-card/50 border-r border-border backdrop-blur-xl z-50 transition-all duration-300 ease-in-out relative",
+                "hidden lg:flex flex-col h-full bg-[#050508] border-r border-white/5 z-50 transition-all duration-300 ease-in-out relative shadow-[10px_0_30px_-10px_rgba(0,0,0,0.5)]",
                 isCollapsed ? "w-20" : "w-64"
             )}
         >
@@ -59,27 +59,36 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
             {navigation.map((item) => {
                 const isActive = currentView === item.view;
                 const ButtonContent = (
-                    <motion.button
+                        <motion.button
                         key={item.name}
                         onClick={() => setCurrentView(item.view as ViewType)}
-                        whileTap={{ scale: 0.95 }}
+                        whileTap={{ scale: 0.98 }}
+                        aria-label={item.name}
                         className={cn(
-                            "relative w-full flex items-center h-12 rounded-xl transition-all duration-200 group/item",
-                            isActive ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                            "relative w-full flex items-center h-11 rounded-lg transition-all duration-300 group/item mb-1 overflow-hidden",
+                            isActive 
+                                ? 'bg-gradient-to-r from-primary/10 to-transparent text-primary shadow-[inset_2px_0_0_0_hsl(var(--primary))]' 
+                                : 'text-muted-foreground/80 hover:text-foreground hover:bg-white/5'
                         )}
                     >
-                        {/* Active indicator removed to avoid visual conflict with rounded corners */}
+                        {/* Glow effect for active state */}
+                        {isActive && (
+                            <div className="absolute inset-0 bg-primary/5 blur-md" />
+                        )}
+
                         <div className={cn(
-                            "w-14 flex items-center justify-center flex-shrink-0",
+                            "w-14 flex items-center justify-center flex-shrink-0 z-10",
                             isActive && "text-primary"
                         )}>
-                            <item.icon className={cn(
-                                "w-5 h-5 transition-transform group-hover/item:scale-110",
-                                isActive ? 'text-primary drop-shadow-[0_0_8px_hsl(var(--primary))]' : ''
+                            <item.icon 
+                                strokeWidth={1.5}
+                                className={cn(
+                                "w-5 h-5 transition-transform duration-300 group-hover/item:scale-110",
+                                isActive ? 'text-primary drop-shadow-[0_0_8px_hsl(var(--primary)/0.5)]' : ''
                             )} />
                         </div>
                         <span className={cn(
-                            "transition-all duration-300 font-medium text-sm whitespace-nowrap overflow-hidden",
+                            "transition-all duration-300 font-medium text-sm whitespace-nowrap overflow-hidden tracking-wide z-10",
                             isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
                         )}>
                             {item.name}
@@ -108,6 +117,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
             )}
             <button 
                 onClick={() => setIsCollapsed(!isCollapsed)}
+                aria-label={isCollapsed ? "Expandir menu" : "Colapsar menu"}
                 className="w-full flex items-center h-12 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors justify-center"
             >
                 {isCollapsed ? <ChevronRight className="w-5 h-5" /> : (
@@ -140,7 +150,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
                 {isCollapsed && <TooltipContent side="right">Ajustes</TooltipContent>}
             </Tooltip>
             
-             <div className={cn("text-[10px] text-muted-foreground text-center mt-2 transition-opacity duration-300", isCollapsed ? "opacity-0" : "opacity-100")}>
+             <div className={cn("text-xs text-muted-foreground text-center mt-2 transition-opacity duration-300", isCollapsed ? "opacity-0" : "opacity-100")}>
                 v4.0.0 Neon Genesis
             </div>
         </div>

@@ -236,7 +236,7 @@ export const SchedulingView: React.FC = () => {
                                                         group === 'Hoje' ? 'text-amber-400' : 'text-gray-400'
                                                     }`}>
                                                         {group}
-                                                        <span className="bg-white/10 text-white text-[10px] px-1.5 py-0.5 rounded-full">{items.length}</span>
+                                                        <span className="bg-white/10 text-white text-xs px-1.5 py-0.5 rounded-full">{items.length}</span>
                                                     </h3>
                                                     <AnimatePresence>
                                                         {items.map(item => (

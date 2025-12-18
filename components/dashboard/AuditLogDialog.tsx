@@ -91,7 +91,7 @@ export const AuditLogDialog: React.FC<AuditLogDialogProps> = ({ isOpen, onClose 
                                                         {log.details}
                                                     </p>
                                                     <div className="flex items-center gap-2 mt-1">
-                                                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-5">
+                                                        <Badge variant="outline" className="text-xs px-1.5 py-0 h-5">
                                                             {getActionLabel(log.action)}
                                                         </Badge>
                                                         <span className="text-xs text-muted-foreground capitalize">
@@ -103,7 +103,7 @@ export const AuditLogDialog: React.FC<AuditLogDialogProps> = ({ isOpen, onClose 
                                                     <div className="text-xs font-medium text-foreground">
                                                         {format(new Date(log.created_at), "d 'de' MMM", { locale: ptBR })}
                                                     </div>
-                                                    <div className="text-[10px] text-muted-foreground">
+                                                    <div className="text-xs text-muted-foreground">
                                                         {format(new Date(log.created_at), "HH:mm", { locale: ptBR })}
                                                     </div>
                                                 </div>

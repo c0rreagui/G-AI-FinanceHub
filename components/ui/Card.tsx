@@ -8,9 +8,11 @@ const Card = React.forwardRef<
     <div
         ref={ref}
         className={cn(
-            "rounded-2xl border border-white/[0.08] bg-card/80 backdrop-blur-xl text-card-foreground",
-            "shadow-[0_8px_32px_rgba(0,0,0,0.12)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.16)]",
-            "transition-all duration-300 ease-out",
+            "rounded-2xl border border-white/[0.08] bg-card/95 text-card-foreground shadow-sm relative overflow-hidden group",
+            // Texture Layer
+            "before:absolute before:inset-0 before:bg-[url('https://grainy-gradients.vercel.app/noise.svg')] before:opacity-[0.03] before:pointer-events-none",
+            // Inner Border Shine
+            "after:absolute after:inset-0 after:rounded-2xl after:border after:border-white/10 after:pointer-events-none after:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]",
             className
         )}
         {...props}

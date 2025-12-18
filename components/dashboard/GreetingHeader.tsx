@@ -73,8 +73,8 @@ export const GreetingHeader: React.FC<GreetingHeaderProps> = ({ user, setCurrent
             <div className="flex items-center gap-4">
                 <div className="relative group cursor-pointer">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-accent p-[2px] group-hover:scale-105 transition-transform duration-300">
-                        <div className="w-full h-full rounded-full bg-background flex items-center justify-center overflow-hidden">
-                             <span className="text-sm font-bold text-foreground">
+                        <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden">
+                             <span className="text-sm font-bold text-white">
                                 {user?.name?.charAt(0) || 'D'}
                              </span>
                         </div>
@@ -82,10 +82,14 @@ export const GreetingHeader: React.FC<GreetingHeaderProps> = ({ user, setCurrent
                     <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-background rounded-full"></div>
                 </div>
                 <div>
-                    <h1 className="text-base md:text-lg font-semibold text-foreground flex items-center gap-1.5">
-                        {greeting}, {greetingName || user?.user_metadata?.name || user?.name || 'Dev'}! {icon}
+                    <h1 className="text-xl md:text-2xl font-bold text-foreground flex items-center gap-2 tracking-tight">
+                        {greeting}, <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">{greetingName || user?.user_metadata?.name || user?.name || 'Dev'}</span> {icon}
                     </h1>
-                    <p className="text-xs text-muted-foreground capitalize">{dateStr}</p>
+                    <div className="mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full bg-white/5 border border-white/5 backdrop-blur-md">
+                        <span className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-widest">
+                            {dateStr}
+                        </span>
+                    </div>
                 </div>
             </div>
             <div className="flex items-center gap-2">
@@ -96,6 +100,7 @@ export const GreetingHeader: React.FC<GreetingHeaderProps> = ({ user, setCurrent
                                 data-testid="notification-bell"
                                 variant="ghost" 
                                 size="icon" 
+                                aria-label="Notificações"
                                 className="relative text-muted-foreground hover:text-foreground"
                                 onClick={handleNotificationClick}
                             >
@@ -118,6 +123,7 @@ export const GreetingHeader: React.FC<GreetingHeaderProps> = ({ user, setCurrent
                             <Button 
                                 variant="ghost" 
                                 size="icon" 
+                                aria-label="Configurações"
                                 className="text-muted-foreground hover:text-foreground hover:rotate-90 transition-transform duration-500"
                                 onClick={() => setCurrentView?.('settings')}
                             >

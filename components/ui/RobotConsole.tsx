@@ -86,7 +86,7 @@ export const RobotConsole: React.FC = () => {
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 50 }}
-                className={`fixed bottom-4 right-4 z-[9999] bg-black/90 text-green-400 font-mono text-xs rounded-lg shadow-2xl border border-green-500/30 backdrop-blur-md transition-all duration-300 ${
+                className={`fixed bottom-4 right-4 z-[9999] bg-black/90 text-green-400 font-mono text-sm rounded-lg shadow-2xl border border-green-500/30 backdrop-blur-md transition-all duration-300 ${
                     isMinimized ? 'w-64 h-12' : 'w-[500px] h-[300px]'
                 }`}
             >
@@ -124,7 +124,7 @@ export const RobotConsole: React.FC = () => {
                         )}
                         {logs.map(log => (
                             <div key={log.id} className="mb-1 break-words">
-                                <span className="opacity-50 text-[10px] mr-2">
+                                <span className="opacity-50 text-xs mr-2">
                                     {new Date(log.timestamp).toLocaleTimeString().split(' ')[0]}
                                 </span>
                                 <span className={`

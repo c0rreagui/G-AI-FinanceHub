@@ -13,12 +13,12 @@ const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
         const data = payload[0].payload;
         return (
-            <div className="bg-black/90 border border-white/10 backdrop-blur-xl p-3 rounded-xl shadow-xl">
+            <div className="bg-black/95 border border-white/10 p-3 rounded-xl shadow-xl">
                 <p className="font-bold text-white mb-1 text-xs uppercase tracking-wider">{data.name}</p>
                 <PrivacyMask>
                     <p className="text-cyan-300 font-mono text-lg font-bold">{formatCurrency(data.realValue)}</p>
                 </PrivacyMask>
-                <p className="text-[10px] text-gray-400 mt-1">{data.value.toFixed(1)}% da Renda</p>
+                <p className="text-xs text-gray-400 mt-1">{data.value.toFixed(1)}% da Renda</p>
             </div>
         );
     }
@@ -98,7 +98,7 @@ export const WealthFunnelChart: React.FC<WealthFunnelChartProps> = ({ income, ex
                             layout="horizontal" 
                             verticalAlign="bottom" 
                             align="center"
-                            wrapperStyle={{ fontSize: '10px', fontWeight: 500, paddingTop: '10px' }}
+                            wrapperStyle={{ fontSize: '12px', fontWeight: 500, paddingTop: '10px' }}
                         />
                         <Tooltip content={<CustomTooltip />} cursor={false} />
                     </RadialBarChart>

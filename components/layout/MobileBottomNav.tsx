@@ -98,7 +98,7 @@ const SpeedDial: React.FC = () => {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
-                          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[80]"
+                          className="fixed inset-0 bg-background/95 z-[80]"
                           onClick={toggleOpen}
                         />
                         <div className="absolute bottom-24 flex flex-col items-center gap-4 z-[90]">
@@ -113,7 +113,7 @@ const SpeedDial: React.FC = () => {
                                     <span className="bg-card text-foreground text-xs font-semibold px-2 py-1 rounded-md shadow-lg border border-border">{action.label}</span>
                                     <button 
                                       onClick={action.onClick} 
-                                      className="w-12 h-12 rounded-full bg-popover backdrop-blur-md border border-border text-popover-foreground flex items-center justify-center shadow-lg hover:bg-muted/50"
+                                      className="w-12 h-12 rounded-full bg-popover border border-border text-popover-foreground flex items-center justify-center shadow-lg hover:bg-muted/50"
                                       aria-label={action.ariaLabel}
                                     >
                                         <action.icon className="w-6 h-6" />
@@ -179,7 +179,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ currentView, s
                 animate={{ y: 0 }}
                 exit={{ y: 100 }}
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
-                className="fixed bottom-0 left-0 right-0 h-20 bg-background/80 backdrop-blur-xl border-t border-border z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]"
+                className="fixed bottom-0 left-0 right-0 h-20 bg-background border-t border-border z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]"
             >
                 <div className="grid grid-cols-5 h-full items-center">
                     <NavItem 

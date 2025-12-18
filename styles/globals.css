@@ -65,39 +65,33 @@
   }
 
   .dark {
-    /* Dark Mode Overrides - Premium Deep Space */
-    --background: 240 20% 4%; /* #0A0A0F - Mais profundo */
-    --foreground: 210 40% 98%;
+    /* Dark Mode Overrides - Luxury Deep Space */
+    --background: 240 10% 3.9%; /* #09090b - Profundo e Neutro */
+    --foreground: 0 0% 98%;
 
-    --card: 222 30% 8%; /* Mais escuro para contraste */
-    --card-foreground: 210 40% 98%;
+    --card: 240 10% 6%; /* Ligeiramente mais claro que bg */
+    --card-foreground: 0 0% 98%;
 
-    --popover: 222 30% 10%; 
-    --popover-foreground: 210 40% 98%;
+    --popover: 240 10% 5%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 183 100% 50%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 263 70% 50%; /* Deep Violet Luxury */
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 240 5% 15%; /* Cinza carvão sofisticado */
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 75%;
+    --muted: 240 5% 15%;
+    --muted-foreground: 240 5% 65%;
 
-    --accent: 262 83% 58%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 263 70% 50%;
+    --accent-foreground: 0 0% 98%;
 
-    --destructive: 348 83% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
 
-    --success: 151 84% 39%;
-    --success-foreground: 210 40% 98%;
-
-    --warning: 37 91% 50%;
-    --warning-foreground: 210 40% 98%;
-
-    --border: 217 33% 20%;
-    --input: 217 33% 20%;
+    --border: 240 5% 15%; /* Bordas sutis */
+    --input: 240 5% 15%;
     --ring: 183 100% 50%;
 
     /* Glass Effect Tokens */
@@ -345,4 +339,55 @@ html {
 /* Chart Gradient Fill */
 .chart-gradient-area {
   fill: url(#gradient-primary);
+}
+
+/* ============================================
+   ACCESSIBILITY & TOUCH TARGET IMPROVEMENTS
+   ============================================ */
+
+/* Minimum touch target size for mobile (44x44px recommended by WCAG 2.2) */
+@media (pointer: coarse) {
+  button, 
+  a, 
+  [role="button"],
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Icon size standardization - Default icons should be 20x20 (w-5 h-5) */
+.icon-sm { @apply w-4 h-4; }
+.icon-md { @apply w-5 h-5; }
+.icon-lg { @apply w-6 h-6; }
+.icon-xl { @apply w-8 h-8; }
+
+/* Focus visible improvements */
+:focus-visible {
+  @apply outline-2 outline-offset-2 outline-ring;
+}
+
+/* Screen reader only class */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

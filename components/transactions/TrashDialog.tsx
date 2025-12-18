@@ -94,7 +94,7 @@ export function TrashDialog({ open, onOpenChange }: TrashDialogProps) {
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 mb-1">
                                             <span className="font-medium truncate">{tx.description}</span>
-                                            <Badge variant="outline" className="text-[10px] h-5 px-1.5 opacity-70">
+                                            <Badge variant="outline" className="text-xs h-5 px-1.5 opacity-70">
                                                 {tx.category.name}
                                             </Badge>
                                         </div>

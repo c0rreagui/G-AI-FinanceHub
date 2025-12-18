@@ -49,7 +49,7 @@ const GoalDonut: React.FC<{ percentage: number; color: string }> = ({ percentage
                     className="transition-all duration-1000 ease-out"
                 />
             </svg>
-            <span className="absolute text-[10px] font-bold text-white">{Math.round(percentage)}%</span>
+            <span className="absolute text-xs font-bold text-white">{Math.round(percentage)}%</span>
         </div>
     );
 };

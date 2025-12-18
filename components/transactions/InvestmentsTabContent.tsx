@@ -92,7 +92,7 @@ export const InvestmentsTabContent: React.FC<InvestmentsTabContentProps> = ({ tr
                     >
                         <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                         <div className="flex flex-col items-center gap-2 relative z-10">
-                            <div className="p-3 bg-white/20 rounded-full backdrop-blur-sm group-hover:scale-110 transition-transform">
+                            <div className="p-3 bg-white/20 rounded-full group-hover:scale-110 transition-transform">
                                 <PlusCircle className="w-8 h-8 text-white" />
                             </div>
                             <span className="font-bold text-lg text-white">Novo Aporte</span>
@@ -102,7 +102,7 @@ export const InvestmentsTabContent: React.FC<InvestmentsTabContentProps> = ({ tr
             </div>
 
             {/* Assets List */}
-            <Card className="border-white/5 bg-black/40 backdrop-blur-xl">
+            <Card className="border-white/5 bg-black/40">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <TrendingUp className="w-5 h-5 text-emerald-400" />
@@ -152,7 +152,7 @@ export const InvestmentsTabContent: React.FC<InvestmentsTabContentProps> = ({ tr
                                                     {t.category.name}
                                                 </Badge>
                                             </td>
-                                            <td className="px-6 py-4 text-gray-400 font-mono text-xs">
+                                            <td className="px-6 py-4 text-gray-400 font-mono text-sm leading-none">
                                                 {formatDate(t.date)}
                                             </td>
                                             <td className="px-6 py-4 text-right font-bold text-emerald-400 font-mono tracking-tight">

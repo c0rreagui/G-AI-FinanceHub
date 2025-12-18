@@ -62,7 +62,7 @@ export const KPICard: React.FC<{ title: string; value: number; trend: number; ic
         : 'border-l-4 border-l-violet-500';
 
     return (
-        <Card className={`glass ${borderStyle} hover:border-${colorClass}-500/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-${colorClass}-500/10 group overflow-hidden relative`}>
+        <Card className={`bg-white/5 border-white/10 ${borderStyle} hover:border-${colorClass}-500/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] group overflow-hidden relative backdrop-blur-none`}>
             <div className={`absolute top-0 right-0 w-24 h-24 ${color} opacity-5 rounded-full blur-2xl -mr-8 -mt-8 group-hover:opacity-10 transition-opacity`} />
             <CardContent className="p-5 relative z-10">
                 <div className="flex justify-between items-start mb-4">
@@ -70,7 +70,7 @@ export const KPICard: React.FC<{ title: string; value: number; trend: number; ic
                         <Icon className={`w-5 h-5 text-${colorClass}-400`} />
                     </div>
                     {trend !== 0 && (
-                        <div className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${trend > 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
+                        <div className={`flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full border ${trend > 0 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-rose-500/10 border-rose-500/20 text-rose-400'}`}>
                             {trend > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingUp className="w-3 h-3 rotate-180" />}
                             {Math.abs(trend)}%
                         </div>

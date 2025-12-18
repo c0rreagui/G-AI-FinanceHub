@@ -28,16 +28,16 @@ export const ScannerOverlay: React.FC<ScannerOverlayProps> = ({ isOpen, onClose,
             <div className="absolute top-0 w-full p-6 flex justify-between items-center z-10">
                 <button 
                     onClick={onClose} 
-                    className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-white"
+                    className="w-10 h-10 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-black/80 transition-colors"
                     aria-label="Fechar scanner"
                 >
                     <X className="w-6 h-6" />
                 </button>
-                <div className="px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md text-xs font-semibold text-white tracking-widest uppercase">
+                <div className="px-4 py-1.5 rounded-full bg-black/60 text-sm font-semibold text-white tracking-widest uppercase">
                     Scanner de Recibo
                 </div>
                 <button 
-                    className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-white"
+                    className="w-10 h-10 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-black/80 transition-colors"
                     aria-label="Ativar flash"
                 >
                     <Zap className="w-5 h-5 text-yellow-400" />
@@ -71,7 +71,7 @@ export const ScannerOverlay: React.FC<ScannerOverlayProps> = ({ isOpen, onClose,
             </div>
 
             {/* Bottom Controls */}
-            <div className="h-40 bg-black/80 backdrop-blur-xl flex items-center justify-around px-8 pb-6 pt-2">
+            <div className="h-40 bg-black/90 flex items-center justify-around px-8 pb-6 pt-2">
                 <button 
                     className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all"
                     aria-label="Abrir galeria"

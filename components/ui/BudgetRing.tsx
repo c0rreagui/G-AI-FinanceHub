@@ -74,7 +74,7 @@ export const BudgetRing: React.FC<BudgetRingProps> = ({
                     <span className="text-2xl font-bold text-white tracking-tighter">
                         {limit > 0 ? Math.round((spent / limit) * 100) : 0}%
                     </span>
-                    <span className={`text-[10px] uppercase font-bold tracking-wider ${isOverBudget ? 'text-red-400' : 'text-slate-400'}`}>
+                    <span className={`text-xs uppercase font-bold tracking-wider ${isOverBudget ? 'text-red-400' : 'text-slate-400'}`}>
                         {isOverBudget ? 'Excedido' : 'Usado'}
                     </span>
                 </div>

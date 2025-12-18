@@ -130,7 +130,7 @@ export const TransactionComments: React.FC<TransactionCommentsProps> = ({ transa
                                 }`}>
                                     {comment.content}
                                 </div>
-                                <span className="text-[10px] text-gray-500 mt-1 px-1">
+                                <span className="text-xs text-gray-500 mt-1 px-1">
                                     {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: ptBR })}
                                 </span>
                             </div>

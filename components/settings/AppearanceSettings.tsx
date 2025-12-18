@@ -213,7 +213,7 @@ export const AppearanceSettings: React.FC = () => {
                                         Padrão
                                     </div>
                                 )}
-                                <div className="absolute bottom-0 left-0 w-full bg-black/50 p-1 text-[10px] text-center text-white">
+                                <div className="absolute bottom-0 left-0 w-full bg-black/50 p-1 text-xs text-center text-white">
                                     {wp.name}
                                 </div>
                             </button>

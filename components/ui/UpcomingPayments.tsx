@@ -34,7 +34,7 @@ const UpcomingPaymentItem: React.FC<{ item: ScheduledTransaction }> = ({ item })
                     <p className="text-sm font-medium text-white flex items-center gap-2">
                         {item.description}
                         {isToday && (
-                            <span className="bg-red-500/20 text-red-400 text-[10px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wide animate-pulse">
+                            <span className="bg-red-500/20 text-red-400 text-xs px-1.5 py-0.5 rounded font-bold uppercase tracking-wide animate-pulse">
                                 Hoje
                             </span>
                         )}

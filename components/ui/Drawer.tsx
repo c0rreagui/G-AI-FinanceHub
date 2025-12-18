@@ -72,7 +72,7 @@ export const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, title, children
                         animate="visible"
                         exit="hidden"
                         variants={overlayVariants}
-                        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[110]"
+                        className="fixed inset-0 bg-black/80 z-[110]"
                         onClick={onClose}
                     />
 

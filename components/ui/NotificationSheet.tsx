@@ -87,7 +87,7 @@ export const NotificationSheet: React.FC<NotificationSheetProps> = ({ isOpen, on
                                         variant="ghost"
                                         size="sm"
                                         onClick={clearRead}
-                                        className="h-6 text-[10px] text-muted-foreground hover:text-destructive"
+                                        className="h-6 text-xs text-muted-foreground hover:text-destructive"
                                     >
                                         Limpar lidas
                                     </Button>

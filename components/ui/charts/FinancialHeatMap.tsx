@@ -74,7 +74,7 @@ export const FinancialHeatMap: React.FC<FinancialHeatMapProps> = ({ transactions
             <div className="flex-1 flex flex-col justify-center items-center relative z-10">
                 <div className="grid grid-cols-7 gap-2 mb-2 w-full max-w-[300px]">
                     {weekDays.map((d, i) => (
-                        <div key={i} className="text-[10px] text-center text-muted-foreground font-medium">
+                        <div key={i} className="text-xs text-center text-muted-foreground font-medium">
                             {d}
                         </div>
                     ))}
@@ -99,7 +99,7 @@ export const FinancialHeatMap: React.FC<FinancialHeatMapProps> = ({ transactions
                     ))}
                 </div>
                 
-                <div className="flex items-center gap-2 mt-4 text-[10px] text-muted-foreground">
+                <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground">
                     <span>Menos</span>
                     <div className="flex gap-1">
                         <div className="w-3 h-3 rounded-sm bg-muted"></div>

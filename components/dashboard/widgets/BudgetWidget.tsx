@@ -75,7 +75,7 @@ export const BudgetWidget: React.FC = () => {
                     <div className="flex flex-wrap gap-2 mt-2">
                         {spendingSegments.map((seg, i) => {
                             return (
-                                <div key={i} className="flex items-center gap-1.5 text-[10px] text-muted-foreground bg-secondary/30 px-2 py-1 rounded-md">
+                                <div key={i} className="flex items-center gap-1.5 text-xs text-muted-foreground bg-secondary/30 px-2 py-1 rounded-md">
                                     <div 
                                         className="w-2 h-2 rounded-full" 
                                         ref={(el) => {

@@ -188,7 +188,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
             </Flex>
             
             <Flex justify="between" align="center" className="pt-3 border-t border-white/5">
-                <Badge variant="outline" className="font-normal text-[10px]">
+                <Badge variant="outline" className="font-normal text-xs">
                     {tx.category.name}
                 </Badge>
                 
@@ -231,7 +231,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                              )}
                              <div className="flex gap-2">
                                 <Text size="xs" variant="muted" className="w-16">Status:</Text>
-                                <Badge variant="secondary" className="text-[10px] h-5">
+                                <Badge variant="secondary" className="text-xs h-5">
                                     {tx.status === 'completed' ? 'Concluído' : tx.status === 'pending' ? 'Pendente' : 'Agendado'}
                                 </Badge>
                              </div>
@@ -279,7 +279,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
             </Flex>
             
             <Flex justify="between" align="center" className="pt-3 border-t border-white/5">
-                <Badge variant="outline" className="font-normal text-[10px]">
+                <Badge variant="outline" className="font-normal text-xs">
                     {tx.category.name}
                 </Badge>
                 

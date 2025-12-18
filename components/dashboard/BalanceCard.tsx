@@ -19,7 +19,8 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({ balance, className, tr
 
   return (
     <Card className={cn(
-      "glass bg-gradient-primary relative overflow-hidden group shadow-lg border-0",
+      "relative overflow-hidden group shadow-[0_0_40px_-10px_rgba(139,92,246,0.3)] border-white/10",
+      "bg-gradient-to-br from-violet-500/10 via-background to-background",
       className
     )}>
       {/* Aurora Glow Background */}
@@ -75,10 +76,14 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({ balance, className, tr
             )} 
             title={isPrivacyMode ? undefined : formatCurrency(balance)}
         >
-          <AnimatedCurrency 
-            value={balance} 
-            className={isPrivacyMode ? "text-foreground" : "text-gradient-primary"}
-          />
+          <span className={cn(
+            isPrivacyMode ? "text-foreground" : "bg-clip-text text-transparent bg-gradient-to-r from-white via-violet-200 to-violet-400 drop-shadow-[0_0_10px_rgba(139,92,246,0.3)]"
+          )}>
+            <AnimatedCurrency 
+                value={balance} 
+                className=""
+            />
+          </span>
         </div>
 
         <div className="mt-3 flex items-center gap-3">

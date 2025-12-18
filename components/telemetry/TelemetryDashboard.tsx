@@ -218,7 +218,7 @@ export const TelemetryDashboard: React.FC = () => {
                                                         {event.tags.map(tag => (
                                                             <span
                                                                 key={tag}
-                                                                className="px-1.5 py-0.5 bg-white/5 rounded text-[10px]"
+                                                                className="px-1.5 py-0.5 bg-white/5 rounded text-xs"
                                                             >
                                                                 #{tag}
                                                             </span>
@@ -233,7 +233,7 @@ export const TelemetryDashboard: React.FC = () => {
                                         <summary className="cursor-pointer text-gray-400 hover:text-white">
                                             Metadata
                                         </summary>
-                                        <pre className="mt-2 p-2 bg-black/50 rounded text-[10px] overflow-auto max-w-md">
+                                        <pre className="mt-2 p-2 bg-black/50 rounded text-xs overflow-auto max-w-md">
                                             {JSON.stringify(event.metadata, null, 2)}
                                         </pre>
                                     </details>

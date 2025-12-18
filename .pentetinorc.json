@@ -1,0 +1,19 @@
+{
+  "thresholds": {
+    "minScore": 70,
+    "maxCritical": 0,
+    "maxWarning": 10
+  },
+  "ignore": [
+    ".blur",
+    ".decorative",
+    "[aria-hidden=\"true\"]",
+    ".backdrop"
+  ],
+  "customRules": [],
+  "output": {
+    "html": true,
+    "json": false,
+    "console": true
+  }
+}

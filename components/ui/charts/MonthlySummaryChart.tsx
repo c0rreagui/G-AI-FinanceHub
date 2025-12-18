@@ -71,7 +71,7 @@ export const MonthlySummaryChart: React.FC<MonthlySummaryChartProps> = ({ data }
                             <button
                                 key={period}
                                 className={cn(
-                                    "px-2 py-1 text-[10px] font-medium rounded-md transition-all",
+                                    "px-2 py-1 text-xs font-medium rounded-md transition-all",
                                     period === '30D' 
                                         ? "bg-cyan-500/20 text-cyan-400 shadow-sm" 
                                         : "text-slate-400 hover:text-slate-200 hover:bg-slate-700/50"
@@ -111,12 +111,12 @@ export const MonthlySummaryChart: React.FC<MonthlySummaryChartProps> = ({ data }
                     <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                         <defs>
                             <linearGradient id="colorReceita" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#34d399" stopOpacity={0.4}/>
-                                <stop offset="95%" stopColor="#34d399" stopOpacity={0}/>
+                                <stop offset="5%" stopColor="#10b981" stopOpacity={0.5}/>
+                                <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
                             </linearGradient>
                             <linearGradient id="colorDespesa" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#fb7185" stopOpacity={0.4}/>
-                                <stop offset="95%" stopColor="#fb7185" stopOpacity={0}/>
+                                <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.5}/>
+                                <stop offset="95%" stopColor="#f43f5e" stopOpacity={0}/>
                             </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" vertical={false} />
@@ -143,7 +143,7 @@ export const MonthlySummaryChart: React.FC<MonthlySummaryChartProps> = ({ data }
                             align="right" 
                             iconType="circle"
                             iconSize={8}
-                            wrapperStyle={{ paddingBottom: '15px', fontSize: '11px', fontWeight: 600, opacity: 0.8 }}
+                            wrapperStyle={{ paddingBottom: '15px', fontSize: '12px', fontWeight: 600, opacity: 0.8 }}
                         />
                         <Brush 
                             dataKey="name" 
