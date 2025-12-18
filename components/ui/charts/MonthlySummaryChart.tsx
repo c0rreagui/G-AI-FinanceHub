@@ -102,7 +102,7 @@ export const MonthlySummaryChart: React.FC<MonthlySummaryChartProps> = ({ data }
             </div>
 
             <MotionDiv 
-                className="flex-grow w-full -ml-2"
+                className="flex-grow w-full -ml-2 min-h-[250px]"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}

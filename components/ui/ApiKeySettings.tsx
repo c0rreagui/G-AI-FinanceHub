@@ -31,7 +31,13 @@ export const ApiKeySettings: React.FC = () => {
             <p className="text-sm text-gray-400 mb-4">
                 Insira sua chave de API do Google Gemini para habilitar as funcionalidades de IA.
             </p>
-            <div className="space-y-4">
+            <form 
+                className="space-y-4"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSave();
+                }}
+            >
                 <Input
                     id="api-key-input"
                     label="Sua Chave de API"
@@ -41,14 +47,14 @@ export const ApiKeySettings: React.FC = () => {
                     placeholder="Cole sua chave de API aqui"
                 />
                 <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <Button onClick={handleDevKey} variant="secondary">
+                    <Button type="button" onClick={handleDevKey} variant="secondary">
                         Usar Chave DEV
                     </Button>
-                    <Button onClick={handleSave} disabled={!inputValue}>
+                    <Button type="submit" disabled={!inputValue}>
                         {saved ? 'Chave Salva!' : 'Salvar Chave'}
                     </Button>
                 </div>
-            </div>
+            </form>
         </div>
     );
 };
