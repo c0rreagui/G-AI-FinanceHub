@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sun, Moon, CloudRain, Bell, Settings } from 'lucide-react';
+import { Sun, Moon, Bell, Settings } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
 import { ViewType } from '../../types';
@@ -69,29 +69,23 @@ export const GreetingHeader: React.FC<GreetingHeaderProps> = ({ user, setCurrent
     };
 
     return (
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+        <div className="flex items-center gap-4">
             <div className="flex items-center gap-4">
                 <div className="relative group cursor-pointer">
-                    <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-primary to-blue-600 p-[2px] group-hover:scale-105 transition-transform duration-300">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-accent p-[2px] group-hover:scale-105 transition-transform duration-300">
                         <div className="w-full h-full rounded-full bg-background flex items-center justify-center overflow-hidden">
-                             <span className="text-xl font-bold text-foreground">
+                             <span className="text-sm font-bold text-foreground">
                                 {user?.name?.charAt(0) || 'D'}
                              </span>
                         </div>
                     </div>
-                    <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-background rounded-full"></div>
+                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-background rounded-full"></div>
                 </div>
                 <div>
-                    <h1 className="text-2xl md:text-3xl font-bold text-foreground flex items-center gap-2">
+                    <h1 className="text-base md:text-lg font-semibold text-foreground flex items-center gap-1.5">
                         {greeting}, {greetingName || user?.user_metadata?.name || user?.name || 'Dev'}! {icon}
                     </h1>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                         <span className="capitalize">{dateStr}</span>
-                         <span className="w-1 h-1 rounded-full bg-muted-foreground"></span>
-                         <span className="flex items-center gap-1">
-                            <CloudRain className="w-3 h-3 text-blue-400" /> 24°C
-                         </span>
-                    </div>
+                    <p className="text-xs text-muted-foreground capitalize">{dateStr}</p>
                 </div>
             </div>
             <div className="flex items-center gap-2">

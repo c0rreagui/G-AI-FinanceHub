@@ -48,7 +48,7 @@ export const ChartsWidget: React.FC<ChartsWidgetProps> = ({ monthlyChartData, tr
                         </TabsList>
                     </div>
                     
-                    <div className="flex-1 min-h-0 bg-card rounded-xl border border-border p-4 shadow-sm">
+                    <div className="flex-1 min-h-0 glass rounded-xl p-4 shadow-lg">
                         <TabsContent value="summary" className="h-full mt-0">
                             <MonthlySummaryChart data={monthlyChartData} />
                         </TabsContent>

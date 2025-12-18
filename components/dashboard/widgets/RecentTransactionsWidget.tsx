@@ -14,7 +14,7 @@ interface RecentTransactionsWidgetProps {
 
 export const RecentTransactionsWidget: React.FC<RecentTransactionsWidgetProps> = ({ transactions, setCurrentView }) => {
     return (
-        <Card className="h-full">
+        <Card className="h-full glass">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle>Últimas Atividades</CardTitle>
                 <Button variant="ghost" size="sm" onClick={() => setCurrentView('transactions')} className="text-xs text-primary hover:text-primary/80 h-8">
@@ -22,9 +22,11 @@ export const RecentTransactionsWidget: React.FC<RecentTransactionsWidgetProps> =
                 </Button>
             </CardHeader>
             <CardContent>
-                <div className="space-y-1">
+                <div className="space-y-1 stagger-container">
                     {transactions.slice(0, 5).map(tx => (
-                        <TransactionRow key={tx.id} tx={tx} />
+                        <div key={tx.id} className="transaction-hover rounded-lg">
+                            <TransactionRow tx={tx} />
+                        </div>
                     ))}
                     {transactions.length === 0 && (
                         <EmptyState 

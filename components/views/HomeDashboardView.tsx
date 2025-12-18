@@ -208,41 +208,40 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
             initial="hidden"
             animate="visible"
             variants={variants}
-            className={`p-4 md:p-8 max-w-6xl mx-auto ${containerSpacing}`}
+            className={`p-4 md:p-6 lg:p-8 max-w-7xl mx-auto ${containerSpacing}`}
         >
-            <div className="flex justify-between items-center mb-8">
-                <div className="w-full">
-                    <GreetingHeader 
-                        user={user} 
-                        setCurrentView={setCurrentView}
-                        onNotificationClick={onNotificationClick}
-                        unreadCount={unreadCount}
-                    />
-                </div>
-                <div className="flex gap-2">
+            {/* HEADER */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                <GreetingHeader 
+                    user={user} 
+                    setCurrentView={setCurrentView}
+                    onNotificationClick={onNotificationClick}
+                    unreadCount={unreadCount}
+                />
+                <div className="flex gap-2 flex-wrap">
                     <Button 
-                        variant={isEditMode ? "default" : "ghost"} 
+                        variant={isEditMode ? "default" : "outline"} 
                         size="sm" 
                         onClick={toggleEditMode}
-                        className={isEditMode ? "bg-yellow-500 hover:bg-yellow-600 text-black" : ""}
+                        className={isEditMode ? "bg-primary hover:bg-primary/90" : ""}
                     >
                         <LayoutGrid className="w-4 h-4 mr-2" />
-                        {isEditMode ? 'Salvar Layout' : 'Personalizar'}
+                        {isEditMode ? 'Salvar' : 'Personalizar'}
                     </Button>
                     {isEditMode && (
-                        <Button variant="outline" size="sm" onClick={resetLayout}>
+                        <Button variant="ghost" size="sm" onClick={resetLayout}>
                             <RotateCcw className="w-4 h-4 mr-2" />
                             Restaurar
                         </Button>
                     )}
-                    <Button variant="outline" size="sm" onClick={() => openDialog('add-transaction')}>
-                        Nova Transação
+                    <Button variant="default" size="sm" onClick={() => openDialog('add-transaction')}>
+                        + Nova Transação
                     </Button>
                 </div>
             </div>
 
             {/* PROACTIVE INSIGHTS */}
-            <div className="mb-6">
+            <div className="mb-4">
                 <ProactiveInsightCard setCurrentView={setCurrentView} />
             </div>
 

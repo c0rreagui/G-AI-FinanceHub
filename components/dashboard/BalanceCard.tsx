@@ -4,7 +4,7 @@ import { AnimatedCurrency } from '../ui/AnimatedCurrency';
 import { cn } from '../../utils/utils';
 import { formatCurrency } from '../../utils/formatters';
 import { usePrivacy } from '../../contexts/PrivacyContext';
-import { Eye, EyeOff, TrendingUp, TrendingDown } from 'lucide-react';
+import { Eye, EyeOff, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
 
 interface BalanceCardProps {
@@ -18,30 +18,46 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({ balance, className, tr
   const isPositive = trend >= 0;
 
   return (
-    <Card className={cn("bg-card border-border relative overflow-hidden group shadow-sm", className)}>
-      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+    <Card className={cn(
+      "glass bg-gradient-primary relative overflow-hidden group shadow-lg border-0",
+      className
+    )}>
+      {/* Aurora Glow Background */}
+      <div className="absolute top-0 right-0 w-40 h-40 bg-primary/20 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none animate-pulse" />
+      <div className="absolute bottom-0 left-0 w-32 h-32 bg-accent/15 rounded-full blur-3xl -ml-10 -mb-10 pointer-events-none" />
       
       {/* Sparkline Background */}
-      <div className="absolute bottom-0 left-0 right-0 h-16 opacity-10 pointer-events-none">
+      <div className="absolute bottom-0 left-0 right-0 h-20 opacity-20 pointer-events-none">
         <svg viewBox="0 0 100 20" className="w-full h-full" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="sparklineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="hsl(var(--primary))" />
+              <stop offset="100%" stopColor="hsl(var(--accent))" />
+            </linearGradient>
+          </defs>
           <path 
             d="M0 15 Q 10 10, 20 12 T 40 8 T 60 14 T 80 5 T 100 10" 
             fill="none" 
-            stroke="currentColor" 
-            strokeWidth="2" 
-            className="text-primary"
+            stroke="url(#sparklineGradient)" 
+            strokeWidth="2"
           />
           <path 
             d="M0 15 Q 10 10, 20 12 T 40 8 T 60 14 T 80 5 T 100 10 V 20 H 0 Z" 
-            fill="currentColor" 
-            className="text-primary"
-            fillOpacity="0.2"
+            fill="url(#sparklineGradient)"
+            fillOpacity="0.3"
           />
         </svg>
       </div>
       
-      <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-        <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Saldo Total</CardTitle>
+      <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0 relative z-10">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
+            <Wallet className="w-4 h-4 text-primary" />
+          </div>
+          <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+            Saldo Total
+          </CardTitle>
+        </div>
         <button 
             onClick={togglePrivacyMode} 
             className="text-muted-foreground/50 hover:text-foreground transition-colors opacity-0 group-hover:opacity-100"
@@ -51,27 +67,32 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({ balance, className, tr
         </button>
       </CardHeader>
       
-      <CardContent>
+      <CardContent className="relative z-10">
         <div 
             className={cn(
-                "text-3xl md:text-4xl font-bold text-foreground tracking-tight tabular-nums truncate transition-all duration-300", 
+                "text-4xl md:text-5xl font-extrabold tracking-tight tabular-nums truncate transition-all duration-300",
                 isPrivacyMode && "blur-md select-none"
             )} 
             title={isPrivacyMode ? undefined : formatCurrency(balance)}
         >
-          <AnimatedCurrency value={balance} />
+          <AnimatedCurrency 
+            value={balance} 
+            className={isPrivacyMode ? "text-foreground" : "text-gradient-primary"}
+          />
         </div>
 
-        <div className="mt-2 flex items-center gap-2">
+        <div className="mt-3 flex items-center gap-3">
             <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <div className={cn(
-                            "flex items-center text-xs font-medium px-2 py-0.5 rounded-full cursor-help",
-                            isPositive ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"
+                            "flex items-center text-sm font-semibold px-3 py-1 rounded-full cursor-help transition-all",
+                            isPositive 
+                              ? "bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25" 
+                              : "bg-red-500/15 text-red-400 hover:bg-red-500/25"
                         )}>
-                            {isPositive ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
-                            {Math.abs(trend)}%
+                            {isPositive ? <TrendingUp className="w-4 h-4 mr-1.5" /> : <TrendingDown className="w-4 h-4 mr-1.5" />}
+                            {isPositive ? '+' : ''}{Math.abs(trend).toFixed(1)}%
                         </div>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -79,9 +100,10 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({ balance, className, tr
                     </TooltipContent>
                 </Tooltip>
             </TooltipProvider>
-            <span className="text-xs text-gray-400">vs. mês anterior</span>
+            <span className="text-sm text-muted-foreground">vs. mês anterior</span>
         </div>
       </CardContent>
     </Card>
   );
 };
+

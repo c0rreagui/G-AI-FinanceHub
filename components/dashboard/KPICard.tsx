@@ -52,8 +52,17 @@ export const KPICard: React.FC<{ title: string; value: number; trend: number; ic
     // Extract color class for text/bg
     const colorClass = color.replace('bg-', '');
 
+    // Determine border style based on color
+    const isIncome = color.includes('emerald') || color.includes('green') || color.includes('success');
+    const isExpense = color.includes('rose') || color.includes('red') || color.includes('destructive');
+    const borderStyle = isIncome 
+        ? 'border-l-4 border-l-emerald-500' 
+        : isExpense 
+        ? 'border-l-4 border-l-rose-500'
+        : 'border-l-4 border-l-violet-500';
+
     return (
-        <Card className={`bg-card border-border hover:border-${colorClass}-500/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-${colorClass}-500/10 group overflow-hidden relative`}>
+        <Card className={`glass ${borderStyle} hover:border-${colorClass}-500/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-${colorClass}-500/10 group overflow-hidden relative`}>
             <div className={`absolute top-0 right-0 w-24 h-24 ${color} opacity-5 rounded-full blur-2xl -mr-8 -mt-8 group-hover:opacity-10 transition-opacity`} />
             <CardContent className="p-5 relative z-10">
                 <div className="flex justify-between items-start mb-4">
