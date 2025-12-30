@@ -129,6 +129,7 @@ export function MultiSelect({
                 )}
                 onClick={() => handleSelect(option.value)}
                 role="option"
+                // eslint-disable-next-line jsx-a11y/aria-proptypes
                 aria-selected={isSelected}
                 tabIndex={0}
                 onKeyDown={(e) => {
@@ -145,7 +146,8 @@ export function MultiSelect({
                 </div>
                 <span>{option.label}</span>
               </div>
-            ))}
+            );
+          })}
         </div>
       </PopoverContent>
     </Popover>

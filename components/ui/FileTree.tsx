@@ -27,12 +27,15 @@ const FileTreeNode: React.FC<{ node: FileNode; level: number; onSelect?: (node: 
     onSelect?.(node);
   };
 
+  // eslint-disable-next-line react/forbid-dom-props
+
   return (
     <div>
       <div
         className={cn(
           "flex items-center py-1 px-2 hover:bg-accent/50 cursor-pointer rounded-sm text-sm select-none",
-          level > 0 && "ml-4"
+          level > 0 && "ml-4",
+          `pl-[${level * 12 + 8}px]`
         )}
         onClick={handleToggle}
         role="button"
@@ -42,8 +45,6 @@ const FileTreeNode: React.FC<{ node: FileNode; level: number; onSelect?: (node: 
             handleToggle(e as any);
           }
         }}
-        // eslint-disable-next-line react/forbid-dom-props
-        style={{ paddingLeft: `${level * 12 + 8}px` }}
       >
         <span className="mr-1 opacity-70">
           {node.type === 'folder' ? (
