@@ -17,9 +17,16 @@ export const UserLevelBar: React.FC = () => {
             <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <div 
+                        <div
                             className="flex flex-col gap-1 cursor-pointer hover:opacity-80 transition-opacity"
                             onClick={() => openDialog('achievements')}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    openDialog('achievements');
+                                }
+                            }}
                         >
                             <div className="flex justify-between items-center text-xs text-muted-foreground">
                                 <span className="flex items-center gap-1 font-bold text-yellow-500">

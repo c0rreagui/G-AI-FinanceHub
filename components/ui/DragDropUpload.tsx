@@ -10,11 +10,11 @@ interface DragDropUploadProps {
   className?: string;
 }
 
-export const DragDropUpload: React.FC<DragDropUploadProps> = ({ 
-  onUpload, 
-  accept, 
-  maxFiles = 1, 
-  className 
+export const DragDropUpload: React.FC<DragDropUploadProps> = ({
+  onUpload,
+  accept,
+  maxFiles = 1,
+  className
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
@@ -64,6 +64,13 @@ export const DragDropUpload: React.FC<DragDropUploadProps> = ({
         onDragOver={handleDrag}
         onDrop={handleDrop}
         onClick={() => inputRef.current?.click()}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            inputRef.current?.click();
+          }
+        }}
       >
         <input
           ref={inputRef}
@@ -84,10 +91,10 @@ export const DragDropUpload: React.FC<DragDropUploadProps> = ({
           </div>
           <div>
             <div className="text-sm font-semibold text-foreground">
-                Clique para enviar ou arraste
+              Clique para enviar ou arraste
             </div>
             <div className="text-xs text-muted-foreground mt-1">
-                Suporta: {accept || 'Todos os arquivos'} (Max: {maxFiles})
+              Suporta: {accept || 'Todos os arquivos'} (Max: {maxFiles})
             </div>
           </div>
         </div>
@@ -102,8 +109,8 @@ export const DragDropUpload: React.FC<DragDropUploadProps> = ({
                   <File className="h-4 w-4 text-primary" />
                 </div>
                 <div className="flex flex-col">
-                    <span className="text-sm font-medium truncate max-w-[200px]" title={file.name}>{file.name}</span>
-                    <span className="text-xs text-muted-foreground">{(file.size / 1024).toFixed(1)} KB</span>
+                  <span className="text-sm font-medium truncate max-w-[200px]" title={file.name}>{file.name}</span>
+                  <span className="text-xs text-muted-foreground">{(file.size / 1024).toFixed(1)} KB</span>
                 </div>
               </div>
               <Button variant="ghost" size="icon" onClick={() => removeFile(i)}>
