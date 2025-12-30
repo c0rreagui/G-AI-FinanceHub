@@ -5,15 +5,56 @@ export type ThemeColor = {
     primary: string; // HSL value
     secondary: string; // HSL value
     accent: string; // HSL value
+    previewColors: {
+        primary: string;
+        secondary: string;
+        accent: string;
+    };
 };
 
 export const themes: ThemeColor[] = [
-    { name: 'FinanceHub (Padrão)', primary: '183 100% 50%', secondary: '217 33% 17%', accent: '262 83% 58%' },
-    { name: 'Ocean', primary: '200 100% 50%', secondary: '220 40% 20%', accent: '180 100% 50%' },
-    { name: 'Sunset', primary: '10 90% 60%', secondary: '20 40% 20%', accent: '40 100% 50%' },
-    { name: 'Forest', primary: '140 70% 50%', secondary: '150 40% 20%', accent: '80 80% 50%' },
-    { name: 'Purple Rain', primary: '270 80% 60%', secondary: '280 40% 20%', accent: '300 100% 50%' },
-    { name: 'Monochrome', primary: '0 0% 100%', secondary: '0 0% 20%', accent: '0 0% 50%' },
+    {
+        name: 'FinanceHub (Padrão)',
+        primary: '183 100% 50%',
+        secondary: '217 33% 17%',
+        accent: '262 83% 58%',
+        previewColors: { primary: 'bg-cyan-500', secondary: 'bg-slate-900', accent: 'bg-violet-500' }
+    },
+    {
+        name: 'Ocean',
+        primary: '200 100% 50%',
+        secondary: '220 40% 20%',
+        accent: '180 100% 50%',
+        previewColors: { primary: 'bg-sky-500', secondary: 'bg-blue-950', accent: 'bg-cyan-400' }
+    },
+    {
+        name: 'Sunset',
+        primary: '10 90% 60%',
+        secondary: '20 40% 20%',
+        accent: '40 100% 50%',
+        previewColors: { primary: 'bg-orange-500', secondary: 'bg-orange-950', accent: 'bg-yellow-500' }
+    },
+    {
+        name: 'Forest',
+        primary: '140 70% 50%',
+        secondary: '150 40% 20%',
+        accent: '80 80% 50%',
+        previewColors: { primary: 'bg-green-500', secondary: 'bg-green-950', accent: 'bg-lime-500' }
+    },
+    {
+        name: 'Purple Rain',
+        primary: '270 80% 60%',
+        secondary: '280 40% 20%',
+        accent: '300 100% 50%',
+        previewColors: { primary: 'bg-purple-500', secondary: 'bg-purple-950', accent: 'bg-fuchsia-500' }
+    },
+    {
+        name: 'Monochrome',
+        primary: '0 0% 100%',
+        secondary: '0 0% 20%',
+        accent: '0 0% 50%',
+        previewColors: { primary: 'bg-white', secondary: 'bg-neutral-900', accent: 'bg-neutral-500' }
+    },
 ];
 
 interface ThemeContextType {

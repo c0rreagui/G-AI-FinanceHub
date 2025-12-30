@@ -40,14 +40,14 @@ export const AppearanceSettings: React.FC = () => {
                                 key={theme.name}
                                 onClick={() => setTheme(theme.name)}
                                 className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${currentTheme.name === theme.name
-                                        ? 'border-primary bg-primary/10'
-                                        : 'border-transparent bg-muted/50 hover:bg-muted'
+                                    ? 'border-primary bg-primary/10'
+                                    : 'border-transparent bg-muted/50 hover:bg-muted'
                                     }`}
                             >
                                 <div className="flex gap-2">
-                                    <div className="w-6 h-6 rounded-full" style={{ backgroundColor: `hsl(${theme.primary})` }} />
-                                    <div className="w-6 h-6 rounded-full" style={{ backgroundColor: `hsl(${theme.secondary})` }} />
-                                    <div className="w-6 h-6 rounded-full" style={{ backgroundColor: `hsl(${theme.accent})` }} />
+                                    <div className={`w-6 h-6 rounded-full ${theme.previewColors.primary}`} />
+                                    <div className={`w-6 h-6 rounded-full ${theme.previewColors.secondary}`} />
+                                    <div className={`w-6 h-6 rounded-full ${theme.previewColors.accent}`} />
                                 </div>
                                 <span className="text-sm font-medium text-foreground">{theme.name}</span>
                             </button>
@@ -69,8 +69,8 @@ export const AppearanceSettings: React.FC = () => {
                         <button
                             onClick={() => mode === 'dark' && toggleMode()}
                             className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${mode === 'light'
-                                    ? 'border-primary bg-primary/10'
-                                    : 'border-transparent bg-muted/50 hover:bg-muted'
+                                ? 'border-primary bg-primary/10'
+                                : 'border-transparent bg-muted/50 hover:bg-muted'
                                 }`}
                         >
                             <Sun className="w-8 h-8 text-yellow-500" />
@@ -79,8 +79,8 @@ export const AppearanceSettings: React.FC = () => {
                         <button
                             onClick={() => mode === 'light' && toggleMode()}
                             className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${mode === 'dark'
-                                    ? 'border-primary bg-primary/10'
-                                    : 'border-transparent bg-muted/50 hover:bg-muted'
+                                ? 'border-primary bg-primary/10'
+                                : 'border-transparent bg-muted/50 hover:bg-muted'
                                 }`}
                         >
                             <Moon className="w-8 h-8 text-indigo-400" />
@@ -141,8 +141,8 @@ export const AppearanceSettings: React.FC = () => {
                                     key={d}
                                     onClick={() => setDensity(d)}
                                     className={`p-3 rounded-lg border text-sm capitalize transition-all ${density === d
-                                            ? 'border-primary bg-primary/10 text-foreground'
-                                            : 'border-border bg-muted/50 text-muted-foreground hover:bg-muted'
+                                        ? 'border-primary bg-primary/10 text-foreground'
+                                        : 'border-border bg-muted/50 text-muted-foreground hover:bg-muted'
                                         }`}
                                 >
                                     {d === 'compact' ? 'Compacto' : d === 'comfortable' ? 'Confortável' : 'Espaçoso'}
