@@ -5,8 +5,7 @@ const SONAR_TOKEN = '144f214521765567f62aac573643187228eae901';
 const PROJECT_KEY = 'c0rreagui_G-AI-FinanceHub';
 
 async function main() {
-    const url = `https://sonarcloud.io/api/issues/search?componentKeys=${PROJECT_KEY}&types=BUG,CODE_SMELL&statuses=OPEN,CONFIRMED,REOPENED&ps=500`;
-    // Including CODE_SMELL to be safe, but mostly interested in BUG
+    const url = `https://sonarcloud.io/api/issues/search?componentKeys=${PROJECT_KEY}&types=BUG,VULNERABILITY&statuses=OPEN,CONFIRMED,REOPENED&ps=100`;
 
     try {
         const response = await fetch(url, {
@@ -14,11 +13,9 @@ async function main() {
         });
         const data = await response.json();
 
-        let output = `Found ${data.total} issues.\n\n`;
-
-        const issues = data.issues || [];
+        let output = `🐛 Found ${data.total} issues.\n\n`;
         const byFile = {};
-        issues.forEach(i => {
+        (data.issues || []).forEach(i => {
             const file = i.component.split(':').pop();
             if (!byFile[file]) byFile[file] = [];
             byFile[file].push(i);
@@ -27,15 +24,13 @@ async function main() {
         Object.keys(byFile).sort().forEach(file => {
             output += `📄 ${file}\n`;
             byFile[file].forEach(i => {
-                if (i.type === 'BUG') {
-                    output += `   └─ [${i.severity}] L${i.line}: ${i.message} [Rules: ${i.rule}]\n`;
-                }
+                output += `   └─ [${i.severity}] L${i.line}: ${i.message}\n`;
             });
             output += '\n';
         });
 
-        fs.writeFileSync('bugs_report.txt', output);
-        console.log('Written to bugs_report.txt');
+        fs.writeFileSync('final_bugs_list.txt', output);
+        console.log('Done.');
 
     } catch (e) {
         console.error(e);

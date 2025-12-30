@@ -29,12 +29,19 @@ const FileTreeNode: React.FC<{ node: FileNode; level: number; onSelect?: (node: 
 
   return (
     <div>
-      <div 
+      <div
         className={cn(
           "flex items-center py-1 px-2 hover:bg-accent/50 cursor-pointer rounded-sm text-sm select-none",
           level > 0 && "ml-4"
         )}
         onClick={handleToggle}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            handleToggle(e as any);
+          }
+        }}
         style={{ paddingLeft: `${level * 12 + 8}px` }}
       >
         <span className="mr-1 opacity-70">

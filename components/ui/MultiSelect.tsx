@@ -65,39 +65,39 @@ export function MultiSelect({
               <span className="text-muted-foreground font-normal">{placeholder}</span>
             )}
             {selected.map((item) => {
-                const option = options.find(o => o.value === item);
-                return (
-                    <Badge
-                        key={item}
-                        variant="secondary"
-                        className="mr-1 mb-1 hover:bg-secondary/80"
-                        onClick={(e) => {
-                        e.stopPropagation()
+              const option = options.find(o => o.value === item);
+              return (
+                <Badge
+                  key={item}
+                  variant="secondary"
+                  className="mr-1 mb-1 hover:bg-secondary/80"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleUnselect(item)
+                  }}
+                >
+                  {option?.label || item}
+                  <div
+                    className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
                         handleUnselect(item)
-                        }}
-                    >
-                        {option?.label || item}
-                        <div
-                        className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                            handleUnselect(item)
-                            }
-                        }}
-                        onMouseDown={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                        }}
-                        onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            handleUnselect(item)
-                        }}
-                        >
-                        <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
-                        </div>
-                    </Badge>
-                )
+                      }
+                    }}
+                    onMouseDown={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                    }}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      handleUnselect(item)
+                    }}
+                  >
+                    <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+                  </div>
+                </Badge>
+              )
             })}
           </div>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -105,37 +105,45 @@ export function MultiSelect({
       </PopoverTrigger>
       <PopoverContent className="w-full p-0 bg-popover border-border" align="start">
         <div className="p-2 border-b border-border">
-            <input 
-                className="w-full bg-transparent outline-none text-sm placeholder:text-muted-foreground"
-                placeholder="Buscar..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-            />
+          <input
+            className="w-full bg-transparent outline-none text-sm placeholder:text-muted-foreground"
+            placeholder="Buscar..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
         <div className="max-h-60 overflow-y-auto p-1 custom-scrollbar">
-            {filteredOptions.length === 0 && (
-                <div className="py-6 text-center text-sm text-muted-foreground">
-                    Nenhum resultado encontrado.
-                </div>
-            )}
-            {filteredOptions.map((option) => (
-                <div
-                    key={option.value}
-                    className={cn(
-                        "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-                        selected.includes(option.value) && "bg-accent/50"
-                    )}
-                    onClick={() => handleSelect(option.value)}
-                >
-                    <div className={cn(
-                        "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                        selected.includes(option.value) ? "bg-primary text-primary-foreground" : "opacity-50 [&_svg]:invisible"
-                    )}>
-                        <Check className={cn("h-4 w-4")} />
-                    </div>
-                    <span>{option.label}</span>
-                </div>
-            ))}
+          {filteredOptions.length === 0 && (
+            <div className="py-6 text-center text-sm text-muted-foreground">
+              Nenhum resultado encontrado.
+            </div>
+          )}
+          {filteredOptions.map((option) => (
+            <div
+              key={option.value}
+              className={cn(
+                "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+                selected.includes(option.value) && "bg-accent/50"
+              )}
+              onClick={() => handleSelect(option.value)}
+              role="option"
+              aria-selected={selected.includes(option.value)}
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  handleSelect(option.value);
+                }
+              }}
+            >
+              <div className={cn(
+                "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                selected.includes(option.value) ? "bg-primary text-primary-foreground" : "opacity-50 [&_svg]:invisible"
+              )}>
+                <Check className={cn("h-4 w-4")} />
+              </div>
+              <span>{option.label}</span>
+            </div>
+          ))}
         </div>
       </PopoverContent>
     </Popover>

@@ -10,11 +10,11 @@ interface SearchAutocompleteProps {
   className?: string;
 }
 
-export const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({ 
-  onSearch, 
-  suggestions = [], 
-  placeholder = "Buscar...", 
-  className 
+export const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
+  onSearch,
+  suggestions = [],
+  placeholder = "Buscar...",
+  className
 }) => {
   const [query, setQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -30,7 +30,7 @@ export const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const filteredSuggestions = suggestions.filter(s => 
+  const filteredSuggestions = suggestions.filter(s =>
     s.toLowerCase().includes(query.toLowerCase())
   );
 
@@ -55,10 +55,10 @@ export const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
           className="pl-9 pr-9"
         />
         {query && (
-          <button 
+          <button
             onClick={() => {
-                setQuery("");
-                onSearch("");
+              setQuery("");
+              onSearch("");
             }}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             aria-label="Limpar busca"
@@ -74,6 +74,14 @@ export const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
               key={i}
               className="px-4 py-2 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground"
               onClick={() => handleSelect(suggestion)}
+              role="option"
+              aria-selected={false}
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  handleSelect(suggestion);
+                }
+              }}
             >
               {suggestion}
             </div>

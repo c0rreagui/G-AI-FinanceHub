@@ -34,7 +34,17 @@ const PinInput: React.FC<{ pin: string; onPinChange: (pin: string) => void; hasE
                 className="absolute inset-0 w-full h-full bg-transparent border-0 text-transparent outline-none caret-transparent"
                 aria-label="Insira o PIN de 4 dígitos"
             />
-            <div className={`flex justify-center gap-3 cursor-text ${hasError ? 'animate-shake' : ''}`} onClick={() => inputRef.current?.focus()}>
+            <div
+                className={`flex justify-center gap-3 cursor-text ${hasError ? 'animate-shake' : ''}`}
+                onClick={() => inputRef.current?.focus()}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        inputRef.current?.focus();
+                    }
+                }}
+            >
                 {Array.from({ length: 4 }).map((_, index) => (
                     <div
                         key={index}

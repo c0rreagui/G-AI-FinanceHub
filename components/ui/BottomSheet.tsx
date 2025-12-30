@@ -13,11 +13,11 @@ interface BottomSheetProps {
   onOpenChange?: (open: boolean) => void;
 }
 
-export const BottomSheet: React.FC<BottomSheetProps> = ({ 
-  trigger, 
-  title, 
-  description, 
-  children, 
+export const BottomSheet: React.FC<BottomSheetProps> = ({
+  trigger,
+  title,
+  description,
+  children,
   footer,
   isOpen,
   onClose,
@@ -34,7 +34,21 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
   // The existing Drawer component handles the mobile bottom sheet behavior internally
   return (
     <>
-      {trigger && <div onClick={() => onOpenChange?.(true)}>{trigger}</div>}
+      {trigger && (
+        <div
+          onClick={() => onOpenChange?.(true)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              onOpenChange?.(true);
+            }
+          }}
+          className="cursor-pointer"
+        >
+          {trigger}
+        </div>
+      )}
       <Drawer
         isOpen={effectiveOpen}
         onClose={handleClose}
