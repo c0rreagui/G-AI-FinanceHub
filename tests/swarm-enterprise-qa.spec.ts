@@ -5,7 +5,7 @@ import { ChaosHelpers } from './utils/ChaosHelpers';
 test.describe('🛡️ Enterprise Swarm - QA & Security Squad', () => {
     let agent: SwarmHelpers;
 
-    test.afterEach(async ({}, testInfo) => {
+    test.afterEach(async (_, testInfo) => {
         if (testInfo.status === 'failed' && agent) {
             console.log(`🧨 DETECTADA FALHA NO TESTE: ${testInfo.title}`);
             console.log('🤖 Iniciando Protocolo Black Box & Auto-Repro...');

@@ -4,7 +4,7 @@ import { SwarmHelpers } from './utils/SwarmHelpers';
 test.describe('🎨 UX/UI Tests - Navigation & Responsiveness', () => {
     let agent: SwarmHelpers;
 
-    test.afterEach(async ({}, testInfo) => {
+    test.afterEach(async (_, testInfo) => {
         if (testInfo.status === 'failed' && agent) {
             await agent.captureEvidence(`FAILURE_UXUI_${testInfo.title.replace(/\s+/g, '_')}`, testInfo.error as Error);
         }

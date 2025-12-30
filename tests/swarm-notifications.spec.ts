@@ -4,7 +4,7 @@ import { SwarmHelpers } from './utils/SwarmHelpers';
 test.describe('🔔 Enterprise Swarm - Notification Squad', () => {
     let agent: SwarmHelpers;
 
-    test.afterEach(async ({}, testInfo) => {
+    test.afterEach(async (_, testInfo) => {
         if (testInfo.status === 'failed' && agent) {
             console.log(`🧨 FALHA EM NOTIFICATIONS: ${testInfo.title}`);
             await agent.captureEvidence(`FAILURE_NOTIFICATIONS_${testInfo.title.replace(/\s+/g, '_')}`, testInfo.error as Error);
