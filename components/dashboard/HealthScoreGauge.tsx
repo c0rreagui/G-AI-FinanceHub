@@ -132,12 +132,12 @@ export const HealthScoreGauge: React.FC<HealthScoreGaugeProps> = ({ score }) => 
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.5 }}
-                        className="flex items-baseline justify-center gap-2"
+                        className="flex flex-col items-center justify-center gap-1"
                     >
                         <Text className="text-4xl font-bold text-foreground leading-none" style={{ color }}>
                             {score}
                         </Text>
-                        <Text size="sm" variant="muted" className="uppercase tracking-wider font-semibold">
+                        <Text size="sm" variant="muted" className="uppercase tracking-wider font-bold">
                             {score >= 800 ? 'Excelente' : score >= 500 ? 'Bom' : 'Atenção'}
                         </Text>
                     </motion.div>
