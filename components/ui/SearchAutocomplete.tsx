@@ -68,14 +68,14 @@ export const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
         )}
       </div>
       {showSuggestions && query && filteredSuggestions.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1 rounded-md border bg-popover shadow-md z-[150] overflow-hidden animate-slide-up" role="listbox">
+        <div className="absolute top-full left-0 right-0 mt-1 rounded-md border bg-popover shadow-md z-[150] overflow-hidden animate-slide-up" role="listbox" aria-label="Sugestões de busca">
           {filteredSuggestions.map((suggestion, i) => (
             <div
               key={i}
               className="px-4 py-2 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground"
               onClick={() => handleSelect(suggestion)}
               role="option"
-              aria-selected="false"
+              aria-selected={false}
               tabIndex={0}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
