@@ -29,7 +29,7 @@ export const TourGuide: React.FC<TourGuideProps> = ({ steps, isOpen, onClose }) 
         tooltipRef.current.style.top = `${rect.bottom + window.scrollY + 12}px`;
         tooltipRef.current.style.left = `${rect.left + window.scrollX + rect.width / 2}px`;
         tooltipRef.current.style.transform = 'translateX(-50%)';
-        
+
         target.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     };
@@ -58,8 +58,18 @@ export const TourGuide: React.FC<TourGuideProps> = ({ steps, isOpen, onClose }) 
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/50 z-[500]" onClick={onClose} />
-      <div 
+      <div
+        className="fixed inset-0 bg-black/50 z-[500]"
+        onClick={onClose}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
+            onClose();
+          }
+        }}
+      />
+      <div
         ref={tooltipRef}
         className="absolute z-[500] transition-all duration-300 ease-in-out"
       >
@@ -75,10 +85,10 @@ export const TourGuide: React.FC<TourGuideProps> = ({ steps, isOpen, onClose }) 
               Anterior
             </Button>
             <div className="flex gap-2">
-                <Button variant="ghost" size="sm" onClick={onClose}>Pular</Button>
-                <Button size="sm" onClick={handleNext}>
+              <Button variant="ghost" size="sm" onClick={onClose}>Pular</Button>
+              <Button size="sm" onClick={handleNext}>
                 {currentStep === steps.length - 1 ? 'Concluir' : 'Próximo'}
-                </Button>
+              </Button>
             </div>
           </CardFooter>
         </Card>

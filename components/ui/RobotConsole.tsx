@@ -34,7 +34,7 @@ export const RobotConsole: React.FC = () => {
         const originalWarn = console.warn;
 
         const addLog = (type: LogMessage['type'], ...args: any[]) => {
-            const message = args.map(arg => 
+            const message = args.map(arg =>
                 typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
             ).join(' ');
 
@@ -86,27 +86,36 @@ export const RobotConsole: React.FC = () => {
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 50 }}
-                className={`fixed bottom-4 right-4 z-[9999] bg-black/90 text-green-400 font-mono text-sm rounded-lg shadow-2xl border border-green-500/30 backdrop-blur-md transition-all duration-300 ${
-                    isMinimized ? 'w-64 h-12' : 'w-[500px] h-[300px]'
-                }`}
+                className={`fixed bottom-4 right-4 z-[9999] bg-black/90 text-green-400 font-mono text-sm rounded-lg shadow-2xl border border-green-500/30 backdrop-blur-md transition-all duration-300 ${isMinimized ? 'w-64 h-12' : 'w-[500px] h-[300px]'
+                    }`}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between p-2 border-b border-white/10 bg-white/5 rounded-t-lg cursor-pointer" onClick={() => setIsMinimized(!isMinimized)}>
+                <div
+                    className="flex items-center justify-between p-2 border-b border-white/10 bg-white/5 rounded-t-lg cursor-pointer"
+                    onClick={() => setIsMinimized(!isMinimized)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            setIsMinimized(!isMinimized);
+                        }
+                    }}
+                >
                     <div className="flex items-center gap-2">
                         <Activity className="w-4 h-4 animate-pulse text-green-500" />
                         <span className="font-bold">🤖 Robot Debug Console</span>
                     </div>
                     <div className="flex gap-1">
-                        <button 
-                            onClick={(e) => { e.stopPropagation(); setIsMinimized(!isMinimized); }} 
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setIsMinimized(!isMinimized); }}
                             className="p-1 hover:bg-white/10 rounded"
                             title={isMinimized ? "Maximizar" : "Minimizar"}
                             aria-label={isMinimized ? "Maximizar console" : "Minimizar console"}
                         >
                             {isMinimized ? <Maximize2 className="w-3 h-3" /> : <Minimize2 className="w-3 h-3" />}
                         </button>
-                        <button 
-                            onClick={(e) => { e.stopPropagation(); setIsVisible(false); }} 
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setIsVisible(false); }}
                             className="p-1 hover:bg-red-500/20 text-red-400 rounded"
                             title="Fechar Console"
                             aria-label="Fechar console"
