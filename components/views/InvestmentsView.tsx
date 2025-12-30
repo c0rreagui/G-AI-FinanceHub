@@ -44,7 +44,7 @@ export const InvestmentsView: React.FC = () => {
   return (
     <div className="space-y-6 pb-20 md:pb-0">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <PageHeader 
+        <PageHeader setCurrentView={setCurrentView} 
           icon={PiggyBank}
           title="Investimentos" 
           subtitle="Gerencie seu patrimônio e acompanhe seus rendimentos"
@@ -132,3 +132,4 @@ export const InvestmentsView: React.FC = () => {
     </div>
   );
 };
+

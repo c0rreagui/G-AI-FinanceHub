@@ -34,7 +34,7 @@ export const SocialView: React.FC = () => {
 
     return (
         <div className="flex flex-col h-full bg-background text-white overflow-y-auto pb-20">
-            <PageHeader
+            <PageHeader setCurrentView={setCurrentView}
                 icon={Users}
                 title="Família & Social"
                 subtitle="Gerencie seu grupo familiar e compartilhamento"
@@ -191,3 +191,4 @@ export const SocialView: React.FC = () => {
         </div>
     );
 };
+

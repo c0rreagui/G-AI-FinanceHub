@@ -7,7 +7,7 @@ import { PieChart } from '../Icons';
 export const BudgetsView: React.FC = () => {
     return (
         <div className="h-full flex flex-col space-y-6">
-            <PageHeader 
+            <PageHeader setCurrentView={setCurrentView} 
                 icon={<PieChart className="w-8 h-8 text-cyan-300" />}
                 title="Orçamentos" 
                 subtitle="Defina limites para suas categorias e acompanhe seus gastos em tempo real."
@@ -24,3 +24,4 @@ export const BudgetsView: React.FC = () => {
         </div>
     );
 };
+

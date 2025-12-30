@@ -897,11 +897,10 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
                 // logAction('delete', 'transaction', id, `Transação movida para lixeira: ${txToDelete.description}`);
             }
         } else {
-            // Soft delete for Supabase
-            const { error } = await supabase.from('transactions').update({ deleted_at: new Date().toISOString() } as any).eq('id', id);
+            // Hard delete for Supabase as deleted_at column is missing
+            const { error } = await supabase.from('transactions').delete().eq('id', id);
             if (error) throw error;
             await fetchData();
-            // logAction('delete', 'transaction', id, `Transação movida para lixeira: ${txToDelete.description}`);
         }
         showToast('Transação movida para a lixeira', { type: 'success' });
         return true;

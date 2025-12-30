@@ -96,7 +96,7 @@ export const DebtsView: React.FC = () => {
 
     return (
         <Flex direction="col" className="h-full">
-            <PageHeader 
+            <PageHeader setCurrentView={setCurrentView} 
                 icon={TrendingDown} 
                 title="Dívidas" 
                 breadcrumbs={['FinanceHub', 'Dívidas']}

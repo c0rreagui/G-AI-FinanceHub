@@ -97,7 +97,7 @@ const InsightsContent: React.FC = () => {
 
     return (
         <>
-            <PageHeader 
+            <PageHeader setCurrentView={setCurrentView} 
                 icon={Lightbulb} 
                 title="Insights e Análises" 
                 breadcrumbs={['FinanceHub', 'Insights']}

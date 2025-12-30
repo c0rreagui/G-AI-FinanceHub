@@ -10,17 +10,11 @@ import { MicrophoneButton } from '../ui/MicrophoneButton';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
 import { FamilySwitcher } from '../dashboard/FamilySwitcher';
 
-interface PageHeaderProps {
-    icon: React.ElementType | React.ReactNode;
-    title: string;
-    subtitle?: string;
-    breadcrumbs?: string[];
-    actions?: React.ReactNode;
-    children?: React.ReactNode;
-    unreadCount?: number;
+unreadCount ?: number;
+setCurrentView ?: (view: ViewType) => void;
 }
 
-export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs = [], actions, children, unreadCount: propUnreadCount }) => {
+export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs = [], actions, children, unreadCount: propUnreadCount, setCurrentView }) => {
     const { user, logout, isDeveloper } = useAuth();
     const { openDialog } = useDialog();
     const { unreadCount: contextUnreadCount } = useNotifications();
@@ -134,10 +128,16 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs
                             <div className="px-2 py-1.5 text-sm font-medium text-foreground border-b border-border mb-1">
                                 {user?.email || 'visitante@financehub.com'}
                             </div>
-                            <button className="flex items-center gap-2 px-2 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors w-full text-left">
+                            <button
+                                onClick={() => setCurrentView?.('settings')}
+                                className="flex items-center gap-2 px-2 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors w-full text-left"
+                            >
                                 <User className="w-4 h-4" /> Perfil
                             </button>
-                            <button className="flex items-center gap-2 px-2 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors w-full text-left">
+                            <button
+                                onClick={() => setCurrentView?.('settings')}
+                                className="flex items-center gap-2 px-2 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors w-full text-left"
+                            >
                                 <Settings className="w-4 h-4" /> Configurações
                             </button>
                             <div className="h-px bg-border my-1" />

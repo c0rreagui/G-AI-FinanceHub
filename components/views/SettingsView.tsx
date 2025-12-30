@@ -58,8 +58,10 @@ export const SettingsView: React.FC = () => {
         <>
             <PageHeader
                 icon={Settings}
-                title={activeTab === 'general' ? 'Ajustes' : 'Perfil'} // Updated title logic
-                breadcrumbs={['FinanceHub', activeTab === 'general' ? 'Ajustes' : 'Perfil']} // Updated breadcrumbs logic
+                title="Configurações"
+                subtitle="Gerencie suas preferências e conta"
+                setCurrentView={setCurrentView}
+                breadcrumbs={['FinanceHub', activeTab === 'general' ? 'Ajustes' : 'Perfil']}
                 actions={<Button onClick={logout} variant="secondary" title="Sair da sua conta">Sair</Button>}
             />
 

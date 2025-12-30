@@ -33,7 +33,7 @@ export const GoalsView: React.FC = () => {
     if (loading) {
         return (
             <Flex direction="col" className="h-full">
-                <PageHeader 
+                <PageHeader setCurrentView={setCurrentView} 
                     icon={Target} 
                     title="Planejamento" 
                     breadcrumbs={['FinanceHub', 'Planejamento']}
@@ -45,7 +45,7 @@ export const GoalsView: React.FC = () => {
 
     return (
         <Flex direction="col" className="h-full space-y-6">
-            <PageHeader 
+            <PageHeader setCurrentView={setCurrentView} 
                 icon={Target} 
                 title="Planejamento Financeiro" 
                 breadcrumbs={['FinanceHub', 'Metas e Orçamentos']}

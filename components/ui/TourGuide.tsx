@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from './Button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './Card';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Step {
-  target: string; // ID of the target element
+  target: string;
   title: string;
   content: string;
 }
@@ -16,54 +17,56 @@ interface TourGuideProps {
 
 export const TourGuide: React.FC<TourGuideProps> = ({ steps, isOpen, onClose }) => {
   const [currentStep, setCurrentStep] = useState(0);
-  const tooltipRef = React.useRef<HTMLDivElement>(null);
+  const [coords, setCoords] = useState({ top: 0, left: 0 });
+  const [placement, setPlacement] = useState<'top' | 'bottom'>('bottom');
+  const tooltipRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || steps.length === 0) return;
 
     const updatePosition = () => {
-      const target = document.getElementById(steps[currentStep].target);
-      if (target && tooltipRef.current) {
-        const rect = target.getBoundingClientRect();
-        const tooltipHeight = tooltipRef.current.offsetHeight || 200;
-        const tooltipWidth = tooltipRef.current.offsetWidth || 300;
+      const element = document.getElementById(steps[currentStep].target);
+      if (!element) return;
 
-        // Calculate vertical position
-        let top = rect.bottom + globalThis.scrollY + 12;
-        const spaceBelow = globalThis.innerHeight - rect.bottom;
+      // Ensure element is visible
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-        // If not enough space below, place above
+      // Small delay to wait for scroll to finish
+      setTimeout(() => {
+        const rect = element.getBoundingClientRect();
+        const tooltipHeight = tooltipRef.current?.offsetHeight || 180;
+        const tooltipWidth = 300;
+
+        let top = rect.bottom + window.scrollY + 12;
+        let left = rect.left + window.scrollX + (rect.width / 2);
+        let currentPlacement: 'top' | 'bottom' = 'bottom';
+
+        // Check vertical space
+        const spaceBelow = window.innerHeight - rect.bottom;
         if (spaceBelow < tooltipHeight + 20) {
-          top = rect.top + globalThis.scrollY - tooltipHeight - 12;
+          top = rect.top + window.scrollY - tooltipHeight - 12;
+          currentPlacement = 'top';
         }
 
-        // Calculate horizontal position
-        let left = rect.left + globalThis.scrollX + rect.width / 2;
-
-        // Horizontal constraints (keep inside viewport)
+        // Horizontal constraints
         const minLeft = (tooltipWidth / 2) + 12;
-        const maxLeft = globalThis.innerWidth - (tooltipWidth / 2) - 12;
+        const maxLeft = window.innerWidth - (tooltipWidth / 2) - 12;
         left = Math.max(minLeft, Math.min(maxLeft, left));
 
-        tooltipRef.current.style.top = `${top}px`;
-        tooltipRef.current.style.left = `${left}px`;
-        tooltipRef.current.style.transform = 'translateX(-50%)';
-
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+        setCoords({ top, left });
+        setPlacement(currentPlacement);
+      }, 100);
     };
 
-    // Use requestAnimationFrame with a small delay to ensure DOM is ready and animations are settled
-    const timer = setTimeout(() => {
-      requestAnimationFrame(updatePosition);
-    }, 100);
+    updatePosition();
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition);
 
-    globalThis.addEventListener('resize', updatePosition);
     return () => {
-      globalThis.removeEventListener('resize', updatePosition);
-      clearTimeout(timer);
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition);
     };
-  }, [currentStep, isOpen, steps]);
+  }, [isOpen, currentStep, steps]);
 
   if (!isOpen) return null;
 
@@ -83,42 +86,66 @@ export const TourGuide: React.FC<TourGuideProps> = ({ steps, isOpen, onClose }) 
 
   return (
     <>
+      {/* Overlay Backdrop - Higher Z than common components */}
       <div
-        className="fixed inset-0 bg-black/50 z-[500]"
+        className="fixed inset-0 bg-black/60 backdrop-blur-[2px] z-[9998]"
         onClick={onClose}
-        role="button"
-        aria-label="Fechar tour"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
-            onClose();
-          }
-        }}
       />
-      <div
+
+      <motion.div
         ref={tooltipRef}
-        className="absolute z-[500] transition-all duration-300 ease-in-out"
+        initial={{ opacity: 0, scale: 0.9, y: placement === 'bottom' ? -10 : 10 }}
+        animate={{
+          opacity: 1,
+          scale: 1,
+          y: 0,
+          top: coords.top,
+          left: coords.left
+        }}
+        className="absolute z-[9999] w-[300px] pointer-events-auto"
+        style={{ transform: 'translateX(-50%)' }}
       >
-        <Card className="w-[300px] shadow-2xl border-primary/50 ring-4 ring-primary/20 bg-popover text-popover-foreground">
-          <CardHeader>
-            <CardTitle className="text-lg">{steps[currentStep].title}</CardTitle>
+        <Card className="shadow-2xl border-primary/50 ring-4 ring-primary/10 bg-card text-card-foreground">
+          {/* Arrow */}
+          <div
+            className={`absolute left-1/2 -translate-x-1/2 w-4 h-4 rotate-45 bg-card border-l border-t border-primary/50 ${placement === 'bottom' ? '-top-2' : '-bottom-2'
+              }`}
+          />
+
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg flex justify-between items-center">
+              {steps[currentStep].title}
+              <span className="text-xs font-normal text-muted-foreground">
+                {currentStep + 1} / {steps.length}
+              </span>
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">{steps[currentStep].content}</p>
+          <CardContent className="pb-4">
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              {steps[currentStep].content}
+            </p>
           </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button variant="ghost" size="sm" onClick={handlePrev} disabled={currentStep === 0}>
+          <CardFooter className="flex justify-between pt-2 border-t border-white/5">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handlePrev}
+              disabled={currentStep === 0}
+              className="text-xs"
+            >
               Anterior
             </Button>
             <div className="flex gap-2">
-              <Button variant="ghost" size="sm" onClick={onClose}>Pular</Button>
-              <Button size="sm" onClick={handleNext}>
+              <Button variant="ghost" size="sm" onClick={onClose} className="text-xs">
+                Pular
+              </Button>
+              <Button size="sm" onClick={handleNext} className="text-xs px-4">
                 {currentStep === steps.length - 1 ? 'Concluir' : 'Próximo'}
               </Button>
             </div>
           </CardFooter>
         </Card>
-      </div>
+      </motion.div>
     </>
   );
 };

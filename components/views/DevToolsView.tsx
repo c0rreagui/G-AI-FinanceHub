@@ -21,12 +21,12 @@ const StatusIndicator: React.FC<{ status: 'online' | 'offline' | 'warning'; labe
         <span className="text-sm font-medium text-gray-300">{label}</span>
         <div className="flex items-center gap-2">
             <span className={`w-2 h-2 rounded-full ${status === 'online' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' :
-                    status === 'warning' ? 'bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]' :
-                        'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]'
+                status === 'warning' ? 'bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]' :
+                    'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]'
                 }`} />
             <span className={`text-xs font-bold ${status === 'online' ? 'text-green-500' :
-                    status === 'warning' ? 'text-yellow-500' :
-                        'text-red-500'
+                status === 'warning' ? 'text-yellow-500' :
+                    'text-red-500'
                 }`}>
                 {status.toUpperCase()}
             </span>
@@ -88,18 +88,46 @@ export const DevToolsView: React.FC<DevToolsViewProps> = ({ setCurrentView }) =>
         setConfirmDelete(false);
     };
 
-    const handleResetCache = () => {
+    const handleResetCache = async () => {
         if (!confirmDelete) {
             setConfirmDelete(true);
             setTimeout(() => setConfirmDelete(false), 3000);
             return;
         }
-        localStorage.clear();
-        sessionStorage.clear();
-        showToast('Cache limpo! Reiniciando...', { type: 'success' });
-        setTimeout(() => {
-            globalThis.location.reload();
-        }, 1000);
+
+        try {
+            // 1. Storage
+            localStorage.clear();
+            sessionStorage.clear();
+
+            // 2. Clear all IndexedDB databases
+            const databases = await indexedDB.databases();
+            for (const db of databases) {
+                if (db.name) indexedDB.deleteDatabase(db.name);
+            }
+
+            // 3. Clear Cache Storage
+            if ('caches' in window) {
+                const cacheNames = await caches.keys();
+                await Promise.all(cacheNames.map(name => caches.delete(name)));
+            }
+
+            // 4. Unregister Service Workers
+            if ('serviceWorker' in navigator) {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                await Promise.all(registrations.map(reg => reg.unregister()));
+            }
+
+            showToast('Reset Radical concluído! Reiniciando...', { type: 'success' });
+
+            setTimeout(() => {
+                globalThis.location.href = '/'; // Go back to root
+            }, 1000);
+        } catch (error) {
+            console.error('Erro no reset:', error);
+            showToast('Erro ao limpar cache, mas recarregando...', { type: 'error' });
+            setTimeout(() => globalThis.location.reload(), 2000);
+        }
     };
 
     return (
@@ -108,6 +136,7 @@ export const DevToolsView: React.FC<DevToolsViewProps> = ({ setCurrentView }) =>
                 title="Developer Console"
                 subtitle="Painel avançado de controle e diagnósticos"
                 icon={<Cpu className="w-6 h-6 text-cyan-400" />}
+                setCurrentView={setCurrentView}
                 actions={
                     <Badge variant="outline" className="bg-cyan-500/10 text-cyan-400 border-cyan-500/20 px-3 py-1">
                         v4.0.0-beta
@@ -121,8 +150,8 @@ export const DevToolsView: React.FC<DevToolsViewProps> = ({ setCurrentView }) =>
                     <button
                         onClick={() => setActiveTab('devtools')}
                         className={`px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'devtools'
-                                ? 'text-cyan-400 border-b-2 border-cyan-400'
-                                : 'text-gray-400 hover:text-white'
+                            ? 'text-cyan-400 border-b-2 border-cyan-400'
+                            : 'text-gray-400 hover:text-white'
                             }`}
                     >
                         🛠️ DevTools
@@ -130,8 +159,8 @@ export const DevToolsView: React.FC<DevToolsViewProps> = ({ setCurrentView }) =>
                     <button
                         onClick={() => setActiveTab('telemetry')}
                         className={`px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'telemetry'
-                                ? 'text-cyan-400 border-b-2 border-cyan-400'
-                                : 'text-gray-400 hover:text-white'
+                            ? 'text-cyan-400 border-b-2 border-cyan-400'
+                            : 'text-gray-400 hover:text-white'
                             }`}
                     >
                         🔍 Telemetria

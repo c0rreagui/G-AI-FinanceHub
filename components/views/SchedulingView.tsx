@@ -150,7 +150,7 @@ export const SchedulingView: React.FC = () => {
 
     return (
         <div className="flex flex-col h-full space-y-6 pb-20">
-            <PageHeader
+            <PageHeader setCurrentView={setCurrentView}
                 icon={Calendar}
                 title="Agendamentos"
                 subtitle="Gerencie suas contas fixas e recorrentes"

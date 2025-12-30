@@ -23,7 +23,7 @@ export const ToolsView: React.FC<ToolsViewProps> = ({ setCurrentView }) => {
 
   return (
     <div className="flex flex-col h-full">
-      <PageHeader icon={Wrench} title="Ferramentas" breadcrumbs={['FinanceHub', 'Ferramentas']} />
+      <PageHeader setCurrentView={setCurrentView} icon={Wrench} title="Ferramentas" breadcrumbs={['FinanceHub', 'Ferramentas']} />
       <div className="mt-6 flex-grow overflow-y-auto pr-2 pb-20">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {/* Calculadora de Juros Compostos - Full Width on Mobile, Half on Desktop */}

@@ -43,7 +43,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
         globalThis.addEventListener('keydown', handleKeyDown);
         return () => globalThis.removeEventListener('keydown', handleKeyDown);
     }, [openDialog]);
-    
+
     // Advanced Filters State
     const [startDate, setStartDate] = useState<string | null>(null);
     const [endDate, setEndDate] = useState<string | null>(null);
@@ -58,9 +58,9 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
     const filteredTransactions = useMemo(() => {
         return transactions.filter(tx => {
             // Search Logic
-            const matchesSearch = tx.description.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                                  tx.category.name.toLowerCase().includes(searchTerm.toLowerCase());
-            
+            const matchesSearch = tx.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                tx.category.name.toLowerCase().includes(searchTerm.toLowerCase());
+
             // Type Logic
             let matchesType = true;
             if (typeFilter === 'all') {
@@ -100,12 +100,12 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
         });
     }, [transactions, searchTerm, typeFilter, startDate, endDate, selectedCategories, selectedAccounts]);
 
-    const selectableTransactions = useMemo(() => 
+    const selectableTransactions = useMemo(() =>
         filteredTransactions.filter(tx => !tx.goal_contribution_id && !tx.debt_payment_id),
-    [filteredTransactions]);
-    
+        [filteredTransactions]);
+
     const handleSelect = (id: string) => {
-        setSelectedIds(prev => 
+        setSelectedIds(prev =>
             prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
         );
     };
@@ -123,7 +123,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
     };
 
     const handleDuplicate = (transaction: Transaction) => {
-        openDialog('add-transaction', { 
+        openDialog('add-transaction', {
             prefill: {
                 type: transaction.type,
                 description: `${transaction.description} (cópia)`,
@@ -161,10 +161,11 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
 
     return (
         <Flex direction="col" className="h-full space-y-6">
-            <PageHeader 
-                icon={ArrowLeftRight} 
-                title="Transações" 
+            <PageHeader
+                icon={ArrowLeftRight}
+                title="Transações"
                 breadcrumbs={['FinanceHub', 'Transações']}
+                setCurrentView={setCurrentView}
                 actions={
                     <Flex gap="sm">
                         <Button variant="outline" onClick={() => setIsReclassifyOpen(true)} title="Reclassificação Inteligente">
@@ -178,21 +179,21 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                             <History className="w-5 h-5 text-muted-foreground hover:text-primary transition-colors" />
                         </Button>
                         <Button variant="outline" onClick={() => openDialog('import-transactions')}>
-                            <Upload className="w-4 h-4 mr-2"/> Importar
+                            <Upload className="w-4 h-4 mr-2" /> Importar
                         </Button>
                         <Button onClick={() => openDialog('add-transaction')}>
-                            <PlusCircle className="w-4 h-4 mr-2"/> Nova Transação
+                            <PlusCircle className="w-4 h-4 mr-2" /> Nova Transação
                         </Button>
                     </Flex>
                 }
             />
 
-             {loading ? (
+            {loading ? (
                 <TransactionsViewSkeleton />
-             ) : (
+            ) : (
                 <Flex direction="col" className="flex-grow overflow-hidden gap-4">
                     {/* Filters Bar */}
-                    <FilterBar 
+                    <FilterBar
                         searchTerm={searchTerm}
                         onSearchChange={setSearchTerm}
                         startDate={startDate}
@@ -208,7 +209,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                         onTypeFilterChange={setTypeFilter}
                         onClearFilters={handleClearFilters}
                     />
-                    
+
 
 
                     {/* Date Grouping Control (Item 118) */}
@@ -233,7 +234,7 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                     {/* Table Area */}
                     <div className="flex-grow overflow-auto rounded-md border bg-card">
                         {filteredTransactions.length > 0 ? (
-                            <TransactionsTable 
+                            <TransactionsTable
                                 transactions={filteredTransactions}
                                 groupBy={groupBy}
                                 groupedData={groupBy !== 'none' ? groupTransactionsByDate(filteredTransactions, groupBy) : []}
@@ -255,14 +256,14 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                             >
                                 {!searchTerm && (
                                     <Button onClick={() => openDialog('add-transaction')}>
-                                        <PlusCircle className="w-4 h-4 mr-2"/> Adicionar Primeira Transação
+                                        <PlusCircle className="w-4 h-4 mr-2" /> Adicionar Primeira Transação
                                     </Button>
                                 )}
                             </EmptyState>
                         )}
                     </div>
                 </Flex>
-             )}
+            )}
 
             {/* Mobile FAB */}
             <div className="md:hidden fixed bottom-24 right-6 z-[80]">
@@ -274,10 +275,10 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                     <PlusCircle className="h-6 w-6 text-primary-foreground" />
                 </Button>
             </div>
-            
+
             <BulkActionsBar selectedIds={selectedIds} onClearSelection={() => setSelectedIds([])} />
-            
-            <SmartReclassificationDialog 
+
+            <SmartReclassificationDialog
                 isOpen={isReclassifyOpen}
                 onClose={() => setIsReclassifyOpen(false)}
                 onSuccess={() => {
@@ -285,12 +286,12 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                 }}
             />
 
-            <TrashDialog 
+            <TrashDialog
                 open={isTrashOpen}
                 onOpenChange={setIsTrashOpen}
             />
 
-            <AuditLogDialog 
+            <AuditLogDialog
                 isOpen={isAuditLogOpen}
                 onClose={() => setIsAuditLogOpen(false)}
             />
