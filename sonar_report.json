@@ -1,0 +1,359 @@
+{
+  "total": 261,
+  "bugs": {
+    "components/ui/charts/BalanceEvolutionChart.tsx": [
+      {
+        "key": "AZtvkgnskzV81Y0SH3sh",
+        "severity": "CRITICAL",
+        "message": "Provide a compare function that depends on \"String.localeCompare\", to reliably sort elements alphabetically.",
+        "line": 32,
+        "rule": "typescript:S2871"
+      }
+    ],
+    "storybook-static/sb-manager/runtime.js": [
+      {
+        "key": "AZtvkg93kzV81Y0SH4OT",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 7165,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4OV",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 7204,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4OX",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 7219,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4OZ",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 7251,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4Pz",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 7909,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4Q3",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8124,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4Q7",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8129,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4Qd",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8040,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4Qm",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8079,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4Qp",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8092,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4Qr",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8103,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4R1",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8350,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4R5",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8356,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4R9",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8380,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4Re",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8249,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4Ro",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8295,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4RR",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8203,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4RT",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8212,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4Rz",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8345,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4S3",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8590,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4S4",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8591,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4SB",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8389,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4SH",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8398,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4SL",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8417,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4SN",
+        "severity": "MAJOR",
+        "message": "Remove this use of the output from \"lp\"; \"lp\" doesn't return anything.",
+        "line": 8417,
+        "rule": "javascript:S3699"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4Sq",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8526,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4SQ",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8431,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4SS",
+        "severity": "MAJOR",
+        "message": "Remove this use of the output from \"Xt\"; \"Xt\" doesn't return anything.",
+        "line": 8431,
+        "rule": "javascript:S3699"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4St",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8535,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4T0",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8785,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4T2",
+        "severity": "MAJOR",
+        "message": "Remove this use of the output from \"ay\"; \"ay\" doesn't return anything.",
+        "line": 8785,
+        "rule": "javascript:S3699"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4Tk",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8750,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4Tp",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8762,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4Ts",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8766,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4Tx",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 8778,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4U3",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 9251,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4Uc",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 9109,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4Ue",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 9115,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4Ug",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 9121,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4Ui",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 9126,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4Uk",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 9136,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4Um",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 9141,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4Un",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 9146,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4US",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 9062,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4Uu",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 9221,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4UW",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 9080,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4Uz",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 9245,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4Va",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 9501,
+        "rule": "javascript:S905"
+      },
+      {
+        "key": "AZtvkg93kzV81Y0SH4Vc",
+        "severity": "MAJOR",
+        "message": "Expected an assignment or function call and instead saw an expression.",
+        "line": 9507,
+        "rule": "javascript:S905"
+      }
+    ]
+  }
+}

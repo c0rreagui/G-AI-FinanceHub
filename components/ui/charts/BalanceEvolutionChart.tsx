@@ -16,21 +16,21 @@ export const BalanceEvolutionChart: React.FC<BalanceEvolutionChartProps> = ({ tr
 
         // Sort transactions by date ascending
         const sorted = [...transactions].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-        
+
         const evolution: { date: string; balance: number; rawDate: number }[] = [];
         let currentBalance = 0;
 
         // Group by day to avoid too many points
         const groupedByDay: { [key: string]: number } = {};
-        
+
         sorted.forEach(tx => {
             const dateKey = new Date(tx.date).toISOString().split('T')[0];
             if (!groupedByDay[dateKey]) groupedByDay[dateKey] = 0;
             groupedByDay[dateKey] += tx.amount;
         });
 
-        const dates = Object.keys(groupedByDay).sort();
-        
+        const dates = Object.keys(groupedByDay).sort((a, b) => a.localeCompare(b));
+
         dates.forEach(date => {
             currentBalance += groupedByDay[date];
             evolution.push({
@@ -75,38 +75,38 @@ export const BalanceEvolutionChart: React.FC<BalanceEvolutionChartProps> = ({ tr
                     <AreaChart data={data}>
                         <defs>
                             <linearGradient id="colorBalance" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.3}/>
-                                <stop offset="95%" stopColor="#06b6d4" stopOpacity={0}/>
+                                <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.3} />
+                                <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
                             </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
-                        <XAxis 
-                            dataKey="date" 
-                            stroke="#666" 
-                            fontSize={12} 
+                        <XAxis
+                            dataKey="date"
+                            stroke="#666"
+                            fontSize={12}
                             tickLine={false}
                             axisLine={false}
                             minTickGap={30}
                         />
-                        <YAxis 
-                            stroke="#666" 
-                            fontSize={12} 
-                            tickFormatter={(val) => `R$${(val/1000).toFixed(0)}k`} 
+                        <YAxis
+                            stroke="#666"
+                            fontSize={12}
+                            tickFormatter={(val) => `R$${(val / 1000).toFixed(0)}k`}
                             tickLine={false}
                             axisLine={false}
                         />
-                        <Tooltip 
+                        <Tooltip
                             contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333', borderRadius: '8px' }}
                             formatter={(value: number) => [formatCurrency(value), 'Saldo Acumulado']}
                             labelStyle={{ color: '#9ca3af', marginBottom: '4px' }}
                         />
-                        <Area 
-                            type="monotone" 
-                            dataKey="balance" 
-                            stroke="#06b6d4" 
+                        <Area
+                            type="monotone"
+                            dataKey="balance"
+                            stroke="#06b6d4"
                             strokeWidth={2}
-                            fillOpacity={1} 
-                            fill="url(#colorBalance)" 
+                            fillOpacity={1}
+                            fill="url(#colorBalance)"
                         />
                     </AreaChart>
                 </ResponsiveContainer>
