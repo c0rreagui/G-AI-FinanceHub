@@ -4,6 +4,7 @@ import { ViewType } from '../../types';
 import { LayoutDashboard, ArrowLeftRight, PieChart, Target, TrendingDown, Calendar, Wrench, Settings, Users, PiggyBank, Lightbulb, Zap, ChevronRight, ChevronLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useDashboardData } from '../../hooks/useDashboardData';
+import { useAuth } from '../../hooks/useAuth';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
 import { Gamification } from '../ui/Gamification';
 import { cn } from '../../utils/utils';
