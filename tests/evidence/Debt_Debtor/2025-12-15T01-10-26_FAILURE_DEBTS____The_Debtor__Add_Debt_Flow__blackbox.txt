@@ -1,0 +1,9 @@
+--- BLACK BOX DUMP ---
+>>> Console Logs:
+
+>>> Network Errors:
+
+>>> Action History:
+[2025-12-15T01:10:20.836Z] CLICK: Clique seguro
+[2025-12-15T01:10:23.996Z] NAVIGATE: Navegar para Dívidas
+[2025-12-15T01:10:25.092Z] CLICK: Clique seguro

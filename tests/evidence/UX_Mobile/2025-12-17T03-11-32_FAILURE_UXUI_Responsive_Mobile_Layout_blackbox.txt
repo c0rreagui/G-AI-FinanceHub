@@ -1,0 +1,6 @@
+--- BLACK BOX DUMP ---
+>>> Console Logs:
+
+>>> Network Errors:
+
+>>> Action History:

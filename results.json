@@ -1,0 +1,186 @@
+{
+  "config": {
+    "configFile": "C:\\APPS - ANTIGRAVITY\\FinanceHub\\G-AI-FinanceHub\\playwright.config.ts",
+    "rootDir": "C:/APPS - ANTIGRAVITY/FinanceHub/G-AI-FinanceHub/tests",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "C:/APPS - ANTIGRAVITY/FinanceHub/G-AI-FinanceHub/tests/results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "C:/APPS - ANTIGRAVITY/FinanceHub/G-AI-FinanceHub/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 120000
+      }
+    ],
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.57.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "family-e2e.spec.ts",
+      "file": "family-e2e.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Feature: Family & Social - Multi-User Flow",
+          "file": "family-e2e.spec.ts",
+          "line": 2,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Should allow User1 to invite User2 to a family",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 31217,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "[Family E2E] Owner: Logging in...\n"
+                        },
+                        {
+                          "text": "Owner: Onboarding screen detected. Dismissing...\n"
+                        },
+                        {
+                          "text": "[Family E2E] Owner: Navigating to Family tab...\n"
+                        },
+                        {
+                          "text": "[Family E2E] Owner: Family already exists. Proceeding to invite...\n"
+                        },
+                        {
+                          "text": "[Family E2E] Owner: Generating invite for User 2...\n"
+                        },
+                        {
+                          "text": "[Family E2E] Owner: attempting to copy token...\n"
+                        },
+                        {
+                          "text": "[Family E2E] Owner: Clipboard Token: fa26063833ac44a50b6a7d25e3229776\n"
+                        },
+                        {
+                          "text": "[Family E2E] Joiner: Logging in / Signing up...\n"
+                        },
+                        {
+                          "text": "Joiner: Onboarding screen detected. Dismissing...\n"
+                        },
+                        {
+                          "text": "[Family E2E] Joiner: Verifying dashboard loaded...\n"
+                        },
+                        {
+                          "text": "[Family E2E] Joiner: Navigating to Family tab...\n"
+                        },
+                        {
+                          "text": "[Family E2E] Joiner: Entering token fa26063833ac44a50b6a7d25e3229776\n"
+                        },
+                        {
+                          "text": "[Family E2E] Joiner: Successfully joined!\n"
+                        },
+                        {
+                          "text": "[Family E2E] Verifying join success...\n"
+                        },
+                        {
+                          "text": "[Family E2E] Success: Joiner successfully joined the family and can see member list!\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "steps": [
+                        {
+                          "title": "User 1 (Owner) - Login & Create Family",
+                          "duration": 12556
+                        },
+                        {
+                          "title": "User 1 (Owner) - Generate Invite",
+                          "duration": 3644
+                        },
+                        {
+                          "title": "User 2 (Joiner) - Login & Join",
+                          "duration": 15007
+                        },
+                        {
+                          "title": "Verification - Check Members List",
+                          "duration": 5
+                        }
+                      ],
+                      "startTime": "2025-12-30T13:25:43.980Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "59da25a414d3f53030e7-b68be00c59fa9decf3b9",
+              "file": "family-e2e.spec.ts",
+              "line": 62,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-12-30T13:25:42.999Z",
+    "duration": 34974.107,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

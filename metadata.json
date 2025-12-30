@@ -1,0 +1,5 @@
+{
+  "name": "FinanceHub",
+  "description": "Um assistente financeiro avançado com tecnologia Gemini, oferecendo conversas por voz em tempo real, análise de dados, compreensão de imagens e insights fundamentados do Google Search e Maps.",
+  "requestFramePermissions": []
+}

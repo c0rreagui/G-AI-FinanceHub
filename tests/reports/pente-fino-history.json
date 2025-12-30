@@ -1,0 +1,702 @@
+[
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "768x1024",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:39:06.765Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:39:20.519Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1440x900",
+    "theme": "light",
+    "timestamp": "2025-12-18T17:39:21.655Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:40:06.815Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:40:20.135Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:40:35.840Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:40:50.364Z"
+  },
+  {
+    "score": 71,
+    "issues": 7,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:41:04.703Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:41:17.115Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:41:19.514Z"
+  },
+  {
+    "score": 71,
+    "issues": 7,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:41:21.723Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:41:53.652Z"
+  },
+  {
+    "score": 62,
+    "issues": 10,
+    "viewport": "375x812",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:42:07.103Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "768x1024",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:42:20.401Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:42:34.006Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1440x900",
+    "theme": "light",
+    "timestamp": "2025-12-18T17:42:35.069Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:42:51.038Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:43:04.351Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:43:20.179Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:43:35.065Z"
+  },
+  {
+    "score": 71,
+    "issues": 7,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:43:49.620Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:44:02.041Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:44:04.533Z"
+  },
+  {
+    "score": 71,
+    "issues": 7,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:44:06.771Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:45:13.206Z"
+  },
+  {
+    "score": 62,
+    "issues": 10,
+    "viewport": "375x812",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:45:26.782Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "768x1024",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:45:40.245Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:45:54.033Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1440x900",
+    "theme": "light",
+    "timestamp": "2025-12-18T17:45:55.129Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:46:11.862Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:46:25.458Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:46:41.403Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:46:56.254Z"
+  },
+  {
+    "score": 71,
+    "issues": 7,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:47:10.964Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:47:23.486Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:47:25.986Z"
+  },
+  {
+    "score": 71,
+    "issues": 7,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:47:28.257Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:47:53.879Z"
+  },
+  {
+    "score": 62,
+    "issues": 10,
+    "viewport": "375x812",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:48:07.508Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "768x1024",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:48:21.000Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:48:34.891Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1440x900",
+    "theme": "light",
+    "timestamp": "2025-12-18T17:48:36.045Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:48:53.227Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:49:06.824Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:49:22.901Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:49:37.706Z"
+  },
+  {
+    "score": 71,
+    "issues": 7,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:49:52.280Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:50:04.869Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:50:07.676Z"
+  },
+  {
+    "score": 71,
+    "issues": 7,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:50:09.933Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:51:10.318Z"
+  },
+  {
+    "score": 62,
+    "issues": 10,
+    "viewport": "375x812",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:51:23.890Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "768x1024",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:51:37.277Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:51:50.997Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1440x900",
+    "theme": "light",
+    "timestamp": "2025-12-18T17:51:52.132Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:52:07.979Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:52:21.623Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:52:35.198Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:52:50.102Z"
+  },
+  {
+    "score": 71,
+    "issues": 7,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:53:04.595Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:53:17.552Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:53:20.119Z"
+  },
+  {
+    "score": 71,
+    "issues": 7,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:53:22.405Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:54:02.276Z"
+  },
+  {
+    "score": 62,
+    "issues": 10,
+    "viewport": "375x812",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:54:15.809Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "768x1024",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:54:29.130Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:54:43.134Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1440x900",
+    "theme": "light",
+    "timestamp": "2025-12-18T17:54:44.219Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:54:57.957Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:55:11.309Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:55:24.757Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:55:39.632Z"
+  },
+  {
+    "score": 71,
+    "issues": 7,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:55:54.134Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:56:06.556Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:56:09.074Z"
+  },
+  {
+    "score": 71,
+    "issues": 7,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:56:11.312Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T17:57:38.336Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T18:05:20.431Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T18:06:42.191Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T18:08:00.211Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T18:12:23.188Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T18:15:32.366Z"
+  },
+  {
+    "score": 67,
+    "issues": 9,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T18:17:31.117Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T18:18:29.387Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T18:24:17.019Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T18:27:22.156Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T18:31:06.834Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T18:55:00.268Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "375x812",
+    "theme": "dark",
+    "timestamp": "2025-12-18T18:55:13.686Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "768x1024",
+    "theme": "dark",
+    "timestamp": "2025-12-18T18:55:26.868Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T18:55:40.374Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1440x900",
+    "theme": "light",
+    "timestamp": "2025-12-18T18:55:41.380Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T18:55:55.054Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T18:56:08.342Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1920x1080",
+    "theme": "dark",
+    "timestamp": "2025-12-18T18:56:21.656Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T18:56:36.153Z"
+  },
+  {
+    "score": 71,
+    "issues": 7,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T18:56:50.593Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T18:57:02.937Z"
+  },
+  {
+    "score": 72,
+    "issues": 8,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T18:57:05.354Z"
+  },
+  {
+    "score": 71,
+    "issues": 7,
+    "viewport": "1440x900",
+    "theme": "dark",
+    "timestamp": "2025-12-18T18:57:07.564Z"
+  }
+]

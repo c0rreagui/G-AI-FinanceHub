@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Pente Fino v3.0 Report</title>
+    <style>
+        body { font-family: system-ui; background: #0a0a0f; color: #e5e5e5; padding: 2rem; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { text-align: center; background: linear-gradient(135deg, #06b6d4, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .score { text-align: center; font-size: 5rem; font-weight: bold; color: #f59e0b; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 2rem 0; }
+        .card { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 1rem; text-align: center; }
+        .card .value { font-size: 2rem; font-weight: bold; }
+        .issue { padding: 1rem; margin: 0.5rem 0; border-radius: 8px; border-left: 3px solid; }
+        .issue.critical { background: rgba(239,68,68,0.1); border-color: #ef4444; }
+        .issue.warning { background: rgba(245,158,11,0.1); border-color: #f59e0b; }
+        .issue.info { background: rgba(59,130,246,0.1); border-color: #3b82f6; }
+        pre { background: #1a1a2e; padding: 1rem; border-radius: 8px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Pente Fino v3.0</h1>
+        <p style="text-align:center;color:#9ca3af">18/12/2025, 15:56:36 | 1440x900 | dark</p>
+        <div class="score">72</div>
+        <div class="grid">
+            <div class="card"><div class="value" style="color:#ef4444">0</div>Críticos</div>
+            <div class="card"><div class="value" style="color:#f59e0b">4</div>Alertas</div>
+            <div class="card"><div class="value" style="color:#3b82f6">4</div>Info</div>
+        </div>
+        <h2>⚡ Performance</h2><div class="grid">
+            <div class="card"><div class="value">692</div>FCP (ms)</div>
+            <div class="card"><div class="value">166</div>FPS</div>
+            <div class="card"><div class="value">5778</div>DOM Nodes</div>
+        </div>
+        <h2>📋 Issues</h2>
+        <div class="issue warning"><strong>[typography]</strong> 12 textos < 12px</div><div class="issue warning"><strong>[a11y]</strong> ARIA: Button sem nome acessível, Button sem nome acessível</div><div class="issue info"><strong>[a11y]</strong> Tab order pode não seguir ordem visual</div><div class="issue info"><strong>[a11y]</strong> Sem skip link</div><div class="issue warning"><strong>[a11y]</strong> Touch targets pequenos: 5</div><div class="issue info"><strong>[performance]</strong> DOM: 5778 nodes</div><div class="issue warning"><strong>[performance]</strong> JS: 5899KB</div><div class="issue info"><strong>[design]</strong> 412 cores hardcoded</div>
+        <h2>📈 Histórico</h2><pre>## 📈 Evolução do Score
+
+```
+18/12/2025 | █░░░░░░░░░░░░░░░░░░░░ 72
+18/12/2025 | █░░░░░░░░░░░░░░░░░░░░ 72
+18/12/2025 | █░░░░░░░░░░░░░░░░░░░░ 72
+18/12/2025 | █░░░░░░░░░░░░░░░░░░░░ 72
+18/12/2025 | █░░░░░░░░░░░░░░░░░░░░ 72
+18/12/2025 | █░░░░░░░░░░░░░░░░░░░░ 72
+18/12/2025 | █░░░░░░░░░░░░░░░░░░░░ 72
+18/12/2025 | █░░░░░░░░░░░░░░░░░░░░ 72
+18/12/2025 | █░░░░░░░░░░░░░░░░░░░░ 72
+18/12/2025 | █░░░░░░░░░░░░░░░░░░░░ 72
+```
+</pre>
+        <p style="text-align:center;color:#6b7280;margin-top:3rem">SwarmPenteFino v3.0 | FinanceHub</p>
+    </div>
+</body>
+</html>

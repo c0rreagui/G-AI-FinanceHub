@@ -1,0 +1,13 @@
+--- BLACK BOX DUMP ---
+>>> Console Logs:
+
+>>> Network Errors:
+
+>>> Action History:
+[2025-12-15T01:11:40.329Z] CLICK: Clique seguro
+[2025-12-15T01:11:43.798Z] NAVIGATE: Navegar para Dívidas
+[2025-12-15T01:11:44.923Z] CLICK: Clique seguro
+[2025-12-15T01:11:46.029Z] FILL: Preencher "Nome da Dívida"
+[2025-12-15T01:11:47.055Z] FILL: Preencher "Valor Total (R$)"
+[2025-12-15T01:11:48.078Z] FILL: Preencher "Taxa de Juros (% a.a.)"
+[2025-12-15T01:11:49.119Z] CLICK: Clique seguro

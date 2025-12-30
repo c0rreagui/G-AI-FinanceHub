@@ -1,0 +1,683 @@
+{
+  "SysAdmin": {
+    "successfulNavigations": [
+      "Ajustes",
+      "DevTools"
+    ],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Analyst": {
+    "successfulNavigations": [
+      "Insights"
+    ],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Auditor": {
+    "successfulNavigations": [
+      "Transações",
+      "Início"
+    ],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "CFO": {
+    "successfulNavigations": [
+      "Início",
+      "Transações"
+    ],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 6,
+      "failure": 2
+    }
+  },
+  "Chaotic": {
+    "successfulNavigations": [
+      "Metas"
+    ],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Debtor": {
+    "successfulNavigations": [
+      "Dívidas"
+    ],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Investor": {
+    "successfulNavigations": [
+      "Investimentos"
+    ],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Mobile": {
+    "successfulNavigations": [
+      "Agenda",
+      "Tools",
+      "Transações"
+    ],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 4,
+      "failure": 3
+    }
+  },
+  "Planner": {
+    "successfulNavigations": [
+      "Metas",
+      "Agenda"
+    ],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Socialite": {
+    "successfulNavigations": [
+      "Família"
+    ],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Mobile_Spender": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 21,
+      "failure": 0
+    }
+  },
+  "Mobile_Analyzer": {
+    "successfulNavigations": [
+      "Metas",
+      "Insights",
+      "Início"
+    ],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Mobile_Organizer": {
+    "successfulNavigations": [
+      "Agenda",
+      "Dívidas"
+    ],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Mobile_UX_Pro": {
+    "successfulNavigations": [
+      "Início",
+      "Transações",
+      "Metas",
+      "Dívidas",
+      "Investimentos",
+      "Agenda",
+      "Insights",
+      "Tools",
+      "Família",
+      "Ajustes",
+      "DevTools"
+    ],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Desktop_Planner": {
+    "successfulNavigations": [
+      "Metas",
+      "Agenda"
+    ],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Desktop_Designer": {
+    "successfulNavigations": [
+      "Início",
+      "Transações",
+      "Metas",
+      "Dívidas",
+      "Investimentos",
+      "Agenda",
+      "Insights",
+      "Tools",
+      "Família",
+      "Ajustes",
+      "DevTools"
+    ],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Desktop_CFO": {
+    "successfulNavigations": [
+      "Transações"
+    ],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Desktop_Investor": {
+    "successfulNavigations": [
+      "Investimentos",
+      "Dívidas"
+    ],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Desktop_BugHunter": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Desktop_Recovery": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Desktop_NetSimpson": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Desktop_SecOfficer": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Tablet_User": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Mobile_Commuter": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Desktop_4K": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Product_Newbie": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Product_FamilyMgr": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Product_Scientist": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "A11y_ScreenReader": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "A11y_Keyboard": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "A11y_LowVision": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Budget_Planner": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Budget_CFO": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Goal_Planner": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Debt_Debtor": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Scheduling_Organizer": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Insights_Analyst": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Tools_Engineer": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Social_Socialite": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Notification_Sentinel": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Debugger": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Sanity": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Settings_Admin": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "UX_Navigator": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "UX_Modal": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "UX_Mobile": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "UX_Tablet": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "UX_Feedback": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "UX_Forms": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Keyboard_Tester": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Error_Tester": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Privacy_Tester": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Notification_Tester": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "Toast_Tester": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "VisualVerifier": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  },
+  "BudgetAuditor": {
+    "successfulNavigations": [],
+    "failedNavigations": [],
+    "lastLoginMethod": "dev_bypass",
+    "experiencedErrors": [],
+    "achievements": [],
+    "transactionStats": {
+      "success": 0,
+      "failure": 0
+    }
+  }
+}
