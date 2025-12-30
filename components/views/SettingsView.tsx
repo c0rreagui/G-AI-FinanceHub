@@ -16,10 +16,11 @@ import { UserLevelBar } from '../dashboard/UserLevelBar';
 import { Input } from '../ui/Input';
 import { Label } from '../ui/Label';
 import { supabase } from '../../services/supabaseClient';
-import { toast } from 'sonner';
+import { useToast } from '../../hooks/useToast';
 
 export const SettingsView: React.FC = () => {
     const { logout, user } = useAuth();
+    const { showToast } = useToast();
     const [activeTab, setActiveTab] = useState('settings');
     const [isEditingName, setIsEditingName] = useState(false);
     const [newName, setNewName] = useState('');
@@ -31,10 +32,10 @@ export const SettingsView: React.FC = () => {
             });
             if (error) throw error;
             setIsEditingName(false);
-            toast.success('Nome atualizado com sucesso!');
+            showToast('Nome atualizado com sucesso!', { type: 'success' });
             // Force reload or state update would be better, but user object typically updates via subscription
         } catch (error) {
-            toast.error('Erro ao atualizar nome.');
+            showToast('Erro ao atualizar nome.', { type: 'error' });
             console.error(error);
         }
     };
