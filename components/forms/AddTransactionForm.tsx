@@ -449,7 +449,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
 
                 {/* Date & Category */}
 
-                <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <motion.div variants={itemVariants} className="grid grid-cols-1 gap-4">
                     <SmartDatePicker
                         label={isRecurring ? "Data de Início *" : "Data *"}
                         value={date}
