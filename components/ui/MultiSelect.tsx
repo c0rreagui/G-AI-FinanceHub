@@ -118,32 +118,34 @@ export function MultiSelect({
               Nenhum resultado encontrado.
             </div>
           )}
-          {filteredOptions.map((option) => (
-            <div
-              key={option.value}
-              className={cn(
-                "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-                selected.includes(option.value) && "bg-accent/50"
-              )}
-              onClick={() => handleSelect(option.value)}
-              role="option"
-              aria-selected={selected.includes(option.value)}
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  handleSelect(option.value);
-                }
-              }}
-            >
-              <div className={cn(
-                "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                selected.includes(option.value) ? "bg-primary text-primary-foreground" : "opacity-50 [&_svg]:invisible"
-              )}>
-                <Check className={cn("h-4 w-4")} />
+          {filteredOptions.map((option) => {
+            const isSelected = selected.includes(option.value);
+            return (
+              <div
+                key={option.value}
+                className={cn(
+                  "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+                  isSelected && "bg-accent/50"
+                )}
+                onClick={() => handleSelect(option.value)}
+                role="option"
+                aria-selected={isSelected}
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    handleSelect(option.value);
+                  }
+                }}
+              >
+                <div className={cn(
+                  "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                  isSelected ? "bg-primary text-primary-foreground" : "opacity-50 [&_svg]:invisible"
+                )}>
+                  <Check className={cn("h-4 w-4")} />
+                </div>
+                <span>{option.label}</span>
               </div>
-              <span>{option.label}</span>
-            </div>
-          ))}
+            ))}
         </div>
       </PopoverContent>
     </Popover>

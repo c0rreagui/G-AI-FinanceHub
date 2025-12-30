@@ -75,7 +75,7 @@ export const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
               className="px-4 py-2 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground"
               onClick={() => handleSelect(suggestion)}
               role="option"
-              aria-selected={false}
+              aria-selected="false"
               tabIndex={0}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
