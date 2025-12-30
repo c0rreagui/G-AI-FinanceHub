@@ -11,15 +11,16 @@ import { BackupManager } from '../settings/BackupManager';
 import { BudgetSettings } from '../settings/BudgetSettings';
 import { AppearanceSettings } from '../settings/AppearanceSettings';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/Tabs';
-import { Sliders, UserCircle, Edit2, Check, X, Camera } from 'lucide-react';
+import { Sliders, UserCircle, Edit2, Check, X, Camera, Rocket } from 'lucide-react';
 import { UserLevelBar } from '../dashboard/UserLevelBar';
 import { Input } from '../ui/Input';
 import { Label } from '../ui/Label';
 import { supabase } from '../../services/supabaseClient';
 import { useToast } from '../../hooks/useToast';
+import { ProfileOnboardingFlow } from '../onboarding/ProfileOnboardingFlow';
 
 export const SettingsView: React.FC = () => {
-    const { logout, user } = useAuth();
+    const { logout, user, apiKey } = useAuth();
     const { showToast } = useToast();
     const [activeTab, setActiveTab] = useState('settings');
     const [isEditingName, setIsEditingName] = useState(false);
@@ -102,12 +103,44 @@ export const SettingsView: React.FC = () => {
                         initial="hidden"
                         animate="visible"
                     >
+                        {/* Status do Perfil */}
+                        {(!user?.user_metadata?.avatar_url || !user?.user_metadata?.name || user?.user_metadata?.name === 'Anônimo' || !apiKey) && (
+                            <Card className="p-4 bg-primary/5 border-primary/20 border-dashed animate-pulse">
+                                <div className="flex items-center gap-3">
+                                    <div className="bg-primary/10 p-2 rounded-full">
+                                        <Rocket className="w-5 h-5 text-primary" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h3 className="text-sm font-bold text-white">Complete seu Perfil!</h3>
+                                        <p className="text-xs text-muted-foreground">Isso ajuda a IA a personalizar suas dicas.</p>
+                                    </div>
+                                    <div className="flex gap-1">
+                                        {!user?.user_metadata?.name || user?.user_metadata?.name === 'Anônimo' ? (
+                                            <div className="w-2 h-2 rounded-full bg-red-500" title="Nome pendente" />
+                                        ) : (
+                                            <div className="w-2 h-2 rounded-full bg-green-500" title="Nome preenchido" />
+                                        )}
+                                        {!user?.user_metadata?.avatar_url ? (
+                                            <div className="w-2 h-2 rounded-full bg-red-500" title="Foto pendente" />
+                                        ) : (
+                                            <div className="w-2 h-2 rounded-full bg-green-500" title="Foto preenchida" />
+                                        )}
+                                        {!apiKey ? (
+                                            <div className="w-2 h-2 rounded-full bg-red-500" title="API Key pendente" />
+                                        ) : (
+                                            <div className="w-2 h-2 rounded-full bg-green-500" title="API Key configurada" />
+                                        )}
+                                    </div>
+                                </div>
+                            </Card>
+                        )}
+
                         {/* Informações do Usuário */}
                         <Card className="p-6 relative overflow-hidden">
                             <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-r from-primary/20 to-purple-600/20" />
 
                             <div className="relative pt-12 text-center flex flex-col items-center">
-                                <div className="relative mb-4 group">
+                                <div id="profile-avatar-step" className="relative mb-4 group">
                                     <div className="w-24 h-24 rounded-full bg-background border-4 border-primary/20 flex items-center justify-center text-4xl font-bold text-primary shadow-xl overflow-hidden">
                                         {user?.user_metadata?.avatar_url ? (
                                             <img src={user.user_metadata.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
@@ -120,7 +153,7 @@ export const SettingsView: React.FC = () => {
                                     </button>
                                 </div>
 
-                                <div className="mb-6 w-full max-w-sm">
+                                <div id="profile-name-step" className="mb-6 w-full max-w-sm">
                                     {isEditingName ? (
                                         <div className="flex items-center gap-2 justify-center">
                                             <Input
@@ -147,7 +180,7 @@ export const SettingsView: React.FC = () => {
                                     <p className="text-sm text-muted-foreground">{user?.email}</p>
                                 </div>
 
-                                <div className="w-full max-w-md bg-card/50 rounded-xl p-4 border border-white/5 mb-6">
+                                <div id="profile-xp-step" className="w-full max-w-md bg-card/50 rounded-xl p-4 border border-white/5 mb-6">
                                     <div className="flex justify-between items-center mb-2">
                                         <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Progresso</span>
                                         <span className="text-xs text-primary font-bold">Nível {user?.user_metadata?.level || 1}</span>
@@ -170,7 +203,7 @@ export const SettingsView: React.FC = () => {
                             </div>
                         </Card>
 
-                        <motion.div variants={itemVariants}><ApiKeySettings /></motion.div>
+                        <motion.div id="profile-api-step" variants={itemVariants}><ApiKeySettings /></motion.div>
 
                         {/* Ações da Conta */}
                         <Card className="p-6 border-red-900/20 bg-red-950/5">
@@ -190,6 +223,7 @@ export const SettingsView: React.FC = () => {
                     </motion.div>
                 </TabsContent>
             </Tabs>
+            <ProfileOnboardingFlow activeTab={activeTab} />
         </>
     );
 };
