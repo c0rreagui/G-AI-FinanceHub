@@ -15,7 +15,7 @@ import {
     Lightbulb,
     Zap,
 } from '../Icons';
-import { Users, PiggyBank } from 'lucide-react';
+import { Users, PiggyBank, SlidersHorizontal } from 'lucide-react';
 import { useDialog } from '../../hooks/useDialog';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BottomSheet } from '../ui/BottomSheet';
@@ -153,7 +153,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ currentView, s
             { name: 'Insights', view: 'insights', icon: Lightbulb },
             { name: 'Tools', view: 'tools', icon: Wrench },
             { name: 'Família', view: 'social', icon: Users },
-            { name: 'Ajustes', view: 'settings', icon: Settings },
+            { name: 'Ajustes', view: 'settings', icon: SlidersHorizontal },
         ];
         if (isDeveloper) {
             items.push({ name: 'DevTools', view: 'devtools', icon: Zap });

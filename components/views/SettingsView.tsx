@@ -11,11 +11,33 @@ import { BackupManager } from '../settings/BackupManager';
 import { BudgetSettings } from '../settings/BudgetSettings';
 import { AppearanceSettings } from '../settings/AppearanceSettings';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/Tabs';
-import { Sliders, UserCircle } from 'lucide-react';
+import { Sliders, UserCircle, Edit2, Check, X, Camera } from 'lucide-react';
+import { UserLevelBar } from '../dashboard/UserLevelBar';
+import { Input } from '../ui/Input';
+import { Label } from '../ui/Label';
+import { supabase } from '../../services/supabaseClient';
+import { toast } from 'sonner';
 
 export const SettingsView: React.FC = () => {
     const { logout, user } = useAuth();
     const [activeTab, setActiveTab] = useState('settings');
+    const [isEditingName, setIsEditingName] = useState(false);
+    const [newName, setNewName] = useState('');
+
+    const handleUpdateName = async () => {
+        try {
+            const { error } = await supabase.auth.updateUser({
+                data: { name: newName }
+            });
+            if (error) throw error;
+            setIsEditingName(false);
+            toast.success('Nome atualizado com sucesso!');
+            // Force reload or state update would be better, but user object typically updates via subscription
+        } catch (error) {
+            toast.error('Erro ao atualizar nome.');
+            console.error(error);
+        }
+    };
 
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -80,25 +102,69 @@ export const SettingsView: React.FC = () => {
                         animate="visible"
                     >
                         {/* Informações do Usuário */}
-                        <Card className="p-6">
-                            <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                                <UserCircle className="w-5 h-5 text-primary" />
-                                Informações da Conta
-                            </h2>
-                            <div className="space-y-3">
-                                <div className="flex justify-between items-center py-2 border-b border-border/50">
-                                    <span className="text-sm text-muted-foreground">Email</span>
-                                    <span className="text-sm font-medium">{user?.email || 'Não conectado'}</span>
+                        <Card className="p-6 relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-r from-primary/20 to-purple-600/20" />
+
+                            <div className="relative pt-12 text-center flex flex-col items-center">
+                                <div className="relative mb-4 group">
+                                    <div className="w-24 h-24 rounded-full bg-background border-4 border-primary/20 flex items-center justify-center text-4xl font-bold text-primary shadow-xl overflow-hidden">
+                                        {user?.user_metadata?.avatar_url ? (
+                                            <img src={user.user_metadata.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                                        ) : (
+                                            user?.user_metadata?.name?.charAt(0).toUpperCase() || 'U'
+                                        )}
+                                    </div>
+                                    <button className="absolute bottom-0 right-0 p-2 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-colors">
+                                        <Camera className="w-4 h-4" />
+                                    </button>
                                 </div>
-                                <div className="flex justify-between items-center py-2 border-b border-border/50">
-                                    <span className="text-sm text-muted-foreground">Nome</span>
-                                    <span className="text-sm font-medium">{user?.user_metadata?.name || 'Anônimo'}</span>
+
+                                <div className="mb-6 w-full max-w-sm">
+                                    {isEditingName ? (
+                                        <div className="flex items-center gap-2 justify-center">
+                                            <Input
+                                                value={newName}
+                                                onChange={(e) => setNewName(e.target.value)}
+                                                className="text-center h-9"
+                                                autoFocus
+                                            />
+                                            <Button size="sm" onClick={handleUpdateName} className="h-9 w-9 p-0 rounded-full bg-green-500 hover:bg-green-600">
+                                                <Check className="w-4 h-4" />
+                                            </Button>
+                                            <Button size="sm" variant="ghost" onClick={() => setIsEditingName(false)} className="h-9 w-9 p-0 rounded-full">
+                                                <X className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center justify-center gap-2">
+                                            <h2 className="text-2xl font-bold text-white">{user?.user_metadata?.name || 'Anônimo'}</h2>
+                                            <button onClick={() => { setNewName(user?.user_metadata?.name || ''); setIsEditingName(true); }} className="p-1 text-muted-foreground hover:text-white transition-colors">
+                                                <Edit2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    )}
+                                    <p className="text-sm text-muted-foreground">{user?.email}</p>
                                 </div>
-                                <div className="flex justify-between items-center py-2">
-                                    <span className="text-sm text-muted-foreground">Membro desde</span>
-                                    <span className="text-sm font-medium">
-                                        {user?.created_at ? new Date(user.created_at).toLocaleDateString('pt-BR') : '-'}
-                                    </span>
+
+                                <div className="w-full max-w-md bg-card/50 rounded-xl p-4 border border-white/5 mb-6">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Progresso</span>
+                                        <span className="text-xs text-primary font-bold">Nível {user?.user_metadata?.level || 1}</span>
+                                    </div>
+                                    <UserLevelBar />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4 w-full max-w-md text-left">
+                                    <div className="p-3 rounded-lg bg-white/5 border border-white/5">
+                                        <span className="text-xs text-muted-foreground block mb-1">Membro desde</span>
+                                        <span className="font-medium text-sm">
+                                            {user?.created_at ? new Date(user.created_at).toLocaleDateString('pt-BR') : '-'}
+                                        </span>
+                                    </div>
+                                    <div className="p-3 rounded-lg bg-white/5 border border-white/5">
+                                        <span className="text-xs text-muted-foreground block mb-1">Plano Atual</span>
+                                        <span className="font-medium text-sm text-yellow-400">PRO</span>
+                                    </div>
                                 </div>
                             </div>
                         </Card>
@@ -106,8 +172,8 @@ export const SettingsView: React.FC = () => {
                         <motion.div variants={itemVariants}><ApiKeySettings /></motion.div>
 
                         {/* Ações da Conta */}
-                        <Card className="p-6">
-                            <h2 className="text-xl font-semibold text-white mb-4">Zona de Perigo</h2>
+                        <Card className="p-6 border-red-900/20 bg-red-950/5">
+                            <h2 className="text-xl font-semibold text-red-400 mb-4">Zona de Perigo</h2>
                             <p className="text-sm text-muted-foreground mb-4">
                                 Ações irreversíveis que afetam sua conta.
                             </p>
