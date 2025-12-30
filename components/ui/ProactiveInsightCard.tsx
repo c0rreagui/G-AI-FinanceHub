@@ -1,7 +1,8 @@
 
 import React, { useMemo } from 'react';
 import { useDashboardData } from '../../hooks/useDashboardData';
-import { Lightbulb, Target, TrendingUp, Wallet } from '../Icons';
+import { Lightbulb, Target, TrendingUp } from '../Icons';
+import { Sparkles } from 'lucide-react';
 import { TransactionType, ViewType, GoalStatus } from '../../types';
 import { formatCurrency, formatDaysUntil } from '../../utils/formatters';
 import { Button } from './Button';
@@ -44,7 +45,7 @@ export const ProactiveInsightCard: React.FC<ProactiveInsightCardProps> = ({ setC
                 message: 'Adicione sua primeira transação para começar a ter controle sobre suas finanças.',
                 actionText: 'Adicionar Transação',
                 actionView: 'transactions',
-                icon: Wallet,
+                icon: Sparkles,
                 iconColor: 'text-cyan-300',
                 glowColor: 'shadow-cyan-500/30'
             };
@@ -55,8 +56,8 @@ export const ProactiveInsightCard: React.FC<ProactiveInsightCardProps> = ({ setC
             .filter(g => g.status === GoalStatus.EM_ANDAMENTO)
             .map(g => ({ ...g, daysLeft: formatDaysUntil(g.deadline) }))
             .filter(g => g.daysLeft.color !== 'gray') // 'red' or 'yellow'
-            .sort((a,b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime())[0];
-        
+            .sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime())[0];
+
         if (upcomingGoal) {
             return {
                 type: InsightType.GOAL_DEADLINE,
@@ -87,9 +88,9 @@ export const ProactiveInsightCard: React.FC<ProactiveInsightCardProps> = ({ setC
                 };
             }
         }
-        
+
         // Insight 4 (Fallback): Highest Spending Category
-        const expensesThisMonth = transactions.filter(t => 
+        const expensesThisMonth = transactions.filter(t =>
             t.type === TransactionType.DESPESA &&
             new Date(t.date).getMonth() === currentMonth &&
             new Date(t.date).getFullYear() === currentYear
@@ -107,7 +108,7 @@ export const ProactiveInsightCard: React.FC<ProactiveInsightCardProps> = ({ setC
             return {
                 type: InsightType.HIGH_SPENDING,
                 title: 'Fique de Olho',
-                message: <>Sua maior despesa este mês foi com <span className="font-semibold" style={{color: highest.color}}>{highest.name}</span>, totalizando <span className="font-bold text-white">{formatCurrency(highest.total)}</span>.</>,
+                message: <>Sua maior despesa este mês foi com <span className="font-semibold" style={{ color: highest.color }}>{highest.name}</span>, totalizando <span className="font-bold text-white">{formatCurrency(highest.total)}</span>.</>,
                 actionText: 'Analisar Gastos',
                 actionView: 'insights',
                 icon: Lightbulb,
