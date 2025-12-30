@@ -621,6 +621,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     }, [user, userLevel, isGuest]);
 
     const healthScore = useMemo(() => {
+        if (transactions.length === 0) return 0;
         let score = 0;
         // 1. Positive Balance (+300)
         if (summary.totalBalance > 0) score += 300;
@@ -924,7 +925,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             setGuestData(data);
         } else {
             // Prepare updates for Supabase (remove UI-only fields if any)
-             
+
             const { category, type, ...rest } = safeUpdates;
 
             const updatePayload = {

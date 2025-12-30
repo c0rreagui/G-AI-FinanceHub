@@ -24,7 +24,6 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs
     const { user, logout, isDeveloper } = useAuth();
     const { openDialog } = useDialog();
     const { unreadCount: contextUnreadCount } = useNotifications();
-    const { greetingName } = useTheme();
     const [greeting, setGreeting] = useState({ text: 'Bem-vindo', icon: '👋' });
 
     const unreadCount = propUnreadCount ?? contextUnreadCount;
@@ -41,8 +40,6 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs
         return () => clearInterval(interval);
     }, []);
 
-
-
     const renderIcon = () => {
         if (React.isValidElement(icon)) {
             return icon;
@@ -52,7 +49,6 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs
     };
 
     const getDisplayName = () => {
-        if (greetingName) return greetingName;
         if (user?.user_metadata?.name) return user.user_metadata.name;
         if (isDeveloper) return 'Desenvolvedor';
         return 'Visitante';

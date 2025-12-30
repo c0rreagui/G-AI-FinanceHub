@@ -36,7 +36,6 @@ import { useNotifications } from '../../contexts/NotificationContext';
 import { useTheme } from '../../contexts/ThemeContext';
 
 export const GreetingHeader: React.FC<GreetingHeaderProps> = ({ user, setCurrentView, onNotificationClick, unreadCount: propUnreadCount }) => {
-    const { greetingName, setGreetingName } = useTheme();
     const { openDialog } = useDialog();
     const { unreadCount: contextUnreadCount } = useNotifications();
     const unreadCount = propUnreadCount ?? contextUnreadCount;
@@ -45,7 +44,6 @@ export const GreetingHeader: React.FC<GreetingHeaderProps> = ({ user, setCurrent
     const [icon, setIcon] = useState<React.ReactNode>(null);
     const today = new Date();
     const dateStr = today.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
-    const [tempName, setTempName] = useState('');
 
     useEffect(() => {
         const hour = new Date().getHours();
@@ -83,30 +81,7 @@ export const GreetingHeader: React.FC<GreetingHeaderProps> = ({ user, setCurrent
                     <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-background rounded-full"></div>
                 </div>
                 <div>
-                    {greeting}, {greetingName ? (
-                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">{greetingName}</span>
-                    ) : (
-                        <div className="flex items-center gap-2">
-                            <input
-                                type="text"
-                                placeholder="Seu nome"
-                                value={tempName}
-                                onChange={e => setTempName(e.target.value)}
-                                className="bg-white/10 text-white rounded px-2 py-1 focus:outline-none"
-                            />
-                            <button
-                                onClick={() => {
-                                    if (tempName.trim()) {
-                                        setGreetingName(tempName.trim());
-                                        setTempName('');
-                                    }
-                                }}
-                                className="bg-primary text-white rounded px-2 py-1"
-                            >
-                                Salvar
-                            </button>
-                        </div>
-                    )} {icon}
+                    {greeting}, <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">{user?.user_metadata?.name || 'Desenvolvedor'}</span> {icon}
                     <div className="mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full bg-white/5 border border-white/5 backdrop-blur-md">
                         <span className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-widest">
                             {dateStr}

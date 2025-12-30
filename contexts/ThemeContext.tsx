@@ -23,8 +23,6 @@ interface ThemeContextType {
     toggleMode: () => void;
     zenMode: boolean;
     toggleZenMode: () => void;
-    greetingName: string;
-    setGreetingName: (name: string) => void;
     wallpaper: string | null;
     setWallpaper: (url: string | null) => void;
     density: 'compact' | 'comfortable' | 'spacious';
@@ -39,7 +37,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const [currentTheme, setCurrentTheme] = useState<ThemeColor>(themes[0]);
     const [mode, setMode] = useState<'light' | 'dark'>('dark');
     const [zenMode, setZenMode] = useState(false);
-    const [greetingName, setGreetingName] = useState('');
     const [wallpaper, setWallpaper] = useState<string | null>(null);
     const [density, setDensity] = useState<'compact' | 'comfortable' | 'spacious'>('comfortable');
     const [hiddenModules, setHiddenModules] = useState<string[]>([]);
@@ -62,9 +59,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         const savedZen = localStorage.getItem('financehub_zen_mode');
         if (savedZen) setZenMode(savedZen === 'true');
 
-        const savedGreeting = localStorage.getItem('financehub_greeting_name');
-        if (savedGreeting) setGreetingName(savedGreeting);
-
         const savedWallpaper = localStorage.getItem('financehub_wallpaper');
         if (savedWallpaper) setWallpaper(savedWallpaper);
 
@@ -81,17 +75,17 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         root.style.setProperty('--primary', currentTheme.primary);
         root.style.setProperty('--secondary', currentTheme.secondary);
         root.style.setProperty('--accent', currentTheme.accent);
-        
+
         // Also update ring to match primary
         root.style.setProperty('--ring', currentTheme.primary);
-        
+
         // Apply Mode
         if (mode === 'dark') {
             root.classList.add('dark');
         } else {
             root.classList.remove('dark');
         }
-        
+
         localStorage.setItem('financehub_theme', currentTheme.name);
         localStorage.setItem('financehub_mode', mode);
     }, [currentTheme, mode]);
@@ -111,11 +105,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         localStorage.setItem('financehub_zen_mode', String(newState));
     };
 
-    const handleSetGreetingName = (name: string) => {
-        setGreetingName(name);
-        localStorage.setItem('financehub_greeting_name', name);
-    };
-
     const handleSetWallpaper = (url: string | null) => {
         setWallpaper(url);
         if (url) localStorage.setItem('financehub_wallpaper', url);
@@ -129,7 +118,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     const toggleModuleVisibility = (moduleId: string) => {
         setHiddenModules(prev => {
-            const newModules = prev.includes(moduleId) 
+            const newModules = prev.includes(moduleId)
                 ? prev.filter(id => id !== moduleId)
                 : [...prev, moduleId];
             localStorage.setItem('financehub_hidden_modules', JSON.stringify(newModules));
@@ -145,8 +134,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             toggleMode,
             zenMode,
             toggleZenMode,
-            greetingName,
-            setGreetingName: handleSetGreetingName,
             wallpaper,
             setWallpaper: handleSetWallpaper,
             density,

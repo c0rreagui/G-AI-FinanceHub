@@ -17,6 +17,7 @@ import { formatCurrency } from '../../utils/formatters';
 
 // Micro-components
 import { GreetingHeader } from '../dashboard/GreetingHeader';
+import { DashboardOnboardingTour } from '../onboarding/DashboardOnboardingTour';
 
 // Widgets
 import { BalanceWidget } from '../dashboard/widgets/BalanceWidget';
@@ -150,11 +151,11 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
 
         switch (widgetId) {
             case 'balance':
-                return <BalanceWidget summary={summary} />;
+                return <div id="dashboard-balance-step"><BalanceWidget summary={summary} /></div>;
             case 'charts':
-                return <ChartsWidget monthlyChartData={monthlyChartData} transactions={transactions} />;
+                return <div id="dashboard-charts-step"><ChartsWidget monthlyChartData={monthlyChartData} transactions={transactions} /></div>;
             case 'health':
-                return <HealthWidget healthScore={healthScore} />;
+                return <div id="dashboard-health-step"><HealthWidget healthScore={healthScore} /></div>;
             case 'quick-actions':
                 return <QuickActionsWidget transactions={transactions} setCurrentView={setCurrentView} />;
             case 'daily_tip':
@@ -189,9 +190,9 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
             case 'challenges':
                 return !hiddenModules.includes('challenges') ? <MonthlyChallengesCard /> : null;
             case 'recent_transactions':
-                return <RecentTransactionsWidget transactions={transactions} setCurrentView={setCurrentView} />;
+                return <div id="dashboard-recent-step"><RecentTransactionsWidget transactions={transactions} setCurrentView={setCurrentView} /></div>;
             case 'budget_tracker':
-                return <BudgetWidget />;
+                return <div id="dashboard-budget-step"><BudgetWidget /></div>;
             default:
                 return null;
         }
@@ -232,7 +233,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                             Restaurar
                         </Button>
                     )}
-                    <Button variant="default" size="sm" onClick={() => openDialog('add-transaction')}>
+                    <Button id="dashboard-new-transaction-step" variant="default" size="sm" onClick={() => openDialog('add-transaction')}>
                         + Nova Transação
                     </Button>
                 </div>
@@ -352,6 +353,8 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                     );
                 })}
             </ReorderGroup>
+            {/* ONBOARDING TOUR */}
+            <DashboardOnboardingTour />
         </MotionDiv>
     );
 };

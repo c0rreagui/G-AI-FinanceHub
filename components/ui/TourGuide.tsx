@@ -25,18 +25,44 @@ export const TourGuide: React.FC<TourGuideProps> = ({ steps, isOpen, onClose }) 
       const target = document.getElementById(steps[currentStep].target);
       if (target && tooltipRef.current) {
         const rect = target.getBoundingClientRect();
-        tooltipRef.current.style.top = `${rect.bottom + globalThis.scrollY + 12}px`;
-        tooltipRef.current.style.left = `${rect.left + globalThis.scrollX + rect.width / 2}px`;
+        const tooltipHeight = tooltipRef.current.offsetHeight || 200;
+        const tooltipWidth = tooltipRef.current.offsetWidth || 300;
+
+        // Calculate vertical position
+        let top = rect.bottom + globalThis.scrollY + 12;
+        const spaceBelow = globalThis.innerHeight - rect.bottom;
+
+        // If not enough space below, place above
+        if (spaceBelow < tooltipHeight + 20) {
+          top = rect.top + globalThis.scrollY - tooltipHeight - 12;
+        }
+
+        // Calculate horizontal position
+        let left = rect.left + globalThis.scrollX + rect.width / 2;
+
+        // Horizontal constraints (keep inside viewport)
+        const minLeft = (tooltipWidth / 2) + 12;
+        const maxLeft = globalThis.innerWidth - (tooltipWidth / 2) - 12;
+        left = Math.max(minLeft, Math.min(maxLeft, left));
+
+        tooltipRef.current.style.top = `${top}px`;
+        tooltipRef.current.style.left = `${left}px`;
         tooltipRef.current.style.transform = 'translateX(-50%)';
 
         target.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     };
 
-    // Use requestAnimationFrame to ensure DOM is ready
-    requestAnimationFrame(updatePosition);
+    // Use requestAnimationFrame with a small delay to ensure DOM is ready and animations are settled
+    const timer = setTimeout(() => {
+      requestAnimationFrame(updatePosition);
+    }, 100);
+
     globalThis.addEventListener('resize', updatePosition);
-    return () => globalThis.removeEventListener('resize', updatePosition);
+    return () => {
+      globalThis.removeEventListener('resize', updatePosition);
+      clearTimeout(timer);
+    };
   }, [currentStep, isOpen, steps]);
 
   if (!isOpen) return null;

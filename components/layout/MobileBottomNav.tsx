@@ -141,25 +141,25 @@ const SpeedDial: React.FC = () => {
 
 export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ currentView, setCurrentView }) => {
     const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
-    const { isDeveloper } = useAuth();
+    const { isDeveloper, isGuest } = useAuth();
     const scrollDirection = useScrollDirection();
     const isVisible = scrollDirection === 'up' || scrollDirection === null; // Show initially or when scrolling up
 
     const moreNavItems = useMemo(() => {
-        const items: { name: string; view: ViewType; icon: React.ElementType }[] = [
+        const items: { name: string; view: ViewType; icon: React.ElementType; requireProfile?: boolean }[] = [
             { name: 'Dívidas', view: 'debts', icon: TrendingDown },
             { name: 'Investimentos', view: 'investments', icon: PiggyBank },
             { name: 'Agenda', view: 'scheduling', icon: Calendar },
             { name: 'Insights', view: 'insights', icon: Lightbulb },
             { name: 'Tools', view: 'tools', icon: Wrench },
-            { name: 'Família', view: 'social', icon: Users },
+            { name: 'Família', view: 'social', icon: Users, requireProfile: true },
             { name: 'Ajustes', view: 'settings', icon: SlidersHorizontal },
         ];
         if (isDeveloper) {
             items.push({ name: 'DevTools', view: 'devtools', icon: Zap });
         }
-        return items;
-    }, [isDeveloper]);
+        return items.filter(item => !item.requireProfile || !isGuest);
+    }, [isDeveloper, isGuest]);
 
     const handleMoreItemClick = (view: ViewType) => {
         triggerHapticFeedback();

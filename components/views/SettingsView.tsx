@@ -11,18 +11,18 @@ import { BackupManager } from '../settings/BackupManager';
 import { BudgetSettings } from '../settings/BudgetSettings';
 import { AppearanceSettings } from '../settings/AppearanceSettings';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/Tabs';
-import { Sliders, UserCircle, Edit2, Check, X, Camera, Rocket } from 'lucide-react';
+import { Sliders, UserCircle, Edit2, Check, X, Camera, Rocket, User, SlidersHorizontal } from 'lucide-react';
 import { UserLevelBar } from '../dashboard/UserLevelBar';
 import { Input } from '../ui/Input';
 import { Label } from '../ui/Label';
 import { supabase } from '../../services/supabaseClient';
 import { useToast } from '../../hooks/useToast';
-import { ProfileOnboardingFlow } from '../onboarding/ProfileOnboardingFlow';
+import { ProfileOnboardingFlow } from '@/components/onboarding/ProfileOnboardingFlow';
 
 export const SettingsView: React.FC = () => {
-    const { logout, user, apiKey } = useAuth();
+    const { logout, user, apiKey, isGuest } = useAuth();
     const { showToast } = useToast();
-    const [activeTab, setActiveTab] = useState('settings');
+    const [activeTab, setActiveTab] = useState('general');
     const [isEditingName, setIsEditingName] = useState(false);
     const [newName, setNewName] = useState('');
 
@@ -58,24 +58,24 @@ export const SettingsView: React.FC = () => {
         <>
             <PageHeader
                 icon={Settings}
-                title={activeTab === 'settings' ? 'Ajustes' : 'Perfil'}
-                breadcrumbs={['FinanceHub', activeTab === 'settings' ? 'Ajustes' : 'Perfil']}
-                actions={<Button onClick={logout} variant="secondary">Sair</Button>}
+                title={activeTab === 'general' ? 'Ajustes' : 'Perfil'} // Updated title logic
+                breadcrumbs={['FinanceHub', activeTab === 'general' ? 'Ajustes' : 'Perfil']} // Updated breadcrumbs logic
+                actions={<Button onClick={logout} variant="secondary" title="Sair da sua conta">Sair</Button>}
             />
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-grow overflow-hidden flex flex-col">
-                <TabsList className="grid w-full grid-cols-2 mb-6">
-                    <TabsTrigger value="settings" className="flex items-center gap-2">
-                        <Sliders className="w-4 h-4" />
-                        Ajustes
+                <TabsList className="mb-8 p-1 bg-white/5 border border-white/10 rounded-2xl w-full sm:w-auto">
+                    <TabsTrigger value="general" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground" title="Configurações gerais do aplicativo">
+                        <User className="w-4 h-4 mr-2" /> Geral
                     </TabsTrigger>
-                    <TabsTrigger value="profile" className="flex items-center gap-2">
-                        <UserCircle className="w-4 h-4" />
-                        Perfil
-                    </TabsTrigger>
+                    {!isGuest && (
+                        <TabsTrigger value="profile" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground" title="Gerenciar seu perfil e conta">
+                            <SlidersHorizontal className="w-4 h-4 mr-2" /> Perfil
+                        </TabsTrigger>
+                    )}
                 </TabsList>
 
-                <TabsContent value="settings" className="flex-grow overflow-y-auto pr-2 space-y-6 pb-20">
+                <TabsContent value="general" className="flex-grow overflow-y-auto pr-2 space-y-6 pb-20"> {/* Changed value from 'settings' to 'general' */}
                     <motion.div
                         {...({ className: "space-y-6" } as any)}
                         variants={containerVariants}
@@ -148,7 +148,11 @@ export const SettingsView: React.FC = () => {
                                             user?.user_metadata?.name?.charAt(0).toUpperCase() || 'U'
                                         )}
                                     </div>
-                                    <button className="absolute bottom-0 right-0 p-2 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-colors">
+                                    <button
+                                        className="absolute bottom-0 right-0 p-2 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-colors"
+                                        title="Alterar avatar"
+                                        aria-label="Alterar avatar"
+                                    >
                                         <Camera className="w-4 h-4" />
                                     </button>
                                 </div>
@@ -172,7 +176,12 @@ export const SettingsView: React.FC = () => {
                                     ) : (
                                         <div className="flex items-center justify-center gap-2">
                                             <h2 className="text-2xl font-bold text-white">{user?.user_metadata?.name || 'Anônimo'}</h2>
-                                            <button onClick={() => { setNewName(user?.user_metadata?.name || ''); setIsEditingName(true); }} className="p-1 text-muted-foreground hover:text-white transition-colors">
+                                            <button
+                                                onClick={() => { setNewName(user?.user_metadata?.name || ''); setIsEditingName(true); }}
+                                                className="p-1 text-muted-foreground hover:text-white transition-colors"
+                                                title="Editar nome"
+                                                aria-label="Editar nome"
+                                            >
                                                 <Edit2 className="w-4 h-4" />
                                             </button>
                                         </div>
