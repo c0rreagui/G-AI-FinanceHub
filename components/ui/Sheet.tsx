@@ -49,8 +49,8 @@ export const Sheet: React.FC<SheetProps> = ({ isOpen, onClose, title, children, 
         const handleEsc = (e: KeyboardEvent) => {
             if (e.key === 'Escape') onClose();
         };
-        window.addEventListener('keydown', handleEsc);
-        return () => window.removeEventListener('keydown', handleEsc);
+        globalThis.addEventListener('keydown', handleEsc);
+        return () => globalThis.removeEventListener('keydown', handleEsc);
     }, [onClose]);
 
     return (

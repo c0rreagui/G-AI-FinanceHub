@@ -6,14 +6,14 @@ test.describe('Fluxos Funcionais Críticos (CRUD)', () => {
     test.beforeEach(async ({ page }) => {
         // Ativar Console Visual do Robô
         await page.addInitScript(() => {
-            window.sessionStorage.setItem('ROBOT_MODE', 'true');
+            globalThis.sessionStorage.setItem('ROBOT_MODE', 'true');
             (window as any).__ROBOT_MODE__ = true;
         });
 
         // Forçar movimento da janela para o monitor da Esquerda (analisando setup do usuário)
         await page.evaluate(() => {
-            window.moveTo(-1800, 50); // Tentativa monitor esquerdo
-            window.resizeTo(1920, 1080);
+            globalThis.moveTo(-1800, 50); // Tentativa monitor esquerdo
+            globalThis.resizeTo(1920, 1080);
         }).catch(() => {}); // Ignora erro se não permitido
 
         await page.setViewportSize({ width: 1920, height: 1080 });

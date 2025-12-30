@@ -12,15 +12,15 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ children, className,
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > offset) {
+      if (globalThis.scrollY > offset) {
         setIsSticky(true);
       } else {
         setIsSticky(false);
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    globalThis.addEventListener('scroll', handleScroll);
+    return () => globalThis.removeEventListener('scroll', handleScroll);
   }, [offset]);
 
   return (

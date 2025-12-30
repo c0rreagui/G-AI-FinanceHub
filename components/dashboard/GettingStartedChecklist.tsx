@@ -43,7 +43,7 @@ export const GettingStartedChecklist: React.FC = () => {
         if (stepId === 'first-debt') {
             localStorage.setItem('financehub_debts_skipped', 'true');
             // Force re-render logic if needed, or simple reload for now as this is a quick win
-            window.location.reload(); 
+            globalThis.location.reload(); 
         }
     };
 

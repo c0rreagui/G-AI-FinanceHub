@@ -212,9 +212,9 @@ class DeepErrorAnalyzer {
     private captureBrowserState(): ErrorContext['browserState'] {
         const state: any = {
             viewport: {
-                width: window.innerWidth,
-                height: window.innerHeight,
-                devicePixelRatio: window.devicePixelRatio || 1,
+                width: globalThis.innerWidth,
+                height: globalThis.innerHeight,
+                devicePixelRatio: globalThis.devicePixelRatio || 1,
             },
             performance: {
                 timeOrigin: performance.timeOrigin,
@@ -398,7 +398,7 @@ class DeepErrorAnalyzer {
                 recentEvents: allRecentEvents,
                 browserState: this.captureBrowserState(),
                 appState: {
-                    currentRoute: window.location.pathname,
+                    currentRoute: globalThis.location.pathname,
                     previousRoute: document.referrer,
                     sessionDuration: performance.now(),
                     userInteractions: last10UserActions.length,

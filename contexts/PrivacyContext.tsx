@@ -44,8 +44,8 @@ export const PrivacyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         lastPress = now;
       }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    globalThis.addEventListener('keydown', handleKeyDown);
+    return () => globalThis.removeEventListener('keydown', handleKeyDown);
   }, [togglePanicMode]);
 
   // Sound Feedback

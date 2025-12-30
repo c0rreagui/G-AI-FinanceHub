@@ -99,7 +99,7 @@ export class PenteFinoPerformance {
                 // Check lazy loading
                 if (!img.loading || img.loading !== 'lazy') {
                     const rect = img.getBoundingClientRect();
-                    if (rect.top > window.innerHeight) noLazy++;
+                    if (rect.top > globalThis.innerHeight) noLazy++;
                 }
                 
                 // Check WebP
@@ -153,7 +153,7 @@ export class PenteFinoPerformance {
             const animations: string[] = [];
             
             document.querySelectorAll('*').forEach(el => {
-                const style = window.getComputedStyle(el);
+                const style = globalThis.getComputedStyle(el);
                 
                 if (style.backdropFilter && style.backdropFilter !== 'none') {
                     backdropFilterCount++;

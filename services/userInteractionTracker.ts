@@ -259,8 +259,8 @@ class UserInteractionTracker {
                 tagName: 'WINDOW',
             },
             position: {
-                x: window.scrollX,
-                y: window.scrollY,
+                x: globalThis.scrollX,
+                y: globalThis.scrollY,
             },
         };
 

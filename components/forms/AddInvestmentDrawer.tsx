@@ -40,7 +40,7 @@ export const AddInvestmentDrawer: React.FC<AddInvestmentDrawerProps> = ({ isOpen
         }
         
         const numericTotal = parseFloat(total);
-        if (isNaN(numericTotal) || numericTotal <= 0) {
+        if (Number.isNaN(numericTotal) || numericTotal <= 0) {
             showToast('Valor inválido. Verifique quantidade e preço.', { type: 'error' });
             return;
         }

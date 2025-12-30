@@ -108,7 +108,7 @@ export const AuthView: React.FC = () => {
 
     const enterGuestMode = () => {
         sessionStorage.setItem('guest_mode', 'true');
-        window.location.reload();
+        globalThis.location.reload();
     };
 
     const togglePinInput = () => {

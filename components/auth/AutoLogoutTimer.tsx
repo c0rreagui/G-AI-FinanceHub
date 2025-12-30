@@ -53,12 +53,12 @@ export const AutoLogoutTimer: React.FC = () => {
             }
         };
 
-        events.forEach(event => window.addEventListener(event, handleActivity));
+        events.forEach(event => globalThis.addEventListener(event, handleActivity));
         
         timerRef.current = setInterval(checkInactivity, 1000);
 
         return () => {
-            events.forEach(event => window.removeEventListener(event, handleActivity));
+            events.forEach(event => globalThis.removeEventListener(event, handleActivity));
             if (timerRef.current) clearInterval(timerRef.current);
             if (warningIntervalRef.current) clearInterval(warningIntervalRef.current);
         };

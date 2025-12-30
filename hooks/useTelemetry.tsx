@@ -182,28 +182,28 @@ export const useFormTracking = (formName: string) => {
  * Hook para rastreamento de navegação
  */
 export const useNavigationTracking = () => {
-    const previousRoute = useRef<string>(window.location.pathname);
+    const previousRoute = useRef<string>(globalThis.location.pathname);
 
     useEffect(() => {
         const handleRouteChange = () => {
-            const newRoute = window.location.pathname;
+            const newRoute = globalThis.location.pathname;
             if (previousRoute.current !== newRoute) {
                 telemetry.trackNavigation(previousRoute.current, newRoute, {
-                    hash: window.location.hash,
-                    search: window.location.search,
+                    hash: globalThis.location.hash,
+                    search: globalThis.location.search,
                 });
                 previousRoute.current = newRoute;
             }
         };
 
-        window.addEventListener('popstate', handleRouteChange);
-        window.addEventListener('pushstate', handleRouteChange);
-        window.addEventListener('replacestate', handleRouteChange);
+        globalThis.addEventListener('popstate', handleRouteChange);
+        globalThis.addEventListener('pushstate', handleRouteChange);
+        globalThis.addEventListener('replacestate', handleRouteChange);
 
         return () => {
-            window.removeEventListener('popstate', handleRouteChange);
-            window.removeEventListener('pushstate', handleRouteChange);
-            window.removeEventListener('replacestate', handleRouteChange);
+            globalThis.removeEventListener('popstate', handleRouteChange);
+            globalThis.removeEventListener('pushstate', handleRouteChange);
+            globalThis.removeEventListener('replacestate', handleRouteChange);
         };
     }, []);
 };

@@ -55,7 +55,7 @@ class ProcessFlowTracker {
             metadata: {
                 ...metadata,
                 timestamp: Date.now(),
-                url: typeof window !== 'undefined' ? window.location.href : '',
+                url: typeof window !== 'undefined' ? globalThis.location.href : '',
             },
             tags: [...tags, name.toLowerCase()],
             depth: parentId ? (this.processes.get(parentId)?.depth ?? 0) + 1 : 0,

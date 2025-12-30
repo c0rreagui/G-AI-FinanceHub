@@ -56,7 +56,7 @@ export const AddPaymentToDebtForm: React.FC<AddPaymentToDebtFormProps> = ({ isOp
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const valueToAdd = parseFloat(amount);
-    if (isNaN(valueToAdd) || valueToAdd <= 0 || isSubmitting) {
+    if (Number.isNaN(valueToAdd) || valueToAdd <= 0 || isSubmitting) {
       return;
     }
     

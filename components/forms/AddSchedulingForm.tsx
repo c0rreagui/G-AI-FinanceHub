@@ -65,7 +65,7 @@ export const AddSchedulingForm: React.FC<AddSchedulingFormProps> = ({ isOpen, on
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const numericAmount = parseFloat(amount);
-    if (!description || !amount || isNaN(numericAmount) || !categoryId || !startDate || !frequency || isSubmitting) return;
+    if (!description || !amount || Number.isNaN(numericAmount) || !categoryId || !startDate || !frequency || isSubmitting) return;
 
     setIsSubmitting(true);
     const finalAmount = type === TransactionType.DESPESA ? -Math.abs(numericAmount) : Math.abs(numericAmount);

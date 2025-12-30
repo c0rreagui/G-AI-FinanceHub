@@ -161,7 +161,7 @@ export class SwarmPenteFino {
             let smallTexts = 0;
             let fontVariations = new Set<string>();
             document.querySelectorAll('*').forEach(el => {
-                const style = window.getComputedStyle(el);
+                const style = globalThis.getComputedStyle(el);
                 const size = parseFloat(style.fontSize);
                 if (size > 0 && size < 12) smallTexts++;
                 if (el.textContent?.trim()) fontVariations.add(style.fontSize);
@@ -175,8 +175,8 @@ export class SwarmPenteFino {
         this.helper.log('📱 Verificando responsividade...');
         const resp = await this.page.evaluate(() => {
             return {
-                hasOverflow: document.body.scrollWidth > window.innerWidth + 5,
-                overflow: document.body.scrollWidth - window.innerWidth
+                hasOverflow: document.body.scrollWidth > globalThis.innerWidth + 5,
+                overflow: document.body.scrollWidth - globalThis.innerWidth
             };
         });
         if (resp.hasOverflow) this.addIssue('responsiveness', 'critical', `Overflow: ${resp.overflow}px`);
@@ -190,8 +190,8 @@ export class SwarmPenteFino {
         const zIndex = await this.page.evaluate(() => {
             let max = 0;
             document.querySelectorAll('*').forEach(el => {
-                const z = parseInt(window.getComputedStyle(el).zIndex);
-                if (!isNaN(z) && z > max) max = z;
+                const z = parseInt(globalThis.getComputedStyle(el).zIndex);
+                if (!Number.isNaN(z) && z > max) max = z;
             });
             return max;
         });

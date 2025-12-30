@@ -104,7 +104,7 @@ test.describe('♿ Enterprise Swarm - A11y Squad', () => {
         // Verificar se houve sobreposição crítica (overlap)
         // Difícil automatizar sem ferramentas visuais, mas vamos checar scrollbar horizontal indesejado
         const scrollWidth = await page.evaluate(() => document.body.scrollWidth);
-        const viewportWidth = await page.evaluate(() => window.innerWidth);
+        const viewportWidth = await page.evaluate(() => globalThis.innerWidth);
 
         if (scrollWidth > viewportWidth) {
             await agent.log('⚠️ Scroll Horizontal detectado (conteúdo vazou da tela).');

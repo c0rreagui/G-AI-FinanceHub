@@ -262,7 +262,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
                 if (!isEditing) {
                     const duplicates = checkForDuplicates(txData);
                     if (duplicates.length > 0) {
-                        const confirmed = window.confirm(
+                        const confirmed = globalThis.confirm(
                             `Atenção! Encontramos ${duplicates.length} transação(ões) similar(es) nesta data. Deseja adicionar mesmo assim?`
                         );
                         if (!confirmed) {

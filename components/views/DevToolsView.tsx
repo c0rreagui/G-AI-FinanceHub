@@ -68,11 +68,11 @@ export const DevToolsView: React.FC<DevToolsViewProps> = ({ setCurrentView }) =>
     useEffect(() => {
         const handleOnline = () => setIsOnline(true);
         const handleOffline = () => setIsOnline(false);
-        window.addEventListener('online', handleOnline);
-        window.addEventListener('offline', handleOffline);
+        globalThis.addEventListener('online', handleOnline);
+        globalThis.addEventListener('offline', handleOffline);
         return () => {
-            window.removeEventListener('online', handleOnline);
-            window.removeEventListener('offline', handleOffline);
+            globalThis.removeEventListener('online', handleOnline);
+            globalThis.removeEventListener('offline', handleOffline);
         };
     }, []);
 
@@ -331,7 +331,7 @@ export const DevToolsView: React.FC<DevToolsViewProps> = ({ setCurrentView }) =>
                             </div>
                             <div className="flex justify-between">
                                 <span>Screen Resolution:</span>
-                                <span className="text-white">{window.innerWidth}x{window.innerHeight}</span>
+                                <span className="text-white">{globalThis.innerWidth}x{globalThis.innerHeight}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span>Timezone:</span>

@@ -58,8 +58,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 }
             }
         };
-        window.addEventListener('storage', handleStorageChange);
-        return () => window.removeEventListener('storage', handleStorageChange);
+        globalThis.addEventListener('storage', handleStorageChange);
+        return () => globalThis.removeEventListener('storage', handleStorageChange);
     }, []);
 
     // Save to local storage whenever changes happen

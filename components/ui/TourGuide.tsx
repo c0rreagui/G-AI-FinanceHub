@@ -25,8 +25,8 @@ export const TourGuide: React.FC<TourGuideProps> = ({ steps, isOpen, onClose }) 
       const target = document.getElementById(steps[currentStep].target);
       if (target && tooltipRef.current) {
         const rect = target.getBoundingClientRect();
-        tooltipRef.current.style.top = `${rect.bottom + window.scrollY + 12}px`;
-        tooltipRef.current.style.left = `${rect.left + window.scrollX + rect.width / 2}px`;
+        tooltipRef.current.style.top = `${rect.bottom + globalThis.scrollY + 12}px`;
+        tooltipRef.current.style.left = `${rect.left + globalThis.scrollX + rect.width / 2}px`;
         tooltipRef.current.style.transform = 'translateX(-50%)';
 
         target.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -35,8 +35,8 @@ export const TourGuide: React.FC<TourGuideProps> = ({ steps, isOpen, onClose }) 
 
     // Use requestAnimationFrame to ensure DOM is ready
     requestAnimationFrame(updatePosition);
-    window.addEventListener('resize', updatePosition);
-    return () => window.removeEventListener('resize', updatePosition);
+    globalThis.addEventListener('resize', updatePosition);
+    return () => globalThis.removeEventListener('resize', updatePosition);
   }, [currentStep, isOpen, steps]);
 
   if (!isOpen) return null;

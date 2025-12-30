@@ -67,7 +67,7 @@ export const BudgetManager: React.FC = () => {
         const categoryId = formData.get('category') as string;
         const amount = parseFloat(formData.get('amount') as string);
 
-        if (!categoryId || isNaN(amount)) return;
+        if (!categoryId || Number.isNaN(amount)) return;
 
         if (editingBudget) {
             await updateBudget({ id: editingBudget.id, amount }); // Usually only amount changes or strictly category?

@@ -55,7 +55,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         const savedMode = localStorage.getItem('financehub_mode');
         if (savedMode) {
             setMode(savedMode as 'light' | 'dark');
-        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+        } else if (globalThis.matchMedia && globalThis.matchMedia('(prefers-color-scheme: light)').matches) {
             setMode('light');
         }
 

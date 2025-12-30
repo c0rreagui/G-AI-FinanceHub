@@ -177,7 +177,7 @@ export function useTransactionColumns({
                 const rows = table.getFilteredRowModel().rows;
                 const total = rows.reduce((sum, row) => {
                     const val = parseFloat(row.getValue("amount"));
-                    return sum + (isNaN(val) ? 0 : val);
+                    return sum + (Number.isNaN(val) ? 0 : val);
                 }, 0);
 
                 return (

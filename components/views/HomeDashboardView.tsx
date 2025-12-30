@@ -69,7 +69,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
 
     // Pull to Refresh Simulation
     const handlePullToRefresh = async () => {
-        if (window.scrollY === 0) {
+        if (globalThis.scrollY === 0) {
             setIsRefreshing(true);
             // Simulate data fetch
             await new Promise(resolve => setTimeout(resolve, 1500));
@@ -99,13 +99,13 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
             }
         };
 
-        window.addEventListener('keydown', handleKeydown);
+        globalThis.addEventListener('keydown', handleKeydown);
         // Add touch listener for pull to refresh simulation on mobile
-        window.addEventListener('touchstart', handlePullToRefresh); // Simplified for demo
+        globalThis.addEventListener('touchstart', handlePullToRefresh); // Simplified for demo
 
         return () => {
-            window.removeEventListener('keydown', handleKeydown);
-            window.removeEventListener('touchstart', handlePullToRefresh);
+            globalThis.removeEventListener('keydown', handleKeydown);
+            globalThis.removeEventListener('touchstart', handlePullToRefresh);
         };
     }, []);
 

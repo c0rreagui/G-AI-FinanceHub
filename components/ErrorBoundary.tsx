@@ -79,7 +79,7 @@ class ErrorBoundaryInner extends Component<ErrorBoundaryAuthProps, ErrorBoundary
     const { error, errorInfo } = this.state;
     const errorDetails = `
 Error: ${error?.name}: ${error?.message}
-URL: ${window.location.href}
+URL: ${globalThis.location.href}
 User Agent: ${navigator.userAgent}
 Stack Trace:
 ${error?.stack}
@@ -131,7 +131,7 @@ ${errorInfo?.componentStack}
                 <div className="flex flex-col gap-3 p-6">
                     <div className="grid grid-cols-2 gap-3">
                         <Button 
-                            onClick={() => window.location.reload()} 
+                            onClick={() => globalThis.location.reload()} 
                             className="flex items-center justify-center gap-2 bg-white text-zinc-900 hover:bg-zinc-200"
                         >
                             <RefreshCw className="h-4 w-4" />
@@ -141,7 +141,7 @@ ${errorInfo?.componentStack}
                             onClick={() => {
                                 localStorage.clear();
                                 sessionStorage.clear();
-                                window.location.reload();
+                                globalThis.location.reload();
                             }} 
                             className="flex items-center justify-center gap-2 bg-zinc-800 text-red-300 hover:bg-zinc-700 hover:text-red-200 border border-red-900/30"
                         >

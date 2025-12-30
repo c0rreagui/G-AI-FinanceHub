@@ -74,7 +74,7 @@ export class SwarmHunter {
      */
     async checkResponsiveness() {
         const scrollWidth = await this.page.evaluate(() => document.body.scrollWidth);
-        const innerWidth = await this.page.evaluate(() => window.innerWidth);
+        const innerWidth = await this.page.evaluate(() => globalThis.innerWidth);
 
         // Permitimos pequena margem de erro (ex: 1px)
         if (scrollWidth > innerWidth + 1) {

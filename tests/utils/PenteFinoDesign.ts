@@ -18,7 +18,7 @@ export class PenteFinoDesign {
             headings.forEach(tag => {
                 const el = document.querySelector(tag);
                 if (el) {
-                    const size = parseFloat(window.getComputedStyle(el).fontSize);
+                    const size = parseFloat(globalThis.getComputedStyle(el).fontSize);
                     sizes.push({ tag, size });
                 }
             });
@@ -43,7 +43,7 @@ export class PenteFinoDesign {
             const issues: string[] = [];
             
             elements.forEach(el => {
-                const style = window.getComputedStyle(el);
+                const style = globalThis.getComputedStyle(el);
                 const values = [
                     parseFloat(style.marginTop),
                     parseFloat(style.marginBottom),
@@ -73,7 +73,7 @@ export class PenteFinoDesign {
             
             let hasBalancedPadding = true;
             children.forEach(child => {
-                const style = window.getComputedStyle(child);
+                const style = globalThis.getComputedStyle(child);
                 const pl = parseFloat(style.paddingLeft);
                 const pr = parseFloat(style.paddingRight);
                 if (Math.abs(pl - pr) > 8) hasBalancedPadding = false;
@@ -91,7 +91,7 @@ export class PenteFinoDesign {
             let hardcodedColors = 0;
             
             document.querySelectorAll('*').forEach(el => {
-                const style = window.getComputedStyle(el);
+                const style = globalThis.getComputedStyle(el);
                 const color = style.color;
                 const bg = style.backgroundColor;
                 
@@ -140,7 +140,7 @@ export class PenteFinoDesign {
             const shadows = new Set<string>();
             
             document.querySelectorAll('*').forEach(el => {
-                const style = window.getComputedStyle(el);
+                const style = globalThis.getComputedStyle(el);
                 if (style.boxShadow && style.boxShadow !== 'none') {
                     // Normalize shadow for comparison
                     shadows.add(style.boxShadow.substring(0, 40));
@@ -206,14 +206,14 @@ export class PenteFinoDesign {
                 const issues: string[] = [];
                 
                 grids.forEach(grid => {
-                    const style = window.getComputedStyle(grid);
+                    const style = globalThis.getComputedStyle(grid);
                     const cols = style.gridTemplateColumns.split(' ').filter(c => c !== '').length;
                     columns.add(cols);
                     if (style.gap) gaps.add(style.gap);
                 });
                 
                 // Check for horizontal overflow
-                if (document.body.scrollWidth > window.innerWidth + 5) {
+                if (document.body.scrollWidth > globalThis.innerWidth + 5) {
                     issues.push('Overflow horizontal');
                 }
                 
@@ -297,7 +297,7 @@ export class PenteFinoDesign {
             const bgColors = new Map<string, number>();
             
             document.querySelectorAll('*').forEach(el => {
-                const style = window.getComputedStyle(el);
+                const style = globalThis.getComputedStyle(el);
                 
                 if (style.color && style.color !== 'rgba(0, 0, 0, 0)') {
                     colors.set(style.color, (colors.get(style.color) || 0) + 1);

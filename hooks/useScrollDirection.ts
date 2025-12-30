@@ -4,11 +4,11 @@ export function useScrollDirection() {
   const [scrollDirection, setScrollDirection] = useState<'up' | 'down' | null>(null);
 
   useEffect(() => {
-    let lastScrollY = window.scrollY;
+    let lastScrollY = globalThis.scrollY;
 
     // Function to handle scroll on window (global scroll)
     const updateScrollDirection = () => {
-      const scrollY = window.scrollY;
+      const scrollY = globalThis.scrollY;
       const direction = scrollY > lastScrollY ? 'down' : 'up';
       if (direction !== scrollDirection && (scrollY - lastScrollY > 10 || scrollY - lastScrollY < -10)) {
         setScrollDirection(direction);
@@ -16,9 +16,9 @@ export function useScrollDirection() {
       lastScrollY = scrollY > 0 ? scrollY : 0;
     };
     
-    window.addEventListener('scroll', updateScrollDirection); // Note: this listens to window scroll
+    globalThis.addEventListener('scroll', updateScrollDirection); // Note: this listens to window scroll
     return () => {
-      window.removeEventListener('scroll', updateScrollDirection);
+      globalThis.removeEventListener('scroll', updateScrollDirection);
     };
   }, [scrollDirection]);
 

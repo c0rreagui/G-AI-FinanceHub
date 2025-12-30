@@ -46,7 +46,7 @@ export const AddGoalForm: React.FC<AddGoalFormProps> = ({ isOpen, onClose }) => 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const parsedAmount = parseFloat(targetAmount);
-    if (!name || !targetAmount || !deadline || isNaN(parsedAmount) || isSubmitting) return;
+    if (!name || !targetAmount || !deadline || Number.isNaN(parsedAmount) || isSubmitting) return;
 
     setIsSubmitting(true);
 

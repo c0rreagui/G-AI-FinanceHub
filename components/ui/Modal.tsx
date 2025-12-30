@@ -19,11 +19,11 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }
     };
 
     if (isOpen) {
-      window.addEventListener('keydown', handleKeyDown);
+      globalThis.addEventListener('keydown', handleKeyDown);
     }
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      globalThis.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen, onClose]);
 

@@ -32,7 +32,7 @@ export const BudgetWidget: React.FC = () => {
 
     const handleSave = () => {
         const val = parseFloat(tempLimit);
-        if (!isNaN(val) && val > 0) {
+        if (!Number.isNaN(val) && val > 0) {
             setMonthlyBudgetLimit(val);
         }
         setIsEditing(false);

@@ -55,9 +55,9 @@ test.describe('FinanceHub Visual Scan', () => {
           await page.waitForTimeout(3000); 
           
           // Scroll down/up para forçar load de imagens/gráficos
-          await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+          await page.evaluate(() => globalThis.scrollTo(0, document.body.scrollHeight));
           await page.waitForTimeout(1000);
-          await page.evaluate(() => window.scrollTo(0, 0));
+          await page.evaluate(() => globalThis.scrollTo(0, 0));
           await page.waitForTimeout(1000);
           
           await page.screenshot({ 

@@ -52,11 +52,11 @@ export const ParticleEffects = () => {
     let animationFrameId: number;
 
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      canvas.width = globalThis.innerWidth;
+      canvas.height = globalThis.innerHeight;
     };
 
-    window.addEventListener('resize', resize);
+    globalThis.addEventListener('resize', resize);
     resize();
 
     const init = () => {
@@ -82,7 +82,7 @@ export const ParticleEffects = () => {
     animate();
 
     return () => {
-      window.removeEventListener('resize', resize);
+      globalThis.removeEventListener('resize', resize);
       cancelAnimationFrame(animationFrameId);
     };
   }, []);

@@ -8,7 +8,7 @@ export const useSound = () => {
   const play = useCallback((type: 'click' | 'success' | 'error' | 'notification') => {
     // Simple AudioContext beep for demo purposes without external assets
     try {
-        const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+        const AudioContext = globalThis.AudioContext || (window as any).webkitAudioContext;
         if (!AudioContext) return;
         
         const ctx = new AudioContext();

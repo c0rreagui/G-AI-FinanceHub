@@ -87,7 +87,7 @@ export class PenteFinoA11y {
             let noFocusStyle = 0;
             
             interactive.forEach(el => {
-                const style = window.getComputedStyle(el);
+                const style = globalThis.getComputedStyle(el);
                 // Check if focus is removed (bad practice)
                 if (style.outline === 'none' && !el.className.includes('focus')) {
                     noFocusStyle++;
@@ -107,7 +107,7 @@ export class PenteFinoA11y {
             // Check for red/green combinations (problematic for deuteranopia)
             const buttons = document.querySelectorAll('button');
             buttons.forEach(btn => {
-                const style = window.getComputedStyle(btn);
+                const style = globalThis.getComputedStyle(btn);
                 const bg = style.backgroundColor;
                 if (bg.includes('rgb(') && !btn.textContent?.trim() && !btn.querySelector('svg')) {
                     issues.push('Botão depende apenas de cor');

@@ -15,7 +15,7 @@ export const useVoiceCommands = () => {
     if (!isSupported) return;
 
     // @ts-ignore - Speech Recognition API not fully typed in TypeScript
-    const SpeechRecognitionAPI = window.webkitSpeechRecognition || window.SpeechRecognition;
+    const SpeechRecognitionAPI = globalThis.webkitSpeechRecognition || globalThis.SpeechRecognition;
     if (!SpeechRecognitionAPI) return;
     
     const recognition = new SpeechRecognitionAPI();

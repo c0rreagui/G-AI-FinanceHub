@@ -47,7 +47,7 @@ export const AddDebtForm: React.FC<AddDebtFormProps> = ({ isOpen, onClose }) => 
     e.preventDefault();
     const parsedAmount = parseFloat(totalAmount);
     const parsedRate = parseFloat(interestRate);
-    if (!name || !totalAmount || !interestRate || isNaN(parsedAmount) || isNaN(parsedRate) || isSubmitting) return;
+    if (!name || !totalAmount || !interestRate || Number.isNaN(parsedAmount) || Number.isNaN(parsedRate) || isSubmitting) return;
 
     setIsSubmitting(true);
     const category = debtCategories.find(c => c.id === selectedCategory)?.label || 'Outros';

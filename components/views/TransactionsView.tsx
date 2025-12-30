@@ -40,8 +40,8 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
             }
         };
 
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
+        globalThis.addEventListener('keydown', handleKeyDown);
+        return () => globalThis.removeEventListener('keydown', handleKeyDown);
     }, [openDialog]);
     
     // Advanced Filters State

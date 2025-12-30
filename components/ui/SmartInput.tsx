@@ -39,7 +39,7 @@ export const SmartInput: React.FC<SmartInputProps> = ({
                 // Safe eval for simple math
                  
                 const result = new Function('return ' + displayValue.replace(',', '.').replace(/[^\d.+\-*/]/g, ''))();
-                if (!isNaN(result) && isFinite(result)) {
+                if (!Number.isNaN(result) && isFinite(result)) {
                     const formatted = result.toFixed(2);
                     onChange(formatted);
                     setDisplayValue(formatted);

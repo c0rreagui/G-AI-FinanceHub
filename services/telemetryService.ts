@@ -66,7 +66,7 @@ class TelemetryService {
         if (typeof window === 'undefined') return;
 
         // Captura erros síncronos
-        window.addEventListener('error', (event) => {
+        globalThis.addEventListener('error', (event) => {
             this.track(
                 EventCategory.ERROR,
                 'Uncaught Error',
@@ -83,7 +83,7 @@ class TelemetryService {
         });
 
         // ⚠️ CRITICAL: Captura erros de Promise (Uncaught in promise)
-        window.addEventListener('unhandledrejection', (event) => {
+        globalThis.addEventListener('unhandledrejection', (event) => {
             const reason = event.reason;
             this.track(
                 EventCategory.ERROR,
@@ -124,10 +124,10 @@ class TelemetryService {
                 ...metadata,
                 userAgent: navigator.userAgent,
                 viewport: {
-                    width: window.innerWidth,
-                    height: window.innerHeight,
+                    width: globalThis.innerWidth,
+                    height: globalThis.innerHeight,
                 },
-                url: window.location.href,
+                url: globalThis.location.href,
             },
             tags,
             userId: this.userId,
@@ -143,7 +143,7 @@ class TelemetryService {
         this.notifyListeners(event);
 
         // Log no console em desenvolvimento
-        const isDev = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+        const isDev = typeof window !== 'undefined' && globalThis.location.hostname === 'localhost';
         if (isDev) {
             this.consoleLog(event);
         }
@@ -556,7 +556,7 @@ class TelemetryService {
         );
 
         // Rastreia saída
-        window.addEventListener('beforeunload', () => {
+        globalThis.addEventListener('beforeunload', () => {
             this.track(
                 EventCategory.LIFECYCLE,
                 'SESSION_END',

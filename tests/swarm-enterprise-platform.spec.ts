@@ -39,7 +39,7 @@ test.describe('📱 Enterprise Swarm - Platform Squad', () => {
         
         // 3. Verificar Layout de Cards (Deve ser coluna única)
         // Difícil validar CSS grid via teste funcional, mas podemos checar scroll
-        await page.evaluate(() => window.scrollTo(0, 500));
+        await page.evaluate(() => globalThis.scrollTo(0, 500));
         await agent.log('✅ Scroll vertical fluido.');
 
         await agent.captureEvidence('mobile_ux_check');
