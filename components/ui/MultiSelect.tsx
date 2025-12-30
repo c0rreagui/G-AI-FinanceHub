@@ -129,8 +129,7 @@ export function MultiSelect({
                 )}
                 onClick={() => handleSelect(option.value)}
                 role="option"
-                // eslint-disable-next-line jsx-a11y/aria-proptypes
-                aria-selected={isSelected}
+                {...{ "aria-selected": isSelected }}
                 tabIndex={0}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
