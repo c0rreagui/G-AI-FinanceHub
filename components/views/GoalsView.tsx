@@ -25,7 +25,13 @@ const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.3 } }
 };
-export const GoalsView: React.FC = () => {
+import { ViewType } from '../../types';
+
+interface GoalsViewProps {
+    setCurrentView: (view: ViewType) => void;
+}
+
+export const GoalsView: React.FC<GoalsViewProps> = ({ setCurrentView }) => {
     const { goals, loading } = useDashboardData();
     const { openDialog } = useDialog();
     const [activeTab, setActiveTab] = useState('goals');
@@ -33,10 +39,10 @@ export const GoalsView: React.FC = () => {
     if (loading) {
         return (
             <Flex direction="col" className="h-full">
-                <PageHeader setCurrentView={setCurrentView} 
-                    icon={Target} 
-                    title="Planejamento" 
-                    breadcrumbs={['FinanceHub', 'Planejamento']}
+                <PageHeader setCurrentView={setCurrentView}
+                    icon={Target}
+                    title="Planejamento"
+                    breadcrumbs={[{ label: 'FinanceHub' }, { label: 'Planejamento', active: true }]}
                 />
                 <GenericViewSkeleton />
             </Flex>
@@ -45,19 +51,19 @@ export const GoalsView: React.FC = () => {
 
     return (
         <Flex direction="col" className="h-full space-y-6">
-            <PageHeader setCurrentView={setCurrentView} 
-                icon={Target} 
-                title="Planejamento Financeiro" 
-                breadcrumbs={['FinanceHub', 'Metas e Orçamentos']}
+            <PageHeader setCurrentView={setCurrentView}
+                icon={Target}
+                title="Planejamento Financeiro"
+                breadcrumbs={[{ label: 'FinanceHub' }, { label: 'Metas e Orçamentos', active: true }]}
             />
-            
+
             <Box className="flex-grow overflow-y-auto pr-2">
                 <Tabs defaultValue="goals" value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
                     <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
                         <TabsTrigger value="goals">Metas</TabsTrigger>
                         <TabsTrigger value="budgets">Orçamentos</TabsTrigger>
                     </TabsList>
-                    
+
                     <TabsContent value="goals" className="space-y-6 outline-none">
                         <div className="flex justify-between items-center">
                             <div>
@@ -65,15 +71,15 @@ export const GoalsView: React.FC = () => {
                                 <p className="text-muted-foreground">Defina e acompanhe seus objetivos financeiros.</p>
                             </div>
                             <Button onClick={() => openDialog('add-goal')} className="bg-primary text-primary-foreground hidden md:flex">
-                                <PlusCircle className="w-4 h-4 mr-2"/> Nova Meta
+                                <PlusCircle className="w-4 h-4 mr-2" /> Nova Meta
                             </Button>
-                             {/* Mobile Button shown via fixed FAB or similar if needed, but for now hidden on small screens? 
+                            {/* Mobile Button shown via fixed FAB or similar if needed, but for now hidden on small screens? 
                                 Actually the previous view had it in PageHeader. 
                                 Let's keep it visible everywhere or responsive. 
                                 'hidden md:flex' might hide it on mobile. Let's make it 'flex'.
                              */}
-                             <Button onClick={() => openDialog('add-goal')} className="bg-primary text-primary-foreground flex md:hidden">
-                                <PlusCircle className="w-4 h-4"/>
+                            <Button onClick={() => openDialog('add-goal')} className="bg-primary text-primary-foreground flex md:hidden">
+                                <PlusCircle className="w-4 h-4" />
                             </Button>
                         </div>
 
@@ -97,13 +103,13 @@ export const GoalsView: React.FC = () => {
                                 description="Crie metas para economizar para um carro, uma viagem ou qualquer outro objetivo."
                                 action={
                                     <Button onClick={() => openDialog('add-goal')}>
-                                        <PlusCircle className="w-4 h-4 mr-2"/> Criar Primeira Meta
+                                        <PlusCircle className="w-4 h-4 mr-2" /> Criar Primeira Meta
                                     </Button>
                                 }
                             />
                         )}
                     </TabsContent>
-                    
+
                     <TabsContent value="budgets" className="outline-none">
                         <BudgetManager />
                     </TabsContent>

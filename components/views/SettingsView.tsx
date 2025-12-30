@@ -11,6 +11,7 @@ import { BackupManager } from '../settings/BackupManager';
 import { BudgetSettings } from '../settings/BudgetSettings';
 import { AppearanceSettings } from '../settings/AppearanceSettings';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/Tabs';
+import { ViewType } from '../../types';
 import { Sliders, UserCircle, Edit2, Check, X, Camera, Rocket, User, SlidersHorizontal } from 'lucide-react';
 import { UserLevelBar } from '../dashboard/UserLevelBar';
 import { Input } from '../ui/Input';
@@ -19,7 +20,11 @@ import { supabase } from '../../services/supabaseClient';
 import { useToast } from '../../hooks/useToast';
 import { ProfileOnboardingFlow } from '@/components/onboarding/ProfileOnboardingFlow';
 
-export const SettingsView: React.FC = () => {
+interface SettingsViewProps {
+    setCurrentView: (view: ViewType) => void;
+}
+
+export const SettingsView: React.FC<SettingsViewProps> = ({ setCurrentView }) => {
     const { logout, user, apiKey, isGuest } = useAuth();
     const { showToast } = useToast();
     const [activeTab, setActiveTab] = useState('general');
@@ -59,9 +64,8 @@ export const SettingsView: React.FC = () => {
             <PageHeader
                 icon={Settings}
                 title="Configurações"
-                subtitle="Gerencie suas preferências e conta"
                 setCurrentView={setCurrentView}
-                breadcrumbs={['FinanceHub', activeTab === 'general' ? 'Ajustes' : 'Perfil']}
+                breadcrumbs={[{ label: 'FinanceHub' }, { label: activeTab === 'general' ? 'Ajustes' : 'Perfil', active: true }]}
                 actions={<Button onClick={logout} variant="secondary" title="Sair da sua conta">Sair</Button>}
             />
 

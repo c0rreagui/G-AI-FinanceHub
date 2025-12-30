@@ -55,7 +55,7 @@ const SummaryWidget: React.FC<{ items: ScheduledTransaction[] }> = ({ items }) =
                     </PrivacyMask>
                 </CardContent>
             </Card>
-             <Card>
+            <Card>
                 <CardContent className="p-4">
                     <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">Vencendo (7d)</p>
                     <div className="flex items-center gap-2">
@@ -80,7 +80,13 @@ type ViewMode = 'list' | 'calendar';
 type SortOption = 'date' | 'amount' | 'name';
 type FilterType = 'all' | 'income' | 'expense';
 
-export const SchedulingView: React.FC = () => {
+import { ViewType } from '../../types';
+
+interface SchedulingViewProps {
+    setCurrentView: (view: ViewType) => void;
+}
+
+export const SchedulingView: React.FC<SchedulingViewProps> = ({ setCurrentView }) => {
     const { scheduledTransactions, loading } = useDashboardData();
     const { openDialog } = useDialog();
     const [viewMode, setViewMode] = useState<ViewMode>('list');
@@ -130,13 +136,13 @@ export const SchedulingView: React.FC = () => {
         };
 
         const today = new Date();
-        today.setHours(0,0,0,0);
+        today.setHours(0, 0, 0, 0);
         const nextWeek = new Date(today);
         nextWeek.setDate(today.getDate() + 7);
 
         filteredItems.forEach(item => {
             const dueDate = new Date(item.next_due_date);
-            dueDate.setHours(0,0,0,0);
+            dueDate.setHours(0, 0, 0, 0);
 
             if (dueDate < today) groups['Atrasados'].push(item);
             else if (dueDate.getTime() === today.getTime()) groups['Hoje'].push(item);
@@ -153,11 +159,10 @@ export const SchedulingView: React.FC = () => {
             <PageHeader setCurrentView={setCurrentView}
                 icon={Calendar}
                 title="Agendamentos"
-                subtitle="Gerencie suas contas fixas e recorrentes"
-                breadcrumbs={['FinanceHub', 'Agendamentos']}
+                breadcrumbs={[{ label: 'FinanceHub' }, { label: 'Agendamentos', active: true }]}
                 actions={
                     <Button onClick={() => openDialog('add-scheduling')} className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-900/20">
-                        <PlusCircle className="w-4 h-4 mr-2"/> Novo Agendamento
+                        <PlusCircle className="w-4 h-4 mr-2" /> Novo Agendamento
                     </Button>
                 }
             />
@@ -173,16 +178,16 @@ export const SchedulingView: React.FC = () => {
                         <div className="flex items-center gap-2 w-full md:w-auto">
                             <div className="relative w-full md:w-64">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                <Input 
-                                    placeholder="Buscar agendamento..." 
+                                <Input
+                                    placeholder="Buscar agendamento..."
                                     className="pl-9 h-9 text-sm"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                             </div>
-                            
+
                             <div className="flex bg-white/5 rounded-lg p-1 border border-white/10">
-                                <button 
+                                <button
                                     onClick={() => setViewMode('list')}
                                     className={`p-1.5 rounded-md transition-all ${viewMode === 'list' ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400 hover:text-white'}`}
                                     aria-label="Mudar para visualização em lista"
@@ -190,7 +195,7 @@ export const SchedulingView: React.FC = () => {
                                 >
                                     <List className="w-4 h-4" />
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => setViewMode('calendar')}
                                     className={`p-1.5 rounded-md transition-all ${viewMode === 'calendar' ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400 hover:text-white'}`}
                                     aria-label="Mudar para visualização em calendário"
@@ -235,10 +240,9 @@ export const SchedulingView: React.FC = () => {
                                         {Object.entries(groupedItems).map(([group, items]) => (
                                             items.length > 0 && (
                                                 <div key={group} className="space-y-3">
-                                                    <h3 className={`text-sm font-bold uppercase tracking-wider flex items-center gap-2 ${
-                                                        group === 'Atrasados' ? 'text-red-400' : 
+                                                    <h3 className={`text-sm font-bold uppercase tracking-wider flex items-center gap-2 ${group === 'Atrasados' ? 'text-red-400' :
                                                         group === 'Hoje' ? 'text-amber-400' : 'text-gray-400'
-                                                    }`}>
+                                                        }`}>
                                                         {group}
                                                         <span className="bg-white/10 text-white text-xs px-1.5 py-0.5 rounded-full">{items.length}</span>
                                                     </h3>
@@ -258,8 +262,8 @@ export const SchedulingView: React.FC = () => {
                                         )}
                                     </div>
                                 ) : (
-                                    <motion.div 
-                                        initial={{ opacity: 0, y: 20 }} 
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         {...({ className: "h-full flex flex-col bg-card/30 rounded-2xl border border-white/5 p-4" } as any)}
                                     >
@@ -269,8 +273,8 @@ export const SchedulingView: React.FC = () => {
                                                 {currentMonthName}
                                             </h3>
                                             <div className="flex gap-1 bg-black/20 rounded-lg p-1">
-                                                <button 
-                                                    onClick={prevMonth} 
+                                                <button
+                                                    onClick={prevMonth}
                                                     className="p-2 hover:bg-white/10 rounded-md transition-colors"
                                                     aria-label="Mês anterior"
                                                 >
@@ -279,8 +283,8 @@ export const SchedulingView: React.FC = () => {
                                                 <button onClick={() => setCurrentDate(new Date())} className="px-3 text-xs font-medium hover:bg-white/10 rounded-md transition-colors">
                                                     Hoje
                                                 </button>
-                                                <button 
-                                                    onClick={nextMonth} 
+                                                <button
+                                                    onClick={nextMonth}
                                                     className="p-2 hover:bg-white/10 rounded-md transition-colors"
                                                     aria-label="Próximo mês"
                                                 >
@@ -299,7 +303,7 @@ export const SchedulingView: React.FC = () => {
                                 description="Adicione transações recorrentes, como aluguel ou assinaturas, para gerenciá-las aqui."
                             >
                                 <Button onClick={() => openDialog('add-scheduling')}>
-                                    <PlusCircle className="w-4 h-4 mr-2"/> Criar Agendamento
+                                    <PlusCircle className="w-4 h-4 mr-2" /> Criar Agendamento
                                 </Button>
                             </EmptyState>
                         )}

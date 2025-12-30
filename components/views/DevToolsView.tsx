@@ -134,9 +134,9 @@ export const DevToolsView: React.FC<DevToolsViewProps> = ({ setCurrentView }) =>
         <div className="space-y-8 pb-24 animate-in fade-in duration-500">
             <PageHeader
                 title="Developer Console"
-                subtitle="Painel avançado de controle e diagnósticos"
-                icon={<Cpu className="w-6 h-6 text-cyan-400" />}
+                icon={Cpu}
                 setCurrentView={setCurrentView}
+                breadcrumbs={[{ label: 'FinanceHub' }, { label: 'DevTools', active: true }]}
                 actions={
                     <Badge variant="outline" className="bg-cyan-500/10 text-cyan-400 border-cyan-500/20 px-3 py-1">
                         v4.0.0-beta

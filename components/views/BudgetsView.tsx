@@ -3,15 +3,20 @@ import { BudgetManager } from '../budgets/BudgetManager';
 import { motion } from 'framer-motion';
 import { PageHeader } from '../layout/PageHeader';
 import { PieChart } from '../Icons';
+import { ViewType } from '../../types';
 
-export const BudgetsView: React.FC = () => {
+interface BudgetsViewProps {
+    setCurrentView: (view: ViewType) => void;
+}
+
+export const BudgetsView: React.FC<BudgetsViewProps> = ({ setCurrentView }) => {
     return (
         <div className="h-full flex flex-col space-y-6">
-            <PageHeader setCurrentView={setCurrentView} 
-                icon={<PieChart className="w-8 h-8 text-cyan-300" />}
-                title="Orçamentos" 
-                subtitle="Defina limites para suas categorias e acompanhe seus gastos em tempo real."
-                breadcrumbs={['FinanceHub', 'Orçamentos']}
+            <PageHeader
+                setCurrentView={setCurrentView}
+                icon={PieChart}
+                title="Orçamentos"
+                breadcrumbs={[{ label: 'FinanceHub' }, { label: 'Orçamentos', active: true }]}
             />
 
             <motion.div

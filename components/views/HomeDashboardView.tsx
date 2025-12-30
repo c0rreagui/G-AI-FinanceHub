@@ -278,8 +278,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                     const currentMonthExpenses = transactions.filter(t =>
                         t.type === 'despesa' &&
                         new Date(t.date).getMonth() === currentMonth &&
-                        new Date(t.date).getFullYear() === currentYear &&
-                        !t.deleted_at
+                        new Date(t.date).getFullYear() === currentYear
                     );
                     const spendingByCategory = currentMonthExpenses.reduce((acc, t) => {
                         acc[t.category.id] = (acc[t.category.id] || 0) + Math.abs(t.amount);

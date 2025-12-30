@@ -28,11 +28,11 @@ export const TourGuide: React.FC<TourGuideProps> = ({ steps, isOpen, onClose }) 
       const element = document.getElementById(steps[currentStep].target);
       if (!element) return;
 
-      // Ensure element is visible
-      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Ensure element is visible - center it in the viewport
+      element.scrollIntoView({ behavior: 'auto', block: 'center' });
 
-      // Small delay to wait for scroll to finish
-      setTimeout(() => {
+      // Small delay to ensure browser has settled
+      requestAnimationFrame(() => {
         const rect = element.getBoundingClientRect();
         const tooltipHeight = tooltipRef.current?.offsetHeight || 180;
         const tooltipWidth = 300;
@@ -41,7 +41,7 @@ export const TourGuide: React.FC<TourGuideProps> = ({ steps, isOpen, onClose }) 
         let left = rect.left + window.scrollX + (rect.width / 2);
         let currentPlacement: 'top' | 'bottom' = 'bottom';
 
-        // Check vertical space
+        // Check vertical space below
         const spaceBelow = window.innerHeight - rect.bottom;
         if (spaceBelow < tooltipHeight + 20) {
           top = rect.top + window.scrollY - tooltipHeight - 12;
@@ -53,9 +53,14 @@ export const TourGuide: React.FC<TourGuideProps> = ({ steps, isOpen, onClose }) 
         const maxLeft = window.innerWidth - (tooltipWidth / 2) - 12;
         left = Math.max(minLeft, Math.min(maxLeft, left));
 
+        // Ensure vertical constraints (don't let tooltip go above screen)
+        if (currentPlacement === 'top' && top < window.scrollY + 12) {
+          top = window.scrollY + 12;
+        }
+
         setCoords({ top, left });
         setPlacement(currentPlacement);
-      }, 100);
+      });
     };
 
     updatePosition();

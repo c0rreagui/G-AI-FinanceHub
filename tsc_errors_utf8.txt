@@ -1,0 +1,47 @@
+﻿components/budgets/BudgetManager.tsx(39,16): error TS2339: Property 'deleted_at' does not exist on type 'Transaction'.
+components/layout/PageHeader.tsx(77,45): error TS2322: Type '{ label: string; path?: string; active?: boolean; }' is not assignable to type 'Key'.
+components/layout/PageHeader.tsx(78,39): error TS2322: Type '{ label: string; path?: string; active?: boolean; }' is not assignable to type 'ReactNode'.
+components/settings/AppearanceSettings.tsx(12,9): error TS2339: Property 'greetingName' does not exist on type 'ThemeContextType'.
+components/settings/AppearanceSettings.tsx(12,23): error TS2339: Property 'setGreetingName' does not exist on type 'ThemeContextType'.
+components/transactions/TrashDialog.tsx(26,11): error TS2339: Property 'deletedTransactions' does not exist on type 'DashboardDataContextType'.
+components/transactions/TrashDialog.tsx(26,32): error TS2339: Property 'restoreTransaction' does not exist on type 'DashboardDataContextType'.
+components/transactions/TrashDialog.tsx(26,52): error TS2339: Property 'permanentDeleteTransaction' does not exist on type 'DashboardDataContextType'.
+components/views/BudgetsView.tsx(10,41): error TS2304: Cannot find name 'setCurrentView'.
+components/views/BudgetsView.tsx(11,17): error TS2322: Type 'Element' is not assignable to type 'ElementType<any, keyof IntrinsicElements>'.
+components/views/BudgetsView.tsx(14,31): error TS2322: Type 'string' is not assignable to type '{ label: string; path?: string; active?: boolean; }'.
+components/views/BudgetsView.tsx(14,45): error TS2322: Type 'string' is not assignable to type '{ label: string; path?: string; active?: boolean; }'.
+components/views/DebtsView.tsx(99,41): error TS2304: Cannot find name 'setCurrentView'.
+components/views/DebtsView.tsx(102,31): error TS2322: Type 'string' is not assignable to type '{ label: string; path?: string; active?: boolean; }'.
+components/views/DebtsView.tsx(102,45): error TS2322: Type 'string' is not assignable to type '{ label: string; path?: string; active?: boolean; }'.
+components/views/DevToolsView.tsx(138,17): error TS2322: Type 'Element' is not assignable to type 'ElementType<any, keyof IntrinsicElements>'.
+components/views/GoalsView.tsx(36,45): error TS2304: Cannot find name 'setCurrentView'.
+components/views/GoalsView.tsx(39,35): error TS2322: Type 'string' is not assignable to type '{ label: string; path?: string; active?: boolean; }'.
+components/views/GoalsView.tsx(39,49): error TS2322: Type 'string' is not assignable to type '{ label: string; path?: string; active?: boolean; }'.
+components/views/GoalsView.tsx(48,41): error TS2304: Cannot find name 'setCurrentView'.
+components/views/GoalsView.tsx(51,31): error TS2322: Type 'string' is not assignable to type '{ label: string; path?: string; active?: boolean; }'.
+components/views/GoalsView.tsx(51,45): error TS2322: Type 'string' is not assignable to type '{ label: string; path?: string; active?: boolean; }'.
+components/views/HomeDashboardView.tsx(282,28): error TS2339: Property 'deleted_at' does not exist on type 'Transaction'.
+components/views/InsightsView.tsx(100,41): error TS2304: Cannot find name 'setCurrentView'.
+components/views/InsightsView.tsx(103,31): error TS2322: Type 'string' is not assignable to type '{ label: string; path?: string; active?: boolean; }'.
+components/views/InsightsView.tsx(103,45): error TS2322: Type 'string' is not assignable to type '{ label: string; path?: string; active?: boolean; }'.
+components/views/InvestmentsView.tsx(47,37): error TS2304: Cannot find name 'setCurrentView'.
+components/views/InvestmentsView.tsx(50,11): error TS2322: Type '{ setCurrentView: any; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; title: string; subtitle: string; }' is not assignable to type 'IntrinsicAttributes & PageHeaderProps'.
+  Property 'subtitle' does not exist on type 'IntrinsicAttributes & PageHeaderProps'.
+components/views/SchedulingView.tsx(153,41): error TS2304: Cannot find name 'setCurrentView'.
+components/views/SchedulingView.tsx(157,31): error TS2322: Type 'string' is not assignable to type '{ label: string; path?: string; active?: boolean; }'.
+components/views/SchedulingView.tsx(157,45): error TS2322: Type 'string' is not assignable to type '{ label: string; path?: string; active?: boolean; }'.
+components/views/SettingsView.tsx(63,33): error TS2304: Cannot find name 'setCurrentView'.
+components/views/SettingsView.tsx(64,31): error TS2322: Type 'string' is not assignable to type '{ label: string; path?: string; active?: boolean; }'.
+components/views/SettingsView.tsx(64,45): error TS2322: Type 'string' is not assignable to type '{ label: string; path?: string; active?: boolean; }'.
+components/views/SocialView.tsx(37,41): error TS2304: Cannot find name 'setCurrentView'.
+components/views/SocialView.tsx(40,17): error TS2322: Type '{ setCurrentView: any; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; title: string; subtitle: string; }' is not assignable to type 'IntrinsicAttributes & PageHeaderProps'.
+  Property 'subtitle' does not exist on type 'IntrinsicAttributes & PageHeaderProps'.
+components/views/ToolsView.tsx(26,99): error TS2322: Type 'string' is not assignable to type '{ label: string; path?: string; active?: boolean; }'.
+components/views/ToolsView.tsx(26,113): error TS2322: Type 'string' is not assignable to type '{ label: string; path?: string; active?: boolean; }'.
+components/views/TransactionsView.tsx(165,31): error TS2322: Type 'string' is not assignable to type '{ label: string; path?: string; active?: boolean; }'.
+components/views/TransactionsView.tsx(165,45): error TS2322: Type 'string' is not assignable to type '{ label: string; path?: string; active?: boolean; }'.
+hooks/useDashboardData.tsx(1911,24): error TS2552: Cannot find name 'deletedTransactions'. Did you mean 'deleteTransaction'?
+hooks/useDashboardData.tsx(1929,24): error TS2552: Cannot find name 'deletedTransactions'. Did you mean 'deleteTransaction'?
+hooks/useDashboardData.tsx(1996,9): error TS1117: An object literal cannot have multiple properties with the same name.
+hooks/useDashboardData.tsx(1997,9): error TS1117: An object literal cannot have multiple properties with the same name.
+

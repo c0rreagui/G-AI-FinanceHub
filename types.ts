@@ -49,7 +49,6 @@ export interface Transaction extends Omit<TransactionRow, 'type' | 'starred' | '
   transfer_id?: string | null;
   from_account_id?: string | null;
   to_account_id?: string | null;
-  deleted_at?: string | null;
 }
 
 export interface AuditLog {
@@ -252,33 +251,33 @@ export interface DashboardDataContextType {
 
   // Functions
   setMonthlyBudgetLimit: (limit: number) => Promise<void>;
-  addTransaction: (tx: Omit<Transaction, 'id' | 'category' | 'user_id' | 'category_id'> & { categoryId: string }) => Promise<boolean>;
-  updateTransaction: (tx: Omit<Transaction, 'category' | 'user_id' | 'category_id'> & { categoryId: string }) => Promise<boolean>;
-  addTransfer: (fromAccountId: string, toAccountId: string, amount: number, description: string, date: string, notes?: string) => Promise<boolean>;
-  deleteTransaction: (id: string) => Promise<boolean>;
-  updateTransactionsCategory: (transactionIds: string[], newCategoryId: string) => Promise<boolean>;
+  addTransaction: (tx: Omit<Transaction, 'id' | 'category' | 'user_id' | 'category_id'> & { categoryId: string }) => Promise<boolean | null>;
+  updateTransaction: (tx: Omit<Transaction, 'category' | 'user_id' | 'category_id'> & { categoryId: string }) => Promise<boolean | null>;
+  addTransfer: (fromAccountId: string, toAccountId: string, amount: number, description: string, date: string, notes?: string) => Promise<boolean | null>;
+  deleteTransaction: (id: string) => Promise<boolean | null>;
+  updateTransactionsCategory: (transactionIds: string[], newCategoryId: string) => Promise<boolean | null>;
   bulkUpdateTransactions: (ids: string[], updates: Partial<Transaction>) => Promise<boolean | null>;
   bulkDeleteTransactions: (ids: string[]) => Promise<boolean | null>;
   checkForDuplicates: (transaction: Partial<Transaction>) => Transaction[];
 
   addGoal: (goal: Omit<Goal, 'id' | 'current_amount' | 'status' | 'user_id' | 'target_amount' | 'deadline'> & { targetAmount: number; deadline: string; }) => Promise<Goal | null>;
-  updateGoalValue: (goalId: string, amount: number) => Promise<boolean>;
-  deleteGoal: (id: string) => Promise<boolean>;
+  updateGoalValue: (goalId: string, amount: number) => Promise<boolean | null>;
+  deleteGoal: (id: string) => Promise<boolean | null>;
 
   addDebt: (debt: Omit<Debt, 'id' | 'paid_amount' | 'status' | 'user_id' | 'total_amount' | 'interest_rate'> & { totalAmount: number; interestRate: number }) => Promise<Debt | null>;
-  addPaymentToDebt: (debtId: string, amount: number) => Promise<boolean>;
-  deleteDebt: (id: string) => Promise<boolean>;
+  addPaymentToDebt: (debtId: string, amount: number) => Promise<boolean | null>;
+  deleteDebt: (id: string) => Promise<boolean | null>;
 
   addInvestment: (investment: NewInvestment) => Promise<Investment | null>;
-  deleteInvestment: (id: string) => Promise<boolean>;
+  deleteInvestment: (id: string) => Promise<boolean | null>;
 
   addBudget: (budget: Omit<Budget, 'id' | 'created_at' | 'updated_at' | 'user_id'>) => Promise<Budget | null>;
-  updateBudget: (budget: Partial<Budget> & { id: string }) => Promise<boolean>;
-  deleteBudget: (id: string) => Promise<boolean>;
+  updateBudget: (budget: Partial<Budget> & { id: string }) => Promise<boolean | null>;
+  deleteBudget: (id: string) => Promise<boolean | null>;
 
-  addScheduledTransaction: (transaction: Omit<ScheduledTransaction, 'id' | 'category' | 'next_due_date' | 'user_id' | 'category_id' | 'start_date'> & { categoryId: string; startDate: string }) => Promise<boolean>;
-  updateScheduledTransaction: (transaction: Omit<ScheduledTransaction, 'category' | 'user_id' | 'category_id' | 'start_date'> & { categoryId: string; startDate: string } & { id: string }) => Promise<boolean>;
-  deleteScheduledTransaction: (id: string) => Promise<boolean>;
+  addScheduledTransaction: (transaction: Omit<ScheduledTransaction, 'id' | 'category' | 'next_due_date' | 'user_id' | 'category_id' | 'start_date'> & { categoryId: string; startDate: string }) => Promise<boolean | null>;
+  updateScheduledTransaction: (transaction: Omit<ScheduledTransaction, 'category' | 'user_id' | 'category_id' | 'start_date'> & { categoryId: string; startDate: string } & { id: string }) => Promise<boolean | null>;
+  deleteScheduledTransaction: (id: string) => Promise<boolean | null>;
 
   completeMission: (missionId: string) => void;
   clearError: () => void;
@@ -292,12 +291,9 @@ export interface DashboardDataContextType {
   addMockInvestments: (count: number) => Promise<void>;
   clearTable: (tableName: 'transactions' | 'goals' | 'debts' | 'scheduled_transactions') => Promise<void>;
   forceError: () => Promise<void>;
-  toggleTransactionStar: (id: string) => Promise<boolean>;
-  restoreTransaction: (id: string) => Promise<boolean>;
-  permanentDeleteTransaction: (id: string) => Promise<boolean>;
-  mergeTransactions: (ids: string[], targetDetails: Partial<Transaction>) => Promise<boolean>;
-  cloneMonth: (sourceDate: Date, targetDate: Date) => Promise<boolean>;
-  deletedTransactions: Transaction[];
+  toggleTransactionStar: (id: string) => Promise<boolean | null>;
+  mergeTransactions: (ids: string[], targetDetails: Partial<Transaction>) => Promise<boolean | null>;
+  cloneMonth: (sourceDate: Date, targetDate: Date) => Promise<boolean | null>;
   auditLogs: AuditLog[];
   logAction: (action: 'create' | 'update' | 'delete' | 'restore' | 'permanent_delete', entity: 'transaction' | 'goal' | 'debt' | 'scheduled_transaction', entityId: string, details: string) => Promise<void>;
 }

@@ -127,22 +127,22 @@ const AppContent: React.FC = () => {
         viewComponent = <TransactionsView setCurrentView={setCurrentView} />;
         break;
       case 'insights':
-        viewComponent = <InsightsView />;
+        viewComponent = <InsightsView setCurrentView={setCurrentView} />;
         break;
       case 'goals':
-        viewComponent = <GoalsView />;
+        viewComponent = <GoalsView setCurrentView={setCurrentView} />;
         break;
       case 'debts':
-        viewComponent = <DebtsView />;
+        viewComponent = <DebtsView setCurrentView={setCurrentView} />;
         break;
       case 'scheduling':
-        viewComponent = <SchedulingView />;
+        viewComponent = <SchedulingView setCurrentView={setCurrentView} />;
         break;
       case 'tools':
         viewComponent = <ToolsView setCurrentView={setCurrentView} />;
         break;
       case 'settings':
-        viewComponent = <SettingsView />;
+        viewComponent = <SettingsView setCurrentView={setCurrentView} />;
         break;
       case 'devtools':
         viewComponent = <DevToolsView setCurrentView={setCurrentView} />;
@@ -151,13 +151,13 @@ const AppContent: React.FC = () => {
         viewComponent = <DesignSystemView />;
         break;
       case 'social':
-        viewComponent = <SocialView />;
+        viewComponent = <SocialView setCurrentView={setCurrentView} />;
         break;
       case 'investments':
-        viewComponent = <InvestmentsView />;
+        viewComponent = <InvestmentsView setCurrentView={setCurrentView} />;
         break;
       case 'budgets':
-        viewComponent = <BudgetsView />;
+        viewComponent = <BudgetsView setCurrentView={setCurrentView} />;
         break;
     }
 

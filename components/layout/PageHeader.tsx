@@ -9,9 +9,16 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/Avatar';
 import { MicrophoneButton } from '../ui/MicrophoneButton';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
 import { FamilySwitcher } from '../dashboard/FamilySwitcher';
+import { ViewType } from '../../types';
 
-unreadCount ?: number;
-setCurrentView ?: (view: ViewType) => void;
+interface PageHeaderProps {
+    icon?: React.ElementType;
+    title: string;
+    breadcrumbs?: { label: string; path?: string; active?: boolean }[];
+    actions?: React.ReactNode;
+    children?: React.ReactNode;
+    unreadCount?: number;
+    setCurrentView?: (view: ViewType) => void;
 }
 
 export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs = [], actions, children, unreadCount: propUnreadCount, setCurrentView }) => {
@@ -67,8 +74,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ icon, title, breadcrumbs
                 {breadcrumbs.length > 0 && (
                     <div className="mt-2 flex items-center gap-x-2 text-sm text-muted-foreground">
                         {breadcrumbs.map((crumb, index) => (
-                            <React.Fragment key={crumb}>
-                                <span>{crumb}</span>
+                            <React.Fragment key={crumb.label}>
+                                <span className={crumb.active ? 'text-primary font-medium' : ''}>{crumb.label}</span>
                                 {index < breadcrumbs.length - 1 && (
                                     <ChevronDown className="w-4 h-4 text-muted-foreground -rotate-90" />
                                 )}

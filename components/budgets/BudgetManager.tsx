@@ -32,11 +32,10 @@ export const BudgetManager: React.FC = () => {
         const currentMonth = now.getMonth();
         const currentYear = now.getFullYear();
 
-        const currentMonthExpenses = transactions.filter(t => 
-            t.type === 'despesa' && 
-            new Date(t.date).getMonth() === currentMonth && 
-            new Date(t.date).getFullYear() === currentYear &&
-            !t.deleted_at
+        const currentMonthExpenses = transactions.filter(t =>
+            t.type === 'despesa' &&
+            new Date(t.date).getMonth() === currentMonth &&
+            new Date(t.date).getFullYear() === currentYear
         );
 
         const spendingByCategory = currentMonthExpenses.reduce((acc, t) => {
@@ -49,7 +48,7 @@ export const BudgetManager: React.FC = () => {
             const category = categories.find(c => c.id === budget.category_id);
             const spent = spendingByCategory[budget.category_id] || 0;
             const percentage = Math.min(100, (spent / budget.amount) * 100);
-            
+
             return {
                 ...budget,
                 spent,
@@ -104,7 +103,7 @@ export const BudgetManager: React.FC = () => {
                     </h2>
                     <p className="text-muted-foreground">Planeje seus gastos e controle suas finanças.</p>
                 </div>
-                <UiDialog open={isAddDialogOpen} onOpenChange={(open) => { setIsAddDialogOpen(open); if(!open) setEditingBudget(null); }}>
+                <UiDialog open={isAddDialogOpen} onOpenChange={(open) => { setIsAddDialogOpen(open); if (!open) setEditingBudget(null); }}>
                     <DialogTrigger asChild>
                         <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
                             <Plus className="w-4 h-4 mr-2" /> Novo Orçamento
@@ -130,13 +129,13 @@ export const BudgetManager: React.FC = () => {
                                             {categories.filter(c => !budgets.some(b => b.category_id === c.id)).map(category => {
                                                 const iconStyle = { color: category.color || 'currentColor' };
                                                 return (
-                                                <SelectItem key={category.id} value={category.id}>
-                                                    <div className="flex items-center gap-2">
-                                                        <span 
-                                                            {...{ style: iconStyle }}>{category.icon && React.createElement(category.icon, { size: 16 })}</span>
-                                                        {category.name}
-                                                    </div>
-                                                </SelectItem>
+                                                    <SelectItem key={category.id} value={category.id}>
+                                                        <div className="flex items-center gap-2">
+                                                            <span
+                                                                {...{ style: iconStyle }}>{category.icon && React.createElement(category.icon, { size: 16 })}</span>
+                                                            {category.name}
+                                                        </div>
+                                                    </SelectItem>
                                                 );
                                             })}
                                             {categories.filter(c => !budgets.some(b => b.category_id === c.id)).length === 0 && (
@@ -148,13 +147,13 @@ export const BudgetManager: React.FC = () => {
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="amount">Limite Mensal (R$)</Label>
-                                <Input 
-                                    id="amount" 
-                                    name="amount" 
-                                    type="number" 
-                                    step="0.01" 
-                                    defaultValue={editingBudget?.amount} 
-                                    required 
+                                <Input
+                                    id="amount"
+                                    name="amount"
+                                    type="number"
+                                    step="0.01"
+                                    defaultValue={editingBudget?.amount}
+                                    required
                                     placeholder="Ex: 500.00"
                                 />
                             </div>
@@ -180,66 +179,66 @@ export const BudgetManager: React.FC = () => {
                                 const stripeStyle = { backgroundColor: budget.categoryColor || 'transparent' };
                                 const iconContainerStyle = { backgroundColor: `${budget.categoryColor}20`, color: budget.categoryColor };
                                 const progressBarStyle = { width: `${Math.min(budget.percentage, 100)}%` };
-                                
-                                return (
-                                <Card className="relative overflow-hidden border-none shadow-md hover:shadow-lg transition-shadow bg-card">
-                                <div 
-                                    className="absolute top-0 left-0 w-1 h-full" 
-                                    {...{ style: stripeStyle }} 
-                                />
-                                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                                    <div className="flex items-center gap-2">
-                                        <div className="p-2 rounded-full" 
-                                            {...{ style: iconContainerStyle }}>
-                                            {budget.categoryIcon && React.createElement(budget.categoryIcon, { size: 20 })}
-                                        </div>
-                                        <div>
-                                            <CardTitle className="text-base font-semibold">{budget.categoryName}</CardTitle>
-                                            <CardDescription className="text-xs">Mensal</CardDescription>
-                                        </div>
-                                    </div>
-                                    <div className="flex gap-1">
-                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" onClick={() => { setEditingBudget(budget); setIsAddDialogOpen(true); }}>
-                                            <Edit2 className="w-4 h-4" />
-                                        </Button>
-                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-red-500" onClick={() => handleDelete(budget.id)}>
-                                            <Trash2 className="w-4 h-4" />
-                                        </Button>
-                                    </div>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="space-y-3">
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-muted-foreground">Gasto: <span className={budget.spent > budget.amount ? 'text-red-500 font-bold' : 'text-foreground'}>{formatCurrency(budget.spent)}</span></span>
-                                            <span className="font-medium">{formatCurrency(budget.amount)}</span>
-                                        </div>
-                                        <div className="relative h-2 w-full bg-secondary rounded-full overflow-hidden">
-                                            <div 
-                                                className={`absolute top-0 left-0 h-full transition-all duration-500 ${getProgressColor(budget.percentage)}`} 
-                                                {...{ style: progressBarStyle }}
-                                            />
-                                        </div>
-                                        {budget.percentage >= 80 && (
-                                            <div className={`flex items-center gap-1 text-xs ${budget.percentage >= 100 ? 'text-red-500 font-bold' : 'text-amber-500'}`}>
-                                                <AlertTriangle className="w-3 h-3" />
-                                                {budget.percentage >= 100 ? 'Orçamento estourado!' : 'Atenção: Limite próximo.'}
-                                            </div>
-                                        )}
-                                        {budget.percentage < 80 && (
-                                            <div className="text-xs text-muted-foreground">
-                                                Restam {formatCurrency(Math.max(0, budget.amount - budget.spent))}
-                                            </div>
-                                        )}
 
-                                    </div>
-                                </CardContent>
-                            </Card>
-                            );
+                                return (
+                                    <Card className="relative overflow-hidden border-none shadow-md hover:shadow-lg transition-shadow bg-card">
+                                        <div
+                                            className="absolute top-0 left-0 w-1 h-full"
+                                            {...{ style: stripeStyle }}
+                                        />
+                                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                                            <div className="flex items-center gap-2">
+                                                <div className="p-2 rounded-full"
+                                                    {...{ style: iconContainerStyle }}>
+                                                    {budget.categoryIcon && React.createElement(budget.categoryIcon, { size: 20 })}
+                                                </div>
+                                                <div>
+                                                    <CardTitle className="text-base font-semibold">{budget.categoryName}</CardTitle>
+                                                    <CardDescription className="text-xs">Mensal</CardDescription>
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-1">
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" onClick={() => { setEditingBudget(budget); setIsAddDialogOpen(true); }}>
+                                                    <Edit2 className="w-4 h-4" />
+                                                </Button>
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-red-500" onClick={() => handleDelete(budget.id)}>
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
+                                            </div>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <div className="space-y-3">
+                                                <div className="flex justify-between text-sm">
+                                                    <span className="text-muted-foreground">Gasto: <span className={budget.spent > budget.amount ? 'text-red-500 font-bold' : 'text-foreground'}>{formatCurrency(budget.spent)}</span></span>
+                                                    <span className="font-medium">{formatCurrency(budget.amount)}</span>
+                                                </div>
+                                                <div className="relative h-2 w-full bg-secondary rounded-full overflow-hidden">
+                                                    <div
+                                                        className={`absolute top-0 left-0 h-full transition-all duration-500 ${getProgressColor(budget.percentage)}`}
+                                                        {...{ style: progressBarStyle }}
+                                                    />
+                                                </div>
+                                                {budget.percentage >= 80 && (
+                                                    <div className={`flex items-center gap-1 text-xs ${budget.percentage >= 100 ? 'text-red-500 font-bold' : 'text-amber-500'}`}>
+                                                        <AlertTriangle className="w-3 h-3" />
+                                                        {budget.percentage >= 100 ? 'Orçamento estourado!' : 'Atenção: Limite próximo.'}
+                                                    </div>
+                                                )}
+                                                {budget.percentage < 80 && (
+                                                    <div className="text-xs text-muted-foreground">
+                                                        Restam {formatCurrency(Math.max(0, budget.amount - budget.spent))}
+                                                    </div>
+                                                )}
+
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                );
                             })()}
                         </motion.div>
                     ))}
                 </AnimatePresence>
-                
+
                 {budgetAnalysis.length === 0 && (
                     <div className="col-span-full flex flex-col items-center justify-center p-8 bg-muted/20 border-2 border-dashed rounded-lg">
                         <div className="p-4 bg-muted rounded-full mb-4">

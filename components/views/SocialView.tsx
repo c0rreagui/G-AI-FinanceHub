@@ -9,7 +9,13 @@ import { ActivityFeed } from '../social/ActivityFeed';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '../ui/Card';
 
-export const SocialView: React.FC = () => {
+import { ViewType } from '../../types';
+
+interface SocialViewProps {
+    setCurrentView: (view: ViewType) => void;
+}
+
+export const SocialView: React.FC<SocialViewProps> = ({ setCurrentView }) => {
     const { family, members, createFamily, leaveFamily, joinFamily, loading } = useSocial();
     const [familyName, setFamilyName] = useState('');
     const [inviteToken, setInviteToken] = useState('');
@@ -37,7 +43,7 @@ export const SocialView: React.FC = () => {
             <PageHeader setCurrentView={setCurrentView}
                 icon={Users}
                 title="Família & Social"
-                subtitle="Gerencie seu grupo familiar e compartilhamento"
+                breadcrumbs={[{ label: 'FinanceHub' }, { label: 'Social', active: true }]}
             />
 
             <div className="p-6 max-w-4xl mx-auto w-full space-y-8">

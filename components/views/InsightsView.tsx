@@ -7,15 +7,15 @@ import { EmptyState } from '../ui/EmptyState';
 import { Lightbulb, Download } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { exportToCSV } from '../../utils/export';
-import { 
-    ResponsiveContainer, 
-    BarChart, 
-    Bar, 
-    XAxis, 
-    YAxis, 
-    CartesianGrid, 
-    Tooltip, 
-    Legend 
+import {
+    ResponsiveContainer,
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Legend
 } from 'recharts';
 import { InvestmentSuggestions } from '../dashboard/InvestmentSuggestions';
 
@@ -40,13 +40,13 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
         const containerStyle = { borderColor: payload[0].color };
         return (
-             
+
             <div className="bg-background/95 backdrop-blur-sm border rounded-xl shadow-xl p-4 min-w-[200px]" {...{ style: containerStyle }}>
                 <p className="font-bold text-white mb-2">{label}</p>
                 {payload.map((entry, index) => {
                     const entryStyle = { color: entry.color };
                     return (
-                        <p key={entry.name || index} className="text-sm font-medium" 
+                        <p key={entry.name || index} className="text-sm font-medium"
                             {...{ style: entryStyle }}>
                             {entry.name}: {formatCurrency(entry.value)}
                         </p>
@@ -58,7 +58,7 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
     return null;
 };
 
-const InsightsContent: React.FC = () => {
+const InsightsContent: React.FC<{ setCurrentView: (view: ViewType) => void }> = ({ setCurrentView }) => {
     const { transactions: allTransactions, categories, loading } = useDashboardData();
     const { dateRange, setDateRange, filterTransactions } = useReport();
     const isMobile = useMediaQuery('(max-width: 768px)');
@@ -97,19 +97,19 @@ const InsightsContent: React.FC = () => {
 
     return (
         <>
-            <PageHeader setCurrentView={setCurrentView} 
-                icon={Lightbulb} 
-                title="Insights e Análises" 
-                breadcrumbs={['FinanceHub', 'Insights']}
+            <PageHeader setCurrentView={setCurrentView}
+                icon={Lightbulb}
+                title="Insights e Análises"
+                breadcrumbs={[{ label: 'FinanceHub' }, { label: 'Insights', active: true }]}
             >
                 <div className="w-full md:w-auto mt-4 md:mt-0 flex flex-col md:flex-row gap-3">
-                    <DateRangePicker 
-                        startDate={dateRange.startDate} 
-                        endDate={dateRange.endDate} 
-                        onChange={(start, end) => setDateRange({ startDate: start, endDate: end })} 
+                    <DateRangePicker
+                        startDate={dateRange.startDate}
+                        endDate={dateRange.endDate}
+                        onChange={(start, end) => setDateRange({ startDate: start, endDate: end })}
                     />
-                    <Button 
-                        variant="outline" 
+                    <Button
+                        variant="outline"
                         onClick={handleExport}
                         disabled={transactions.length === 0}
                         className="w-full md:w-auto"
@@ -125,11 +125,11 @@ const InsightsContent: React.FC = () => {
                 </div>
             ) : (
                 <div className="mt-6 flex-grow flex flex-col overflow-y-auto pr-2 pb-20 space-y-6">
-                     {transactions.length > 0 ? (
+                    {transactions.length > 0 ? (
                         <>
                             <InvestmentSuggestions />
                             <BalanceEvolutionChart transactions={allTransactions} dateRange={dateRange} />
-                            
+
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="h-[400px]">
                                     <div className="h-full bg-card rounded-xl border border-white/5 p-4 flex flex-col">
@@ -137,38 +137,38 @@ const InsightsContent: React.FC = () => {
                                         <CategoryBreakdownChart transactions={transactions} categories={categories} />
                                     </div>
                                 </div>
-                                
+
                                 {categoryAnalysis.length > 0 && (
                                     <div className="h-[400px]">
                                         <div className="h-full bg-card rounded-xl border border-white/5 p-4 flex flex-col">
                                             <h3 className="text-lg font-semibold text-white mb-4">Fluxo por Categoria</h3>
                                             <ResponsiveContainer width="100%" height="100%">
-                                                <BarChart 
-                                                    data={categoryAnalysis} 
+                                                <BarChart
+                                                    data={categoryAnalysis}
                                                     layout="vertical"
                                                     margin={{ top: 5, right: isMobile ? 5 : 30, left: 20, bottom: 20 }}
                                                     barCategoryGap="20%"
                                                 >
                                                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" horizontal={false} />
-                                                    <XAxis 
+                                                    <XAxis
                                                         type="number"
-                                                        tick={{ fill: '#d1d5db', fontSize: 12 }} 
+                                                        tick={{ fill: '#d1d5db', fontSize: 12 }}
                                                         stroke="rgba(255, 255, 255, 0.2)"
                                                         tickFormatter={(value) => formatCurrency(Number(value))}
                                                         axisLine={false}
                                                         tickLine={false}
                                                     />
-                                                    <YAxis 
-                                                        type="category" 
-                                                        dataKey="name" 
-                                                        tick={{ fill: '#d1d5db', fontSize: 12 }} 
+                                                    <YAxis
+                                                        type="category"
+                                                        dataKey="name"
+                                                        tick={{ fill: '#d1d5db', fontSize: 12 }}
                                                         stroke="rgba(255, 255, 255, 0.2)"
                                                         width={isMobile ? 100 : 120}
                                                         tickLine={false}
                                                         axisLine={false}
                                                     />
                                                     <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }} />
-                                                    <Legend 
+                                                    <Legend
                                                         wrapperStyle={{ bottom: 0, left: 20 }}
                                                         iconType="circle"
                                                         formatter={(value) => <span className="text-gray-300 capitalize">{value}</span>}
@@ -187,8 +187,8 @@ const InsightsContent: React.FC = () => {
                             <EmptyState
                                 icon={Lightbulb}
                                 title={allTransactions.length === 0 ? "Sem Dados para Análise" : "Nenhum dado neste período"}
-                                description={allTransactions.length === 0 
-                                    ? "Adicione algumas transações para começar a gerar insights sobre seus hábitos financeiros." 
+                                description={allTransactions.length === 0
+                                    ? "Adicione algumas transações para começar a gerar insights sobre seus hábitos financeiros."
                                     : "Tente selecionar um intervalo de datas diferente para visualizar seus insights."}
                             />
                         </div>
@@ -199,10 +199,16 @@ const InsightsContent: React.FC = () => {
     );
 };
 
-export const InsightsView: React.FC = () => {
+import { ViewType } from '../../types';
+
+interface InsightsViewProps {
+    setCurrentView: (view: ViewType) => void;
+}
+
+export const InsightsView: React.FC<InsightsViewProps> = ({ setCurrentView }) => {
     return (
         <ReportProvider>
-            <InsightsContent />
+            <InsightsContent setCurrentView={setCurrentView} />
         </ReportProvider>
     );
 };

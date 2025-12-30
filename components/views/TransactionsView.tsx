@@ -11,7 +11,6 @@ import { TransactionsTable } from '../transactions/TransactionsTable';
 import { FilterBar } from '../transactions/FilterBar';
 import { BulkActionsBar } from '../transactions/BulkActionsBar';
 import { SmartReclassificationDialog } from '../transactions/SmartReclassificationDialog';
-import { TrashDialog } from '../transactions/TrashDialog';
 import { AuditLogDialog } from '../dashboard/AuditLogDialog';
 import { History } from 'lucide-react';
 import { groupTransactionsByDate, GroupBy } from '../../utils/dateGrouping';
@@ -52,7 +51,6 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
     const [groupBy, setGroupBy] = useState<GroupBy>('none');
 
     const [isReclassifyOpen, setIsReclassifyOpen] = useState(false);
-    const [isTrashOpen, setIsTrashOpen] = useState(false);
     const [isAuditLogOpen, setIsAuditLogOpen] = useState(false);
 
     const filteredTransactions = useMemo(() => {
@@ -164,16 +162,13 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
             <PageHeader
                 icon={ArrowLeftRight}
                 title="Transações"
-                breadcrumbs={['FinanceHub', 'Transações']}
+                breadcrumbs={[{ label: 'FinanceHub' }, { label: 'Transações', active: true }]}
                 setCurrentView={setCurrentView}
                 actions={
                     <Flex gap="sm">
                         <Button variant="outline" onClick={() => setIsReclassifyOpen(true)} title="Reclassificação Inteligente">
                             <FolderSync className="w-4 h-4 mr-2" />
                             Reclassificar
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => setIsTrashOpen(true)} title="Lixeira">
-                            <Trash2 className="w-5 h-5 text-muted-foreground hover:text-red-500 transition-colors" />
                         </Button>
                         <Button variant="ghost" size="icon" onClick={() => setIsAuditLogOpen(true)} title="Histórico de Alterações">
                             <History className="w-5 h-5 text-muted-foreground hover:text-primary transition-colors" />
@@ -284,11 +279,6 @@ export const TransactionsView: React.FC<TransactionsViewProps> = ({ setCurrentVi
                 onSuccess={() => {
                     // Optional: refresh data if needed, but bulkUpdateTransactions already does it
                 }}
-            />
-
-            <TrashDialog
-                open={isTrashOpen}
-                onOpenChange={setIsTrashOpen}
             />
 
             <AuditLogDialog

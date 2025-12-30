@@ -6,10 +6,9 @@ import { useTheme, themes } from '../../contexts/ThemeContext';
 import { Palette, Monitor, User, Image as ImageIcon, Layout, Sun, Moon } from 'lucide-react';
 
 export const AppearanceSettings: React.FC = () => {
-    const { 
-        currentTheme, setTheme, 
-        zenMode, toggleZenMode, 
-        greetingName, setGreetingName,
+    const {
+        currentTheme, setTheme,
+        zenMode, toggleZenMode,
         wallpaper, setWallpaper,
         density, setDensity,
         hiddenModules, toggleModuleVisibility,
@@ -40,11 +39,10 @@ export const AppearanceSettings: React.FC = () => {
                             <button
                                 key={theme.name}
                                 onClick={() => setTheme(theme.name)}
-                                className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
-                                    currentTheme.name === theme.name 
-                                        ? 'border-primary bg-primary/10' 
+                                className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${currentTheme.name === theme.name
+                                        ? 'border-primary bg-primary/10'
                                         : 'border-transparent bg-muted/50 hover:bg-muted'
-                                }`}
+                                    }`}
                             >
                                 <div className="flex gap-2">
                                     <div className="w-6 h-6 rounded-full" style={{ backgroundColor: `hsl(${theme.primary})` }} />
@@ -70,22 +68,20 @@ export const AppearanceSettings: React.FC = () => {
                     <div className="grid grid-cols-2 gap-4">
                         <button
                             onClick={() => mode === 'dark' && toggleMode()}
-                            className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
-                                mode === 'light'
+                            className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${mode === 'light'
                                     ? 'border-primary bg-primary/10'
                                     : 'border-transparent bg-muted/50 hover:bg-muted'
-                            }`}
+                                }`}
                         >
                             <Sun className="w-8 h-8 text-yellow-500" />
                             <span className="text-sm font-medium text-foreground">Claro</span>
                         </button>
                         <button
                             onClick={() => mode === 'light' && toggleMode()}
-                            className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
-                                mode === 'dark'
+                            className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${mode === 'dark'
                                     ? 'border-primary bg-primary/10'
                                     : 'border-transparent bg-muted/50 hover:bg-muted'
-                            }`}
+                                }`}
                         >
                             <Moon className="w-8 h-8 text-indigo-400" />
                             <span className="text-sm font-medium text-foreground">Escuro</span>
@@ -103,13 +99,10 @@ export const AppearanceSettings: React.FC = () => {
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-muted-foreground">Como devemos te chamar?</label>
-                        <Input 
-                            value={greetingName} 
-                            onChange={(e) => setGreetingName(e.target.value)} 
-                            placeholder="Ex: Mestre, Chefe, Seu Nome..." 
-                        />
+                    <div className="p-4 bg-muted/30 rounded-xl border border-border/50">
+                        <p className="text-sm text-center text-muted-foreground">
+                            O seu nome agora é sincronizado automaticamente com o seu perfil do Google/Supabase.
+                        </p>
                     </div>
 
                     <div className="flex items-center justify-between p-4 bg-muted/50 rounded-xl">
@@ -120,8 +113,8 @@ export const AppearanceSettings: React.FC = () => {
                                 <p className="text-xs text-muted-foreground">Oculta detalhes e foca no essencial.</p>
                             </div>
                         </div>
-                        <Button 
-                            variant={zenMode ? "default" : "secondary"} 
+                        <Button
+                            variant={zenMode ? "default" : "secondary"}
                             onClick={toggleZenMode}
                         >
                             {zenMode ? 'Ativado' : 'Desativado'}
@@ -147,11 +140,10 @@ export const AppearanceSettings: React.FC = () => {
                                 <button
                                     key={d}
                                     onClick={() => setDensity(d)}
-                                    className={`p-3 rounded-lg border text-sm capitalize transition-all ${
-                                        density === d 
-                                            ? 'border-primary bg-primary/10 text-foreground' 
+                                    className={`p-3 rounded-lg border text-sm capitalize transition-all ${density === d
+                                            ? 'border-primary bg-primary/10 text-foreground'
                                             : 'border-border bg-muted/50 text-muted-foreground hover:bg-muted'
-                                    }`}
+                                        }`}
                                 >
                                     {d === 'compact' ? 'Compacto' : d === 'comfortable' ? 'Confortável' : 'Espaçoso'}
                                 </button>
@@ -201,9 +193,8 @@ export const AppearanceSettings: React.FC = () => {
                             <button
                                 key={idx}
                                 onClick={() => setWallpaper(wp.url)}
-                                className={`relative aspect-video rounded-lg overflow-hidden border-2 transition-all ${
-                                    wallpaper === wp.url ? 'border-primary' : 'border-transparent opacity-70 hover:opacity-100'
-                                }`}
+                                className={`relative aspect-video rounded-lg overflow-hidden border-2 transition-all ${wallpaper === wp.url ? 'border-primary' : 'border-transparent opacity-70 hover:opacity-100'
+                                    }`}
                             >
                                 {wp.url ? (
                                     <img src={wp.url} alt={wp.name} className="w-full h-full object-cover" />

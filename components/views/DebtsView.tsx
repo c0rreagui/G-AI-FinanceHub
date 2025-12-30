@@ -34,7 +34,7 @@ const DebtCard: React.FC<{ debt: Debt }> = ({ debt }) => {
     };
 
     return (
-        <motion.div 
+        <motion.div
             layout
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -70,14 +70,14 @@ const DebtCard: React.FC<{ debt: Debt }> = ({ debt }) => {
                     </Box>
                 </CardContent>
                 <CardFooter className="pt-2 flex justify-between">
-                    <Button 
-                        variant="ghost" 
-                        size="icon" 
+                    <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={handleDelete}
                         disabled={isMutating}
                         className="text-muted-foreground hover:text-destructive"
                     >
-                        <TrashIcon className="w-5 h-5"/>
+                        <TrashIcon className="w-5 h-5" />
                     </Button>
                     {!isPaid && (
                         <Button variant="default" onClick={() => openDialog('add-payment-to-debt', { debt })} size="sm" disabled={isMutating}>
@@ -90,24 +90,30 @@ const DebtCard: React.FC<{ debt: Debt }> = ({ debt }) => {
     );
 };
 
-export const DebtsView: React.FC = () => {
+import { ViewType } from '../../types';
+
+interface DebtsViewProps {
+    setCurrentView: (view: ViewType) => void;
+}
+
+export const DebtsView: React.FC<DebtsViewProps> = ({ setCurrentView }) => {
     const { debts, loading } = useDashboardData();
     const { openDialog } = useDialog();
 
     return (
         <Flex direction="col" className="h-full">
-            <PageHeader setCurrentView={setCurrentView} 
-                icon={TrendingDown} 
-                title="Dívidas" 
-                breadcrumbs={['FinanceHub', 'Dívidas']}
-                actions={<Button onClick={() => openDialog('add-debt')}><PlusCircle className="w-4 h-4 mr-2"/> Nova Dívida</Button>}
+            <PageHeader setCurrentView={setCurrentView}
+                icon={TrendingDown}
+                title="Dívidas"
+                breadcrumbs={[{ label: 'FinanceHub' }, { label: 'Dívidas', active: true }]}
+                actions={<Button onClick={() => openDialog('add-debt')}><PlusCircle className="w-4 h-4 mr-2" /> Nova Dívida</Button>}
             />
             {loading ? (
                 <GenericViewSkeleton />
             ) : (
                 <Box className="flex-grow overflow-y-auto pr-2">
                     {debts.length > 0 ? (
-                         <Grid cols={1} className="md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <Grid cols={1} className="md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {debts.map(debt => (
                                 <DebtCard key={debt.id} debt={debt} />
                             ))}
@@ -119,7 +125,7 @@ export const DebtsView: React.FC = () => {
                             description="Adicione suas dívidas, como empréstimos ou faturas de cartão, para gerenciá-las."
                         >
                             <Button onClick={() => openDialog('add-debt')}>
-                                <PlusCircle className="w-4 h-4 mr-2"/> Adicionar Dívida
+                                <PlusCircle className="w-4 h-4 mr-2" /> Adicionar Dívida
                             </Button>
                         </EmptyState>
                     )}
