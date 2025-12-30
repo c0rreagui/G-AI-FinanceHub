@@ -112,7 +112,7 @@ export function MultiSelect({
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div className="max-h-60 overflow-y-auto p-1 custom-scrollbar">
+        <div className="max-h-60 overflow-y-auto p-1 custom-scrollbar" role="listbox">
           {filteredOptions.length === 0 && (
             <div className="py-6 text-center text-sm text-muted-foreground">
               Nenhum resultado encontrado.
@@ -127,7 +127,7 @@ export function MultiSelect({
               )}
               onClick={() => handleSelect(option.value)}
               role="option"
-              aria-selected={selected.includes(option.value)}
+              aria-selected={selected.includes(option.value) ? "true" : "false"}
               tabIndex={0}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {

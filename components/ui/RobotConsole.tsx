@@ -90,18 +90,18 @@ export const RobotConsole: React.FC = () => {
                     }`}
             >
                 {/* Header */}
-                <div
-                    className="flex items-center justify-between p-2 border-b border-white/10 bg-white/5 rounded-t-lg cursor-pointer"
-                    onClick={() => setIsMinimized(!isMinimized)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            setIsMinimized(!isMinimized);
-                        }
-                    }}
-                >
-                    <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between p-2 border-b border-white/10 bg-white/5 rounded-t-lg">
+                    <div
+                        className="flex items-center gap-2 cursor-pointer hover:opacity-80"
+                        onClick={() => setIsMinimized(!isMinimized)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                setIsMinimized(!isMinimized);
+                            }
+                        }}
+                    >
                         <Activity className="w-4 h-4 animate-pulse text-green-500" />
                         <span className="font-bold">🤖 Robot Debug Console</span>
                     </div>

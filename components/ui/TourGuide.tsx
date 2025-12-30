@@ -62,6 +62,7 @@ export const TourGuide: React.FC<TourGuideProps> = ({ steps, isOpen, onClose }) 
         className="fixed inset-0 bg-black/50 z-[500]"
         onClick={onClose}
         role="button"
+        aria-label="Fechar tour"
         tabIndex={0}
         onKeyDown={(e) => {
           if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {

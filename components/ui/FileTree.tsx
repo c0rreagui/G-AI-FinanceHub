@@ -42,6 +42,7 @@ const FileTreeNode: React.FC<{ node: FileNode; level: number; onSelect?: (node: 
             handleToggle(e as any);
           }
         }}
+        // eslint-disable-next-line react/forbid-dom-props
         style={{ paddingLeft: `${level * 12 + 8}px` }}
       >
         <span className="mr-1 opacity-70">
