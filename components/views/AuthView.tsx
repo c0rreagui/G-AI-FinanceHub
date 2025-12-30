@@ -47,7 +47,7 @@ const PinInput: React.FC<{ pin: string; onPinChange: (pin: string) => void; hasE
                 {Array.from({ length: 4 }).map((_, index) => (
                     <div
                         key={index}
-                        className={`w-10 h-12 flex items-center justify-center text-2xl font-bold border-b-2 transition-colors duration-200 ${pin.length > index ? 'border-cyan-400 text-white' : 'border-gray-600'
+                        className={`w-10 h-12 flex items-center justify-center text-2xl font-bold rounded-lg transition-all duration-200 border ${pin.length > index ? 'border-cyan-500 bg-cyan-500/10 text-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.5)]' : 'border-white/10 bg-white/5 text-transparent'
                             }`}
                     >
                         {pin[index] ? '●' : ''}

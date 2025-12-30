@@ -8,10 +8,10 @@ export const GuestModeBanner: React.FC = () => {
   if (isDeveloper || !isGuest) return null;
 
   return (
-    <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 flex items-center justify-between shadow-md relative z-[100]">
+    <div className="fixed bottom-24 left-4 right-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-3 rounded-xl flex items-center justify-between shadow-lg z-[50] backdrop-blur-sm border border-white/10">
       <div className="flex items-center gap-2">
         <span className="font-medium text-sm">Modo Convidado</span>
-        <span className="text-xs opacity-80 hidden sm:inline">
+        <span className="text-xs opacity-80 hidden min-[380px]:inline">
           Seus dados são salvos apenas neste dispositivo.
         </span>
       </div>
