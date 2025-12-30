@@ -54,7 +54,7 @@ export class PenteFinoA11y {
             
             focusables.forEach((el, i) => {
                 const rect = el.getBoundingClientRect();
-                const tabIndex = parseInt(el.getAttribute('tabindex') || '0');
+                const tabIndex = Number.parseInt(el.getAttribute('tabindex') || '0');
                 
                 // Check for positive tabindex (anti-pattern)
                 if (tabIndex > 0) {
@@ -291,7 +291,7 @@ export class PenteFinoA11y {
             const issues: string[] = [];
             
             document.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(h => {
-                const level = parseInt(h.tagName.substring(1));
+                const level = Number.parseInt(h.tagName.substring(1));
                 const text = h.textContent?.trim().substring(0, 30) || '';
                 const headingIssues: string[] = [];
                 

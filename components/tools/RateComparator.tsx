@@ -10,11 +10,11 @@ export const RateComparator: React.FC = () => {
     const [days, setDays] = useState('365');
 
     const calculateNetReturn = (ratePercent: number, isTaxFree: boolean) => {
-        const grossRate = (ratePercent / 100) * (parseFloat(cdi) / 100);
+        const grossRate = (ratePercent / 100) * (Number.parseFloat(cdi) / 100);
         
         let taxRate = 0;
         if (!isTaxFree) {
-            const d = parseFloat(days);
+            const d = Number.parseFloat(days);
             if (d <= 180) taxRate = 0.225;
             else if (d <= 360) taxRate = 0.20;
             else if (d <= 720) taxRate = 0.175;
@@ -25,8 +25,8 @@ export const RateComparator: React.FC = () => {
         return netRate * 100;
     };
 
-    const cdbNet = calculateNetReturn(parseFloat(cdbRate), false);
-    const lciNet = calculateNetReturn(parseFloat(lciRate), true);
+    const cdbNet = calculateNetReturn(Number.parseFloat(cdbRate), false);
+    const lciNet = calculateNetReturn(Number.parseFloat(lciRate), true);
 
     const winner = cdbNet > lciNet ? 'CDB' : 'LCI/LCA';
     const difference = Math.abs(cdbNet - lciNet);

@@ -36,7 +36,7 @@ export const AddIncomeDrawer: React.FC<AddIncomeDrawerProps> = ({ isOpen, onClos
             return;
         }
         
-        const numericAmount = parseFloat(amount);
+        const numericAmount = Number.parseFloat(amount);
         if (Number.isNaN(numericAmount) || numericAmount <= 0) {
             showToast('Valor inválido. Insira um valor maior que zero.', { type: 'error' });
             return;

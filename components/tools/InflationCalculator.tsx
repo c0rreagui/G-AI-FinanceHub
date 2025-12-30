@@ -11,9 +11,9 @@ export const InflationCalculator: React.FC = () => {
     const [years, setYears] = useState('10');
 
     const result = useMemo(() => {
-        const val = parseFloat(amount) || 0;
-        const rate = (parseFloat(inflationRate) || 0) / 100;
-        const time = parseFloat(years) || 0;
+        const val = Number.parseFloat(amount) || 0;
+        const rate = (Number.parseFloat(inflationRate) || 0) / 100;
+        const time = Number.parseFloat(years) || 0;
 
         if (val <= 0 || time <= 0) return null;
 
@@ -75,7 +75,7 @@ export const InflationCalculator: React.FC = () => {
                     <>
                         <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
                             <p className="text-sm text-red-200 mb-2">
-                                Para comprar o que você compra hoje com <strong>{formatCurrency(parseFloat(amount))}</strong>, daqui a <strong>{years} anos</strong> você precisará de:
+                                Para comprar o que você compra hoje com <strong>{formatCurrency(Number.parseFloat(amount))}</strong>, daqui a <strong>{years} anos</strong> você precisará de:
                             </p>
                             <p className="text-3xl font-bold text-red-500">
                                 {formatCurrency(result.futureRequired)}

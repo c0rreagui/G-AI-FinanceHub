@@ -131,7 +131,7 @@ export const useAutoAlerts = () => {
         const now = Date.now();
         
         // Clear on mount if >24h since last clear
-        if (!lastClear || now - parseInt(lastClear) > CLEANUP_INTERVAL) {
+        if (!lastClear || now - Number.parseInt(lastClear) > CLEANUP_INTERVAL) {
             sentAlerts.current.clear();
             localStorage.setItem('alerts_last_clear', now.toString());
             localStorage.removeItem('financehub_sent_alerts');

@@ -14,10 +14,10 @@ export const CompoundInterestCalculator: React.FC = () => {
     const isMobile = useMediaQuery('(max-width: 640px)');
 
     const data = useMemo(() => {
-        const p = parseFloat(principal) || 0;
-        const m = parseFloat(monthly) || 0;
-        const r = (parseFloat(rate) || 0) / 100;
-        const t = parseFloat(years) || 0;
+        const p = Number.parseFloat(principal) || 0;
+        const m = Number.parseFloat(monthly) || 0;
+        const r = (Number.parseFloat(rate) || 0) / 100;
+        const t = Number.parseFloat(years) || 0;
 
         const monthlyRate = r / 12;
         const months = t * 12;

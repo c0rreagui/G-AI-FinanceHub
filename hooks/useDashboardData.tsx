@@ -254,9 +254,9 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     useEffect(() => {
         if (isGuest) {
             const savedLimit = localStorage.getItem('financehub_monthly_limit');
-            if (savedLimit) setMonthlyBudgetLimitState(parseFloat(savedLimit));
+            if (savedLimit) setMonthlyBudgetLimitState(Number.parseFloat(savedLimit));
         } else if (user?.user_metadata?.monthly_budget_limit) {
-            setMonthlyBudgetLimitState(parseFloat(user.user_metadata.monthly_budget_limit));
+            setMonthlyBudgetLimitState(Number.parseFloat(user.user_metadata.monthly_budget_limit));
         }
     }, [user, isGuest]);
 
@@ -1795,7 +1795,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             name: `Dívida de Teste ${i + 1}`,
             total_amount: safeFloat(Math.floor(Math.random() * 5000) + 500),
             paid_amount: safeFloat(0),
-            interest_rate: safeFloat(parseFloat((Math.random() * 20 + 5).toFixed(2))),
+            interest_rate: safeFloat(Number.parseFloat((Math.random() * 20 + 5).toFixed(2))),
             category: 'Teste',
             status: DebtStatus.ATIVA,
         }));

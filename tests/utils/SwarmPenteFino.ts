@@ -162,7 +162,7 @@ export class SwarmPenteFino {
             let fontVariations = new Set<string>();
             document.querySelectorAll('*').forEach(el => {
                 const style = globalThis.getComputedStyle(el);
-                const size = parseFloat(style.fontSize);
+                const size = Number.parseFloat(style.fontSize);
                 if (size > 0 && size < 12) smallTexts++;
                 if (el.textContent?.trim()) fontVariations.add(style.fontSize);
             });
@@ -190,7 +190,7 @@ export class SwarmPenteFino {
         const zIndex = await this.page.evaluate(() => {
             let max = 0;
             document.querySelectorAll('*').forEach(el => {
-                const z = parseInt(globalThis.getComputedStyle(el).zIndex);
+                const z = Number.parseInt(globalThis.getComputedStyle(el).zIndex);
                 if (!Number.isNaN(z) && z > max) max = z;
             });
             return max;

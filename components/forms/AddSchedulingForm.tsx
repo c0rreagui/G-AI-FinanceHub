@@ -64,7 +64,7 @@ export const AddSchedulingForm: React.FC<AddSchedulingFormProps> = ({ isOpen, on
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const numericAmount = parseFloat(amount);
+    const numericAmount = Number.parseFloat(amount);
     if (!description || !amount || Number.isNaN(numericAmount) || !categoryId || !startDate || !frequency || isSubmitting) return;
 
     setIsSubmitting(true);

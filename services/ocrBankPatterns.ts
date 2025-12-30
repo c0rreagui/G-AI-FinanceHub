@@ -30,7 +30,7 @@ export const normalizeDate = (dateStr: string): string => {
     }
     
     // Validação básica
-    if (Number.isNaN(parseInt(day)) || Number.isNaN(parseInt(month)) || Number.isNaN(parseInt(year))) {
+    if (Number.isNaN(Number.parseInt(day)) || Number.isNaN(Number.parseInt(month)) || Number.isNaN(Number.parseInt(year))) {
         return new Date().toISOString().split('T')[0];
     }
 
@@ -44,7 +44,7 @@ export const normalizeDate = (dateStr: string): string => {
  */
 export const parseBRL = (value: string): number => {
     if (!value) return 0;
-    return parseFloat(value.replace(/\./g, '').replace(',', '.'));
+    return Number.parseFloat(value.replace(/\./g, '').replace(',', '.'));
 };
 
 // Padrões de Regex para identificar linhas de transação em extratos.

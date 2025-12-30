@@ -161,7 +161,7 @@ test.describe('FinanceHub Usability & Coherence', () => {
         
         try {
             const text = await balanceEl.innerText();
-            initialBalance = parseFloat(text.replace('R$', '').replace(/\./g, '').replace(',', '.').trim());
+            initialBalance = Number.parseFloat(text.replace('R$', '').replace(/\./g, '').replace(',', '.').trim());
             console.log(`      💰 Saldo Inicial: R$ ${initialBalance.toFixed(2)}`);
         } catch (e) {
             console.log('      ❌ Não foi possível ler o saldo inicial. Abortando teste matemático.');
@@ -205,7 +205,7 @@ test.describe('FinanceHub Usability & Coherence', () => {
         // 3. Validar Saldo Final
         const finalBalanceEl = page.locator('.text-4xl, .text-3xl').filter({ hasText: 'R$' }).first();
         const finalText = await finalBalanceEl.innerText();
-        const finalBalance = parseFloat(finalText.replace('R$', '').replace(/\./g, '').replace(',', '.').trim());
+        const finalBalance = Number.parseFloat(finalText.replace('R$', '').replace(/\./g, '').replace(',', '.').trim());
         
         console.log(`      💰 Saldo Final: R$ ${finalBalance.toFixed(2)}`);
         

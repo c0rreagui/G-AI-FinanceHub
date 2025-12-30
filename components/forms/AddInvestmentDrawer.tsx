@@ -28,7 +28,7 @@ export const AddInvestmentDrawer: React.FC<AddInvestmentDrawerProps> = ({ isOpen
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Calculate total automatically
-    const total = (parseFloat(quantity || '0') * parseFloat(price || '0')).toFixed(2);
+    const total = (Number.parseFloat(quantity || '0') * Number.parseFloat(price || '0')).toFixed(2);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -39,7 +39,7 @@ export const AddInvestmentDrawer: React.FC<AddInvestmentDrawerProps> = ({ isOpen
             return;
         }
         
-        const numericTotal = parseFloat(total);
+        const numericTotal = Number.parseFloat(total);
         if (Number.isNaN(numericTotal) || numericTotal <= 0) {
             showToast('Valor inválido. Verifique quantidade e preço.', { type: 'error' });
             return;

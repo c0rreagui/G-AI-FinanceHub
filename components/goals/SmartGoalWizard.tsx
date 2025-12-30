@@ -42,7 +42,7 @@ export const SmartGoalWizard: React.FC<SmartGoalWizardProps> = ({ isOpen, onClos
 
     useEffect(() => {
         if (formData.targetAmount && formData.deadline) {
-            const target = parseFloat(formData.targetAmount);
+            const target = Number.parseFloat(formData.targetAmount);
             const months = differenceInMonths(new Date(formData.deadline), today);
             if (target > 0 && months > 0) {
                 setMonthlySavings(target / months);
@@ -65,7 +65,7 @@ export const SmartGoalWizard: React.FC<SmartGoalWizardProps> = ({ isOpen, onClos
     const handleSave = async () => {
         await addGoal({
             name: formData.name,
-            targetAmount: parseFloat(formData.targetAmount),
+            targetAmount: Number.parseFloat(formData.targetAmount),
             deadline: formData.deadline,
             created_at: new Date().toISOString()
         });
@@ -150,7 +150,7 @@ export const SmartGoalWizard: React.FC<SmartGoalWizardProps> = ({ isOpen, onClos
                         <div className="space-y-6">
                             <div className="bg-primary/10 p-6 rounded-xl text-center border border-primary/20">
                                 <p className="text-sm text-muted-foreground mb-1">Para juntar</p>
-                                <p className="text-2xl font-bold text-primary">{formatCurrency(parseFloat(formData.targetAmount || '0'))}</p>
+                                <p className="text-2xl font-bold text-primary">{formatCurrency(Number.parseFloat(formData.targetAmount || '0'))}</p>
                                 <p className="text-sm text-muted-foreground mt-1">até {formData.deadline && format(new Date(formData.deadline), 'dd/MM/yyyy')}</p>
                             </div>
 

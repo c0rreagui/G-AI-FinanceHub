@@ -8,16 +8,17 @@ function processFile(filePath: string) {
     const content = fs.readFileSync(filePath, 'utf-8');
     let newContent = content;
 
-    // Replace window. with globalThis.
-    // We guard against edge cases where 'window' might be a variable name, 
-    // but typically window.property is what we want. 
-    // To be safe, we look for ' window.' or '(window.' or 'window.' at start of line
-    // Actually, widespread replacement of 'window.' to 'globalThis.' is usually safe in TS projects 
-    // adhering to Sonar rules, as long as it's the global object.
-    newContent = newContent.replace(/([^a-zA-Z0-9_])window\./g, '$1globalThis.');
+    // Pattern: replace "parseInt(" with "Number.parseInt("
+    // We check that it isn't ALREADY Number.parseInt
+    // And ideally it's not someObject.parseInt
 
-    // Replace isNaN( with Number.isNaN(
-    newContent = newContent.replace(/([^a-zA-Z0-9_])isNaN\(/g, '$1Number.isNaN(');
+    // Regex explanation:
+    // (?<!\.) : Negative lookbehind to ensure no dot precedes parseInt (avoids Number.parseInt, someObj.parseInt)
+    // \bparseInt\s*\( : matches "parseInt(" with optional whitespace
+    newContent = newContent.replace(/(?<!\.)\bparseInt\s*\(/g, 'Number.parseInt(');
+
+    // Also do parseFloat while we are at it
+    newContent = newContent.replace(/(?<!\.)\bparseFloat\s*\(/g, 'Number.parseFloat(');
 
     if (content !== newContent) {
         fs.writeFileSync(filePath, newContent, 'utf-8');

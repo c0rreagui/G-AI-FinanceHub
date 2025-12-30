@@ -191,7 +191,7 @@ export const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ isOpen, 
             return;
         }
 
-        const numericAmount = parseFloat(amount.replace(/\./g, '').replace(',', '.'));
+        const numericAmount = Number.parseFloat(amount.replace(/\./g, '').replace(',', '.'));
 
         // Item 143: Transfer validation
         if (isTransfer) {

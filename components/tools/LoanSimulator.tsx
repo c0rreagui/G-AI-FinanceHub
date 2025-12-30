@@ -15,9 +15,9 @@ export const LoanSimulator: React.FC = () => {
     const [system, setSystem] = useState<AmortizationSystem>('SAC');
 
     const simulation = useMemo(() => {
-        const principal = parseFloat(loanAmount) || 0;
-        const rAnnual = parseFloat(annualRate) || 0;
-        const totalMonths = (parseFloat(years) || 0) * 12;
+        const principal = Number.parseFloat(loanAmount) || 0;
+        const rAnnual = Number.parseFloat(annualRate) || 0;
+        const totalMonths = (Number.parseFloat(years) || 0) * 12;
         
         if (principal <= 0 || rAnnual <= 0 || totalMonths <= 0) return null;
 

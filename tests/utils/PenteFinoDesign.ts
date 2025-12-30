@@ -18,7 +18,7 @@ export class PenteFinoDesign {
             headings.forEach(tag => {
                 const el = document.querySelector(tag);
                 if (el) {
-                    const size = parseFloat(globalThis.getComputedStyle(el).fontSize);
+                    const size = Number.parseFloat(globalThis.getComputedStyle(el).fontSize);
                     sizes.push({ tag, size });
                 }
             });
@@ -45,11 +45,11 @@ export class PenteFinoDesign {
             elements.forEach(el => {
                 const style = globalThis.getComputedStyle(el);
                 const values = [
-                    parseFloat(style.marginTop),
-                    parseFloat(style.marginBottom),
-                    parseFloat(style.paddingTop),
-                    parseFloat(style.paddingBottom),
-                    parseFloat(style.gap) || 0
+                    Number.parseFloat(style.marginTop),
+                    Number.parseFloat(style.marginBottom),
+                    Number.parseFloat(style.paddingTop),
+                    Number.parseFloat(style.paddingBottom),
+                    Number.parseFloat(style.gap) || 0
                 ].filter(v => v > 0);
                 
                 values.forEach(v => {
@@ -74,8 +74,8 @@ export class PenteFinoDesign {
             let hasBalancedPadding = true;
             children.forEach(child => {
                 const style = globalThis.getComputedStyle(child);
-                const pl = parseFloat(style.paddingLeft);
-                const pr = parseFloat(style.paddingRight);
+                const pl = Number.parseFloat(style.paddingLeft);
+                const pr = Number.parseFloat(style.paddingRight);
                 if (Math.abs(pl - pr) > 8) hasBalancedPadding = false;
             });
             

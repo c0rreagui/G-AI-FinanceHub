@@ -160,7 +160,7 @@ export function useTransactionColumns({
                 </div>
             ),
             cell: ({ row }) => {
-                const amount = parseFloat(row.getValue("amount"));
+                const amount = Number.parseFloat(row.getValue("amount"));
                 const isExpense = row.original.type === TransactionType.DESPESA;
 
                 return (
@@ -176,7 +176,7 @@ export function useTransactionColumns({
             footer: ({ table }) => {
                 const rows = table.getFilteredRowModel().rows;
                 const total = rows.reduce((sum, row) => {
-                    const val = parseFloat(row.getValue("amount"));
+                    const val = Number.parseFloat(row.getValue("amount"));
                     return sum + (Number.isNaN(val) ? 0 : val);
                 }, 0);
 

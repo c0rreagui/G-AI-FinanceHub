@@ -48,7 +48,7 @@ export const ImportTransactionsDialog: React.FC<ImportTransactionsDialogProps> =
         .slice(1) // Skip header
         .filter(row => row.length >= 3 && row[0] && row[1] && row[2])
         .map((row, index) => {
-            const amount = parseFloat(row[2]);
+            const amount = Number.parseFloat(row[2]);
             const date = new Date(row[0]).toISOString();
             const description = row[1].replace(/"/g, '');
             const type = amount < 0 ? TransactionType.DESPESA : TransactionType.RECEITA;

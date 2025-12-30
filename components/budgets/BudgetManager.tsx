@@ -65,7 +65,7 @@ export const BudgetManager: React.FC = () => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
         const categoryId = formData.get('category') as string;
-        const amount = parseFloat(formData.get('amount') as string);
+        const amount = Number.parseFloat(formData.get('amount') as string);
 
         if (!categoryId || Number.isNaN(amount)) return;
 

@@ -162,7 +162,7 @@ export class PenteFinoPerformance {
                 if (style.animationName && style.animationName !== 'none') {
                     animations.push(style.animationName);
                     if (style.animationIterationCount === 'infinite') {
-                        const duration = parseFloat(style.animationDuration);
+                        const duration = Number.parseFloat(style.animationDuration);
                         if (duration < 0.3) infiniteAnimations++;
                     }
                 }

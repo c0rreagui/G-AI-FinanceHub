@@ -288,8 +288,8 @@ class DeepErrorAnalyzer {
                 return {
                     function: match[1].trim(),
                     file: match[2],
-                    line: parseInt(match[3]),
-                    column: parseInt(match[4]),
+                    line: Number.parseInt(match[3]),
+                    column: Number.parseInt(match[4]),
                 };
             }
             return { raw: line.trim() };

@@ -45,8 +45,8 @@ export const AddDebtForm: React.FC<AddDebtFormProps> = ({ isOpen, onClose }) => 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const parsedAmount = parseFloat(totalAmount);
-    const parsedRate = parseFloat(interestRate);
+    const parsedAmount = Number.parseFloat(totalAmount);
+    const parsedRate = Number.parseFloat(interestRate);
     if (!name || !totalAmount || !interestRate || Number.isNaN(parsedAmount) || Number.isNaN(parsedRate) || isSubmitting) return;
 
     setIsSubmitting(true);
