@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Transaction, TransactionType } from '../../../types';
+import { Transaction } from '../../../types';
 import { formatCurrency } from '../../../utils/formatters';
 import { Card, CardContent, CardHeader, CardTitle } from '../Card';
 import { TrendingUp } from 'lucide-react';

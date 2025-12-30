@@ -6,7 +6,6 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { useDialog } from '../../hooks/useDialog';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/Avatar';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
 import { MicrophoneButton } from '../ui/MicrophoneButton';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
 import { FamilySwitcher } from '../dashboard/FamilySwitcher';

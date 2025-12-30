@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { PageHeader } from '../layout/PageHeader';
-import { ArrowLeftRight, PlusCircle, FolderSync, Search, Upload, Trash2 } from '../Icons';
+import { ArrowLeftRight, PlusCircle, FolderSync, Upload, Trash2 } from '../Icons';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { Transaction, ViewType } from '../../types';
 import { Button } from '../ui/Button';
@@ -12,15 +12,11 @@ import { FilterBar } from '../transactions/FilterBar';
 import { BulkActionsBar } from '../transactions/BulkActionsBar';
 import { SmartReclassificationDialog } from '../transactions/SmartReclassificationDialog';
 import { TrashDialog } from '../transactions/TrashDialog';
-import { CloneMonthDialog } from '../transactions/CloneMonthDialog';
 import { AuditLogDialog } from '../dashboard/AuditLogDialog';
 import { History } from 'lucide-react';
 import { groupTransactionsByDate, GroupBy } from '../../utils/dateGrouping';
 
-import { Input } from '../ui/Input';
-import { Tabs, TabsList, TabsTrigger } from '../ui/Tabs';
-import { Flex, Box, Grid } from '../ui/AppLayout';
-import { Card, CardContent } from '../ui/Card';
+import { Flex } from '../ui/AppLayout';
 
 interface TransactionsViewProps {
     setCurrentView: (view: ViewType) => void;

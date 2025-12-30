@@ -8,7 +8,6 @@ import { PrivacyMask } from '../../ui/PrivacyMask';
 import { Button } from '../../ui/Button';
 import { formatCurrency } from '../../../utils/formatters';
 import { Goal, ViewType } from '../../../types';
-import { motion } from 'framer-motion';
 import { EmptyState } from '../../ui/EmptyState';
 
 interface GoalsWidgetProps {

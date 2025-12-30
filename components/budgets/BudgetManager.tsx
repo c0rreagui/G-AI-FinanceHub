@@ -3,11 +3,10 @@ import React, { useState, useMemo } from 'react';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/Card';
 import { Button } from '../ui/Button';
-import { Progress } from '../ui/Progress';
 import { Plus, Edit2, Trash2, PieChart, AlertTriangle } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
 import { motion, AnimatePresence } from 'framer-motion';
-import * as Dialog from '@radix-ui/react-dialog'; // Assuming we have Radix or similar, or I should use our UI Dialog
+// Assuming we have Radix or similar, or I should use our UI Dialog
 import { Dialog as UiDialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/Dialog';
 import { Label } from '../ui/Label';
 import { Input } from '../ui/Input';

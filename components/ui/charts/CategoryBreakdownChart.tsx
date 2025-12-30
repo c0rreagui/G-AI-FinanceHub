@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, Sector } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Sector } from 'recharts';
 import { Category, Transaction, TransactionType } from '../../../types';
 import { formatCurrency } from '../../../utils/formatters';
 import { motion } from 'framer-motion';

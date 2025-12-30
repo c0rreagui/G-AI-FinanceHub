@@ -1,7 +1,6 @@
 import React, { useRef, useEffect } from 'react';
-import { Camera, X, Zap, Image as ImageIcon } from 'lucide-react';
+import { X, Zap, Image as ImageIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Button } from './Button';
 
 interface ScannerOverlayProps {
     isOpen: boolean;

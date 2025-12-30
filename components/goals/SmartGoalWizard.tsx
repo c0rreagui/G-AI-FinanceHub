@@ -5,9 +5,8 @@ import { Input } from '../ui/Input';
 import { Label } from '../ui/Label';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { formatCurrency } from '../../utils/formatters';
-import { Target, Calendar, Calculator, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Target, Calculator, ArrowRight, ArrowLeft } from 'lucide-react';
 import { addMonths, differenceInMonths, format } from 'date-fns';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 
 interface SmartGoalWizardProps {
     isOpen: boolean;

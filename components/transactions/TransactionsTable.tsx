@@ -1,26 +1,18 @@
-import React, { useMemo, useState } from 'react';
-import { ColumnDef } from '@tanstack/react-table';
+import React, { useState } from 'react';
 import { motion, useAnimation, PanInfo, AnimatePresence } from 'framer-motion';
-import { Transaction, TransactionType, TransactionStatus } from '../../types';
+import { Transaction, TransactionType } from '../../types';
 import { formatCurrency } from '../../utils/formatters';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
-import { PencilIcon, TrashIcon, LockClosed } from '../Icons';
-import { MessageSquare, ArrowUpDown, MoreHorizontal, Star, Edit2, Copy, Trash2 } from 'lucide-react';
+import { PencilIcon, TrashIcon } from '../Icons';
+import { MessageSquare, Star } from 'lucide-react';
 import { Flex, Box } from '../ui/AppLayout';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../ui/DropdownMenu";
+
+
 import { PrivacyMask } from "../ui/PrivacyMask";
 import { Text } from '../ui/AppTypography';
 import { Checkbox } from '../ui/Checkbox';
 import { DataTable } from '../ui/DataTable';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
 import { GroupBy, TransactionGroup } from '../../utils/dateGrouping';
 
 interface TransactionsTableProps {

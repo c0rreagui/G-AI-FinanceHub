@@ -10,7 +10,6 @@ import {
     Wrench,
     Settings,
     MoreHorizontal,
-    XIcon,
     ArrowDownLeft,
     ArrowUpRight,
     Lightbulb,

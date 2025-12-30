@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Terminal, X, Minimize2, Maximize2, Activity } from 'lucide-react';
+import { X, Minimize2, Maximize2, Activity } from 'lucide-react';
 
 interface LogMessage {
     id: string;

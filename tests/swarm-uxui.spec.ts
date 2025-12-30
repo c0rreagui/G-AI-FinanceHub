@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 import { SwarmHelpers } from './utils/SwarmHelpers';
 
 test.describe('🎨 UX/UI Tests - Navigation & Responsiveness', () => {

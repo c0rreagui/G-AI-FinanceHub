@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../services/supabaseClient';
 import { useSocial } from '../../contexts/SocialContext';
-import { Transaction } from '../../types';
 import { formatCurrency } from '../../utils/formatters';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { ArrowRight, TrendingDown, TrendingUp } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 export const ActivityFeed: React.FC = () => {
     const { family } = useSocial();

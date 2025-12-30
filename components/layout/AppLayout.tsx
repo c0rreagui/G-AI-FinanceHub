@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Sidebar } from './Sidebar';
 import { ViewType } from '../../types';
 import { useMediaQuery } from '../../hooks/useMediaQuery';

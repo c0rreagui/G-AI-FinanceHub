@@ -3,12 +3,12 @@ import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { DragDropUpload } from '../ui/DragDropUpload';
 import { useDashboardData } from '../../hooks/useDashboardData';
-import { Transaction, TransactionType } from '../../types';
+import { TransactionType } from '../../types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/Table';
 import { Checkbox } from '../ui/Checkbox';
 import { formatCurrency } from '../../utils/formatters';
 import { LoadingSpinner } from '../LoadingSpinner';
-import { Upload, FileText, CheckCircle, AlertCircle, AlertTriangle } from 'lucide-react';
+import { AlertCircle, AlertTriangle } from 'lucide-react';
 
 interface ImportTransactionsDialogProps {
   isOpen: boolean;

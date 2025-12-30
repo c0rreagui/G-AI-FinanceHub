@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { PageHeader } from '../layout/PageHeader';
-import { Target, PlusCircle, Wallet, PieChart } from '../Icons';
+import { Target, PlusCircle } from '../Icons';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { Button } from '../ui/Button';
 import { useDialog } from '../../hooks/useDialog';
 import { EmptyState } from '../ui/EmptyState';
 import { GenericViewSkeleton } from './skeletons/GenericViewSkeleton';
-import { Flex, Box, Grid } from '../ui/AppLayout';
+import { Flex, Box } from '../ui/AppLayout';
 import { GoalCard } from '../goals/GoalCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/Tabs';
 import { BudgetManager } from '../budgets/BudgetManager';

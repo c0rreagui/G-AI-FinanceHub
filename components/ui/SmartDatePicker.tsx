@@ -1,9 +1,7 @@
 import { Button } from './Button';
 import { Input } from './Input';
-import { Popover, PopoverContent, PopoverTrigger } from './Popover';
 import { CalendarIcon } from 'lucide-react';
 import { format, parseISO, isSameDay, subDays, addDays } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import { cn } from '../../utils/utils';
 
 interface SmartDatePickerProps {

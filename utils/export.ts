@@ -1,5 +1,4 @@
 import { Transaction } from '../types';
-import { formatCurrency } from './formatters';
 
 export const exportToCSV = (transactions: Transaction[], filename: string = 'relatorio-financeiro.csv') => {
     // CSV Header

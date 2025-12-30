@@ -5,7 +5,6 @@ import { CheckCircle2, Circle, ArrowRight } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { useDialog } from '../../hooks/useDialog';
-import { motion, AnimatePresence } from 'framer-motion';
 
 export const GettingStartedChecklist: React.FC = () => {
     const { transactions, goals, debts } = useDashboardData();

@@ -1,4 +1,4 @@
-import { Page, expect } from '@playwright/test';
+import { Page } from '@playwright/test';
 import { SwarmHelpers } from './SwarmHelpers';
 
 export class SwarmHunter {

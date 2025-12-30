@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/Button";
 import { ScrollArea } from "@/components/ui/ScrollArea";
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { formatCurrency, formatDate } from '@/utils/formatters';
-import { Trash, RefreshCw, X, AlertTriangle, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
+import { Trash, RefreshCw, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Badge } from '@/components/ui/Badge';
 import { cn } from '@/utils/utils';

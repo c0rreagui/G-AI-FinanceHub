@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../services/supabaseClient';
-import { Family, FamilyMember, FamilyInvite, UserProfile } from '../types';
+import { Family, FamilyMember, FamilyInvite } from '../types';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 

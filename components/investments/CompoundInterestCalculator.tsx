@@ -2,9 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { Input } from '../ui/Input';
 import { Label } from '../ui/Label';
-import { Button } from '../ui/Button';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-import { Calculator, RefreshCw } from 'lucide-react';
+import { Calculator } from 'lucide-react';
 
 export const CompoundInterestCalculator: React.FC = () => {
   const [initialAmount, setInitialAmount] = useState(1000);

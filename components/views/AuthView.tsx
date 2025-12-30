@@ -1,6 +1,5 @@
 // components/views/AuthView.tsx
 import React, { useState, useEffect, useRef } from 'react';
-import { supabase } from '../../services/supabaseClient';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { LoadingSpinner } from '../LoadingSpinner';

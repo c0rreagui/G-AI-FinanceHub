@@ -37,7 +37,7 @@ export const SmartInput: React.FC<SmartInputProps> = ({
         if (displayValue.match(/[+\-*/]/)) {
             try {
                 // Safe eval for simple math
-                // eslint-disable-next-line no-new-func
+                 
                 const result = new Function('return ' + displayValue.replace(',', '.').replace(/[^\d.+\-*/]/g, ''))();
                 if (!isNaN(result) && isFinite(result)) {
                     const formatted = result.toFixed(2);

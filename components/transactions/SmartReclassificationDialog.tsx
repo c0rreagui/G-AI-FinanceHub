@@ -7,7 +7,6 @@ import { useDashboardData } from '../../hooks/useDashboardData';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/Table';
 import { formatCurrency } from '../../utils/formatters';
 import { ArrowRight, Filter, AlertCircle } from 'lucide-react';
-import { Transaction } from '../../types';
 
 interface SmartReclassificationDialogProps {
     isOpen: boolean;

@@ -4,7 +4,7 @@ import { useDashboardData } from '@/hooks/useDashboardData';
 import { AuditLog } from '@/types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { History, Search, Filter, ArrowUpCircle, ArrowDownCircle, Trash2, RotateCcw, Edit2, PlusCircle } from 'lucide-react';
+import { History, Search, Filter, Trash2, RotateCcw, Edit2, PlusCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { ScrollArea } from '@/components/ui/ScrollArea';
 

@@ -4,7 +4,6 @@ import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { useTheme, themes } from '../../contexts/ThemeContext';
 import { Palette, Monitor, User, Image as ImageIcon, Layout, Sun, Moon } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 export const AppearanceSettings: React.FC = () => {
     const { 

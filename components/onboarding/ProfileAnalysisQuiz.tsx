@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
-import { Card } from '../ui/Card';
 import { motion } from 'framer-motion';
-import { Brain, CheckCircle, TrendingUp, Shield } from 'lucide-react';
+import { CheckCircle, TrendingUp, Shield } from 'lucide-react';
 import { useToast } from '../../hooks/useToast';
 
 export type InvestorProfile = 'Conservador' | 'Moderado' | 'Arrojado';

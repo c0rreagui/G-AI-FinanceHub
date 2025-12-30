@@ -11,9 +11,8 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { useDashboardData } from '@/hooks/useDashboardData';
-import { Transaction, TransactionType } from '@/types';
-import { formatCurrency, formatDate } from '@/utils/formatters';
-import { Merge, ArrowRight } from 'lucide-react';
+import { formatCurrency } from '@/utils/formatters';
+import { Merge } from 'lucide-react';
 import { CategoryPicker } from '@/components/ui/CategoryPicker';
 import { SmartDatePicker } from '@/components/ui/SmartDatePicker';
 

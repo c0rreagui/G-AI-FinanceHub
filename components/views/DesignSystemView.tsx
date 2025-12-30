@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/Dialog"
-import { Box, Flex, Grid, Container } from '../ui/AppLayout';
+import { Box, Flex, Grid } from '../ui/AppLayout';
 import { Heading, Text, Paragraph, Code } from '../ui/AppTypography';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../ui/Select';
 import { Switch } from '../ui/Switch';
@@ -27,8 +27,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/Avatar';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../ui/Table';
 import { List, ListItem } from '../ui/List';
-import { Icons } from '../ui/Icons';
-import { AlertTriangle, Terminal, CreditCard, Settings, User } from 'lucide-react';
+import { AlertTriangle, Terminal, Settings } from 'lucide-react';
 
 export const DesignSystemView: React.FC = () => {
     return (

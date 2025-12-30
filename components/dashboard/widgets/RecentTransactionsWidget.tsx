@@ -2,7 +2,6 @@ import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import { TransactionRow } from '../TransactionRow';
-import { Text } from '../../ui/AppTypography';
 import { Transaction, ViewType } from '../../../types';
 import { EmptyState } from '../../ui/EmptyState';
 import { Clock } from 'lucide-react';

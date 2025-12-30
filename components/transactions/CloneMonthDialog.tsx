@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/Button";
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { format, subMonths, addMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Copy, Calendar, ArrowRight, AlertTriangle } from 'lucide-react';
+import { Copy, ArrowRight, AlertTriangle } from 'lucide-react';
 import { Label } from '@/components/ui/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/Select";
 

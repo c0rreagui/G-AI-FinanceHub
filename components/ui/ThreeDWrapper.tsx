@@ -1,5 +1,4 @@
-import React, { Suspense } from 'react';
-import { Loader2 } from 'lucide-react';
+import React from 'react';
 
 // This is a wrapper for 3D content like Spline or Three.js
 // Usage: <ThreeDWrapper url="https://prod.spline.design/..." />

@@ -3,7 +3,6 @@ import { Popover, PopoverContent, PopoverTrigger } from './Popover';
 import { Button } from './Button';
 import { Calendar as CalendarIcon, X } from 'lucide-react';
 import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import { cn } from '../../utils/utils';
 import { Input } from './Input';
 

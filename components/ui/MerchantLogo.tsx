@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Coffee, Zap, Info } from 'lucide-react';
+import { ShoppingBag, Coffee, Zap } from 'lucide-react';
 
 interface MerchantLogoProps {
     merchantName: string;

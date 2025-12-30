@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { PageHeader } from '../layout/PageHeader';
-import { Settings, User } from '../Icons';
+import { Settings } from '../Icons';
 import { ApiKeySettings } from '../ui/ApiKeySettings';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';

@@ -8,7 +8,6 @@ import { Input } from '../ui/Input';
 import { Checkbox } from '../ui/Checkbox';
 import { SmartInput } from '../ui/SmartInput';
 import { SmartDatePicker } from '../ui/SmartDatePicker';
-import { TypeToggle } from '../ui/TypeToggle';
 import { CategoryPicker } from '../ui/CategoryPicker';
 import { LoadingSpinner } from '../LoadingSpinner';
 import { DragDropUpload } from '../ui/DragDropUpload';

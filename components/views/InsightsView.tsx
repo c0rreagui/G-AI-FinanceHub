@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { PageHeader } from '../layout/PageHeader';
-import { Card, CardContent } from '../ui/Card';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { BalanceEvolutionChart } from '../ui/charts/BalanceEvolutionChart';
 import { LoadingSpinner } from '../LoadingSpinner';
@@ -41,7 +40,7 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
         const containerStyle = { borderColor: payload[0].color };
         return (
-            // eslint-disable-next-line
+             
             <div className="bg-background/95 backdrop-blur-sm border rounded-xl shadow-xl p-4 min-w-[200px]" {...{ style: containerStyle }}>
                 <p className="font-bold text-white mb-2">{label}</p>
                 {payload.map((entry, index) => {

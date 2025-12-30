@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import { cn } from '@/utils/utils';
 import { Input } from './Input';
 

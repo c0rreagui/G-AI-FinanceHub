@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import { cn } from '@/utils/utils';
 import { Bold, Italic, List, ListOrdered } from 'lucide-react';
 import { Button } from './Button';

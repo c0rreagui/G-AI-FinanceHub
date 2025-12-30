@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { motion, Reorder } from 'framer-motion';
-import { DailyTipCard } from '../dashboard/DailyTipCard';
 import { ProactiveInsightCard } from '../ui/ProactiveInsightCard';
 import { MonthlySummaryChart } from '../ui/charts/MonthlySummaryChart';
 import { FinancialHeatMap } from '../ui/charts/FinancialHeatMap';
@@ -12,7 +11,7 @@ import { useDashboardData } from '../../hooks/useDashboardData';
 import { useDialog } from '../../hooks/useDialog';
 import { useToast } from '../../hooks/useToast';
 import { useLayout, WidgetId } from '../../hooks/useLayout';
-import { LayoutGrid, RotateCcw, Info, Target } from 'lucide-react';
+import { LayoutGrid, RotateCcw, Info } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { formatCurrency } from '../../utils/formatters';
 
@@ -26,7 +25,6 @@ import { HealthWidget } from '../dashboard/widgets/HealthWidget';
 import { QuickActionsWidget } from '../dashboard/widgets/QuickActionsWidget';
 import { RecentTransactionsWidget } from '../dashboard/widgets/RecentTransactionsWidget';
 import { GoalsWidget } from '../dashboard/widgets/GoalsWidget';
-import { InvestmentsWidget } from '../dashboard/widgets/InvestmentsWidget';
 import { BudgetWidget } from '../dashboard/widgets/BudgetWidget';
 import { Skeleton } from '../ui/Skeleton';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Investment, InvestmentType } from '../../types';
-import { TrendingUp, TrendingDown, MoreHorizontal, Building2, Bitcoin, Globe, Landmark, Wallet, Pencil } from 'lucide-react';
+import { TrendingUp, Building2, Bitcoin, Globe, Landmark, Wallet, Pencil } from 'lucide-react';
 import { Button } from '../ui/Button';
 
 interface AssetListProps {

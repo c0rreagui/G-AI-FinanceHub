@@ -24,10 +24,9 @@ import {
 import { Button } from './Button';
 import { Input } from './Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './Select';
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown } from 'lucide-react';
-import { Flex } from './AppLayout';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { DataTableViewOptions } from './DataTableViewOptions';
-import { LayoutList, Maximize2, Minimize2, SearchX } from 'lucide-react';
+import { Maximize2, Minimize2, SearchX } from 'lucide-react';
 import { EmptyState } from './EmptyState';
 
 interface DataTableProps<TData, TValue> {

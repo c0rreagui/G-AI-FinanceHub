@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { Input } from '../ui/Input';
-import { Button } from '../ui/Button';
 import { formatCurrency } from '../../utils/formatters';
 import { TrendingUp } from 'lucide-react';
 import { useMediaQuery } from '../../hooks/useMediaQuery';

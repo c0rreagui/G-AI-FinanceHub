@@ -2,7 +2,7 @@
 import React from 'react';
 import { useSocial } from '../../contexts/SocialContext';
 import { Button } from '../ui/Button';
-import { Users, RefreshCw, UserPlus, Crown, User, Mail, Trash2 } from 'lucide-react';
+import { Users, RefreshCw, UserPlus, Crown, User, Mail } from 'lucide-react';
 import { useDialog } from '../../hooks/useDialog';
 
 export const FamilyList: React.FC = () => {

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from './Button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './Card';
-import { cn } from '../../utils/utils';
 
 interface Step {
   target: string; // ID of the target element

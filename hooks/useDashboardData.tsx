@@ -1,6 +1,6 @@
 // hooks/useDashboardData.ts
 // FIX: Imported React to resolve the "UMD global" error when using React.createElement.
-import React, { createContext, useState, useEffect, useContext, useCallback, useMemo, ReactNode } from 'react';
+import React, { useState, useEffect, useContext, useCallback, useMemo } from 'react';
 import { supabase } from '../services/supabaseClient';
 import { Database } from '../types/database.types';
 import { useAuth } from './useAuth';
@@ -32,12 +32,10 @@ import {
 import { DashboardDataContext } from '../contexts/DashboardDataContext';
 import { getIconByName } from '../utils/categoryIcons';
 import { useToast } from './useToast';
-import { useNotifications } from '../contexts/NotificationContext';
 import { logger } from '../services/loggingService';
 import { triggerConfetti } from '../components/ui/Confetti';
 import { formatCurrency, formatDate, safeFloat } from '../utils/formatters';
-import { format, subMonths, isSameMonth, parseISO, getDaysInMonth, getDate, setDate, setMonth, setYear, isAfter, startOfMonth, endOfMonth } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { format, getDaysInMonth, getDate, startOfMonth, endOfMonth } from 'date-fns';
 
 const GUEST_DATA_KEY = 'financehub_guest_data';
 
@@ -926,7 +924,7 @@ export const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
             setGuestData(data);
         } else {
             // Prepare updates for Supabase (remove UI-only fields if any)
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+             
             const { category, type, ...rest } = safeUpdates;
 
             const updatePayload = {

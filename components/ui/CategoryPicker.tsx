@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/role-supports-aria-props */
 import React from 'react';
 import { Category } from '../../types';
-import { motion } from 'framer-motion';
 import { triggerHapticFeedback } from '../../utils/haptics';
 
 interface CategoryGridItemProps {

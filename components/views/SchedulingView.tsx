@@ -1,21 +1,18 @@
 import React, { useState, useMemo } from 'react';
 import { PageHeader } from '../layout/PageHeader';
-import { Calendar, PlusCircle, PencilIcon, TrashIcon, LayoutGrid, List, ChevronDown, Search, Filter, ArrowUpRight, ArrowDownLeft, CheckCircle, Clock, AlertTriangle, MoreVertical } from '../Icons';
+import { Calendar, PlusCircle, LayoutGrid, List, ChevronDown, Search, AlertTriangle } from '../Icons';
 import { useDashboardData } from '../../hooks/useDashboardData';
-import { ScheduledTransaction, TransactionType } from '../../types';
-import { formatCurrency, formatDate } from '../../utils/formatters';
+import { ScheduledTransaction } from '../../types';
+import { formatCurrency } from '../../utils/formatters';
 import { Button } from '../ui/Button';
-import { Badge } from '../ui/Badge';
 import { useDialog } from '../../hooks/useDialog';
 import { EmptyState } from '../ui/EmptyState';
 import { Skeleton } from '../ui/skeletons/Skeleton';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { CalendarGrid } from '../ui/CalendarGrid';
 import { Card, CardContent } from '../ui/Card';
 import { Input } from '../ui/Input';
 import { PrivacyMask } from '../ui/PrivacyMask';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../ui/Tooltip';
 import { ScheduledTransactionCard } from '@/components/transactions/ScheduledTransactionCard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 

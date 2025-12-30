@@ -6,19 +6,15 @@ import { useAuth } from '../../hooks/useAuth';
 import { TelemetryDashboard } from '../telemetry/TelemetryDashboard';
 import { Button } from '../ui/Button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/Card';
-import { Input } from '../ui/Input';
 import { useDialog } from '../../hooks/useDialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
-import { Switch } from '../ui/Switch';
 import { Badge } from '../ui/Badge';
 import { ViewType } from '../../types';
 import { 
     Activity, Database, Server, Shield, Smartphone, WifiOff, 
-    AlertTriangle, TrashIcon, RefreshCw, Cpu, Layout, 
+    AlertTriangle, TrashIcon, Cpu, Layout, 
     ArrowLeftRight, Target, TrendingDown, Bell, PlusCircle 
 } from 'lucide-react';
 import { PageHeader } from '../layout/PageHeader';
-import { motion } from 'framer-motion';
 
 const StatusIndicator: React.FC<{ status: 'online' | 'offline' | 'warning'; label: string }> = ({ status, label }) => (
     <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10">

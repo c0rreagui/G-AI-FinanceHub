@@ -1,6 +1,5 @@
 import React from 'react';
 import { HealthScoreGauge } from '../HealthScoreGauge';
-import { MonthlyChallengesCard } from '../MonthlyChallengesCard';
 
 interface HealthWidgetProps {
     healthScore: number;

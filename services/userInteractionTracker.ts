@@ -3,7 +3,7 @@
  * Rastreia TODAS as interações do usuário com a UI em tempo real
  */
 
-import { telemetry, EventCategory } from './telemetryService';
+import { telemetry } from './telemetryService';
 
 interface InteractionEvent {
     type: 'click' | 'input' | 'focus' | 'blur' | 'keypress' | 'change' | 'submit' | 'scroll';

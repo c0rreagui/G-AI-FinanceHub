@@ -1,8 +1,8 @@
 // @ts-nocheck
 import React, { useState } from 'react';
 import { ViewType } from '../../types';
-import { LayoutDashboard, ArrowLeftRight, PieChart, Target, TrendingDown, Calendar, Wrench, Settings, Terminal, Palette, Users, PiggyBank, Lightbulb, Zap, ChevronRight, ChevronLeft, Search } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { LayoutDashboard, ArrowLeftRight, PieChart, Target, TrendingDown, Calendar, Wrench, Settings, Users, PiggyBank, Lightbulb, Zap, ChevronRight, ChevronLeft } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/Tooltip';
 import { Gamification } from '../ui/Gamification';

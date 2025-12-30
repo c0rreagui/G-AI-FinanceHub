@@ -10,7 +10,6 @@ import { ToastContainer } from './components/ui/ToastContainer';
 import { OnboardingView } from './components/views/OnboardingView';
 import { GuestModeBanner } from '@/components/GuestModeBanner';
 import { logger } from './services/loggingService';
-import { APP_VERSION, APP_CODENAME } from './config';
 import { PrivacyProvider } from './contexts/PrivacyContext';
 import { useAuth, AuthProvider } from './hooks/useAuth';
 import { useDialog } from './hooks/useDialog';

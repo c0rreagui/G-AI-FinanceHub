@@ -6,7 +6,6 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
 import { cn } from '@/utils/utils';
 import { LucideIcon } from 'lucide-react';

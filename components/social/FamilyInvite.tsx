@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useSocial } from '../../contexts/SocialContext';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
-import { Mail, Copy, Check, Clock } from 'lucide-react';
+import { Copy, Check, Clock } from 'lucide-react';
 import { useToast } from '../../hooks/useToast';
 
 export const FamilyInvite: React.FC = () => {
