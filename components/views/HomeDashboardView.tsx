@@ -333,8 +333,17 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({ setCurrent
                             value={widget}
                             drag={isEditMode}
                             className={`
-                                ${widget.colSpan.md === 4 ? 'md:col-span-4' : widget.colSpan.md === 2 ? 'md:col-span-2' : 'md:col-span-1'}
-                                ${widget.colSpan.lg === 4 ? 'lg:col-span-4' : widget.colSpan.lg === 2 ? 'lg:col-span-2' : widget.colSpan.lg === 3 ? 'lg:col-span-3' : 'lg:col-span-1'}
+                                ${(() => {
+                                    if (widget.colSpan.md === 4) return 'md:col-span-4';
+                                    if (widget.colSpan.md === 2) return 'md:col-span-2';
+                                    return 'md:col-span-1';
+                                })()}
+                                ${(() => {
+                                    if (widget.colSpan.lg === 4) return 'lg:col-span-4';
+                                    if (widget.colSpan.lg === 2) return 'lg:col-span-2';
+                                    if (widget.colSpan.lg === 3) return 'lg:col-span-3';
+                                    return 'lg:col-span-1';
+                                })()}
                                 ${isEditMode ? 'cursor-move ring-2 ring-yellow-500/50 rounded-lg bg-card/50' : ''}
                             `}
                         >

@@ -282,12 +282,12 @@ export const AuthView: React.FC = () => {
                                     </button>
                                 </div>
                                 <div className="mt-4 text-center">
-                                    <Button onClick={enterGuestMode} variant="secondary" size="sm" disabled={loading} className="w-full">
+                                    <Button onClick={enterGuestMode} variant="ghost" size="sm" disabled={loading} className="w-full text-white border border-white/10 hover:bg-white/10 bg-white/5">
                                         Continuar como Visitante
                                     </Button>
                                 </div>
                                 <div className="mt-4 text-center">
-                                    <Button onClick={togglePinInput} variant="secondary" size="sm" disabled={loading} className="w-full">
+                                    <Button onClick={togglePinInput} variant="ghost" size="sm" disabled={loading} className="w-full text-white border border-white/10 hover:bg-white/10 bg-white/5">
                                         Login de Desenvolvedor
                                     </Button>
                                 </div>
