@@ -34,7 +34,7 @@ const PinInput: React.FC<{ pin: string; onPinChange: (pin: string) => void; hasE
                 aria-label="Insira o PIN de 4 dígitos"
             />
             <div
-                className={`flex justify-center gap-3 cursor-text ${hasError ? 'animate-shake' : ''}`}
+                className={`flex justify-center gap-4 cursor-text ${hasError ? 'animate-shake' : ''}`}
                 onClick={() => inputRef.current?.focus()}
                 role="button"
                 tabIndex={0}
@@ -47,10 +47,14 @@ const PinInput: React.FC<{ pin: string; onPinChange: (pin: string) => void; hasE
                 {Array.from({ length: 4 }).map((_, index) => (
                     <div
                         key={index}
-                        className={`w-10 h-12 flex items-center justify-center text-2xl font-bold rounded-lg transition-all duration-200 border ${pin.length > index ? 'border-cyan-500 bg-cyan-500/10 text-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.5)]' : 'border-white/10 bg-white/5 text-transparent'
+                        className={`w-14 h-14 flex items-center justify-center text-4xl font-bold rounded-full transition-all duration-300 border-2 ${pin.length > index
+                            ? 'border-primary bg-primary/20 text-primary shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)]'
+                            : pin.length === index
+                                ? 'border-primary/50 bg-white/5 animate-pulse'
+                                : 'border-white/10 bg-white/5'
                             }`}
                     >
-                        {pin[index] ? '●' : ''}
+                        {pin[index] ? '•' : ''}
                     </div>
                 ))}
             </div>
